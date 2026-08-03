@@ -439,8 +439,17 @@ export const work = {
 export const about = {
   bodyPara1:
     "I'm Zoeb — an AI product manager in Bengaluru working on the hardest trust problem in applied AI: making a system tell the truth about its sources.",
-  bodyPara2:
-    "I started as a mechanical engineer (B.E., MIT Aurangabad, 2019), went through STOA's General Management Program (2022), and spent my first product years shipping enterprise software: LMS analytics at Hurix, then Keka HR, where I built their Background Verification module from zero to a $2.7M MRR line across three roles and two promotions, then global employment infrastructure at Multiplier. Since late 2025 I've been at Instead, an AI-native tax research platform, owning output quality for a production LLM.",
+  // Rule-separated timeline replacing the arc paragraph (orchestrator-approved
+  // 2026-08-03 polish pass). Facts only — every figure here also ships
+  // elsewhere in the copy pack (Work page, JSON-LD, llms.txt).
+  timeline: [
+    { year: '2019', body: 'B.E. Mechanical Engineering, MIT Aurangabad' },
+    { year: '2021–2022', body: 'Business Analyst, Hurix Digital' },
+    { year: '2022', body: 'STOA General Management Program' },
+    { year: '2022–2025', body: 'Product Manager, Keka HR · 3 roles, 2 promotions · BGV zero-to-one to $2.7M MRR' },
+    { year: '2025', body: 'Product Manager, Multiplier · global employment across 150+ countries' },
+    { year: '2025–present', body: 'Product Manager, Instead · owning production LLM output quality' },
+  ],
   beliefPre: 'What I believe: ',
   beliefStrong: 'evals are a product surface, not a QA afterthought.',
   beliefPost:

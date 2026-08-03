@@ -7,6 +7,12 @@ interface Achievement {
   metrics?: string[];
 }
 
+interface Logo {
+  src: string;
+  width: number;
+  height: number;
+}
+
 interface Props {
   company: string;
   role: string;
@@ -15,13 +21,35 @@ interface Props {
   standfirst?: string | null;
   achievements: Achievement[];
   primary?: boolean;
+  logo?: Logo | null;
 }
 
-const { company, role, dateRange, descriptor = null, standfirst = null, achievements, primary = false } = Astro.props;
+const {
+  company,
+  role,
+  dateRange,
+  descriptor = null,
+  standfirst = null,
+  achievements,
+  primary = false,
+  logo = null,
+} = Astro.props;
 ---
 
 <div class:list={['entry', { primary }]}>
   <aside class="margin-col" aria-label={`${company} — ${dateRange}`}>
+    {logo && (
+      <img
+        class="company-logo"
+        src={logo.src}
+        width={logo.width}
+        height={logo.height}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      />
+    )}
     <p class="date-range">{dateRange}</p>
     <p class="role">{role}</p>
   </aside>
@@ -52,6 +80,14 @@ const { company, role, dateRange, descriptor = null, standfirst = null, achievem
   .margin-col {
     border-right: 1px solid var(--rule);
     padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .company-logo {
+    display: block;
+    height: 22px;
+    width: auto;
+    opacity: 0.85;
+    margin-bottom: var(--s-4);
   }
 
   .date-range,
@@ -150,7 +186,13 @@ const { company, role, dateRange, descriptor = null, standfirst = null, achievem
       border-bottom: 1px solid var(--rule);
       padding: var(--s-6) var(--gutter);
       display: flex;
+      align-items: center;
       gap: var(--s-4);
+    }
+
+    .company-logo {
+      height: 18px;
+      margin-bottom: 0;
     }
 
     .body-col {

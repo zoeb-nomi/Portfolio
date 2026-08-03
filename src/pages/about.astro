@@ -27,8 +27,17 @@ const links = [
   <section class="body-section">
     <div class="body-inner">
       <p class="prose">{about.bodyPara1}</p>
-      <p class="prose">{about.bodyPara2}</p>
     </div>
+
+    <ul class="timeline">
+      {about.timeline.map((t) => (
+        <li class="timeline-row">
+          <p class="timeline-year">{t.year}</p>
+          <p class="timeline-body">{t.body}</p>
+        </li>
+      ))}
+    </ul>
+
     <blockquote class="belief">
       <p>
         {about.beliefPre}<strong>{about.beliefStrong}</strong>{about.beliefPost}
@@ -108,13 +117,48 @@ const links = [
     gap: var(--s-4);
     max-width: 68ch;
     margin-inline: auto;
-    margin-bottom: var(--s-9);
+    margin-bottom: var(--s-8);
   }
 
   .prose {
     font-family: var(--font-body);
     font-size: var(--t-lead);
     line-height: 1.62;
+    color: var(--ink-body);
+  }
+
+  /* Timeline — replaces the arc paragraph; mono year (kicker) + one-line
+     body, hairline-ruled rows. Same left-label / body-content pattern as
+     TimelineEntry on the Work page, condensed to single rows. */
+  .timeline {
+    list-style: none;
+    max-width: 68ch;
+    margin-inline: auto;
+    margin-bottom: var(--s-9);
+    border-top: 1px solid var(--ink);
+  }
+
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: var(--s-5);
+    align-items: baseline;
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .timeline-year {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .08em;
+    color: var(--red-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timeline-body {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.5;
     color: var(--ink-body);
   }
 
@@ -230,6 +274,11 @@ const links = [
 
     .facts-row li:first-child {
       border-top: 0;
+    }
+
+    .timeline-row {
+      grid-template-columns: 1fr;
+      gap: var(--s-1);
     }
   }
 </style>

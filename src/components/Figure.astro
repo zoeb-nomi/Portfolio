@@ -38,8 +38,32 @@ const { caption, alt, eager = false, size = 'small' } = Astro.props;
     width: 100%;
   }
 
+  /* Break the plate out of the margin-column's text padding so it fills
+     noticeably more of the column than the eyebrow/caption text does.
+     Parent .margin-col padding is asymmetric on desktop/tablet
+     (var(--gutter) left, var(--s-5) right) and symmetric on mobile
+     (var(--gutter) both sides) — the two rule sets below mirror that. */
   .rp-figure--small {
-    max-width: 240px;
+    --figure-inset: var(--s-4);
+  }
+
+  .rp-figure--large {
+    --figure-inset: var(--s-2);
+  }
+
+  .rp-figure--small,
+  .rp-figure--large {
+    margin-left: calc(var(--figure-inset) - var(--gutter));
+    margin-right: calc(var(--figure-inset) - var(--s-5));
+    width: calc(100% + var(--gutter) + var(--s-5) - 2 * var(--figure-inset));
+  }
+
+  @media (max-width: 899px) {
+    .rp-figure--small,
+    .rp-figure--large {
+      margin-right: calc(var(--figure-inset) - var(--gutter));
+      width: calc(100% + 2 * var(--gutter) - 2 * var(--figure-inset));
+    }
   }
 
   .rp-figure picture {
