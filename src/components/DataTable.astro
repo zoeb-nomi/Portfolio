@@ -1,0 +1,111 @@
+---
+interface Cell {
+  text: string;
+  win?: boolean;
+}
+
+interface Row {
+  label: string;
+  cells: Cell[];
+}
+
+interface Props {
+  caption: string;
+  columns: string[]; // first column header is the row-label header
+  rows: Row[];
+}
+
+const { caption, columns, rows } = Astro.props;
+const [labelHeader, ...dataHeaders] = columns;
+---
+
+<table class="data-table">
+  <caption>{caption}</caption>
+  <thead>
+    <tr>
+      <th scope="col">{labelHeader}</th>
+      {dataHeaders.map((h) => <th scope="col">{h}</th>)}
+    </tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((row) => (
+        <tr>
+          <th scope="row">{row.label}</th>
+          {row.cells.map((cell) => (
+            <td class:list={[{ win: cell.win }]}>{cell.text}</td>
+          ))}
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<style>
+  .data-table {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+  }
+
+  .data-table caption {
+    caption-side: top;
+    text-align: left;
+    font-size: var(--t-caption);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    padding-bottom: var(--s-3);
+  }
+
+  .data-table th,
+  .data-table td {
+    padding-block: 11px;
+    text-align: right;
+    font-weight: 400;
+  }
+
+  .data-table thead th {
+    border-bottom: 1px solid var(--ink);
+    font-size: var(--t-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .data-table th[scope='col']:first-child,
+  .data-table th[scope='row'] {
+    text-align: left;
+  }
+
+  .data-table th[scope='row'] {
+    color: var(--ink-body);
+  }
+
+  .data-table tbody tr {
+    border-bottom: 1px solid var(--rule-soft);
+    transition: background-color 120ms var(--ease-draw);
+  }
+
+  .data-table tbody tr:hover {
+    background: var(--paper-raised);
+  }
+
+  .data-table td {
+    color: var(--ink-muted);
+  }
+
+  .data-table td.win {
+    color: var(--red-ink);
+    font-weight: 500;
+  }
+
+  .data-table td:last-child,
+  .data-table th[scope='col']:last-child {
+    color: var(--ink);
+  }
+
+  .data-table td.win:last-child {
+    color: var(--red-ink);
+  }
+</style>

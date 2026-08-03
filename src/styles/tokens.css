@@ -1,0 +1,74 @@
+/* zoebnomi.com — design tokens · The Red Pen v1.0
+   Tokens only. No selectors beyond :root. Components own their own CSS. */
+
+:root {
+  /* §2 — Typefaces */
+  --font-display: 'Instrument Serif', 'Display Fallback', Georgia, 'Times New Roman', serif;
+  --font-body: 'IBM Plex Sans', 'Body Fallback', -apple-system, 'Segoe UI', Helvetica, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Mono Fallback', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* §3 — Colour tokens */
+  --paper: #f4f1ea;
+  --paper-raised: #faf8f3;
+  --ink: #191713;
+  --ink-body: #3b362e;
+  --ink-muted: #6d675e;
+  --rule: #d5cfc2;
+  --rule-soft: #ddd7cb;
+  --red: oklch(0.52 0.19 28);
+  --red-ink: oklch(0.47 0.18 28);
+  --red-tint: oklch(0.52 0.19 28 / .18);
+  --on-red: #f4f1ea;
+  --on-red-muted: oklch(0.96 0.015 30);
+
+  /* §4 — Type scale (fluid 390px -> 1200px) */
+  --t-hero: clamp(46px, 8vw, 96px);
+  --t-page: clamp(38px, 5.4vw, 64px);
+  --t-stat: clamp(52px, 7vw, 84px);
+  --t-h2: clamp(32px, 4vw, 52px);
+  --t-h3: clamp(24px, 2.6vw, 30px);
+  --t-quote: clamp(21px, 2.4vw, 27px);
+  --t-lead: clamp(15.5px, 1.5vw, 17px);
+  --t-body: 15px;
+  --t-data: 13px;
+  --t-label: 11px;
+  --t-label-lg: 12.5px;
+  --t-caption: 10.5px;
+
+  /* §5 — Space scale (4px base) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 28px;
+  --s-8: 32px;
+  --s-9: 40px;
+  --s-10: 44px;
+  --s-11: 56px;
+  --s-12: 72px;
+  --s-13: 96px;
+
+  /* §5 — Grid */
+  --shell-max: 1200px;
+  --margin-col: 240px;
+  --gutter: 44px;
+  --body-inset: 40px;
+
+  /* Motion */
+  --ease-draw: cubic-bezier(.2, .7, .2, 1);
+}
+
+@media (max-width: 1099px) {
+  :root {
+    --margin-col: 200px;
+    --gutter: 28px;
+  }
+}
+
+@media (max-width: 899px) {
+  :root {
+    --gutter: 20px;
+  }
+}

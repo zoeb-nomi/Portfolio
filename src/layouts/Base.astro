@@ -1,0 +1,111 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import {
+  site,
+  personJsonLd,
+  softwareSourceCodeJsonLd,
+  googleSiteVerification,
+  cloudflareBeaconToken,
+} from '../data/copy';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string; // e.g. '/', '/crosssource/'
+  ogImage: string; // e.g. '/og/home.png'
+  includeSoftwareSourceCode?: boolean;
+  noindex?: boolean;
+}
+
+const { title, description, path, ogImage, includeSoftwareSourceCode = false, noindex = false } = Astro.props;
+
+const canonicalURL = new URL(path, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonicalURL.href} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:image" content={ogImageURL.href} />
+    <meta property="og:site_name" content={site.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL.href} />
+
+    <meta name="google-site-verification" content={googleSiteVerification} />
+
+    <!-- Fonts: self-hosted, preload the two above-the-fold files only -->
+    <link
+      rel="preload"
+      href="/fonts/instrument-serif-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/ibm-plex-sans-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} is:inline />
+    {
+      includeSoftwareSourceCode && (
+        <script type="application/ld+json" set:html={JSON.stringify(softwareSourceCodeJsonLd)} is:inline />
+      )
+    }
+
+    <script
+      type="module"
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={`{"token": "${cloudflareBeaconToken}"}`}
+      is:inline
+    ></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="shell">
+      <SiteHeader currentPath={path} />
+      <main id="main">
+        <slot />
+      </main>
+      <SiteFooter />
+    </div>
+  </body>
+</html>
+
+<style>
+  .shell {
+    max-width: var(--shell-max);
+    margin-inline: auto;
+    border-left: 1px solid var(--rule-soft);
+    border-right: 1px solid var(--rule-soft);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1;
+  }
+</style>

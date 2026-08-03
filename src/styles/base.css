@@ -1,0 +1,245 @@
+/* zoebnomi.com — fonts + resets · The Red Pen v1.0
+   Self-hosted, zero requests to Google Fonts at runtime. */
+
+/* ---- Instrument Serif (display) ---- */
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('/fonts/instrument-serif-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('/fonts/instrument-serif-latin-400-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+}
+
+/* ---- IBM Plex Sans (body) ---- */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('/fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('/fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+}
+
+/* ---- IBM Plex Mono (labels, data, code) ---- */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+}
+
+/* ---- Metric-matched local fallbacks — hold layout while webfonts swap in ---- */
+@font-face {
+  font-family: 'Display Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 104%;
+  ascent-override: 84%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Body Fallback';
+  src: local('Segoe UI'), local('Arial');
+  size-adjust: 102%;
+  ascent-override: 92%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Mono Fallback';
+  src: local('SF Mono'), local('Consolas'), local('Menlo');
+  size-adjust: 100%;
+  ascent-override: 88%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+/* ---- Resets ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink-body);
+  font-family: var(--font-body);
+  font-size: var(--t-lead);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+h1, h2, h3, h4, p, figure, blockquote, dl, dd {
+  margin: 0;
+}
+
+ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+::selection {
+  background: var(--red-tint);
+  color: var(--ink);
+}
+
+/* ---- Numerals ---- */
+table,
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Prose wrap ---- */
+p, li, dd, blockquote {
+  text-wrap: pretty;
+}
+
+h1, h2 {
+  text-wrap: balance;
+}
+
+/* ---- Focus ---- */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+/* ---- Skip link ---- */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--s-5);
+  background: var(--paper);
+  color: var(--red-ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: var(--s-3) var(--s-5);
+  border: 1px solid var(--ink);
+  z-index: 1000;
+  transition: top 150ms var(--ease-draw);
+}
+
+.skip-link:focus-visible {
+  top: var(--s-5);
+}
+
+/* ---- Print — §13.5 ---- */
+@media print {
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body,
+  .shell {
+    background: #ffffff !important;
+  }
+
+  /* Red is preserved (not stripped) on headings, marks and kickers — only the
+     paper background is forced to white; ink/red tokens print as authored. */
+
+  .site-header,
+  .cta-slab,
+  .skip-link,
+  .nav-toggle,
+  nav[aria-label='Primary'],
+  nav[aria-label='Mobile'] {
+    display: none !important;
+  }
+
+  table,
+  tr,
+  td,
+  th {
+    break-inside: avoid;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+/* ---- Motion budget ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

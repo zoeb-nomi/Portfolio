@@ -1,0 +1,98 @@
+---
+import { site, cta } from '../data/copy';
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p class="footer-line">{site.footerLine}</p>
+    <div class="footer-links">
+      <ul class="footer-ctas">
+        <li><a href={cta.bookACall.href}>{cta.bookACall.label}</a></li>
+        <li><a href={cta.email.href}>{cta.email.label}</a></li>
+        <li><a href={cta.linkedin.href}>{cta.linkedin.label}</a></li>
+        <li><a href={cta.github.href}>{cta.github.label}</a></li>
+      </ul>
+      <a class="llms-link" href="/llms.txt">llms.txt</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding: var(--s-9) var(--gutter) var(--s-10);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--s-6);
+  }
+
+  .footer-line {
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    letter-spacing: .04em;
+    color: var(--ink-muted);
+    max-width: 34ch;
+    order: 2;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--s-3);
+    order: 1;
+  }
+
+  .footer-ctas {
+    display: flex;
+    gap: var(--s-5);
+    list-style: none;
+  }
+
+  .footer-ctas a,
+  .llms-link {
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .footer-ctas a:hover,
+  .llms-link:hover {
+    color: var(--red-ink);
+  }
+
+  .llms-link {
+    color: var(--ink-muted);
+    text-transform: none;
+    font-size: var(--t-caption);
+    letter-spacing: .04em;
+  }
+
+  @media (max-width: 599px) {
+    .footer-inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer-line {
+      order: 2;
+    }
+
+    .footer-links {
+      order: 1;
+      align-items: flex-start;
+    }
+
+    .footer-ctas {
+      flex-wrap: wrap;
+      row-gap: var(--s-3);
+    }
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+import MarginNote from './MarginNote.astro';
+
+interface Props {
+  mark: string;
+  label: string;
+  note?: string;
+  as?: 'section' | 'div';
+}
+
+const { mark, label, note, as: Tag = 'section' } = Astro.props;
+---
+
+<Tag class="rp-section">
+  <div class="section-inner">
+    <aside class="margin-col" aria-label={label}>
+      <p class="mark-label">
+        <span class="mark" aria-hidden="true">{mark}</span> <span class="label">{label}</span>
+      </p>
+      <slot name="margin" />
+      {note && <MarginNote as="div" label={`Note — ${label}`}>{note}</MarginNote>}
+    </aside>
+    <div class="body-col">
+      <slot />
+    </div>
+  </div>
+</Tag>
+
+<style>
+  .rp-section {
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .section-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .mark-label {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-9) var(--body-inset);
+  }
+
+  @media (max-width: 899px) {
+    .section-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .margin-col {
+      padding: var(--s-5) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-6) var(--gutter);
+    }
+  }
+</style>

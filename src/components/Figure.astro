@@ -1,0 +1,72 @@
+---
+interface Props {
+  caption: string;
+  alt: string;
+  eager?: boolean;
+  size?: 'small' | 'large'; // small = hero/margin (200-260px), large = About masthead
+}
+
+const { caption, alt, eager = false, size = 'small' } = Astro.props;
+---
+
+<figure class:list={['rp-figure', `rp-figure--${size}`]}>
+  <picture>
+    <source
+      type="image/avif"
+      srcset="/img/headshot-480.avif 480w, /img/headshot-960.avif 960w"
+      sizes={size === 'large' ? '(min-width: 900px) 480px, 100vw' : '240px'}
+    />
+    <source
+      type="image/webp"
+      srcset="/img/headshot-480.webp 480w, /img/headshot-960.webp 960w"
+      sizes={size === 'large' ? '(min-width: 900px) 480px, 100vw' : '240px'}
+    />
+    <img
+      src="/zoeb-nomi.jpg"
+      width="960"
+      height="960"
+      alt={alt}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding={eager ? 'sync' : 'async'}
+    />
+  </picture>
+  <figcaption>{caption}</figcaption>
+</figure>
+
+<style>
+  .rp-figure {
+    width: 100%;
+  }
+
+  .rp-figure--small {
+    max-width: 240px;
+  }
+
+  .rp-figure picture {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--ink);
+    overflow: hidden;
+  }
+
+  .rp-figure img {
+    display: block;
+    width: 100%;
+    /* The HTML width/height attributes (kept for CLS prevention before the
+       image loads) otherwise win over `aspect-ratio` for a replaced element —
+       height must be forced back to auto so aspect-ratio can take over. */
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center 12%;
+  }
+
+  .rp-figure figcaption {
+    margin-top: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    letter-spacing: .04em;
+    color: var(--ink-muted);
+  }
+</style>

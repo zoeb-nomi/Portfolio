@@ -1,0 +1,187 @@
+---
+import { nav, cta } from '../data/copy';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+---
+
+<button
+  id="nav-toggle"
+  class="nav-toggle"
+  type="button"
+  aria-expanded="false"
+  aria-controls="mobile-sheet"
+  aria-label="Menu"
+>
+  <span aria-hidden="true"></span>
+  <span aria-hidden="true"></span>
+</button>
+
+<div id="mobile-sheet" class="mobile-sheet" hidden>
+  <nav aria-label="Mobile">
+    <ul class="sheet-links">
+      {
+        nav.map((item) => {
+          const isCurrent = currentPath === item.href;
+          return (
+            <li>
+              <a href={item.href} aria-current={isCurrent ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+    <ul class="sheet-ctas">
+      <li><a href={cta.bookACall.href}>{cta.bookACall.label}</a></li>
+      <li><a href={cta.email.href}>{cta.email.label}</a></li>
+      <li><a href={cta.linkedin.href}>{cta.linkedin.label}</a></li>
+      <li><a href={cta.github.href}>{cta.github.label}</a></li>
+    </ul>
+  </nav>
+</div>
+
+<style>
+  .nav-toggle {
+    display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    flex-direction: column;
+    gap: 6px;
+    border: 0;
+  }
+
+  .nav-toggle span {
+    display: block;
+    width: 18px;
+    height: 1px;
+    background: var(--ink);
+  }
+
+  .mobile-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--paper);
+    overflow-y: auto;
+    padding: var(--s-13) var(--gutter) var(--s-9);
+  }
+
+  .sheet-links {
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .sheet-links li {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .sheet-links a {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .sheet-links a[aria-current='page'] {
+    color: var(--red-ink);
+  }
+
+  .sheet-ctas {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    margin-top: var(--s-9);
+  }
+
+  .sheet-ctas a {
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  @media (max-width: 899px) {
+    .nav-toggle {
+      display: inline-flex;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const sheet = document.getElementById('mobile-sheet');
+  const main = document.getElementById('main');
+  const footer = document.querySelector('.site-footer');
+  const wordmark = document.querySelector('.wordmark');
+  let lastFocused: HTMLElement | null = null;
+
+  function focusable(): HTMLElement[] {
+    if (!sheet) return [];
+    return Array.from(sheet.querySelectorAll('a, button'));
+  }
+
+  function onKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      close();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const items = focusable();
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  function open() {
+    if (!toggle || !sheet) return;
+    lastFocused = document.activeElement as HTMLElement;
+    toggle.setAttribute('aria-expanded', 'true');
+    sheet.hidden = false;
+    document.body.style.overflow = 'hidden';
+    main?.setAttribute('inert', '');
+    footer?.setAttribute('inert', '');
+    wordmark?.setAttribute('inert', '');
+    document.addEventListener('keydown', onKeydown);
+    focusable()[0]?.focus();
+  }
+
+  function close() {
+    if (!toggle || !sheet) return;
+    toggle.setAttribute('aria-expanded', 'false');
+    sheet.hidden = true;
+    document.body.style.overflow = '';
+    main?.removeAttribute('inert');
+    footer?.removeAttribute('inert');
+    wordmark?.removeAttribute('inert');
+    document.removeEventListener('keydown', onKeydown);
+    (lastFocused ?? toggle).focus();
+  }
+
+  toggle?.addEventListener('click', () => {
+    if (toggle.getAttribute('aria-expanded') === 'true') close();
+    else open();
+  });
+
+  sheet?.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+</script>

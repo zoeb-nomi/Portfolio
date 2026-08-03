@@ -1,0 +1,31 @@
+---
+// Reviewer-annotation. Never carries a fact that exists nowhere else.
+// Renders as <aside> (a real landmark) by default. When already nested inside
+// another <aside> (e.g. Section's margin column), pass as="div" — a landmark
+// should never be nested inside another landmark of the same kind.
+interface Props {
+  label?: string;
+  as?: 'aside' | 'div';
+}
+const { label = "Reviewer's note", as: Tag = 'aside' } = Astro.props;
+const ariaProps = Tag === 'aside' ? { 'aria-label': label } : {};
+---
+
+<Tag class="margin-note" {...ariaProps}>
+  <p><slot /></p>
+</Tag>
+
+<style>
+  .margin-note {
+    border-left: 2px solid var(--red-ink);
+    padding-left: 14px;
+    margin-top: var(--s-6);
+  }
+
+  .margin-note p {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--red-ink);
+  }
+</style>

@@ -1,0 +1,90 @@
+---
+interface Props {
+  value: string;
+  verdict?: string | null;
+  sub?: string | null;
+  label: string;
+  provenance?: string | null;
+}
+
+const { value, verdict = null, sub = null, label, provenance = null } = Astro.props;
+---
+
+<div class="stat-row">
+  <p class="stat-figure tabular">
+    {value}
+    {verdict && <span class="verdict" aria-hidden="true">{verdict}</span>}
+    {sub && <span class="stat-sub">{sub}</span>}
+  </p>
+  <p class="stat-label">
+    {label}
+    {provenance && <span class="provenance"> {provenance}</span>}
+  </p>
+</div>
+
+<style>
+  .stat-row {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    align-items: baseline;
+    gap: 40px;
+    padding-block: 24px;
+    border-top: 1px solid var(--rule);
+    transition: border-color 120ms var(--ease-draw);
+  }
+
+  .stat-row:first-child {
+    border-top: 0;
+  }
+
+  @media (hover: hover) {
+    .stat-row:hover {
+      border-top-color: var(--ink);
+    }
+  }
+
+  .stat-figure {
+    font-family: var(--font-display);
+    font-size: var(--t-stat);
+    line-height: 0.9;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .verdict {
+    color: var(--red-ink);
+    font-size: 0.35em;
+    vertical-align: super;
+    margin-left: 4px;
+  }
+
+  .stat-sub {
+    font-family: var(--font-mono);
+    font-size: 0.35em;
+    color: var(--ink-muted);
+    margin-left: 8px;
+    letter-spacing: 0;
+  }
+
+  .stat-label {
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    color: var(--ink-body);
+    line-height: 1.5;
+  }
+
+  .provenance {
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 899px) {
+    .stat-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding-block: 14px;
+    }
+  }
+</style>

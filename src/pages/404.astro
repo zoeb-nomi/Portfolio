@@ -1,0 +1,50 @@
+---
+import Base from '../layouts/Base.astro';
+import { notFound } from '../data/copy';
+---
+
+<Base
+  title="404 — Zoeb Nomi"
+  description="Page not found."
+  path="/404/"
+  ogImage="/og/home.png"
+  noindex
+>
+  <section class="not-found">
+    <h1 class="code">{notFound.message}</h1>
+    <a class="home-link" href={notFound.linkHref}>{notFound.linkLabel} <span aria-hidden="true">→</span></a>
+  </section>
+</Base>
+
+<style>
+  .not-found {
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--s-6);
+    padding: var(--s-13) var(--gutter);
+  }
+
+  .code {
+    font-family: var(--font-mono);
+    font-size: var(--t-h3);
+    letter-spacing: .02em;
+    color: var(--red-ink);
+  }
+
+  .home-link {
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--ink);
+  }
+
+  .home-link:hover {
+    color: var(--red-ink);
+  }
+</style>

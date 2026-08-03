@@ -1,0 +1,74 @@
+---
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary' | 'inverse';
+  class?: string;
+}
+
+const { href, variant = 'secondary', class: className = '' } = Astro.props;
+const isExternal = /^https?:\/\//.test(href);
+---
+
+<a
+  href={href}
+  class={`rp-button rp-button--${variant} ${className}`}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
+>
+  <slot />
+</a>
+
+<style>
+  .rp-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 13px 22px;
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 0;
+    border: 1px solid transparent;
+    transition: background-color 120ms var(--ease-draw), color 120ms var(--ease-draw),
+      border-color 120ms var(--ease-draw), transform 120ms var(--ease-draw);
+  }
+
+  .rp-button:active {
+    transform: translateY(1px);
+  }
+
+  .rp-button--primary {
+    background: var(--red);
+    color: var(--on-red);
+    border-color: var(--red);
+  }
+
+  .rp-button--primary:hover {
+    background: oklch(0.45 0.19 28);
+    border-color: oklch(0.45 0.19 28);
+  }
+
+  .rp-button--secondary {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .rp-button--secondary:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .rp-button--inverse {
+    background: var(--paper);
+    color: oklch(0.45 0.19 28);
+    border-color: var(--paper);
+  }
+
+  .rp-button--inverse:hover {
+    background: #ffffff;
+  }
+</style>

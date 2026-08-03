@@ -1,0 +1,289 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import MarginNote from '../components/MarginNote.astro';
+import StatRow from '../components/StatRow.astro';
+import FlagshipCard from '../components/FlagshipCard.astro';
+import DataTable from '../components/DataTable.astro';
+import PullQuote from '../components/PullQuote.astro';
+import Button from '../components/Button.astro';
+import Figure from '../components/Figure.astro';
+import CTASlab from '../components/CTASlab.astro';
+import { meta, home, cta } from '../data/copy';
+
+const table1Rows = home.table1.rows.map((r) => ({
+  label: r.dimension,
+  cells: [
+    { text: r.baseline },
+    { text: r.strict, win: r.strictWins },
+  ],
+}));
+---
+
+<Base title={meta.home.title} description={meta.home.description} path="/" ogImage="/og/home.png">
+  <section class="hero">
+    <div class="hero-inner">
+      <aside class="margin-col" aria-label="Profile photo and role">
+        <p class="eyebrow">{home.eyebrow}</p>
+        <Figure caption={home.figure1Caption} alt="Zoeb Nomi" eager />
+      </aside>
+      <div class="body-col">
+        <h1 class="hero-h1">
+          <span class="line1"
+            >LLM products fail <span class="underline-wrap"
+              >quietly.<span class="underline" aria-hidden="true"></span></span
+            > <span class="unflagged" aria-hidden="true">{home.unflaggedMark}</span></span
+          >
+          <span class="line2">{home.h1Line2}</span>
+        </h1>
+
+        <div class="hero-lower">
+          <p class="subhead">
+            {home.subheadPre}<span class="highlight">{home.subheadHighlight}</span>
+          </p>
+          <MarginNote>{home.reviewerNote}</MarginNote>
+        </div>
+
+        <div class="hero-ctas">
+          <Button href={cta.bookACall.href} variant="primary">{cta.bookACall.label}</Button>
+          <Button href={cta.email.href} variant="secondary">{cta.email.label}</Button>
+          <Button href={cta.linkedin.href} variant="secondary">{cta.linkedin.label}</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Section mark="§1" label={home.measuredLabel}>
+    {home.proofStrip.map((s) => (
+      <StatRow value={s.value} verdict={s.verdict} sub={s.sub} label={s.label} provenance={s.provenance} />
+    ))}
+  </Section>
+
+  <Section mark="§2" label={home.flagship.label}>
+    <FlagshipCard
+      title={home.flagship.title}
+      description={home.flagship.description}
+      linkLabel={home.flagship.linkLabel}
+      linkHref={home.flagship.linkHref}
+    >
+      <DataTable caption={home.table1.caption} columns={home.table1.columns} rows={table1Rows} />
+    </FlagshipCard>
+
+    <div class="finding">
+      <PullQuote kicker={home.findingKicker}>{home.findingQuote}</PullQuote>
+    </div>
+  </Section>
+
+  <Section mark="§3" label={home.howIWorkLabel}>
+    <ul class="methods">
+      {home.methods.map((m) => (
+        <li class="method-row">
+          <p class="method-n" aria-hidden="true">{m.n}</p>
+          <h2 class="method-name">{m.name}</h2>
+          <p class="method-desc">{m.description}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <CTASlab
+    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
+    body={home.ctaSlabBody}
+    buttonLabel={cta.bookACall.label}
+    buttonHref={cta.bookACall.href}
+  />
+</Base>
+
+<style>
+  .hero-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    line-height: 1.7;
+    margin-bottom: var(--s-7);
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
+  }
+
+  .hero-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-hero);
+    line-height: 0.98;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    max-width: 18ch;
+    margin-bottom: var(--s-8);
+  }
+
+  .hero-h1 .line1 {
+    display: block;
+  }
+
+  .hero-h1 .line2 {
+    display: block;
+    font-style: italic;
+  }
+
+  .underline-wrap {
+    position: relative;
+    display: inline-block;
+  }
+
+  .underline {
+    position: absolute;
+    left: 0;
+    bottom: 0.06em;
+    width: 100%;
+    height: 3px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: draw-underline 600ms var(--ease-draw) 250ms forwards;
+  }
+
+  @keyframes draw-underline {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .underline {
+      animation: none;
+      transform: scaleX(1);
+    }
+  }
+
+  .unflagged {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.22em;
+    letter-spacing: .04em;
+    color: var(--red-ink);
+    vertical-align: super;
+    margin-left: 0.15em;
+  }
+
+  .hero-lower {
+    display: grid;
+    grid-template-columns: 1fr 268px;
+    gap: 44px;
+    margin-bottom: var(--s-9);
+  }
+
+  .subhead {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 68ch;
+  }
+
+  .highlight {
+    background-image: linear-gradient(transparent 62%, var(--red-tint) 62%);
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+  }
+
+  .finding {
+    margin-top: var(--s-11);
+  }
+
+  .methods {
+    list-style: none;
+  }
+
+  .method-row {
+    display: grid;
+    grid-template-columns: 46px 260px 1fr;
+    gap: 24px;
+    align-items: baseline;
+    padding-block: var(--s-7);
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .method-row:first-child {
+    border-top: 0;
+  }
+
+  .method-n {
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    color: var(--red-ink);
+  }
+
+  .method-name {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    color: var(--ink);
+  }
+
+  .method-desc {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.6;
+    color: var(--ink-body);
+    max-width: 52ch;
+  }
+
+  @media (max-width: 1099px) {
+    .hero-lower {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+
+    .method-row {
+      grid-template-columns: 1fr;
+      gap: var(--s-2);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .hero-ctas {
+      flex-direction: column;
+    }
+
+    .hero-ctas :global(.rp-button) {
+      width: 100%;
+      min-height: 48px;
+    }
+
+    .hero-ctas :global(.rp-button:first-child) {
+      order: -1;
+    }
+  }
+</style>

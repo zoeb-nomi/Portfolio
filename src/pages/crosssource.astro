@@ -1,0 +1,359 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import DataTable from '../components/DataTable.astro';
+import PullQuote from '../components/PullQuote.astro';
+import CTASlab from '../components/CTASlab.astro';
+import { meta, crosssource as cs, cta, home } from '../data/copy';
+
+const table1Rows = cs.s3.table1.rows.map((r) => ({
+  label: r.dimension,
+  cells: [{ text: r.baseline }, { text: r.strict, win: r.strictWins }],
+}));
+
+const table2Rows = cs.s3.table2.rows.map((r) => ({
+  label: r.type,
+  cells: [{ text: r.baseline }, { text: r.strict, win: r.strictWins }],
+}));
+---
+
+<Base
+  title={meta.crosssource.title}
+  description={meta.crosssource.description}
+  path="/crosssource/"
+  ogImage="/og/crosssource.png"
+  includeSoftwareSourceCode
+>
+  <section class="masthead">
+    <div class="masthead-inner">
+      <aside class="margin-col" aria-label="Case study specification">
+        <p class="kicker">{cs.kicker}</p>
+        <dl class="spec-block">
+          {cs.specBlock.map((s) => (
+            <div class="spec-row">
+              <dt>{s.label}</dt>
+              <dd class="tabular">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <a class="repo-link" href={cs.repoHref} target="_blank" rel="noopener noreferrer">{cs.repoLabel}</a>
+      </aside>
+      <div class="body-col">
+        <h1 class="page-h1">{cs.title}</h1>
+        <p class="standfirst">{cs.standfirst}</p>
+      </div>
+    </div>
+  </section>
+
+  <Section mark={cs.s1.mark} label={cs.s1.label}>
+    <p class="prose">
+      {cs.s1.paraPre}<em>{cs.s1.caseName}</em>{cs.s1.paraMid}<span class="highlight">{cs.s1.highlight}</span>{cs.s1.paraPost}
+    </p>
+  </Section>
+
+  <Section mark={cs.s2.mark} label={cs.s2.label}>
+    <dl class="method-list">
+      {cs.s2.rows.map((row) => (
+        <div class="method-row">
+          <dt>{row.term}</dt>
+          <dd>
+            {row.kind === 'plain' && row.body}
+            {row.kind === 'code' && (
+              <>
+                {row.bodyPre}
+                <code>{row.code}</code>
+                {row.bodyPost}
+              </>
+            )}
+            {row.kind === 'configs' && (
+              <>
+                <em>{row.italic1}</em>
+                {row.mid}
+                <em>{row.italic2}</em>
+                {row.bodyPost}
+              </>
+            )}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </Section>
+
+  <Section mark={cs.s3.mark} label={cs.s3.label}>
+    <DataTable caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
+    <div class="table-gap">
+      <DataTable caption={cs.s3.table2.caption} columns={cs.s3.table2.columns} rows={table2Rows} />
+    </div>
+    <p class="prose finding">
+      <strong>{cs.s3.findingLeadIn}</strong>{cs.s3.findingPre}<em>{cs.s3.findingItalic}</em>{cs.s3.findingPost}
+    </p>
+  </Section>
+
+  <Section mark={cs.s4.mark} label={cs.s4.label} note={cs.s4.marginNote}>
+    <p class="stat-lead">
+      {cs.s4.statPre}<span class="stat-inline tabular">{cs.s4.statQuote}</span>{cs.s4.statPost}
+    </p>
+    <p class="prose">{cs.s4.bugPara}</p>
+    <div class="lesson">
+      <PullQuote rule="red">{cs.s4.lessonQuote}</PullQuote>
+    </div>
+  </Section>
+
+  <Section mark={cs.s5.mark} label={cs.s5.label}>
+    <p class="prose intro">{cs.s5.intro}</p>
+    <ul class="rule-list">
+      {cs.s5.items.map((item) => <li>{item}</li>)}
+    </ul>
+  </Section>
+
+  <Section mark={cs.s6.mark} label={cs.s6.label}>
+    <p class="status-line">{cs.s6.status}</p>
+    <ul class="mono-list">
+      {cs.s6.items.map((item) => <li>{item}</li>)}
+    </ul>
+  </Section>
+
+  <CTASlab
+    marginLines={[home.eyebrow.toUpperCase()]}
+    body={cs.ctaSlabBody}
+    buttonLabel="View the repo →"
+    buttonHref={cs.repoHref}
+    secondaryLabel={cta.bookACall.label}
+    secondaryHref={cta.bookACall.href}
+  />
+</Base>
+
+<style>
+  .masthead-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: var(--s-7);
+  }
+
+  .spec-block {
+    margin-bottom: var(--s-6);
+  }
+
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding-block: var(--s-2);
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+  }
+
+  .spec-row:first-child {
+    border-top: 0;
+  }
+
+  .spec-row dt {
+    color: var(--ink-muted);
+  }
+
+  .spec-row dd {
+    color: var(--ink);
+  }
+
+  .repo-link {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    word-break: break-all;
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
+  }
+
+  .page-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin-bottom: var(--s-6);
+    max-width: 22ch;
+  }
+
+  .standfirst {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 62ch;
+  }
+
+  .prose {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 68ch;
+  }
+
+  .prose em {
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+
+  .highlight {
+    background-image: linear-gradient(transparent 62%, var(--red-tint) 62%);
+  }
+
+  .method-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .method-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--s-6);
+    padding-block: var(--s-6);
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .method-row:first-child {
+    border-top: 0;
+  }
+
+  .method-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .method-row dd {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.6;
+    color: var(--ink-body);
+    max-width: 60ch;
+  }
+
+  .method-row dd em {
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+
+  .method-row code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--paper-raised);
+    padding: 2px 4px;
+  }
+
+  .table-gap {
+    margin-top: var(--s-9);
+  }
+
+  .finding {
+    margin-top: var(--s-8);
+  }
+
+  .stat-lead {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 60ch;
+    margin-bottom: var(--s-7);
+  }
+
+  .stat-inline {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .lesson {
+    margin-top: var(--s-8);
+  }
+
+  .rule-list {
+    list-style: none;
+    margin-top: var(--s-5);
+  }
+
+  .rule-list li {
+    padding-block: var(--s-5);
+    border-top: 1px solid var(--rule-soft);
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    color: var(--ink-body);
+    max-width: 60ch;
+  }
+
+  .rule-list li:first-child {
+    border-top: 0;
+  }
+
+  .status-line {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--red-ink);
+    margin-bottom: var(--s-5);
+  }
+
+  .mono-list {
+    list-style: none;
+  }
+
+  .mono-list li {
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink-muted);
+    padding-block: var(--s-3);
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .mono-list li:first-child {
+    border-top: 0;
+  }
+
+  @media (max-width: 899px) {
+    .masthead-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+
+    .method-row {
+      grid-template-columns: 1fr;
+      gap: var(--s-2);
+    }
+  }
+</style>

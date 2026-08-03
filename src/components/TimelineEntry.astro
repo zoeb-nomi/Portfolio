@@ -1,0 +1,160 @@
+---
+import { renderMetrics } from '../utils/metrics';
+
+interface Achievement {
+  kicker: string | null;
+  text: string;
+  metrics?: string[];
+}
+
+interface Props {
+  company: string;
+  role: string;
+  dateRange: string;
+  descriptor?: string | null;
+  standfirst?: string | null;
+  achievements: Achievement[];
+  primary?: boolean;
+}
+
+const { company, role, dateRange, descriptor = null, standfirst = null, achievements, primary = false } = Astro.props;
+---
+
+<div class:list={['entry', { primary }]}>
+  <aside class="margin-col" aria-label={`${company} — ${dateRange}`}>
+    <p class="date-range">{dateRange}</p>
+    <p class="role">{role}</p>
+  </aside>
+  <div class="body-col">
+    <h2 class="company">{company}</h2>
+    {descriptor && <p class="descriptor">{descriptor}</p>}
+    {standfirst && <p class="standfirst">{standfirst}</p>}
+    <ul class="achievements">
+      {
+        achievements.map((a) => (
+          <li>
+            {a.kicker && <p class="kicker">{a.kicker}</p>}
+            <p class="achievement-text" set:html={renderMetrics(a.text, a.metrics)} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style>
+  .entry {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .date-range,
+  .role {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .08em;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-9) var(--body-inset);
+  }
+
+  .entry.primary .body-col {
+    padding-top: var(--s-11);
+    padding-bottom: var(--s-11);
+  }
+
+  .entry.primary .company {
+    font-size: clamp(40px, 4.6vw, 60px);
+  }
+
+  .company {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+
+  .descriptor {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--t-lead);
+    color: var(--ink-body);
+    max-width: 60ch;
+    margin-bottom: var(--s-7);
+  }
+
+  .standfirst {
+    font-family: var(--font-display);
+    font-size: var(--t-quote);
+    line-height: 1.35;
+    letter-spacing: -.01em;
+    color: var(--ink);
+    max-width: 58ch;
+    margin-bottom: var(--s-7);
+  }
+
+  .achievements {
+    list-style: none;
+  }
+
+  .achievements li {
+    padding-block: var(--s-5);
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .achievements li:first-child {
+    border-top: 0;
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--red-ink);
+    margin-bottom: var(--s-2);
+  }
+
+  .achievement-text {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 68ch;
+  }
+
+  .achievement-text :global(.metric) {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 899px) {
+    .entry {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+      display: flex;
+      gap: var(--s-4);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+  }
+</style>

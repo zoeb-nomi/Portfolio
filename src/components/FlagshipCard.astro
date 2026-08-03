@@ -1,0 +1,75 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  linkLabel: string;
+  linkHref: string;
+}
+
+const { title, description, linkLabel, linkHref } = Astro.props;
+---
+
+<div class="flagship">
+  <div class="flagship-prose">
+    <h2>{title}</h2>
+    <p>{description}</p>
+    <a class="read-more" href={linkHref}>{linkLabel.replace(' →', '')} <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="flagship-table">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .flagship {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+
+  .flagship-prose h2 {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: var(--s-5);
+  }
+
+  .flagship-prose p {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 46ch;
+    margin-bottom: var(--s-6);
+  }
+
+  .read-more {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+    text-underline-offset: 3px;
+    transition: color 120ms var(--ease-draw);
+  }
+
+  .read-more span {
+    display: inline-block;
+    transition: transform 120ms var(--ease-draw);
+  }
+
+  .read-more:hover span {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 899px) {
+    .flagship {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+</style>

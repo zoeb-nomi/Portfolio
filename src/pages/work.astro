@@ -1,0 +1,104 @@
+---
+import Base from '../layouts/Base.astro';
+import TimelineEntry from '../components/TimelineEntry.astro';
+import CTASlab from '../components/CTASlab.astro';
+import { meta, work, cta, home } from '../data/copy';
+---
+
+<Base title={meta.work.title} description={meta.work.description} path="/work/" ogImage="/og/work.png">
+  <section class="masthead">
+    <h1 class="page-h1">Work</h1>
+    <p class="standfirst">{work.standfirst}</p>
+  </section>
+
+  <TimelineEntry
+    company={work.instead.company}
+    role={work.instead.role}
+    dateRange={work.instead.dateRange}
+    descriptor={work.instead.descriptor}
+    achievements={work.instead.achievements}
+    primary
+  />
+
+  <TimelineEntry
+    company={work.multiplier.company}
+    role={work.multiplier.role}
+    dateRange={work.multiplier.dateRange}
+    descriptor={work.multiplier.descriptor}
+    achievements={work.multiplier.achievements}
+  />
+
+  <TimelineEntry
+    company={work.keka.company}
+    role={work.keka.role}
+    dateRange={work.keka.dateRange}
+    descriptor={work.keka.descriptor}
+    standfirst={work.keka.standfirst}
+    achievements={work.keka.achievements}
+  />
+
+  <TimelineEntry
+    company={work.hurix.company}
+    role={work.hurix.role}
+    dateRange={work.hurix.dateRange}
+    achievements={work.hurix.achievements}
+  />
+
+  <section class="arc-close">
+    <p>{work.arcClose}</p>
+  </section>
+
+  <CTASlab
+    marginLines={[home.eyebrow.toUpperCase()]}
+    body={home.ctaSlabBody}
+    buttonLabel={cta.bookACall.label}
+    buttonHref={cta.bookACall.href}
+  />
+</Base>
+
+<style>
+  .masthead {
+    padding: var(--s-9) var(--gutter) var(--s-7);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .page-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+
+  .standfirst {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 60ch;
+  }
+
+  .arc-close {
+    padding: var(--s-11) var(--gutter);
+    border-bottom: 1px solid var(--ink);
+    text-align: center;
+  }
+
+  .arc-close p {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: 1.1;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    max-width: 42ch;
+    margin-inline: auto;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 599px) {
+    .arc-close p {
+      font-size: var(--t-h3);
+    }
+  }
+</style>

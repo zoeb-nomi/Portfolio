@@ -1,0 +1,235 @@
+---
+import Base from '../layouts/Base.astro';
+import Figure from '../components/Figure.astro';
+import CTASlab from '../components/CTASlab.astro';
+import { meta, about, cta, home } from '../data/copy';
+
+const links = [
+  { label: 'GitHub', href: cta.github.href },
+  { label: 'LinkedIn', href: cta.linkedin.href },
+  { label: 'Email', href: cta.email.href },
+  { label: 'Book a call', href: cta.bookACall.href },
+];
+---
+
+<Base title={meta.about.title} description={meta.about.description} path="/about/" ogImage="/og/about.png">
+  <section class="masthead">
+    <div class="masthead-inner">
+      <aside class="margin-col" aria-label="Photo">
+        <Figure caption={about.figureCaption} alt={about.photoAlt} eager size="large" />
+      </aside>
+      <div class="body-col">
+        <h1 class="page-h1">About</h1>
+      </div>
+    </div>
+  </section>
+
+  <section class="body-section">
+    <div class="body-inner">
+      <p class="prose">{about.bodyPara1}</p>
+      <p class="prose">{about.bodyPara2}</p>
+    </div>
+    <blockquote class="belief">
+      <p>
+        {about.beliefPre}<strong>{about.beliefStrong}</strong>{about.beliefPost}
+      </p>
+    </blockquote>
+  </section>
+
+  <section class="facts-row">
+    <ul>
+      {about.factsRow.map((fact, i) => (
+        <li>
+          {i === about.factsRow.length - 1 ? (
+            <a href={cta.bookACall.href}>{fact}</a>
+          ) : (
+            fact
+          )}
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="links-list">
+    <ul>
+      {links.map((l) => (
+        <li>
+          <a href={l.href} target={/^https?:\/\//.test(l.href) ? '_blank' : undefined} rel={/^https?:\/\//.test(l.href) ? 'noopener noreferrer' : undefined}>
+            <span>{l.label}</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <CTASlab
+    marginLines={[home.eyebrow.toUpperCase()]}
+    body={home.ctaSlabBody}
+    buttonLabel={cta.bookACall.label}
+    buttonHref={cta.bookACall.href}
+  />
+</Base>
+
+<style>
+  .masthead-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-9) var(--body-inset);
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .page-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: -.015em;
+    color: var(--ink);
+  }
+
+  .body-section {
+    padding: var(--s-9) var(--gutter);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .body-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    max-width: 68ch;
+    margin-inline: auto;
+    margin-bottom: var(--s-9);
+  }
+
+  .prose {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+  }
+
+  .belief {
+    border-top: 1px solid var(--ink);
+    padding-top: var(--s-7);
+    max-width: 68ch;
+    margin-inline: auto;
+  }
+
+  .belief p {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .belief strong {
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .facts-row ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .facts-row li {
+    padding: var(--s-7) var(--gutter);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink-body);
+    border-left: 1px solid var(--rule);
+  }
+
+  .facts-row li:first-child {
+    border-left: 0;
+  }
+
+  .facts-row a {
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .links-list ul {
+    list-style: none;
+  }
+
+  .links-list li {
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .links-list li:first-child {
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .links-list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding-inline: var(--gutter);
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .links-list .arrow {
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 120ms var(--ease-draw), transform 120ms var(--ease-draw);
+    color: var(--red-ink);
+  }
+
+  .links-list a:hover {
+    color: var(--red-ink);
+  }
+
+  .links-list a:hover .arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (max-width: 899px) {
+    .masthead-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+
+    .facts-row ul {
+      grid-template-columns: 1fr;
+    }
+
+    .facts-row li {
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .facts-row li:first-child {
+      border-top: 0;
+    }
+  }
+</style>
