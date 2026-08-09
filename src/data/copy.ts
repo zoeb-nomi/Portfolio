@@ -21,7 +21,7 @@ export const site = {
   name: 'Zoeb Nomi',
   titleSuffix: 'Zoeb Nomi · AI Product Manager',
   titlePattern: (page: string) => `${page} — Zoeb Nomi · AI Product Manager`,
-  standingLine: 'AI Product Manager · Bengaluru (IST)',
+  standingLine: 'Zoeb Nomi · AI Product Manager · Bengaluru (IST)',
   footerLine:
     'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to US relocation',
 };
@@ -46,9 +46,9 @@ export const cta = {
 
 export const meta = {
   home: {
-    title: 'Zoeb Nomi — AI Product Manager · LLM Evaluation & RAG Quality',
+    title: 'Zoeb Nomi — AI Product Manager at Instead | LLM Evaluation & RAG Quality',
     description:
-      'AI PM owning output quality for a production tax-research LLM: eval loops, citation accuracy, model benchmarking. Builder of CrossSource, an open RAG citation-evaluation harness.',
+      'Zoeb Nomi is an AI product manager at Instead, an AI-native tax research and planning platform, based in Bengaluru, India. He owns output quality for a production tax-research LLM — eval loops, citation accuracy, model benchmarking — and built CrossSource, an open RAG citation-evaluation harness.',
   },
   crosssource: {
     title: 'CrossSource: RAG citation evaluation — Zoeb Nomi',
@@ -61,7 +61,7 @@ export const meta = {
       'Instead (LLM output quality), Multiplier (global employment), Keka HR (zero-to-one BGV, $2.7M MRR), Hurix. Four companies, two promotions, quality you can measure.',
   },
   about: {
-    title: 'About — Zoeb Nomi',
+    title: 'About Zoeb Nomi — AI Product Manager at Instead, Bengaluru',
     description:
       'Mechanical engineer turned AI product manager. Bengaluru, open to US relocation. Evals are a product surface, not a QA afterthought.',
   },
@@ -77,17 +77,43 @@ export const cloudflareBeaconToken = 'f73bbdec2def46e98c0bd8c94edf3bdf';
 export const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': 'https://www.zoebnomi.com/#person',
   name: 'Zoeb Nomi',
-  jobTitle: 'AI Product Manager — LLM Evaluation & RAG Quality',
-  worksFor: { '@type': 'Organization', name: 'Instead' },
+  givenName: 'Zoeb',
+  familyName: 'Nomi',
+  jobTitle: 'Product Manager',
+  disambiguatingDescription:
+    'Zoeb Nomi is an individual person: a product manager based in Bengaluru, India, who works on evaluation and output quality for large language model and retrieval-augmented generation products.',
+  description:
+    'Product manager at Instead, an AI-native tax research and planning platform. Works on LLM and RAG output quality: evaluation harnesses, citation accuracy, LLM-as-a-judge validation and model benchmarking. Author of CrossSource, an open-source evaluation harness for citation accuracy in legal RAG.',
+  worksFor: {
+    '@type': 'Organization',
+    name: 'Instead',
+    url: 'https://www.instead.com/',
+    description: 'AI-native tax research, planning and filing platform.',
+  },
   url: 'https://www.zoebnomi.com',
   email: 'mailto:zoeb.nomi@gmail.com',
-  address: { '@type': 'PostalAddress', addressLocality: 'Bengaluru', addressCountry: 'IN' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Bengaluru', addressRegion: 'Karnataka', addressCountry: 'IN' },
+  knowsAbout: [
+    'Large language model evaluation',
+    'Retrieval-augmented generation',
+    'RAG citation accuracy and grounding',
+    'LLM-as-a-judge evaluation and judge validation',
+    'Model benchmarking and regression testing for LLM products',
+    'AI product management',
+  ],
   alumniOf: [
     { '@type': 'CollegeOrUniversity', name: 'MIT Aurangabad' },
     { '@type': 'EducationalOrganization', name: 'STOA' },
   ],
-  sameAs: ['https://www.linkedin.com/in/zoebnomi', 'https://github.com/zoeb-nomi'],
+  sameAs: [
+    'https://www.linkedin.com/in/zoebnomi',
+    'https://github.com/zoeb-nomi',
+    'https://x.com/zoeb_nomi',
+    'https://topmate.io/zoebnomi',
+    'https://www.zoebnomi.com',
+  ],
 };
 
 export const softwareSourceCodeJsonLd = {
@@ -438,7 +464,7 @@ export const work = {
 
 export const about = {
   bodyPara1:
-    "I'm Zoeb — an AI product manager in Bengaluru working on the hardest trust problem in applied AI: making a system tell the truth about its sources.",
+    "I'm Zoeb Nomi — an AI product manager at Instead, in Bengaluru, working on the hardest trust problem in applied AI: making a system tell the truth about its sources.",
   // Rule-separated timeline replacing the arc paragraph (orchestrator-approved
   // 2026-08-03 polish pass). Facts only — every figure here also ships
   // elsewhere in the copy pack (Work page, JSON-LD, llms.txt).
@@ -479,7 +505,7 @@ export const notFound = {
 
 export const llmsTxt = `# Zoeb Nomi
 
-> AI Product Manager specializing in LLM evaluation and RAG output quality. Owns end-to-end output quality for a production tax-research LLM at Instead (AI-native tax research & planning platform; first new entrant to clear IRS e-filing approval alongside incumbents). Based in Bengaluru, India; open to US relocation.
+> Zoeb Nomi is an AI Product Manager at Instead (AI-native tax research & planning platform; first new entrant to clear IRS e-filing approval alongside incumbents), specializing in LLM evaluation and RAG output quality. He owns end-to-end output quality for the production tax-research LLM. Based in Bengaluru, India; open to US relocation.
 
 ## Key facts
 
