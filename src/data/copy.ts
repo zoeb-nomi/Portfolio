@@ -172,7 +172,7 @@ export const home = {
     sectionMark: '§2',
     title: 'CrossSource',
     description:
-      'An open evaluation harness for citation accuracy in legal RAG. 22 public court opinions, a 25-question golden set, an LLM judge validated blind against a human — and a real harness bug caught by that validation.',
+      'An open evaluation harness for citation accuracy in legal RAG. 22 public court opinions, a 25-question golden set, an LLM judge validated blind against a human — and a real harness bug caught by that validation. The full harness, golden set and results are public and MIT-licensed at github.com/zoeb-nomi/crosssource.',
     linkLabel: 'Read the case study →',
     linkHref: '/crosssource/',
   },
