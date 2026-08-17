@@ -113,6 +113,8 @@ export const personJsonLd = {
     'https://x.com/zoeb_nomi',
     'https://topmate.io/zoebnomi',
     'https://www.zoebnomi.com',
+    'https://www.wikidata.org/wiki/Q141108023',
+    'https://orcid.org/0009-0004-6287-6152',
   ],
 };
 
