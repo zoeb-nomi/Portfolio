@@ -22,7 +22,8 @@ export const site = {
   titleSuffix: 'Zoeb Nomi · AI Product Manager',
   titlePattern: (page: string) => `${page} — Zoeb Nomi · AI Product Manager`,
   standingLine: 'AI Product Manager · Bengaluru (IST)',
-    'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to US relocation',
+    footerLine:
+      'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to US relocation',
 };
 
 export const nav: NavItem[] = [
