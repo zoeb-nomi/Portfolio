@@ -1,0 +1,192 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/copy';
+
+const kicker = 'Writing';
+const title = 'Writing';
+const standfirst =
+  'Notes on eval methodology, LLM-as-judge reliability, and RAG output quality — drawn from CrossSource and production eval work.';
+
+const posts = [
+  {
+    href: '/writing/the-judge-caught-a-bug/',
+    title: "The judge caught a bug I didn't",
+    date: '2026-08-20',
+    kicker: 'Eval methodology · CrossSource',
+    dek: 'On validating LLM-as-judge evals — why a 15/15 blind agreement and a broken instrument can live in the same pipeline.',
+  },
+];
+---
+
+<Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/home.png">
+  <section class="masthead">
+    <div class="masthead-inner">
+      <aside class="margin-col" aria-label="Article kicker">
+        <p class="kicker">{kicker}</p>
+      </aside>
+      <div class="body-col">
+        <h1 class="page-h1">{title}</h1>
+        <p class="standfirst">{standfirst}</p>
+      </div>
+    </div>
+  </section>
+
+  <ul class="post-list">
+    {
+      posts.map((p) => (
+        <li>
+          <a href={p.href}>
+            <div class="post-inner">
+              <p class="post-kicker">{p.kicker}</p>
+              <h2 class="post-title">{p.title}</h2>
+              <p class="post-dek">{p.dek}</p>
+              <p class="post-date tabular">{p.date}</p>
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  .masthead-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
+  }
+
+  .page-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin-bottom: var(--s-6);
+    max-width: 22ch;
+  }
+
+  .standfirst {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 62ch;
+  }
+
+  @media (max-width: 899px) {
+    .masthead-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+  }
+
+  /* Post list — uses the same two-column masthead grid (margin-col / body-col
+     widths) so rows align with the post page above. */
+  .post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .post-list li {
+    border-top: 1px solid var(--rule);
+  }
+
+  .post-list a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .post-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    padding-block: var(--s-7);
+  }
+
+  .post-kicker {
+    padding: 0 var(--s-5) 0 var(--gutter);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .post-title {
+    padding: 0 var(--gutter) 0 var(--body-inset);
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: 1.1;
+    letter-spacing: -.01em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+    transition: color 120ms var(--ease-draw);
+  }
+
+  .post-dek {
+    padding: 0 var(--gutter) 0 var(--body-inset);
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    color: var(--ink-body);
+    max-width: 60ch;
+    margin-bottom: var(--s-5);
+  }
+
+  .post-date {
+    padding: 0 var(--gutter) 0 var(--body-inset);
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    color: var(--ink-muted);
+  }
+
+  .post-list a:hover .post-title {
+    color: var(--red-ink);
+  }
+
+  @media (max-width: 899px) {
+    .post-inner {
+      grid-template-columns: 1fr;
+      padding-block: var(--s-6);
+    }
+
+    .post-kicker {
+      padding: 0 var(--gutter);
+      margin-bottom: var(--s-3);
+    }
+
+    .post-title,
+    .post-dek,
+    .post-date {
+      padding: 0 var(--gutter);
+    }
+  }
+</style>
