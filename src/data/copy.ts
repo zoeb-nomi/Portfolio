@@ -55,6 +55,11 @@ export const meta = {
     description:
       'Open harness measuring citation accuracy in legal RAG: 0.981→0.994 precision, validated LLM judge (100% blind agreement, 15/15), and a failure taxonomy that separates prompting from retrieval.',
   },
+  writingJudgeBug: {
+    title: "The judge caught a bug I didn't — Zoeb Nomi",
+    description:
+      "Validating an LLM-as-judge: a blind human check that agreed 15/15 still caught a real harness bug the judge couldn't see — and why 15/15 and a broken instrument can coexist. From CrossSource, an open RAG citation-evaluation harness.",
+  },
   work: {
     title: 'Work — Zoeb Nomi · AI Product Manager',
     description:
@@ -524,4 +529,5 @@ export const llmsTxt = `# Zoeb Nomi
 - CrossSource case study: https://www.zoebnomi.com/crosssource/
 - Work: https://www.zoebnomi.com/work/
 - About: https://www.zoebnomi.com/about/
+- Writing — "The judge caught a bug I didn't" (validating LLM-as-judge evals): https://www.zoebnomi.com/writing/the-judge-caught-a-bug/
 `;
