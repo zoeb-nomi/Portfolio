@@ -21,7 +21,6 @@ export const site = {
   name: 'Zoeb Nomi',
   titleSuffix: 'Zoeb Nomi · AI Product Manager',
   titlePattern: (page: string) => `${page} — Zoeb Nomi · AI Product Manager`,
-  standingLine: 'AI Product Manager · Bengaluru (IST)',
     footerLine:
       'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to US relocation',
 };
@@ -29,6 +28,7 @@ export const site = {
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'CrossSource', href: '/crosssource/' },
+  { label: 'Writing', href: '/writing/' },
   { label: 'Work', href: '/work/' },
   { label: 'About', href: '/about/' },
 ];
@@ -59,6 +59,10 @@ export const meta = {
     title: "The judge caught a bug I didn't — Zoeb Nomi",
     description:
       "Validating an LLM-as-judge: a blind human check that agreed 15/15 still caught a real harness bug the judge couldn't see — and why 15/15 and a broken instrument can coexist. From CrossSource, an open RAG citation-evaluation harness.",
+  },
+  writingIndex: {
+    title: 'Writing — Zoeb Nomi',
+    description: 'Notes on LLM evaluation, LLM-as-judge reliability, and RAG output quality — from CrossSource and production eval work.',
   },
   work: {
     title: 'Work — Zoeb Nomi · AI Product Manager',
@@ -529,5 +533,6 @@ export const llmsTxt = `# Zoeb Nomi
 - CrossSource case study: https://www.zoebnomi.com/crosssource/
 - Work: https://www.zoebnomi.com/work/
 - About: https://www.zoebnomi.com/about/
+- Writing (essays index): https://www.zoebnomi.com/writing/
 - Writing — "The judge caught a bug I didn't" (validating LLM-as-judge evals): https://www.zoebnomi.com/writing/the-judge-caught-a-bug/
 `;
