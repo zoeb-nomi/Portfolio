@@ -1,0 +1,194 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/Section.astro';
+import PullQuote from '../../components/PullQuote.astro';
+import CTASlab from '../../components/CTASlab.astro';
+import { meta, cta, home } from '../../data/copy';
+
+const kicker = 'Eval methodology · CrossSource';
+const title = "The judge caught a bug I didn't";
+const standfirst =
+  'On validating LLM-as-judge evals — and why a 15/15 blind agreement and a broken instrument can live in the same pipeline.';
+const repoHref = 'https://github.com/zoeb-nomi/crosssource';
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: "The judge caught a bug I didn't",
+  description: meta.writingJudgeBug.description,
+  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+  url: 'https://www.zoebnomi.com/writing/the-judge-caught-a-bug/',
+  mainEntityOfPage: 'https://www.zoebnomi.com/writing/the-judge-caught-a-bug/',
+  datePublished: '2026-08-20',
+  dateModified: '2026-08-20',
+  about: 'LLM-as-judge evaluation, RAG citation accuracy',
+  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+};
+---
+
+<Base
+  title={meta.writingJudgeBug.title}
+  description={meta.writingJudgeBug.description}
+  path="/writing/the-judge-caught-a-bug/"
+  ogImage="/og/crosssource.png"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+
+  <section class="masthead">
+    <div class="masthead-inner">
+      <aside class="margin-col" aria-label="Article kicker">
+        <p class="kicker">{kicker}</p>
+      </aside>
+      <div class="body-col">
+        <h1 class="page-h1">{title}</h1>
+        <p class="standfirst">{standfirst}</p>
+      </div>
+    </div>
+  </section>
+
+  <Section mark="§1" label="What I checked">
+    <p class="prose">
+      My eval judge agreed with me 15 times out of 15. That's not the interesting part.
+    </p>
+    <p class="prose">
+      For CrossSource — an open harness I built to measure citation accuracy in legal RAG — I use an
+      LLM judge to score whether each cited passage actually supports the claim. Standard practice.
+      Also the part of the pipeline everyone trusts by default.
+    </p>
+    <p class="prose">
+      I didn't want to trust it by default. So I hand-graded a blind, stratified sample of its
+      verdicts: 15/15 agreement. Validation passed.
+    </p>
+    <div class="lesson">
+      <PullQuote rule="red">The judge didn't catch the bug. The act of checking the judge caught the bug.</PullQuote>
+    </div>
+  </Section>
+
+  <Section mark="§2" label="The bug the validation surfaced">
+    <p class="prose">
+      But the validation pass itself surfaced something the judge and I had both been getting wrong:
+      consecutive citations were producing punctuation-only claim spans — fragments like "." — which
+      the judge was dutifully scoring as citation failures. A harness bug, not a model failure. Fixing
+      it changed the metrics: citation precision moved from 0.981 to 0.994 under strict citation
+      discipline.
+    </p>
+  </Section>
+
+  <Section mark="§3" label="Why this keeps happening">
+    <p class="prose">
+      That's the lesson I keep re-learning: an unvalidated eval reports wrong numbers with full
+      confidence — which is precisely the failure mode the eval exists to catch. A 15/15 validation
+      and a broken instrument can coexist in the same pipeline. You only find out which world you're
+      in by grading blind against ground truth.
+    </p>
+  </Section>
+
+  <Section mark="§4" label="More">
+    <p class="prose">
+      The harness, data, and method are public — including the failure taxonomy and the validation
+      protocol.
+    </p>
+    <p class="prose links-line">
+      <a href="/crosssource/">Read the CrossSource case study</a> · <a href={repoHref} target="_blank" rel="noopener noreferrer">Read the code</a>
+    </p>
+    <div class="lesson">
+      <PullQuote>If you own eval quality for an LLM product: what's your validation protocol for the judge itself?</PullQuote>
+    </div>
+  </Section>
+
+  <CTASlab
+    marginLines={[home.eyebrow.toUpperCase()]}
+    body="If you're shipping an LLM product, let's talk about what your evals miss."
+    buttonLabel="View the repo →"
+    buttonHref={repoHref}
+    secondaryLabel={cta.bookACall.label}
+    secondaryHref={cta.bookACall.href}
+  />
+</Base>
+
+<style>
+  .masthead-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
+  }
+
+  .page-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin-bottom: var(--s-6);
+    max-width: 22ch;
+  }
+
+  .standfirst {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 62ch;
+  }
+
+  .prose {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 68ch;
+  }
+
+  .prose + .prose {
+    margin-top: var(--s-6);
+  }
+
+  .lesson {
+    margin-top: var(--s-8);
+  }
+
+  .links-line {
+    margin-top: var(--s-6);
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+  }
+
+  .links-line a {
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 899px) {
+    .masthead-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+  }
+</style>
