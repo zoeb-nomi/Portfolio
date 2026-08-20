@@ -113,6 +113,12 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     </ul>
   </Section>
 
+  <Section mark="§7" label="Related writing">
+    <p class="prose related-writing">
+      <a href="/writing/the-judge-caught-a-bug/">The judge caught a bug I didn't</a> — on validating the LLM judge behind these numbers.
+    </p>
+  </Section>
+
   <CTASlab
     marginLines={[home.eyebrow.toUpperCase()]}
     body={cs.ctaSlabBody}
@@ -213,6 +219,12 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   .prose em {
     font-family: var(--font-display);
     font-style: italic;
+  }
+
+  .related-writing a {
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .highlight {
