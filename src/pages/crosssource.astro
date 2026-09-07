@@ -90,9 +90,8 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   </Section>
 
   <Section mark={cs.s4.mark} label={cs.s4.label} note={cs.s4.marginNote}>
-    <p class="stat-lead">
-      {cs.s4.statPre}<span class="stat-inline tabular">{cs.s4.statQuote}</span>{cs.s4.statPost}
-    </p>
+    <p class="stat-lead">{cs.s4.statPre}</p>
+    <p class="stat-figure tabular">{cs.s4.statQuote}{cs.s4.statPost}</p>
     <p class="prose">{cs.s4.bugPara}</p>
     <div class="lesson">
       <PullQuote rule="red">{cs.s4.lessonQuote}</PullQuote>
@@ -133,7 +132,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   .masthead-inner {
     display: grid;
     grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
   }
 
   .margin-col {
@@ -183,7 +182,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: 3px;
-    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   .body-col {
@@ -241,7 +240,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     grid-template-columns: 200px 1fr;
     gap: var(--s-6);
     padding-block: var(--s-6);
-    border-top: 1px solid var(--rule-soft);
+    border-top: 1px solid var(--rule);
   }
 
   .method-row:first-child {
@@ -290,14 +289,19 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     line-height: 1.62;
     color: var(--ink-body);
     max-width: 60ch;
-    margin-bottom: var(--s-7);
+    margin-bottom: var(--s-5);
   }
 
-  .stat-inline {
+  /* The figure is the point of the section — it gets its own line rather than
+     sitting 51px tall inside a 17px paragraph. */
+  .stat-figure {
+    display: block;
     font-family: var(--font-display);
     font-size: var(--t-h2);
-    color: var(--ink);
     line-height: 1;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin-bottom: var(--s-7);
   }
 
   .lesson {
@@ -311,7 +315,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   .rule-list li {
     padding-block: var(--s-5);
-    border-top: 1px solid var(--rule-soft);
+    border-top: 1px solid var(--rule);
     font-family: var(--font-body);
     font-size: var(--t-lead);
     color: var(--ink-body);
@@ -341,7 +345,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     font-size: var(--t-data);
     color: var(--ink-muted);
     padding-block: var(--s-3);
-    border-top: 1px solid var(--rule-soft);
+    border-top: 1px solid var(--rule);
   }
 
   .mono-list li:first-child {

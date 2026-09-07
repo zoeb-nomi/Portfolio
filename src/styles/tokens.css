@@ -14,12 +14,22 @@
   --ink-body: #3b362e;
   --ink-muted: #6d675e;
   --rule: #d5cfc2;
-  --rule-soft: #ddd7cb;
   --red: oklch(0.52 0.19 28);
   --red-ink: oklch(0.47 0.18 28);
   --red-tint: oklch(0.52 0.19 28 / .18);
   --on-red: #f4f1ea;
   --on-red-muted: oklch(0.96 0.015 30);
+
+  /* §3b — Line tiers. Exactly three; nothing else draws a line.
+     strong  — structural boundaries: header bottom, section tops/bottoms,
+               the top rule of a block that closes a thought.
+     rule    — every secondary divider: list rows, table cells, the
+               margin-column edge, the shell's left/right edges.
+     accent  — red editorial lines only: MarginNote's left bar, the red
+               pull-quote rule. Never a structural boundary.
+     At most ONE strong rule between any two adjacent blocks. */
+  --rule-strong: var(--ink);
+  --rule-accent: var(--red);
 
   /* §4 — Type scale (fluid 390px -> 1200px) */
   --t-hero: clamp(46px, 8vw, 88px);

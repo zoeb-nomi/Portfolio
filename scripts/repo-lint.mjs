@@ -246,4 +246,3 @@ async function main() {
 }
 
 main();
-onst x = { a: [1, 'foo'], re: /1,?200\+/, b: `template ${x}` };

@@ -48,7 +48,7 @@ export const meta = {
   home: {
     title: 'Zoeb Nomi — AI Product Manager at Instead | LLM Evaluation & RAG Quality',
     description:
-      'Zoeb Nomi is an AI product manager at Instead, an AI-native tax research and planning platform, based in Bengaluru, India. He owns output quality for a production tax-research LLM — eval loops, citation accuracy, model benchmarking — and built CrossSource, an open RAG citation-evaluation harness.',
+      'AI product manager at Instead, in Bengaluru. I own LLM output quality for a production tax-research system — eval loops, citation accuracy — and CrossSource.',
   },
   crosssource: {
     title: 'CrossSource: RAG citation evaluation — Zoeb Nomi',
@@ -74,6 +74,23 @@ export const meta = {
     description:
       'Mechanical engineer turned AI product manager. Bengaluru, open to US relocation. Evals are a product surface, not a QA afterthought.',
   },
+};
+
+// ---------------------------------------------------------------------------
+// PUBLIC RECORD — third-party and first-party artefacts that corroborate the
+// claims made elsewhere on the site. Every URL here is public and checkable.
+// ---------------------------------------------------------------------------
+
+export const sources = {
+  kekaProfile: {
+    href: 'https://medium.com/keka-product/meet-zoeb-nomi-the-rabbit-hole-explorer-and-corehr-maestro-a252fedbe113',
+    headline: 'Meet Zoeb Nomi: The Rabbit-Hole Explorer and CoreHR Maestro',
+    publisher: 'Keka',
+    datePublished: '2025-01-16',
+  },
+  insteadResearch: { href: 'https://instead.com/products/research' },
+  veremarkPartner: { href: 'https://usemultiplier.com/marketplace/partner/veremark' },
+  kekaBgvVideo: { href: 'https://www.youtube.com/watch?v=rPYfTCj181w' },
 };
 
 export const googleSiteVerification = 'vgzEQSI7C-PSHphOVsVKmJtkssXkxltkinTBE9NIPDM';
@@ -115,6 +132,15 @@ export const personJsonLd = {
   alumniOf: [
     { '@type': 'CollegeOrUniversity', name: 'MIT Aurangabad' },
     { '@type': 'EducationalOrganization', name: 'STOA' },
+  ],
+  subjectOf: [
+    {
+      '@type': 'Article',
+      headline: 'Meet Zoeb Nomi: The Rabbit-Hole Explorer and CoreHR Maestro',
+      url: sources.kekaProfile.href,
+      datePublished: '2025-01-16',
+      publisher: { '@type': 'Organization', name: 'Keka' },
+    },
   ],
   sameAs: [
     'https://www.linkedin.com/in/zoebnomi',
@@ -265,7 +291,8 @@ export const crosssource = {
       {
         term: 'Corpus',
         kind: 'plain' as const,
-        body: '22 public-domain US court opinions (16 Supreme Court, 2 federal circuit, 4 state), sourced from Harvard Law School’s Caselaw Access Project, chunked to ~350 words.',
+        body:
+          "22 public-domain US court opinions (16 Supreme Court, 2 federal circuit, 4 state), sourced from Harvard Law School's Caselaw Access Project, chunked to ~350 words.",
       },
       { term: 'Retrieval', kind: 'plain' as const, body: 'BM25, top-5.' },
       {
@@ -336,7 +363,7 @@ export const crosssource = {
       'That validation pass also surfaced a genuine harness defect — consecutive citations produced punctuation-only claim spans that the judge initially mislabeled as failures. Fixing it changed the metrics.',
     lessonQuote:
       'That is the lesson worth paying for: an unvalidated eval reports wrong numbers with full confidence — precisely the failure mode the eval exists to catch.',
-    marginNote: 'Fig. 2 — validation pass, stratified blind sample.',
+    marginNote: 'Validation pass — stratified blind sample, hand-graded.',
   },
 
   s5: {
@@ -371,14 +398,34 @@ export const crosssource = {
 // 4 · WORK — pack §4
 // ---------------------------------------------------------------------------
 
+export interface RecordLink {
+  label: string;
+  href: string;
+}
+
+export interface RecordItem {
+  what: string;
+  links: RecordLink[];
+  where: string;
+}
+
+export interface PublicRecord {
+  note?: string;
+  items: RecordItem[];
+}
+
 export const work = {
   standfirst: 'Four companies, two promotions, one through-line: quality you can measure.',
   arcClose: 'Mechanical engineering → enterprise product → AI product quality.',
+  recordKicker: 'Public record',
+
+  insteadNote:
+    "Reviewer's note — every figure here is from a production eval set, not a demo. The open, reproducible version of the method is CrossSource.",
 
   instead: {
     company: 'Instead',
     role: 'Product Manager',
-    dateRange: 'Sept 2025–present',
+    dateRange: 'Sep 2025–present',
     descriptor:
       'AI-native tax research & planning platform; first new entrant to clear IRS e-filing approval alongside incumbents.',
     achievements: [
@@ -409,7 +456,7 @@ export const work = {
       {
         kicker: 'Corpus',
         text:
-          'Architected and QA’d the 270K+-record RAG corpus across 100+ legal source types: ingestion-pipeline PRDs, MongoDB schemas, a Python fetchability harness across 378 sources, and remediation of ~139K scraped documents.',
+          "Architected and QA'd the 270K+-record RAG corpus across 100+ legal source types: ingestion-pipeline PRDs, MongoDB schemas, a Python fetchability harness across 378 sources, and remediation of ~139K scraped documents.",
         metrics: ['270K+', '100+', '378 sources', '~139K'],
       },
       {
@@ -419,12 +466,39 @@ export const work = {
         metrics: ['160+ tax strategies'],
       },
     ],
+    record: {
+      note:
+        "What's public. The eval numbers above are from production; the reproducible version is CrossSource.",
+      items: [
+        {
+          what: 'How the AI cites tax law —',
+          links: [{ label: 'Research product page', href: sources.insteadResearch.href }],
+          where: 'instead.com',
+        },
+        {
+          // Rendered only once the exact release URL replaces the TODO_ href.
+          what: 'IRS e-file: 100% government testing across all US jurisdictions —',
+          links: [{ label: 'press release', href: 'TODO_GLOBENEWSWIRE' }],
+          where: 'May 2026',
+        },
+        {
+          what: 'CrossSource —',
+          links: [{ label: 'open harness, MIT', href: 'https://github.com/zoeb-nomi/crosssource' }],
+          where: 'github.com',
+        },
+        {
+          what: 'The judge caught a bug —',
+          links: [{ label: 'essay', href: '/writing/the-judge-caught-a-bug/' }],
+          where: 'zoebnomi.com',
+        },
+      ],
+    } as PublicRecord,
   },
 
   multiplier: {
     company: 'Multiplier',
     role: 'Product Manager',
-    dateRange: 'Mar 2025–Sept 2025',
+    dateRange: 'Mar 2025–Sep 2025',
     descriptor: 'Global employment platform enabling compliant hiring across 150+ countries.',
     achievements: [
       {
@@ -434,6 +508,36 @@ export const work = {
         metrics: ['$100K', '47%', '21 days'],
       },
     ],
+    record: {
+      note: "What's public. The PosterElite launch was not announced publicly; the claim stands, unlinked.",
+      items: [
+        {
+          what: 'Background screening for global hires —',
+          links: [{ label: 'Veremark partner page', href: sources.veremarkPartner.href }],
+          where: 'usemultiplier.com',
+        },
+        {
+          what: 'Initiate background verification through Multiplier —',
+          links: [
+            {
+              label: 'help centre',
+              href: 'https://help.usemultiplier.com/hr/resources/initiate-background-verification-through-multiplier',
+            },
+          ],
+          where: 'help.usemultiplier.com',
+        },
+        {
+          what: 'IT asset & equipment support at onboarding —',
+          links: [
+            {
+              label: 'product news',
+              href: 'https://usemultiplier.com/product-news/streamline-onboarding-process-with-multiplier',
+            },
+          ],
+          where: 'updated Aug 2025',
+        },
+      ],
+    } as PublicRecord,
   },
 
   keka: {
@@ -451,6 +555,81 @@ export const work = {
         metrics: ['6 SSO', '27%', '$121K', '28%', '80%'],
       },
     ],
+    figure: {
+      href: sources.kekaBgvVideo.href,
+      label: 'YOUTUBE · KEKA HR',
+      // The card is the link; the caption sits outside it, so the link needs
+      // its own accessible name.
+      linkLabel: 'Watch "Background Verification Made Simple" on YouTube',
+      caption:
+        'Fig. 1 — "Background Verification Made Simple", Keka HR product video. Opens on YouTube.',
+    },
+    record: {
+      note: "What shipped, on Keka's own surfaces. None of these name me; the profile piece does.",
+      items: [
+        {
+          what: 'Background Verification module —',
+          links: [{ label: 'product video', href: sources.kekaBgvVideo.href }],
+          where: 'youtube.com',
+        },
+        {
+          what: 'Keka × Checkr —',
+          links: [
+            { label: 'marketplace listing', href: 'https://www.keka.com/marketplace/app/checkr' },
+            {
+              label: "Checkr's integration guide",
+              href: 'https://help.checkr.com/s/article/Keka-Checkr-Integration-User-Guide',
+            },
+          ],
+          where: 'keka.com · help.checkr.com',
+        },
+        {
+          what: 'Employee Exit module revamp —',
+          links: [
+            { label: 'announcement', href: 'https://help.keka.com/admin/updates-to-the-exit-process' },
+            { label: 'exit-process guide', href: 'https://help.keka.com/admin/exits-revamaped' },
+          ],
+          where: 'help.keka.com',
+        },
+        {
+          what: 'SSO —',
+          links: [
+            {
+              label: 'Azure AD',
+              href: 'https://help.keka.com/hc/en-us/articles/39946697572241-Azure-AD-integration-with-Keka',
+            },
+            { label: 'Okta', href: 'https://help.keka.com/admin/how-to-configure-okta-sso-with-keka' },
+            {
+              label: 'OneLogin',
+              href: 'https://help.keka.com/hc/en-us/articles/39946711883281-Configuring-OneLogin-SSO-with-Keka',
+            },
+          ],
+          where: 'help.keka.com',
+        },
+        {
+          what: 'Verification partners —',
+          links: [
+            { label: 'SpringVerify', href: 'https://help.keka.com/admin/integrating-springverify-with-keka-2' },
+            {
+              label: 'OnGrid',
+              href: 'https://help.keka.com/hc/en-us/articles/39946713812881-Ongrid-Integration-with-Keka',
+            },
+            { label: 'HelloVerify', href: 'https://www.keka.com/marketplace/app/helloverifybgv' },
+          ],
+          where: 'keka.com',
+        },
+        {
+          what: 'Profile —',
+          links: [
+            {
+              label: '"Meet Zoeb Nomi: the rabbit-hole explorer and CoreHR maestro"',
+              href: sources.kekaProfile.href,
+            },
+          ],
+          where: 'Jan 2025',
+        },
+      ],
+    } as PublicRecord,
   },
 
   hurix: {
@@ -473,24 +652,61 @@ export const work = {
 // 5 · ABOUT — pack §5
 // ---------------------------------------------------------------------------
 
+export interface TimelineSource {
+  label: string;
+  href: string;
+}
+
 export const about = {
   bodyPara1:
     "I'm Zoeb Nomi — an AI product manager at Instead, in Bengaluru, working on the hardest trust problem in applied AI: making a system tell the truth about its sources.",
   // Rule-separated timeline replacing the arc paragraph (orchestrator-approved
   // 2026-08-03 polish pass). Facts only — every figure here also ships
   // elsewhere in the copy pack (Work page, JSON-LD, llms.txt).
+  // `source` is present only where a public artefact actually exists. A row
+  // with no source is a claim you take on trust; a row with one is checkable.
   timeline: [
-    { year: '2019', body: 'B.E. Mechanical Engineering, MIT Aurangabad' },
-    { year: '2021–2022', body: 'Business Analyst, Hurix Digital' },
-    { year: '2022', body: 'STOA General Management Program' },
-    { year: '2022–2025', body: 'Product Manager, Keka HR · 3 roles, 2 promotions · BGV zero-to-one to $2.7M MRR' },
-    { year: '2025', body: 'Product Manager, Multiplier · global employment across 150+ countries' },
-    { year: '2025–present', body: 'Product Manager, Instead · owning production LLM output quality' },
+    { year: '2019', body: 'B.E. Mechanical Engineering, MIT Aurangabad', source: null as TimelineSource | null },
+    { year: '2021–2022', body: 'Business Analyst, Hurix Digital', source: null as TimelineSource | null },
+    { year: '2022', body: 'STOA General Management Program', source: null as TimelineSource | null },
+    {
+      year: '2022–2025',
+      body: 'Product Manager, Keka HR · 3 roles, 2 promotions · BGV zero-to-one to $2.7M MRR',
+      source: {
+        label: 'Keka Product blog, Jan 2025 →',
+        href: sources.kekaProfile.href,
+      } as TimelineSource | null,
+    },
+    {
+      year: '2025',
+      body: 'Product Manager, Multiplier · global employment across 150+ countries',
+      source: null as TimelineSource | null,
+    },
+    {
+      year: '2025–present',
+      body: 'Product Manager, Instead · owning production LLM output quality',
+      source: { label: 'instead.com/research →', href: sources.insteadResearch.href } as TimelineSource | null,
+    },
   ],
+  // The quoted line is the profile author's, not a self-description — the note
+  // says so, and the row below is labelled Profile. It is a profile piece, not
+  // journalism about him, and nothing here should imply otherwise.
+  profileNote: {
+    label: "From Keka's profile",
+    body:
+      'From Keka\'s profile of him — "once a mechanical engineer, now a product manager (with occasional relapses)." Keka\'s CoreHR team, Jan 2025.',
+    linkLabel: 'Read the piece →',
+    href: sources.kekaProfile.href,
+  },
+  profileRow: {
+    label: 'Profile',
+    detail: '"Meet Zoeb Nomi: the rabbit-hole explorer and CoreHR maestro" · Keka Product blog · Jan 2025 →',
+    href: sources.kekaProfile.href,
+  },
   beliefPre: 'What I believe: ',
   beliefStrong: 'evals are a product surface, not a QA afterthought.',
   beliefPost:
-    ' The interesting product work in AI is deciding what "good output" means, making that measurable, and wiring the measurement into how the team ships. That’s what my flagship project, CrossSource, demonstrates in public.',
+    ` The interesting product work in AI is deciding what "good output" means, making that measurable, and wiring the measurement into how the team ships. That's what my flagship project, CrossSource, demonstrates in public.`,
   factsRow: [
     'Bengaluru, India (IST)',
     'Open to US relocation',
@@ -520,12 +736,19 @@ export const llmsTxt = `# Zoeb Nomi
 
 ## Key facts
 
-- Role: Product Manager, Instead (Sept 2025–present). Owns citation-accuracy evaluation, model benchmarking, and regression-catching eval loops for a production tax-research LLM. ~95% citation accuracy on the eval set.
+- Role: Product Manager, Instead (Sep 2025–present). Owns citation-accuracy evaluation, model benchmarking, and regression-catching eval loops for a production tax-research LLM. ~95% citation accuracy on the eval set.
 - Flagship public project: CrossSource (https://github.com/zoeb-nomi/crosssource) — open evaluation harness for citation accuracy in legal RAG. Citation precision 0.981 (baseline) → 0.994 (strict); recall 0.760; faithfulness 1.000; 100% (15/15) blind human–judge agreement. Corpus: 22 public-domain US court opinions; 25-question golden set; BM25 top-5 retrieval.
 - At Instead: fixed the "knowledge–citation gap" failure mode (plausible-but-wrong citations); cut workflow latency ~90% (10–15 min → under a minute); architected a 270K+-record RAG corpus across 100+ legal source types; fetchability harness across 378 sources; remediation of ~139K documents; Legal Support Matrix across 160+ tax strategies; shipped Source Explorer.
 - Previously: Multiplier (Value-Added Services vertical: $100K incremental revenue, 47% efficiency gain, partnership launched in 21 days). Keka HR (3 roles, 2 promotions: built Background Verification module zero-to-one on Checkr API — 28 US enterprise clients, $2.7M MRR, company's first US expansion; 6 SSO integrations, 27% adoption lift, $121K upsell; Exit Module revamp, offboarding time −28%, CSAT +80%). Hurix Digital (agile transformation, 43% faster delivery; 31% conversion growth).
 - Education: STOA General Management Program (2022); B.E. Mechanical Engineering, MIT Aurangabad (2019).
 - Contact: zoeb.nomi@gmail.com · https://www.linkedin.com/in/zoebnomi · book: https://calendar.app.google/56javKNeXqw7X8oq6
+
+## Public record
+
+- Profile — "Meet Zoeb Nomi: The Rabbit-Hole Explorer and CoreHR Maestro", Keka Product blog, Jan 2025: https://medium.com/keka-product/meet-zoeb-nomi-the-rabbit-hole-explorer-and-corehr-maestro-a252fedbe113
+- Instead Research product (the AI citation surface he owns): https://instead.com/products/research
+- Multiplier × Veremark background-screening partner page: https://usemultiplier.com/marketplace/partner/veremark
+- Keka Background Verification module — product video: https://www.youtube.com/watch?v=rPYfTCj181w
 
 ## Pages
 

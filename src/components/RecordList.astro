@@ -1,0 +1,156 @@
+---
+// Public record — the claims-you-can-check block that closes a Work entry.
+// Every row is `what` (with the artefacts as underlined red-ink links) on the
+// left and `where` (the surface it lives on) on the right. Rows whose only
+// link is still a placeholder (href starting `TODO_`) are not rendered: an
+// unlinked "public record" row is a claim pretending to be evidence.
+import type { RecordItem } from '../data/copy';
+
+interface Props {
+  kicker: string;
+  items: RecordItem[];
+  note?: string;
+  // Disambiguates the landmark when several entries each carry a record.
+  context?: string;
+}
+
+const { kicker, items, note, context } = Astro.props;
+const regionLabel = context ? `Public record — ${context}` : 'Public record';
+
+const isReady = (item: RecordItem) =>
+  item.links.length > 0 && item.links.every((l) => !l.href.startsWith('TODO_'));
+
+const rows = items.filter(isReady);
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+---
+
+{
+  rows.length > 0 && (
+    <section class="record" aria-label={regionLabel}>
+      <div class="record-head">
+        <h3 class="record-kicker">{kicker}</h3>
+        {note && <p class="record-note">{note}</p>}
+      </div>
+      <ul class="record-rows">
+        {rows.map((item) => (
+          <li class="record-row">
+            <p class="what">
+              <span class="what-lead">{item.what}</span>{' '}
+              {item.links.map((l, i) => (
+                <>
+                  {i > 0 && <span class="sep" aria-hidden="true"> · </span>}
+                  <a
+                    href={l.href}
+                    target={isExternal(l.href) ? '_blank' : undefined}
+                    rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}
+                  >
+                    {l.label}
+                  </a>
+                </>
+              ))}
+            </p>
+            <p class="where">{item.where}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  /* Strong rule: this block closes the entry's argument. */
+  .record {
+    border-top: 1px solid var(--rule-strong);
+    padding-top: var(--s-4);
+    margin-top: var(--s-8);
+  }
+
+  .record-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-4);
+    padding-bottom: var(--s-2);
+  }
+
+  .record-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--red-ink);
+    line-height: 1.7;
+  }
+
+  .record-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--ink-muted);
+    text-align: right;
+    max-width: 52ch;
+  }
+
+  .record-rows {
+    list-style: none;
+  }
+
+  .record-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 168px;
+    gap: var(--s-6);
+    align-items: baseline;
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .record-row:last-child {
+    border-bottom: 0;
+  }
+
+  .what {
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .what a {
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  .what a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .sep {
+    color: var(--ink-muted);
+  }
+
+  .where {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-muted);
+    text-align: right;
+  }
+
+  @media (max-width: 899px) {
+    .record-note {
+      text-align: left;
+    }
+
+    .record-row {
+      grid-template-columns: 1fr;
+      gap: var(--s-1);
+    }
+
+    .where {
+      text-align: left;
+    }
+  }
+</style>

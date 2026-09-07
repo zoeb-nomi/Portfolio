@@ -1,14 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
 import TimelineEntry from '../components/TimelineEntry.astro';
+import RecordList from '../components/RecordList.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, work, cta, home } from '../data/copy';
 ---
 
 <Base title={meta.work.title} description={meta.work.description} path="/work/" ogImage="/og/work.png">
   <section class="masthead">
-    <h1 class="page-h1">Work</h1>
-    <p class="standfirst">{work.standfirst}</p>
+    <div class="masthead-inner">
+      <div class="margin-col" aria-hidden="true"></div>
+      <div class="body-col">
+        <h1 class="page-h1">Work</h1>
+        <p class="standfirst">{work.standfirst}</p>
+      </div>
+    </div>
   </section>
 
   <TimelineEntry
@@ -18,8 +24,17 @@ import { meta, work, cta, home } from '../data/copy';
     descriptor={work.instead.descriptor}
     achievements={work.instead.achievements}
     logo={{ src: '/img/logos/instead.png', width: 180, height: 48 }}
+    note={work.insteadNote}
     primary
-  />
+  >
+    <RecordList
+      slot="record"
+      kicker={work.recordKicker}
+      items={work.instead.record.items}
+      note={work.instead.record.note}
+      context={work.instead.company}
+    />
+  </TimelineEntry>
 
   <TimelineEntry
     company={work.multiplier.company}
@@ -28,7 +43,15 @@ import { meta, work, cta, home } from '../data/copy';
     descriptor={work.multiplier.descriptor}
     achievements={work.multiplier.achievements}
     logo={{ src: '/img/logos/multiplier.png', width: 160, height: 48 }}
-  />
+  >
+    <RecordList
+      slot="record"
+      kicker={work.recordKicker}
+      items={work.multiplier.record.items}
+      note={work.multiplier.record.note}
+      context={work.multiplier.company}
+    />
+  </TimelineEntry>
 
   <TimelineEntry
     company={work.keka.company}
@@ -38,7 +61,32 @@ import { meta, work, cta, home } from '../data/copy';
     standfirst={work.keka.standfirst}
     achievements={work.keka.achievements}
     logo={{ src: '/img/logos/keka.png', width: 133, height: 48 }}
-  />
+  >
+    <figure slot="figure" class="entry-figure">
+      <a
+        class="entry-figure-link"
+        href={work.keka.figure.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={work.keka.figure.linkLabel}
+      >
+        <span class="plate">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+          <span class="plate-label" aria-hidden="true">{work.keka.figure.label}</span>
+        </span>
+      </a>
+      <figcaption class="plate-caption">{work.keka.figure.caption}</figcaption>
+    </figure>
+    <RecordList
+      slot="record"
+      kicker={work.recordKicker}
+      items={work.keka.record.items}
+      note={work.keka.record.note}
+      context={work.keka.company}
+    />
+  </TimelineEntry>
 
   <TimelineEntry
     company={work.hurix.company}
@@ -61,9 +109,20 @@ import { meta, work, cta, home } from '../data/copy';
 </Base>
 
 <style>
-  .masthead {
-    padding: var(--s-9) var(--gutter) var(--s-7);
-    border-bottom: 1px solid var(--ink);
+  /* Masthead sits on the same margin-col | body-col grid as every other page,
+     so the h1 starts at the site's body x. */
+  .masthead-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
   }
 
   .page-h1 {
@@ -85,7 +144,7 @@ import { meta, work, cta, home } from '../data/copy';
 
   .arc-close {
     padding: var(--s-11) var(--gutter);
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
     text-align: center;
   }
 
@@ -98,6 +157,70 @@ import { meta, work, cta, home } from '../data/copy';
     max-width: 42ch;
     margin-inline: auto;
     text-wrap: balance;
+  }
+
+  /* Fig. 1 — a linked plate, not an embed. No iframe, no third-party image.
+     Only the card is the link; the caption sits outside it and reads as every
+     other Fig. caption on the site does. */
+  .entry-figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    margin-top: var(--s-6);
+    max-width: 172px;
+  }
+
+  .entry-figure-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .entry-figure .plate {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 172 / 97;
+    background: var(--ink);
+    color: var(--paper);
+    transition: background-color 120ms var(--ease-draw);
+  }
+
+  .entry-figure-link:hover .plate {
+    background: var(--red-ink);
+  }
+
+  .entry-figure .plate-label {
+    position: absolute;
+    left: var(--s-2);
+    bottom: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .08em;
+    color: var(--on-red-muted);
+  }
+
+  .entry-figure .plate-caption {
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    line-height: 1.5;
+    letter-spacing: .04em;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 899px) {
+    .masthead-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      display: none;
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
   }
 
   @media (max-width: 599px) {

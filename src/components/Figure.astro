@@ -4,27 +4,35 @@ interface Props {
   alt: string;
   eager?: boolean;
   size?: 'small' | 'large'; // small = hero/margin (200-260px), large = About masthead
+  ratio?: string; // aspect-ratio for the plate, e.g. '1/1' (default) or '4/5'
 }
 
-const { caption, alt, eager = false, size = 'small' } = Astro.props;
+const { caption, alt, eager = false, size = 'small', ratio = '1/1' } = Astro.props;
+const plateRatio = ratio.replace('/', ' / ');
+
+// The ratio picks the crop that actually ships, so the file can never disagree
+// with the plate it is poured into. 4:5 is a real crop (scripts/process-headshot-4x5.mjs),
+// not a square asset relying on object-fit to hide the overflow.
+const sets = {
+  '4/5': { slug: '/img/headshot-4x5', width: 960, height: 1200 },
+  '1/1': { slug: '/img/headshot', width: 960, height: 960 },
+};
+const set = sets[ratio] ?? sets['1/1'];
+const srcset = (ext: string) => `${set.slug}-480.${ext} 480w, ${set.slug}-960.${ext} 960w`;
+// Both plates render ~224-240 CSS px wide, so 480w covers 2x DPR.
+const sizes = '240px';
 ---
 
-<figure class:list={['rp-figure', `rp-figure--${size}`]}>
+<figure class:list={['rp-figure', `rp-figure--${size}`]} style={`--plate-ratio: ${plateRatio};`}>
   <picture>
-    <source
-      type="image/avif"
-      srcset="/img/headshot-480.avif 480w, /img/headshot-960.avif 960w"
-      sizes={size === 'large' ? '(min-width: 900px) 480px, 100vw' : '240px'}
-    />
-    <source
-      type="image/webp"
-      srcset="/img/headshot-480.webp 480w, /img/headshot-960.webp 960w"
-      sizes={size === 'large' ? '(min-width: 900px) 480px, 100vw' : '240px'}
-    />
+    <source type="image/avif" srcset={srcset('avif')} sizes={sizes} />
+    <source type="image/webp" srcset={srcset('webp')} sizes={sizes} />
     <img
-      src="/zoeb-nomi.jpg"
-      width="960"
-      height="960"
+      src={`${set.slug}-960.jpg`}
+      srcset={srcset('jpg')}
+      sizes={sizes}
+      width={set.width}
+      height={set.height}
       alt={alt}
       loading={eager ? 'eager' : 'lazy'}
       decoding={eager ? 'sync' : 'async'}
@@ -66,11 +74,12 @@ const { caption, alt, eager = false, size = 'small' } = Astro.props;
     }
   }
 
+  /* Unboxed: the plate is the photograph, not a framed exhibit. The only
+     lines on the page are the grid's own. */
   .rp-figure picture {
     display: block;
     width: 100%;
-    aspect-ratio: 1 / 1;
-    border: 1px solid var(--ink);
+    aspect-ratio: var(--plate-ratio, 1 / 1);
     overflow: hidden;
   }
 
@@ -81,7 +90,7 @@ const { caption, alt, eager = false, size = 'small' } = Astro.props;
        image loads) otherwise win over `aspect-ratio` for a replaced element —
        height must be forced back to auto so aspect-ratio can take over. */
     height: auto;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: var(--plate-ratio, 1 / 1);
     object-fit: cover;
     object-position: center 12%;
   }

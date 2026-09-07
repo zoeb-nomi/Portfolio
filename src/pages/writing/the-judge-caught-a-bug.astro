@@ -31,6 +31,7 @@ const articleLd = {
   description={meta.writingJudgeBug.description}
   path="/writing/the-judge-caught-a-bug/"
   ogImage="/og/crosssource.png"
+  ogType="article"
 >
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
 
@@ -110,7 +111,7 @@ const articleLd = {
   .masthead-inner {
     display: grid;
     grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
   }
 
   .margin-col {

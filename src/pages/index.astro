@@ -79,7 +79,7 @@ const table1Rows = home.table1.rows.map((r) => ({
       {home.methods.map((m) => (
         <li class="method-row">
           <p class="method-n" aria-hidden="true">{m.n}</p>
-          <h2 class="method-name">{m.name}</h2>
+          <h3 class="method-name">{m.name}</h3>
           <p class="method-desc">{m.description}</p>
         </li>
       ))}
@@ -98,7 +98,7 @@ const table1Rows = home.table1.rows.map((r) => ({
   .hero-inner {
     display: grid;
     grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
   }
 
   .margin-col {
@@ -218,7 +218,7 @@ const table1Rows = home.table1.rows.map((r) => ({
     gap: 24px;
     align-items: baseline;
     padding-block: var(--s-7);
-    border-top: 1px solid var(--rule-soft);
+    border-top: 1px solid var(--rule);
   }
 
   .method-row:first-child {

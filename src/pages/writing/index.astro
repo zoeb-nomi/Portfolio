@@ -53,7 +53,7 @@ const posts = [
   .masthead-inner {
     display: grid;
     grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
   }
 
   .margin-col {
@@ -119,6 +119,11 @@ const posts = [
     border-top: 1px solid var(--rule);
   }
 
+  /* The masthead already closes with a strong rule — no second line here. */
+  .post-list li:first-child {
+    border-top: 0;
+  }
+
   .post-list a {
     display: block;
     text-decoration: none;
@@ -148,6 +153,10 @@ const posts = [
     letter-spacing: -.01em;
     color: var(--ink);
     margin-bottom: var(--s-4);
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--red-ink);
     transition: color 120ms var(--ease-draw);
   }
 

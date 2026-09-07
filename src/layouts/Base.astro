@@ -18,9 +18,18 @@ interface Props {
   ogImage: string; // e.g. '/og/home.png'
   includeSoftwareSourceCode?: boolean;
   noindex?: boolean;
+  ogType?: 'website' | 'article';
 }
 
-const { title, description, path, ogImage, includeSoftwareSourceCode = false, noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  path,
+  ogImage,
+  includeSoftwareSourceCode = false,
+  noindex = false,
+  ogType = 'website',
+} = Astro.props;
 
 const canonicalURL = new URL(path, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
@@ -43,7 +52,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <meta name="theme-color" content="#f4f1ea" />
 
     <!-- Open Graph -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL.href} />
@@ -71,6 +80,13 @@ const ogImageURL = new URL(ogImage, Astro.site);
       type="font/woff2"
       crossorigin
     />
+    <link
+      rel="preload"
+      href="/fonts/ibm-plex-mono-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 
@@ -92,7 +108,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="shell">
       <SiteHeader currentPath={path} />
-      <main id="main">
+      <main id="main" tabindex="-1">
         <slot />
       </main>
       <SiteFooter />
@@ -104,8 +120,8 @@ const ogImageURL = new URL(ogImage, Astro.site);
   .shell {
     max-width: var(--shell-max);
     margin-inline: auto;
-    border-left: 1px solid var(--rule-soft);
-    border-right: 1px solid var(--rule-soft);
+    border-left: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
     min-height: 100vh;
     display: flex;
     flex-direction: column;

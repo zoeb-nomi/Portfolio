@@ -17,7 +17,8 @@ const { currentPath } = Astro.props;
       <ul>
         {
           nav.map((item) => {
-            const isCurrent = currentPath === item.href;
+            const isCurrent =
+              item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href);
             return (
               <li>
                 <a href={item.href} aria-current={isCurrent ? 'page' : undefined} class:list={[{ current: isCurrent }]}>
@@ -36,7 +37,7 @@ const { currentPath } = Astro.props;
 
 <style>
   .site-header {
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
     background: var(--paper);
   }
 

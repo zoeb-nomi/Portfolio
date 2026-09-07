@@ -14,9 +14,9 @@ const { mark, label, note, as: Tag = 'section' } = Astro.props;
 <Tag class="rp-section">
   <div class="section-inner">
     <aside class="margin-col" aria-label={label}>
-      <p class="mark-label">
+      <h2 class="mark-label">
         <span class="mark" aria-hidden="true">{mark}</span> <span class="label">{label}</span>
-      </p>
+      </h2>
       <slot name="margin" />
       {note && <MarginNote as="div" label={`Note — ${label}`}>{note}</MarginNote>}
     </aside>
@@ -28,7 +28,7 @@ const { mark, label, note, as: Tag = 'section' } = Astro.props;
 
 <style>
   .rp-section {
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
   }
 
   .section-inner {

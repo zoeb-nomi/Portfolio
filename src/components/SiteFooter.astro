@@ -39,28 +39,40 @@ import { site, cta } from '../data/copy';
     order: 2;
   }
 
+  /* llms.txt sits left-aligned under the CTA row, not hanging off its right
+     edge — it reads as a footnote to the row above it. */
   .footer-links {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: var(--s-3);
     order: 1;
   }
 
   .footer-ctas {
     display: flex;
-    gap: var(--s-5);
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--s-5);
     list-style: none;
   }
 
   .footer-ctas a,
   .llms-link {
+    display: inline-block;
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
     letter-spacing: .06em;
     text-transform: uppercase;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--red-ink);
     color: var(--ink);
+  }
+
+  /* 44px tap target without changing the row's visual height. */
+  .footer-ctas a {
+    padding-block: 14px;
   }
 
   .footer-ctas a:hover,

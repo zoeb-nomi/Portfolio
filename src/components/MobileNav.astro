@@ -16,8 +16,8 @@ const { currentPath } = Astro.props;
   aria-controls="mobile-sheet"
   aria-label="Menu"
 >
-  <span aria-hidden="true"></span>
-  <span aria-hidden="true"></span>
+  <span class="bar" aria-hidden="true"></span>
+  <span class="bar" aria-hidden="true"></span>
 </button>
 
 <div id="mobile-sheet" class="mobile-sheet" hidden>
@@ -25,7 +25,8 @@ const { currentPath } = Astro.props;
     <ul class="sheet-links">
       {
         nav.map((item) => {
-          const isCurrent = currentPath === item.href;
+          const isCurrent =
+            item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href);
           return (
             <li>
               <a href={item.href} aria-current={isCurrent ? 'page' : undefined}>
@@ -48,6 +49,9 @@ const { currentPath } = Astro.props;
 <style>
   .nav-toggle {
     display: none;
+    /* Above the sheet (z-index 200) so it stays hittable while open. */
+    position: relative;
+    z-index: 201;
     width: 44px;
     height: 44px;
     align-items: center;
@@ -58,11 +62,21 @@ const { currentPath } = Astro.props;
     border: 0;
   }
 
-  .nav-toggle span {
+  .nav-toggle .bar {
     display: block;
     width: 18px;
     height: 1px;
     background: var(--ink);
+    transition: transform 120ms var(--ease-draw);
+  }
+
+  /* Open: the two bars cross into a ×, so the control says how to leave. */
+  .nav-toggle[aria-expanded='true'] .bar:first-child {
+    transform: translateY(3.5px) rotate(45deg);
+  }
+
+  .nav-toggle[aria-expanded='true'] .bar:last-child {
+    transform: translateY(-3.5px) rotate(-45deg);
   }
 
   .mobile-sheet {
@@ -106,12 +120,21 @@ const { currentPath } = Astro.props;
   }
 
   .sheet-ctas a {
+    display: inline-block;
+    padding-block: 14px;
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
     letter-spacing: .06em;
     text-transform: uppercase;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--rule);
     color: var(--ink);
+  }
+
+  .sheet-ctas a:hover {
+    color: var(--red-ink);
+    text-decoration-color: currentColor;
   }
 
   @media (max-width: 899px) {
@@ -157,6 +180,7 @@ const { currentPath } = Astro.props;
     if (!toggle || !sheet) return;
     lastFocused = document.activeElement as HTMLElement;
     toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close menu');
     sheet.hidden = false;
     document.body.style.overflow = 'hidden';
     main?.setAttribute('inert', '');
@@ -169,6 +193,7 @@ const { currentPath } = Astro.props;
   function close() {
     if (!toggle || !sheet) return;
     toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Menu');
     sheet.hidden = true;
     document.body.style.overflow = '';
     main?.removeAttribute('inert');

@@ -1,5 +1,6 @@
 ---
 import { renderMetrics } from '../utils/metrics';
+import MarginNote from './MarginNote.astro';
 
 interface Achievement {
   kicker: string | null;
@@ -22,6 +23,7 @@ interface Props {
   achievements: Achievement[];
   primary?: boolean;
   logo?: Logo | null;
+  note?: string | null;
 }
 
 const {
@@ -33,6 +35,7 @@ const {
   achievements,
   primary = false,
   logo = null,
+  note = null,
 } = Astro.props;
 ---
 
@@ -52,6 +55,8 @@ const {
     )}
     <p class="date-range">{dateRange}</p>
     <p class="role">{role}</p>
+    <slot name="figure" />
+    {note && <MarginNote as="div" label={`Note — ${company}`}>{note}</MarginNote>}
   </aside>
   <div class="body-col">
     <h2 class="company">{company}</h2>
@@ -67,6 +72,7 @@ const {
         ))
       }
     </ul>
+    <slot name="record" />
   </div>
 </div>
 
@@ -74,7 +80,7 @@ const {
   .entry {
     display: grid;
     grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-strong);
   }
 
   .margin-col {
@@ -145,7 +151,7 @@ const {
 
   .achievements li {
     padding-block: var(--s-5);
-    border-top: 1px solid var(--rule-soft);
+    border-top: 1px solid var(--rule);
   }
 
   .achievements li:first-child {
@@ -186,8 +192,17 @@ const {
       border-bottom: 1px solid var(--rule);
       padding: var(--s-6) var(--gutter);
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--s-4);
+    }
+
+    /* Slotted figure / note drop to their own full-width line rather than
+       squeezing into the logo + dates row. */
+    .margin-col :global(.entry-figure),
+    .margin-col :global(.margin-note) {
+      flex-basis: 100%;
+      margin-top: 0;
     }
 
     .company-logo {

@@ -124,6 +124,17 @@ h1, h2, h3, h4, p, figure, blockquote, dl, dd {
   margin: 0;
 }
 
+/* Only 400 faces ship for the display serif, and 400/500 for sans + mono.
+   Resetting headings to 400 and strong/b to 500 keeps the browser from
+   synthesising a bold weight that has no real face behind it. */
+h1, h2, h3, h4 {
+  font-weight: 400;
+}
+
+strong, b {
+  font-weight: 500;
+}
+
 ul, ol {
   margin: 0;
   padding: 0;
@@ -163,6 +174,14 @@ p, li, dd, blockquote {
 }
 
 h1, h2 {
+  text-wrap: balance;
+}
+
+/* Display-set prose that reads as a heading: balance the rag too. */
+.slab-body,
+.quote,
+.standfirst,
+.belief p {
   text-wrap: balance;
 }
 
@@ -228,8 +247,24 @@ h1, h2 {
     break-inside: avoid;
   }
 
+  .rp-section,
+  .stat-row,
+  .method-row,
+  .entry {
+    break-inside: avoid;
+  }
+
   a {
     text-decoration: underline;
+  }
+
+  /* A printed page has no hover and no click — spell the destination out. */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-muted);
+    word-break: break-all;
   }
 }
 
