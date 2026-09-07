@@ -55,13 +55,13 @@ const {
     )}
     <p class="date-range">{dateRange}</p>
     <p class="role">{role}</p>
-    <slot name="figure" />
     {note && <MarginNote as="div" label={`Note — ${company}`}>{note}</MarginNote>}
   </aside>
   <div class="body-col">
     <h2 class="company">{company}</h2>
     {descriptor && <p class="descriptor">{descriptor}</p>}
     {standfirst && <p class="standfirst">{standfirst}</p>}
+    <slot name="video" />
     <ul class="achievements">
       {
         achievements.map((a) => (
@@ -197,9 +197,8 @@ const {
       gap: var(--s-4);
     }
 
-    /* Slotted figure / note drop to their own full-width line rather than
-       squeezing into the logo + dates row. */
-    .margin-col :global(.entry-figure),
+    /* A slotted note drops to its own full-width line rather than squeezing
+       into the logo + dates row. */
     .margin-col :global(.margin-note) {
       flex-basis: 100%;
       margin-top: 0;

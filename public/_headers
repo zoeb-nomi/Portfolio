@@ -1,3 +1,7 @@
+# TODO — Content-Security-Policy. When it lands, the video facade on /work/
+# needs: frame-src https://www.youtube-nocookie.com
+# Nothing else: the poster is self-hosted, so img-src 'self' suffices and the
+# page makes no third-party request until someone clicks play.
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: DENY
