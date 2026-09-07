@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Figure from '../components/Figure.astro';
 import MarginNote from '../components/MarginNote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, about, cta, home } from '../data/copy';
@@ -19,11 +18,23 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 <Base title={meta.about.title} description={meta.about.description} path="/about/" ogImage="/og/about.png">
   <section class="masthead">
     <div class="masthead-inner">
-      <aside class="margin-col" aria-label="Photo">
-        <Figure caption={about.figureCaption} alt={about.photoAlt} eager size="large" ratio="4/5" />
-      </aside>
-      <div class="body-col">
-        <h1 class="page-h1">About</h1>
+      <picture class="masthead-photo">
+        <source type="image/avif" srcset="/img/headshot-480.avif 480w, /img/headshot-960.avif 960w" sizes="120px" />
+        <source type="image/webp" srcset="/img/headshot-480.webp 480w, /img/headshot-960.webp 960w" sizes="120px" />
+        <img
+          src="/img/headshot-480.jpg"
+          srcset="/img/headshot-480.jpg 480w, /img/headshot-960.jpg 960w"
+          sizes="120px"
+          width="480"
+          height="480"
+          alt={about.photoAlt}
+          loading="eager"
+          decoding="sync"
+        />
+      </picture>
+      <div class="masthead-text">
+        <h1 class="page-h1">{about.h1}</h1>
+        <p class="dek">{about.dek}</p>
       </div>
     </div>
   </section>
@@ -117,30 +128,44 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 </Base>
 
 <style>
-  .masthead-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
+  /* Direction B masthead: no margin column, a small square photo and the
+     title bottom-aligned with it. The photo column is sized so the text column
+     starts at the site's body x (--margin-col + --body-inset from the shell
+     edge), which the masthead's own --gutter padding and the 32px gap eat
+     into — so the photo sits inside the margin column's footprint and the h1
+     lines up with the body text of every other page. */
+  .masthead {
     border-bottom: 1px solid var(--rule-strong);
   }
 
-  .masthead-inner .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  .masthead-inner {
+    display: grid;
+    grid-template-columns:
+      calc(var(--margin-col) + var(--body-inset) - var(--gutter) - var(--s-8))
+      minmax(0, 1fr);
+    gap: var(--s-8);
+    align-items: end;
+    padding: var(--s-9) var(--gutter) var(--s-11);
   }
 
-  /* The h1 sits on the photo's bottom edge — the original composition.
-     The plate's width is deterministic from the grid (Figure breaks out of the
-     margin column's padding by --s-2 on each side), so its height is too:
-     plate = (--margin-col - 2 * --s-2), and at 4/5 that is x 5/4 tall. Fixing
-     the body column to that height and bottom-aligning inside it lands the h1's
-     baseline on the plate's bottom, without hard-coding a pixel offset or
-     depending on how many lines the caption below the plate happens to run. */
-  .masthead-inner .body-col {
-    align-self: start;
-    height: calc(var(--s-9) * 2 + (var(--margin-col) - 2 * var(--s-2)) * 5 / 4);
-    padding: var(--s-9) var(--gutter) var(--s-9) var(--body-inset);
+  .masthead-photo {
+    display: block;
+    width: 120px;
+    height: 120px;
+  }
+
+  .masthead-photo img {
+    display: block;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    object-position: center 12%;
+  }
+
+  .masthead-text {
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+    gap: var(--s-3);
   }
 
   .page-h1 {
@@ -149,6 +174,14 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
     line-height: 1.02;
     letter-spacing: -.015em;
     color: var(--ink);
+  }
+
+  .dek {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 640px;
   }
 
   /* The body sits on the site's grid — same margin-col | body-col split as
@@ -354,27 +387,26 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   }
 
   @media (max-width: 899px) {
-    .masthead-inner,
+    /* Stack: photo above the title, at the same 120px. */
+    .masthead-inner {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+      align-items: start;
+      padding: var(--s-7) var(--gutter);
+    }
+
     .body-inner {
       grid-template-columns: 1fr;
     }
 
-    .masthead-inner .margin-col,
     .body-inner .margin-col {
       border-right: 0;
       border-bottom: 1px solid var(--rule);
       padding: var(--s-6) var(--gutter);
     }
 
-    .masthead-inner .body-col,
     .body-inner .body-col {
       padding: var(--s-7) var(--gutter);
-    }
-
-    /* One column: the photo is above the h1, so there is nothing to align to. */
-    .masthead-inner .body-col {
-      height: auto;
-      align-self: auto;
     }
 
     .facts-row ul {

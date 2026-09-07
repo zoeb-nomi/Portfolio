@@ -555,14 +555,14 @@ export const work = {
         metrics: ['6 SSO', '27%', '$121K', '28%', '80%'],
       },
     ],
-    figure: {
-      href: sources.kekaBgvVideo.href,
-      label: 'YOUTUBE · KEKA HR',
-      // The card is the link; the caption sits outside it, so the link needs
-      // its own accessible name.
-      linkLabel: 'Watch "Background Verification Made Simple" on YouTube',
-      caption:
-        'Fig. 1 — "Background Verification Made Simple", Keka HR product video. Opens on YouTube.',
+    // The Fig. number is a prop on VideoEmbed, so the caption here is the
+    // sentence only — the component renders the "Fig. 1 — " prefix.
+    video: {
+      youtubeId: 'rPYfTCj181w',
+      title: 'Background Verification in Keka',
+      channel: 'KEKA HR · YOUTUBE',
+      poster: '/img/keka-bgv-poster',
+      caption: 'Background Verification in Keka. Product video, Keka HR. Plays here.',
     },
     record: {
       note: "What shipped, on Keka's own surfaces. None of these name me; the profile piece does.",
@@ -713,7 +713,8 @@ export const about = {
     'I keep US-morning slots open — book one',
   ],
   photoAlt: 'Zoeb Nomi',
-  figureCaption: 'Fig. 1 — Zoeb Nomi. Bengaluru (IST).',
+  h1: 'About — the record',
+  dek: "Every claim on this site links to something you can check. This page is the ledger: what I've done, and where the evidence lives.",
 };
 
 // ---------------------------------------------------------------------------

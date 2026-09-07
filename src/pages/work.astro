@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import TimelineEntry from '../components/TimelineEntry.astro';
 import RecordList from '../components/RecordList.astro';
+import VideoEmbed from '../components/VideoEmbed.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, work, cta, home } from '../data/copy';
 ---
@@ -62,23 +63,15 @@ import { meta, work, cta, home } from '../data/copy';
     achievements={work.keka.achievements}
     logo={{ src: '/img/logos/keka.png', width: 133, height: 48 }}
   >
-    <figure slot="figure" class="entry-figure">
-      <a
-        class="entry-figure-link"
-        href={work.keka.figure.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={work.keka.figure.linkLabel}
-      >
-        <span class="plate">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">
-            <path d="M8 5v14l11-7z"></path>
-          </svg>
-          <span class="plate-label" aria-hidden="true">{work.keka.figure.label}</span>
-        </span>
-      </a>
-      <figcaption class="plate-caption">{work.keka.figure.caption}</figcaption>
-    </figure>
+    <VideoEmbed
+      slot="video"
+      youtubeId={work.keka.video.youtubeId}
+      title={work.keka.video.title}
+      caption={work.keka.video.caption}
+      channel={work.keka.video.channel}
+      poster={work.keka.video.poster}
+      figNo={1}
+    />
     <RecordList
       slot="record"
       kicker={work.recordKicker}
@@ -157,56 +150,6 @@ import { meta, work, cta, home } from '../data/copy';
     max-width: 42ch;
     margin-inline: auto;
     text-wrap: balance;
-  }
-
-  /* Fig. 1 — a linked plate, not an embed. No iframe, no third-party image.
-     Only the card is the link; the caption sits outside it and reads as every
-     other Fig. caption on the site does. */
-  .entry-figure {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-    margin-top: var(--s-6);
-    max-width: 172px;
-  }
-
-  .entry-figure-link {
-    display: block;
-    text-decoration: none;
-  }
-
-  .entry-figure .plate {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    aspect-ratio: 172 / 97;
-    background: var(--ink);
-    color: var(--paper);
-    transition: background-color 120ms var(--ease-draw);
-  }
-
-  .entry-figure-link:hover .plate {
-    background: var(--red-ink);
-  }
-
-  .entry-figure .plate-label {
-    position: absolute;
-    left: var(--s-2);
-    bottom: 6px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: .08em;
-    color: var(--on-red-muted);
-  }
-
-  .entry-figure .plate-caption {
-    font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    line-height: 1.5;
-    letter-spacing: .04em;
-    color: var(--ink-muted);
   }
 
   @media (max-width: 899px) {

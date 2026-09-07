@@ -1,0 +1,230 @@
+---
+// Lite-embed facade. Nothing third-party loads until someone asks to watch:
+// the poster is self-hosted, and the YouTube iframe is created on click. On
+// first paint the page makes zero requests off this origin.
+//
+// Progressive enhancement: the markup ships an <a> to the watch page, so the
+// poster is a working link with JavaScript off. The inline script upgrades that
+// anchor into a real <button> (aria-label "Play: <title>") — reusing the same
+// child nodes, so the poster is never re-requested — and that button swaps in
+// the iframe. Exactly one control exists in either mode.
+interface Props {
+  youtubeId: string;
+  title: string;
+  caption: string;
+  figNo: number;
+  // Extensionless path to the self-hosted poster: <poster>.webp + <poster>.jpg
+  // must both exist under public/. Required — there is no remote fallback.
+  poster: string;
+  channel?: string; // small mono plate, e.g. 'KEKA HR · YOUTUBE'
+}
+
+const { youtubeId, title, caption, figNo, poster, channel } = Astro.props;
+
+const watchHref = `https://www.youtube.com/watch?v=${youtubeId}`;
+const embedSrc = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`;
+const playLabel = `Play: ${title}`;
+---
+
+<figure
+  class="video-figure"
+  data-video-embed
+  data-embed-src={embedSrc}
+  data-embed-title={title}
+  data-play-label={playLabel}
+>
+  <div class="frame">
+    <a
+      class="facade"
+      href={watchHref}
+      aria-label={playLabel}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <picture>
+        <source type="image/webp" srcset={`${poster}.webp`} />
+        <img
+          class="poster"
+          src={`${poster}.jpg`}
+          width="1280"
+          height="720"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
+      <span class="glyph" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+          <path d="M8 5v14l11-7z"></path>
+        </svg>
+      </span>
+      {channel && <span class="plate" aria-hidden="true">{channel}</span>}
+    </a>
+  </div>
+  <figcaption>Fig. {figNo} — {caption}</figcaption>
+  <a class="open-link" href={watchHref} target="_blank" rel="noopener noreferrer">Open on YouTube →</a>
+</figure>
+
+<style>
+  .video-figure {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-3);
+    width: 100%;
+    max-width: 100%;
+    margin-block: var(--s-8);
+  }
+
+  .frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    /* Ink ground: the glyph and plate still read if the poster never arrives. */
+    background: var(--ink);
+    overflow: hidden;
+  }
+
+  .facade {
+    position: absolute;
+    inset: 0;
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Set by the script if the poster ever fails to decode: the ink ground,
+     glyph and plate carry the frame on their own. */
+  .poster[data-failed] {
+    display: none;
+  }
+
+  .facade picture {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  .poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .glyph {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    /* A paper hairline so the disc still reads against a dark frame of the
+       poster — or against the ink ground when the poster does not load. */
+    box-shadow: 0 0 0 1px var(--paper);
+    transition: background-color 120ms var(--ease-draw);
+  }
+
+  .facade:hover .glyph,
+  .facade:focus-visible .glyph {
+    background: var(--red-ink);
+  }
+
+  /* The plate sits on whatever the poster happens to show, so it carries its
+     own ink ground rather than trusting the frame behind it. */
+  .plate {
+    position: absolute;
+    left: var(--s-3);
+    bottom: var(--s-3);
+    padding: 4px var(--s-2);
+    background: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .08em;
+    color: var(--on-red-muted);
+  }
+
+  .frame :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  figcaption {
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    line-height: 1.5;
+    letter-spacing: .04em;
+    color: var(--ink-muted);
+    max-width: 60ch;
+  }
+
+  .open-link {
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    letter-spacing: .04em;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 599px) {
+    .glyph {
+      width: 52px;
+      height: 52px;
+    }
+  }
+</style>
+
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-video-embed]')) {
+    const anchor = fig.querySelector<HTMLAnchorElement>('a.facade');
+    const frame = fig.querySelector<HTMLElement>('.frame');
+    if (!anchor || !frame) continue;
+
+    // The poster is same-origin, so this should never fire — but a missing
+    // file must not leave a broken-image marker on the page.
+    const poster = fig.querySelector<HTMLImageElement>('img.poster');
+    if (poster) {
+      const markFailed = () => poster.setAttribute('data-failed', '');
+      poster.addEventListener('error', markFailed);
+      if (poster.complete && poster.naturalWidth === 0) markFailed();
+    }
+
+    // Upgrade the no-JS link into a real button, reusing its children so the
+    // poster image is not fetched a second time.
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = anchor.className;
+    button.setAttribute('aria-label', fig.dataset.playLabel ?? 'Play video');
+    while (anchor.firstChild) button.appendChild(anchor.firstChild);
+    anchor.replaceWith(button);
+
+    button.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = fig.dataset.embedSrc ?? '';
+      iframe.title = fig.dataset.embedTitle ?? '';
+      iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('loading', 'lazy');
+      button.remove();
+      frame.appendChild(iframe);
+      iframe.focus();
+    });
+  }
+</script>
