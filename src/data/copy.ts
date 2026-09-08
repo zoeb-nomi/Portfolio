@@ -688,15 +688,16 @@ export const about = {
       source: { label: 'instead.com/research →', href: sources.insteadResearch.href } as TimelineSource | null,
     },
   ],
-  // The quoted line is the profile author's, not a self-description — the note
-  // says so, and the row below is labelled Profile. It is a profile piece, not
-  // journalism about him, and nothing here should imply otherwise.
-  profileNote: {
-    label: "From Keka's profile",
-    body:
-      'From Keka\'s profile of him — "once a mechanical engineer, now a product manager (with occasional relapses)." Keka\'s CoreHR team, Jan 2025.',
-    linkLabel: 'Read the piece →',
+  // The Medium piece cannot be framed, so the About page draws the link card
+  // itself. Every string here is from the article: the kicker is its metadata,
+  // the excerpt is its opening line verbatim, the byline is its publication.
+  embed: {
+    kicker: 'Medium · Keka Product · 16 Jan 2025 · 1 min read',
+    title: 'Meet Zoeb Nomi: The Rabbit-Hole Explorer and CoreHR Maestro',
+    excerpt: `"Hi, I'm Zoeb Nomi, a Product Manager on the CoreHR team at Keka…"`,
+    byline: 'Keka Blog · in Keka Product',
     href: sources.kekaProfile.href,
+    linkLabel: 'Read on Medium →',
   },
   profileRow: {
     label: 'Profile',

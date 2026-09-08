@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import MarginNote from '../components/MarginNote.astro';
+import EmbedCard from '../components/EmbedCard.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, about, cta, home } from '../data/copy';
 
@@ -41,21 +41,21 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 
   <section class="body-section">
     <div class="body-inner">
-      <aside class="margin-col" aria-label="Profile note">
-        <MarginNote as="div" label={about.profileNote.label}>
-          {about.profileNote.body}
-          <br />
-          <a
-            class="note-link"
-            href={about.profileNote.href}
-            target="_blank"
-            rel="noopener noreferrer">{about.profileNote.linkLabel}</a
-          >
-        </MarginNote>
-      </aside>
+      <div class="margin-col" aria-hidden="true"></div>
 
       <div class="body-col">
         <p class="prose">{about.bodyPara1}</p>
+
+        <EmbedCard
+          kicker={about.embed.kicker}
+          title={about.embed.title}
+          excerpt={about.embed.excerpt}
+          byline={about.embed.byline}
+          href={about.embed.href}
+          linkLabel={about.embed.linkLabel}
+          imageAlt={about.photoAlt}
+          logo={{ src: '/img/logos/keka.png', width: 66, height: 24, alt: 'Keka' }}
+        />
 
         <ul class="timeline">
           {about.timeline.map((t) => (
@@ -204,22 +204,6 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
     padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
   }
 
-  .body-inner :global(.margin-note) {
-    margin-top: 0;
-  }
-
-  .note-link {
-    display: inline-block;
-    margin-top: var(--s-3);
-    font-family: var(--font-mono);
-    font-size: var(--t-label);
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--red-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
   .prose {
     font-family: var(--font-body);
     font-size: var(--t-lead);
@@ -233,6 +217,9 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
      artefact exists, a source. A row with no source is a claim on trust. */
   .timeline {
     list-style: none;
+    /* The embed card closes with a strong rule; the timeline opens with one.
+       56px of paper keeps them from reading as a doubled rule. */
+    margin-top: var(--s-11);
     margin-bottom: var(--s-9);
     border-top: 1px solid var(--rule-strong);
   }
