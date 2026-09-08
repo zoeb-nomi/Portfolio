@@ -1,0 +1,251 @@
+---
+// A link card for an article that cannot be embedded. Medium refuses framing,
+// so this is what its preview would look like if the site drew it: kicker,
+// title, the opening line verbatim, the publication's byline, a real button —
+// and the article's hero image, which happens to be the same headshot the site
+// already ships. Rules and type only; no card background, no new colours.
+import Button from './Button.astro';
+
+interface Logo {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+}
+
+interface Props {
+  kicker: string;
+  title: string;
+  excerpt: string;
+  byline: string;
+  href: string;
+  linkLabel: string;
+  imageAlt: string;
+  logo?: Logo;
+}
+
+const { kicker, title, excerpt, byline, href, linkLabel, imageAlt, logo } = Astro.props;
+
+// A hyphenated word must never break across lines ("Rabbit-/Hole"). CSS has no
+// property for that, so each one is wrapped in a nowrap span at render time.
+const escapeHtml = (t: string) =>
+  t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const titleHtml = escapeHtml(title).replace(
+  /([\p{L}\p{N}]+-[\p{L}\p{N}]+)/gu,
+  '<span class="nb">$1</span>'
+);
+---
+
+<section class="embed-card" aria-label={`Article — ${byline}`}>
+  <div class="card-grid">
+    <div class="card-main">
+      <div class="card-head">
+        <p class="kicker">{kicker}</p>
+        <h2 class="title">
+          <a href={href} target="_blank" rel="noopener noreferrer" set:html={titleHtml} />
+        </h2>
+      </div>
+
+      <p class="excerpt">{excerpt}</p>
+
+      <div class="byline">
+        {
+          logo && (
+            <img
+              class="byline-mark"
+              src={logo.src}
+              width={logo.width}
+              height={logo.height}
+              alt={logo.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          )
+        }
+        <p class="byline-text">{byline}</p>
+      </div>
+
+      <div class="cta">
+        <Button href={href} variant="primary">{linkLabel}</Button>
+      </div>
+    </div>
+
+    <picture class="card-photo">
+      <source type="image/avif" srcset="/img/headshot-480.avif 480w, /img/headshot-960.avif 960w" sizes="300px" />
+      <source type="image/webp" srcset="/img/headshot-480.webp 480w, /img/headshot-960.webp 960w" sizes="300px" />
+      <img
+        src="/img/headshot-960.jpg"
+        srcset="/img/headshot-480.jpg 480w, /img/headshot-960.jpg 960w"
+        sizes="300px"
+        width="960"
+        height="960"
+        alt={imageAlt}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  </div>
+</section>
+
+<style>
+  /* Strong rules top and bottom: the card is a self-contained object, not a
+     passage of the page. Whatever follows must keep its distance — see the
+     margin the About page gives it — so the rules never pair up. */
+  .embed-card {
+    border-top: 1px solid var(--rule-strong);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: var(--gutter);
+    align-items: start;
+    padding-block: var(--s-8);
+  }
+
+  .card-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-5);
+  }
+
+  .card-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--red-ink);
+    line-height: 1.7;
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 2.8vw, 34px);
+    line-height: 1.15;
+    letter-spacing: -.01em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  /* A heading that links: no standing underline, because the button below it
+     goes to the same place and is the block's obvious way in. */
+  .title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .title a:hover {
+    color: var(--red);
+  }
+
+  .title :global(.nb) {
+    white-space: nowrap;
+  }
+
+  .excerpt {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 54ch;
+  }
+
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .byline-mark {
+    display: block;
+    width: 66px;
+    height: 24px;
+    object-fit: contain;
+    object-position: left center;
+    opacity: .85;
+  }
+
+  .byline-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .04em;
+    color: var(--ink-muted);
+  }
+
+  .cta {
+    margin-top: var(--s-2);
+  }
+
+  /* Unboxed, like every other plate on the site. */
+  .card-photo,
+  .card-photo img {
+    display: block;
+    width: 300px;
+    height: 300px;
+  }
+
+  .card-photo img {
+    object-fit: cover;
+    object-position: center 12%;
+  }
+
+  @media (max-width: 899px) {
+    /* Photo moves up beside the kicker and title; everything else runs full
+       width beneath. `display: contents` lets the card's own children take
+       part in this grid without a second wrapper. */
+    .card-grid {
+      grid-template-columns: 120px minmax(0, 1fr);
+      grid-template-areas:
+        'photo head'
+        'excerpt excerpt'
+        'byline byline'
+        'cta cta';
+      gap: var(--s-5);
+      align-items: start;
+      padding-block: var(--s-7);
+    }
+
+    .card-main {
+      display: contents;
+    }
+
+    .card-head {
+      grid-area: head;
+    }
+
+    .excerpt {
+      grid-area: excerpt;
+      max-width: none;
+    }
+
+    .byline {
+      grid-area: byline;
+    }
+
+    .cta {
+      grid-area: cta;
+      margin-top: 0;
+    }
+
+    .card-photo,
+    .card-photo img {
+      grid-area: photo;
+      width: 120px;
+      height: 120px;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .cta :global(.rp-button) {
+      width: 100%;
+    }
+  }
+</style>
