@@ -1,5 +1,5 @@
 ---
-import { nav, cta } from '../data/copy';
+import { nav, cta, isNavCurrent } from '../data/copy';
 
 interface Props {
   currentPath: string;
@@ -25,8 +25,7 @@ const { currentPath } = Astro.props;
     <ul class="sheet-links">
       {
         nav.map((item) => {
-          const isCurrent =
-            item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href);
+          const isCurrent = isNavCurrent(item, currentPath);
           return (
             <li>
               <a href={item.href} aria-current={isCurrent ? 'page' : undefined}>

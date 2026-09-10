@@ -6,6 +6,16 @@
 export interface NavItem {
   label: string;
   href: string;
+  // Extra path prefixes that also count as "current" for this nav item —
+  // e.g. Evals covers /crosssource/ and /mirror-eval/ in addition to its
+  // own /evals/ index.
+  activePrefixes?: string[];
+}
+
+export function isNavCurrent(item: NavItem, currentPath: string): boolean {
+  if (item.href === '/') return currentPath === '/';
+  if (currentPath.startsWith(item.href)) return true;
+  return item.activePrefixes?.some((p) => currentPath.startsWith(p)) ?? false;
 }
 
 export interface CtaLink {
@@ -27,10 +37,17 @@ export const site = {
 
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'CrossSource', href: '/crosssource/' },
+  { label: 'Evals', href: '/evals/', activePrefixes: ['/crosssource/', '/mirror-eval/'] },
   { label: 'Writing', href: '/writing/' },
   { label: 'Work', href: '/work/' },
   { label: 'About', href: '/about/' },
+];
+
+// Evals index switcher — reused in the /evals/ index and in the margin-column
+// switcher on /crosssource and /mirror-eval.
+export const evalsSwitcher = [
+  { name: 'CrossSource', href: '/crosssource/' },
+  { name: 'mirror-eval', href: '/mirror-eval/' },
 ];
 
 export const cta = {
@@ -63,6 +80,11 @@ export const meta = {
   writingIndex: {
     title: 'Writing — Zoeb Nomi',
     description: 'Notes on LLM evaluation, LLM-as-judge reliability, and RAG output quality — from CrossSource and production eval work.',
+  },
+  evals: {
+    title: 'Evals — Zoeb Nomi · AI Product Manager',
+    description:
+      'Two open evaluation harnesses built to one method: CrossSource (citation accuracy in legal RAG) and mirror-eval (what AI search engines say about a person). Judges validated blind; numbers counted, not scored.',
   },
   mirrorEval: {
     title: 'mirror-eval: what AI search says about a person — Zoeb Nomi',
@@ -1061,6 +1083,7 @@ export const llmsTxt = `# Zoeb Nomi
 ## Pages
 
 - Home: https://www.zoebnomi.com/
+- Evals index: https://www.zoebnomi.com/evals/
 - CrossSource case study: https://www.zoebnomi.com/crosssource/
 - mirror-eval case study: https://www.zoebnomi.com/mirror-eval/
 - Work: https://www.zoebnomi.com/work/

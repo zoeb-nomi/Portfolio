@@ -4,6 +4,7 @@ import Section from '../components/Section.astro';
 import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
+import EvalsSwitcher from '../components/EvalsSwitcher.astro';
 import { meta, crosssource as cs, cta, home } from '../data/copy';
 
 const table1Rows = cs.s3.table1.rows.map((r) => ({
@@ -36,6 +37,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
             </div>
           ))}
         </dl>
+        <EvalsSwitcher current="CrossSource" />
         <a class="repo-link" href={cs.repoHref} target="_blank" rel="noopener noreferrer">{cs.repoLabel}</a>
       </aside>
       <div class="body-col">
@@ -180,6 +182,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   .repo-link {
     display: inline-block;
+    margin-top: var(--s-6);
     font-family: var(--font-mono);
     font-size: var(--t-caption);
     color: var(--red-ink);

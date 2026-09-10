@@ -13,8 +13,10 @@ interface Card {
 }
 
 interface Props {
-  h2: string;
-  methodLine: string;
+  // Optional: /evals/ carries this text in its own masthead h1/standfirst
+  // instead, and reuses this component for the cards + close line only.
+  h2?: string;
+  methodLine?: string;
   cards: Card[];
   closeLine: string;
 }
@@ -23,8 +25,8 @@ const { h2, methodLine, cards, closeLine } = Astro.props;
 ---
 
 <div class="evals-block">
-  <h2 class="evals-h2">{h2}</h2>
-  <p class="evals-method">{methodLine}</p>
+  {h2 && <h2 class="evals-h2">{h2}</h2>}
+  {methodLine && <p class="evals-method">{methodLine}</p>}
   <div class="evals-cards">
     {
       cards.map((c) => (

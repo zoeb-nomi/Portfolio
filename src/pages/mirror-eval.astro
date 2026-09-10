@@ -4,6 +4,7 @@ import Section from '../components/Section.astro';
 import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
+import EvalsSwitcher from '../components/EvalsSwitcher.astro';
 import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home } from '../data/copy';
 
 const table1Rows = me.s3.table1.rows.map((r) => ({
@@ -41,6 +42,7 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
             </div>
           ))}
         </dl>
+        <EvalsSwitcher current="mirror-eval" />
         <a class="repo-link" href={me.repoHref} target="_blank" rel="noopener noreferrer">{me.repoLabel}</a>
       </aside>
       <div class="body-col">
@@ -187,6 +189,7 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 
   .repo-link {
     display: inline-block;
+    margin-top: var(--s-6);
     font-family: var(--font-mono);
     font-size: var(--t-caption);
     color: var(--red-ink);

@@ -1,7 +1,7 @@
 {
   "source": "snapshot",
-  "fetched_at": "2026-09-10T14:41:38.214Z",
-  "total_last_year": 75,
+  "fetched_at": "2026-09-10T15:47:14.243Z",
+  "total_last_year": 76,
   "days": [
     {
       "date": "2025-09-07",
@@ -1845,8 +1845,8 @@
     },
     {
       "date": "2026-09-10",
-      "level": 2,
-      "count": 5
+      "level": 3,
+      "count": 6
     }
   ]
 }
