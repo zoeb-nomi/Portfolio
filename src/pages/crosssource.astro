@@ -116,6 +116,9 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     <p class="prose related-writing">
       <a href="/writing/the-judge-caught-a-bug/">The judge caught a bug I didn't</a> — on validating the LLM judge behind these numbers.
     </p>
+    <p class="prose related-writing">
+      <a href="/mirror-eval/">mirror-eval</a> — the same method pointed at what AI search engines say about me.
+    </p>
   </Section>
 
   <CTASlab
@@ -224,6 +227,10 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  .related-writing + .related-writing {
+    margin-top: var(--s-3);
   }
 
   .highlight {

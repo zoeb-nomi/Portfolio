@@ -1,0 +1,326 @@
+---
+// A month-labelled GitHub-style contribution heatmap. Server-renders the
+// committed snapshot (src/data/contributions.json) so it works with JS off
+// and never disappears; a small inline script then tries /api/contributions
+// and re-renders with live data on success, updating the caption to match.
+//
+// Monochrome by design (§6 tokens in tokens.css) — never GitHub green.
+import snapshot from '../data/contributions.json';
+import { contributions as copy } from '../data/copy';
+
+interface Day {
+  date: string; // YYYY-MM-DD
+  level: number; // 0-4
+  count: number;
+}
+
+const days = snapshot.days as Day[];
+const totalLastYear = snapshot.total_last_year as number;
+const fetchedAt = snapshot.fetched_at as string;
+
+const MONTH_ABBR = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+const MONTH_FULL = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+const WEEKDAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', '']; // Sun=0 .. Sat=6
+
+function utcDate(dateStr: string): Date {
+  return new Date(`${dateStr}T00:00:00Z`);
+}
+
+// Place each day into a Sun-Sat week grid: row = weekday (0=Sun..6=Sat),
+// column = weeks elapsed since the Sunday on/before the first day.
+const firstDate = days.length ? utcDate(days[0].date) : new Date();
+const firstWeekday = firstDate.getUTCDay();
+const gridStart = new Date(firstDate);
+gridStart.setUTCDate(gridStart.getUTCDate() - firstWeekday);
+
+interface Cell extends Day {
+  row: number;
+  col: number;
+}
+
+const cells: Cell[] = days.map((d) => {
+  const dt = utcDate(d.date);
+  const dayIndex = Math.round((dt.getTime() - gridStart.getTime()) / 86400000);
+  return { ...d, row: dt.getUTCDay(), col: Math.floor(dayIndex / 7) };
+});
+
+const weekCount = cells.length ? Math.max(...cells.map((c) => c.col)) + 1 : 0;
+const recentWeeksStart = Math.max(0, weekCount - 26);
+
+// Month labels: one per column where the month changes from the previous
+// labelled column, with a minimum 2-column gap so short months don't crowd.
+const monthLabels: { col: number; label: string }[] = [];
+{
+  let lastCol = -99;
+  let lastMonth = -1;
+  for (let col = 0; col < weekCount; col++) {
+    const sundayCell = cells.find((c) => c.col === col && c.row === 0) ?? cells.find((c) => c.col === col);
+    if (!sundayCell) continue;
+    const month = utcDate(sundayCell.date).getUTCMonth();
+    if (month !== lastMonth && col - lastCol >= 2) {
+      monthLabels.push({ col, label: MONTH_ABBR[month] });
+      lastMonth = month;
+      lastCol = col;
+    }
+  }
+}
+
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
+}
+
+function cellTitle(c: Cell): string {
+  const dt = utcDate(c.date);
+  const monthDay = `${MONTH_FULL[dt.getUTCMonth()]} ${ordinal(dt.getUTCDate())}, ${dt.getUTCFullYear()}`;
+  const noun = c.count === 1 ? 'contribution' : 'contributions';
+  return `${c.count} ${noun} on ${monthDay}`;
+}
+
+const snapshotDateStr = fetchedAt
+  ? new Date(fetchedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  : '';
+
+const initialCaption = `${totalLastYear} ${copy.captionSnapshot} ${snapshotDateStr}`;
+
+const rangeLabel =
+  days.length > 0
+    ? `${MONTH_FULL[utcDate(days[0].date).getUTCMonth()]} ${utcDate(days[0].date).getUTCFullYear()} to ${
+        MONTH_FULL[utcDate(days[days.length - 1].date).getUTCMonth()]
+      } ${utcDate(days[days.length - 1].date).getUTCFullYear()}`
+    : '';
+
+const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear} contributions in the last year`;
+---
+
+<div class="cg" data-contrib-graph data-recent-start={recentWeeksStart}>
+  <p class="cg-kicker">{copy.kicker}</p>
+
+  <div class="cg-scroll">
+    <div class="cg-layout">
+      <div class="cg-weekday-col" aria-hidden="true">
+        <div class="cg-weekday-spacer"></div>
+        {WEEKDAY_LABELS.map((label) => <div class="cg-weekday-label">{label}</div>)}
+      </div>
+
+      <div
+        class="cg-grid"
+        role="img"
+        aria-label={ariaSummary}
+        style={`--weeks: ${weekCount};`}
+      >
+        {monthLabels.map((m) => (
+          <div class="cg-month-label" style={`grid-column: ${m.col + 1} / span 4; grid-row: 1;`}>
+            {m.label}
+          </div>
+        ))}
+        {cells.map((c) => (
+          <div
+            class="cg-cell"
+            data-date={c.date}
+            data-level={c.level}
+            data-count={c.count}
+            style={`grid-column: ${c.col + 1}; grid-row: ${c.row + 2};`}
+            title={cellTitle(c)}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="cg-footer">
+    <p class="cg-caption" data-contrib-caption>{initialCaption}</p>
+    <div class="cg-legend" aria-hidden="true">
+      <span class="cg-legend-label">{copy.legendLess}</span>
+      <span class="cg-legend-swatch" data-level="0"></span>
+      <span class="cg-legend-swatch" data-level="1"></span>
+      <span class="cg-legend-swatch" data-level="2"></span>
+      <span class="cg-legend-swatch" data-level="3"></span>
+      <span class="cg-legend-swatch" data-level="4"></span>
+      <span class="cg-legend-label">{copy.legendMore}</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Progressive enhancement only — the server-rendered snapshot above is a
+  // complete, correct graph on its own. This script:
+  //   1. scrolls the grid so the most recent ~26 weeks are in view by default
+  //      on narrow viewports (fixed 11px cells never shrink below legible size,
+  //      overflow-x:auto is the fallback for older weeks).
+  //   2. fetches /api/contributions and, on success, re-renders cell levels
+  //      and the caption with live data; on failure it leaves the snapshot
+  //      exactly as server-rendered.
+  const roots = document.querySelectorAll<HTMLElement>('[data-contrib-graph]');
+
+  for (const root of roots) {
+    const scroller = root.querySelector<HTMLElement>('.cg-scroll');
+    if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+
+    const captionEl = root.querySelector<HTMLElement>('[data-contrib-caption]');
+    const cellEls = root.querySelectorAll<HTMLElement>('.cg-cell');
+
+    fetch('/api/contributions')
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+      .then((data: { source: string; total_last_year?: number; days?: { date: string; level: number; count: number }[] }) => {
+        if (data.source !== 'live' || !Array.isArray(data.days)) throw new Error('unexpected payload');
+
+        const byDate = new Map(data.days.map((d) => [d.date, d]));
+        cellEls.forEach((el) => {
+          const date = el.dataset.date;
+          const day = date ? byDate.get(date) : undefined;
+          if (!day) return;
+          el.dataset.level = String(day.level);
+          el.dataset.count = String(day.count);
+          const noun = day.count === 1 ? 'contribution' : 'contributions';
+          const existingTitle = el.getAttribute('title') || '';
+          const onPart = existingTitle.replace(/^\d+ contributions? /, '');
+          el.setAttribute('title', `${day.count} ${noun} ${onPart}`);
+        });
+
+        if (captionEl && typeof data.total_last_year === 'number') {
+          captionEl.textContent = `${data.total_last_year} contributions in the last year · live from GitHub`;
+        }
+      })
+      .catch(() => {
+        // Leave the server-rendered snapshot exactly as-is.
+      });
+  }
+</script>
+
+<style>
+  .cg {
+    max-width: 100%;
+  }
+
+  .cg-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: var(--s-4);
+  }
+
+  .cg-scroll {
+    overflow-x: auto;
+    padding-bottom: var(--s-1);
+  }
+
+  .cg-layout {
+    display: flex;
+    gap: 6px;
+    width: max-content;
+  }
+
+  .cg-weekday-col {
+    display: grid;
+    grid-template-rows: 14px repeat(7, 11px);
+    gap: 3px;
+    flex: 0 0 auto;
+  }
+
+  .cg-weekday-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    line-height: 11px;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+
+  .cg-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--weeks), 11px);
+    grid-auto-rows: 11px;
+    grid-template-rows: 14px repeat(7, 11px);
+    gap: 3px;
+    flex: 0 0 auto;
+  }
+
+  .cg-month-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-muted);
+    align-self: end;
+    white-space: nowrap;
+  }
+
+  .cg-cell {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+    background: var(--heat-0);
+  }
+
+  .cg-cell[data-level='1'] {
+    background: var(--heat-1);
+  }
+  .cg-cell[data-level='2'] {
+    background: var(--heat-2);
+  }
+  .cg-cell[data-level='3'] {
+    background: var(--heat-3);
+  }
+  .cg-cell[data-level='4'] {
+    background: var(--heat-4);
+  }
+
+  .cg-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .cg-caption {
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+    color: var(--ink-muted);
+  }
+
+  .cg-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cg-legend-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-muted);
+  }
+
+  .cg-legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--heat-0);
+  }
+  .cg-legend-swatch[data-level='1'] {
+    background: var(--heat-1);
+  }
+  .cg-legend-swatch[data-level='2'] {
+    background: var(--heat-2);
+  }
+  .cg-legend-swatch[data-level='3'] {
+    background: var(--heat-3);
+  }
+  .cg-legend-swatch[data-level='4'] {
+    background: var(--heat-4);
+  }
+
+  @media (max-width: 639px) {
+    .cg-scroll {
+      max-width: 100%;
+    }
+  }
+</style>

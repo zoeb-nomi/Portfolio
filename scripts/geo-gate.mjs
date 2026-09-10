@@ -57,6 +57,27 @@ const POSITIVES = [
   'calendar.app.google/56javKNeXqw7X8oq6',
   'zoeb.nomi@gmail.com',
   'Open to US relocation',
+
+  // mirror-eval — copy-pack-additions.md §16, added 2026-09-10.
+  'mirror-eval',
+  'github.com/zoeb-nomi/mirror-eval',
+  '13 → 63',
+  '0 → 0',
+  '0 → 25',
+  '0 → 32',
+  '79 → 11',
+  '0 → 74',
+  '228 → 36',
+  '27% → 19%',
+  '3/40',
+  '12/40',
+  '117 of 332',
+  '86%',
+  '63 search-mode probes',
+  '332 per wave',
+  'two of nine',
+  'Two harnesses, one method',
+  'PM who ships code',
 ];
 
 // Simple literal-string negatives.
@@ -67,6 +88,11 @@ const NEGATIVE_LITERALS = [
   '$800K',
   'cultural products',
   '1,200+',
+
+  // mirror-eval — copy-pack-additions.md §16 negative checks, added 2026-09-10.
+  '+1.41',
+  '+0.65',
+  '−0.25',
 ];
 
 // "Filed" as a standalone product name — must not match the common word

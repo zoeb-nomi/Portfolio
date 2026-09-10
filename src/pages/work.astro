@@ -18,6 +18,20 @@ import { meta, work, cta, home } from '../data/copy';
     </div>
   </section>
 
+  <section class="open-work">
+    <div class="open-work-inner">
+      <div class="margin-col" aria-hidden="true"></div>
+      <div class="body-col">
+        <h2 class="visually-hidden">{work.openWork.kicker}</h2>
+        <RecordList
+          kicker={work.openWork.kicker}
+          items={work.openWork.items}
+          note={work.openWork.note}
+        />
+      </div>
+    </div>
+  </section>
+
   <TimelineEntry
     company={work.instead.company}
     role={work.instead.role}
@@ -118,6 +132,29 @@ import { meta, work, cta, home } from '../data/copy';
     padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
   }
 
+  /* Open work — same margin-col | body-col grid, its own closing rule
+     (RecordList supplies the visible content and its own top rule). */
+  .open-work-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  /* Keeps h1 -> h2 -> h3 order intact: RecordList's own kicker renders as an
+     h3, so this establishes the h2 the outline needs without a second
+     visible "Open work" label. */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .page-h1 {
     font-family: var(--font-display);
     font-size: var(--t-page);
@@ -153,7 +190,8 @@ import { meta, work, cta, home } from '../data/copy';
   }
 
   @media (max-width: 899px) {
-    .masthead-inner {
+    .masthead-inner,
+    .open-work-inner {
       grid-template-columns: 1fr;
     }
 
