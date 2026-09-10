@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import EvalsBlock from '../components/EvalsBlock.astro';
+import CTASlab from '../components/CTASlab.astro';
+import { meta, home, cta } from '../data/copy';
+---
+
+<Base title={meta.evals.title} description={meta.evals.description} path="/evals/" ogImage="/og/crosssource.png">
+  <section class="masthead">
+    <div class="masthead-inner">
+      <aside class="margin-col" aria-label="Article kicker">
+        <p class="kicker">{home.evals.kicker}</p>
+      </aside>
+      <div class="body-col">
+        <h1 class="page-h1">{home.evals.h2}</h1>
+        <p class="standfirst">{home.evals.methodLine}</p>
+      </div>
+    </div>
+  </section>
+
+  <Section mark="§1" label="Harnesses">
+    <EvalsBlock cards={home.evals.cards} closeLine={home.evals.closeLine} />
+  </Section>
+
+  <CTASlab
+    marginLines={[home.eyebrow.toUpperCase()]}
+    body={home.ctaSlabBody}
+    buttonLabel={cta.bookACall.label}
+    buttonHref={cta.bookACall.href}
+  />
+</Base>
+
+<style>
+  .masthead-inner {
+    display: grid;
+    grid-template-columns: var(--margin-col) 1fr;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .margin-col {
+    border-right: 1px solid var(--rule);
+    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .body-col {
+    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
+  }
+
+  .page-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin-bottom: var(--s-6);
+    max-width: 20ch;
+  }
+
+  .standfirst {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 58ch;
+  }
+
+  @media (max-width: 899px) {
+    .masthead-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .margin-col {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--s-6) var(--gutter);
+    }
+
+    .body-col {
+      padding: var(--s-7) var(--gutter);
+    }
+  }
+</style>

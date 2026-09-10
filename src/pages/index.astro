@@ -3,21 +3,12 @@ import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import MarginNote from '../components/MarginNote.astro';
 import StatRow from '../components/StatRow.astro';
-import FlagshipCard from '../components/FlagshipCard.astro';
-import DataTable from '../components/DataTable.astro';
-import PullQuote from '../components/PullQuote.astro';
+import EvalsBlock from '../components/EvalsBlock.astro';
+import ContributionGraph from '../components/ContributionGraph.astro';
 import Button from '../components/Button.astro';
 import Figure from '../components/Figure.astro';
 import CTASlab from '../components/CTASlab.astro';
-import { meta, home, cta } from '../data/copy';
-
-const table1Rows = home.table1.rows.map((r) => ({
-  label: r.dimension,
-  cells: [
-    { text: r.baseline },
-    { text: r.strict, win: r.strictWins },
-  ],
-}));
+import { meta, home, cta, contributions } from '../data/copy';
 ---
 
 <Base title={meta.home.title} description={meta.home.description} path="/" ogImage="/og/home.png">
@@ -59,22 +50,21 @@ const table1Rows = home.table1.rows.map((r) => ({
     ))}
   </Section>
 
-  <Section mark="§2" label={home.flagship.label}>
-    <FlagshipCard
-      title={home.flagship.title}
-      description={home.flagship.description}
-      linkLabel={home.flagship.linkLabel}
-      linkHref={home.flagship.linkHref}
-    >
-      <DataTable caption={home.table1.caption} columns={home.table1.columns} rows={table1Rows} />
-    </FlagshipCard>
-
-    <div class="finding">
-      <PullQuote kicker={home.findingKicker}>{home.findingQuote}</PullQuote>
-    </div>
+  <Section mark="§2" label={home.evals.kicker}>
+    <EvalsBlock
+      h2={home.evals.h2}
+      methodLine={home.evals.methodLine}
+      cards={home.evals.cards}
+      closeLine={home.evals.closeLine}
+    />
   </Section>
 
-  <Section mark="§3" label={home.howIWorkLabel}>
+  <Section mark="§3" label={contributions.kicker}>
+    <p class="contrib-dek">{contributions.dek}</p>
+    <ContributionGraph />
+  </Section>
+
+  <Section mark="§4" label={home.howIWorkLabel}>
     <ul class="methods">
       {home.methods.map((m) => (
         <li class="method-row">
@@ -204,8 +194,30 @@ const table1Rows = home.table1.rows.map((r) => ({
     flex-wrap: wrap;
   }
 
-  .finding {
-    margin-top: var(--s-11);
+  .contrib-dek {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.6;
+    color: var(--ink-body);
+    max-width: 56ch;
+    margin-bottom: var(--s-6);
+  }
+
+  /* Section's margin-col already carries "PM who ships code" as this
+     section's kicker (mark="§3" label={contributions.kicker}) — hide
+     ContributionGraph's own internal kicker line so it isn't repeated in
+     the body column. The component itself is untouched. */
+  :global([data-contrib-graph] .cg-kicker) {
+    display: none;
+  }
+
+  /* Grid items default to min-width: auto (content-based). The heatmap's
+     fixed-width week columns are wider than Section's body-col track at
+     mobile, so without this the grid track — and the page — grows to fit
+     it instead of letting ContributionGraph's own .cg-scroll overflow-x:
+     auto contain it. */
+  :global(.rp-section .body-col) {
+    min-width: 0;
   }
 
   .methods {

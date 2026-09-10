@@ -1,0 +1,73 @@
+---
+// Margin-column switcher on /crosssource and /mirror-eval — lets a reader on
+// one case study jump to the other without going back through nav. Three
+// line tiers only: --rule for the divider above it, --red-ink for the
+// current item (no new colors).
+import { evalsSwitcher } from '../data/copy';
+
+interface Props {
+  current: 'CrossSource' | 'mirror-eval';
+}
+
+const { current } = Astro.props;
+---
+
+<div class="evals-switch">
+  <p class="switch-label">Evals</p>
+  <ul class="switch-list">
+    {
+      evalsSwitcher.map((s) => (
+        <li>
+          {s.name === current ? (
+            <span class="current" aria-current="page">
+              <span aria-hidden="true">→</span> {s.name}
+            </span>
+          ) : (
+            <a href={s.href}>{s.name}</a>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .evals-switch {
+    margin-top: var(--s-6);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--rule);
+  }
+
+  .switch-label {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: var(--s-3);
+  }
+
+  .switch-list {
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: var(--t-caption);
+  }
+
+  .switch-list li {
+    padding-block: 3px;
+  }
+
+  .switch-list a {
+    color: var(--ink-body);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .switch-list a:hover {
+    color: var(--red-ink);
+  }
+
+  .switch-list .current {
+    color: var(--red-ink);
+  }
+</style>

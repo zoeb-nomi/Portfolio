@@ -1,0 +1,120 @@
+---
+// Home — Evals block. Replaces the single FlagshipCard (copy-pack-additions.md
+// §11, added 2026-09-10). Two cards side by side on the body column at
+// >=900px, stacked below. Three line tiers only (--rule / --rule-strong via
+// the wrapping Section / --rule-accent — none introduced here); 400 weights
+// only (no font-weight declared — the site loads only the 400 weight of
+// each face, so anything else would fake-bold).
+interface Card {
+  name: string;
+  description: string;
+  linkLabel: string;
+  linkHref: string;
+}
+
+interface Props {
+  // Optional: /evals/ carries this text in its own masthead h1/standfirst
+  // instead, and reuses this component for the cards + close line only.
+  h2?: string;
+  methodLine?: string;
+  cards: Card[];
+  closeLine: string;
+}
+
+const { h2, methodLine, cards, closeLine } = Astro.props;
+---
+
+<div class="evals-block">
+  {h2 && <h2 class="evals-h2">{h2}</h2>}
+  {methodLine && <p class="evals-method">{methodLine}</p>}
+  <div class="evals-cards">
+    {
+      cards.map((c) => (
+        <article class="evals-card">
+          <h3 class="evals-card-name">{c.name}</h3>
+          <p class="evals-card-desc">
+            {c.description} <a class="evals-card-link" href={c.linkHref}>{c.linkLabel}</a>
+          </p>
+        </article>
+      ))
+    }
+  </div>
+  <p class="evals-close">{closeLine}</p>
+</div>
+
+<style>
+  .evals-h2 {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: 1.05;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    max-width: 20ch;
+    margin-bottom: var(--s-4);
+  }
+
+  .evals-method {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.6;
+    color: var(--ink-body);
+    max-width: 58ch;
+    margin-bottom: var(--s-8);
+  }
+
+  .evals-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-bottom: var(--s-8);
+  }
+
+  .evals-card {
+    border-top: 1px solid var(--rule);
+    padding-top: var(--s-5);
+  }
+
+  .evals-card-name {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: var(--s-3);
+  }
+
+  .evals-card-desc {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.6;
+    color: var(--ink-body);
+    max-width: 48ch;
+  }
+
+  .evals-card-link {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: .04em;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+    text-underline-offset: 3px;
+  }
+
+  .evals-close {
+    font-family: var(--font-body);
+    font-size: var(--t-lead);
+    line-height: 1.6;
+    color: var(--ink-body);
+    max-width: 60ch;
+    border-top: 1px solid var(--rule);
+    padding-top: var(--s-6);
+  }
+
+  @media (max-width: 899px) {
+    .evals-cards {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+</style>

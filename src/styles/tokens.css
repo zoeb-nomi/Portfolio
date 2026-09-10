@@ -68,6 +68,16 @@
 
   /* Motion */
   --ease-draw: cubic-bezier(.2, .7, .2, 1);
+
+  /* §6 — Contribution heatmap. Monochrome, derived from --ink so it reads as
+     the same instrument as everything else on the page — never GitHub green.
+     Five steps: 0 (no contributions, a bare rule-tint square) through 4
+     (heaviest day, full --ink). */
+  --heat-0: var(--rule);
+  --heat-1: color-mix(in oklch, var(--ink) 32%, var(--paper));
+  --heat-2: color-mix(in oklch, var(--ink) 52%, var(--paper));
+  --heat-3: color-mix(in oklch, var(--ink) 74%, var(--paper));
+  --heat-4: var(--ink);
 }
 
 @media (max-width: 1099px) {

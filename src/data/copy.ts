@@ -6,6 +6,16 @@
 export interface NavItem {
   label: string;
   href: string;
+  // Extra path prefixes that also count as "current" for this nav item —
+  // e.g. Evals covers /crosssource/ and /mirror-eval/ in addition to its
+  // own /evals/ index.
+  activePrefixes?: string[];
+}
+
+export function isNavCurrent(item: NavItem, currentPath: string): boolean {
+  if (item.href === '/') return currentPath === '/';
+  if (currentPath.startsWith(item.href)) return true;
+  return item.activePrefixes?.some((p) => currentPath.startsWith(p)) ?? false;
 }
 
 export interface CtaLink {
@@ -27,10 +37,17 @@ export const site = {
 
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'CrossSource', href: '/crosssource/' },
+  { label: 'Evals', href: '/evals/', activePrefixes: ['/crosssource/', '/mirror-eval/'] },
   { label: 'Writing', href: '/writing/' },
   { label: 'Work', href: '/work/' },
   { label: 'About', href: '/about/' },
+];
+
+// Evals index switcher — reused in the /evals/ index and in the margin-column
+// switcher on /crosssource and /mirror-eval.
+export const evalsSwitcher = [
+  { name: 'CrossSource', href: '/crosssource/' },
+  { name: 'mirror-eval', href: '/mirror-eval/' },
 ];
 
 export const cta = {
@@ -63,6 +80,21 @@ export const meta = {
   writingIndex: {
     title: 'Writing — Zoeb Nomi',
     description: 'Notes on LLM evaluation, LLM-as-judge reliability, and RAG output quality — from CrossSource and production eval work.',
+  },
+  evals: {
+    title: 'Evals — Zoeb Nomi · AI Product Manager',
+    description:
+      'Two open evaluation harnesses built to one method: CrossSource (citation accuracy in legal RAG) and mirror-eval (what AI search engines say about a person). Judges validated blind; numbers counted, not scored.',
+  },
+  mirrorEval: {
+    title: 'mirror-eval: what AI search says about a person — Zoeb Nomi',
+    description:
+      'Open harness measuring what four AI search engines say about a person, twice: Perplexity 13→63 of 63 probes citing the canonical site, Claude 0→0, a data broker filling the gap, and a judge that failed blind validation — so the numbers are counts, not scores.',
+  },
+  writingReflection: {
+    title: 'I pointed an eval harness at my own reflection — Zoeb Nomi',
+    description:
+      'Engines fill rather than abstain; self-published claims get discounted; the LLM judge failed blind validation and the study got stronger for it. Three findings from running an eval harness on my own name.',
   },
   work: {
     title: 'Work — Zoeb Nomi · AI Product Manager',
@@ -164,6 +196,19 @@ export const softwareSourceCodeJsonLd = {
   author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
 };
 
+// mirror-eval — copy-pack-additions.md §16, verbatim
+export const mirrorEvalJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: 'mirror-eval',
+  description:
+    'Open evaluation harness measuring what AI search engines say about a person, with a claim-failure taxonomy, dual-family LLM judges validated blind against a human, and a judge-free citation trail. Two waves, 332 probes each, across ChatGPT, Claude, Perplexity and Gemini.',
+  codeRepository: 'https://github.com/zoeb-nomi/mirror-eval',
+  programmingLanguage: 'Python',
+  version: '1.0',
+  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+};
+
 // ---------------------------------------------------------------------------
 // 2 · HOME — pack §2 + build-spec §8.1
 // ---------------------------------------------------------------------------
@@ -204,28 +249,31 @@ export const home = {
       provenance: null as string | null,
     },
   ],
-  flagship: {
-    label: 'Flagship — open source', // design-authored §12
-    sectionMark: '§2',
-    title: 'CrossSource',
-    description:
-      'An open evaluation harness for citation accuracy in legal RAG. 22 public court opinions, a 25-question golden set, an LLM judge validated blind against a human — and a real harness bug caught by that validation. The full harness, golden set and results are public and MIT-licensed at github.com/zoeb-nomi/crosssource.',
-    linkLabel: 'Read the case study →',
-    linkHref: '/crosssource/',
-  },
-  table1: {
-    caption: 'Table 1 — baseline vs. strict',
-    columns: ['Dimension', 'Baseline', 'Strict'],
-    rows: [
-      { dimension: 'Citation precision', baseline: '0.981', strict: '0.994', strictWins: true },
-      { dimension: 'Citation recall', baseline: '0.760', strict: '0.760', strictWins: false },
-      { dimension: 'Faithfulness', baseline: '1.000', strict: '1.000', strictWins: false },
-      { dimension: 'Answer relevance', baseline: '0.980', strict: '0.960', strictWins: false },
+  // Evals block — replaces the single flagship card, copy-pack-additions.md §11,
+  // added 2026-09-10. Rendered by EvalsBlock.astro inside Section §2.
+  evals: {
+    kicker: 'Evals',
+    h2: 'Two harnesses, one method.',
+    methodLine: 'Build the judge. Validate it blind against a human. Count what you can. Report the rest as bands.',
+    cards: [
+      {
+        name: 'CrossSource',
+        description:
+          'An open evaluation harness for citation accuracy in legal RAG. 22 public court opinions, a 25-question golden set, an LLM judge validated blind against a human — 100% (15/15) — and a real harness bug caught by that validation.',
+        linkLabel: 'Read the case study →',
+        linkHref: '/crosssource/',
+      },
+      {
+        name: 'mirror-eval',
+        description:
+          'The same method pointed at what AI search engines say about me. Four engines, 63 search probes each, two waves a month apart. The judges failed blind validation — 3/40 and 12/40 — so the study stands on counted citations instead: Perplexity 13 → 63 of 63, Claude 0 → 0.',
+        linkLabel: 'Read the case study →',
+        linkHref: '/mirror-eval/',
+      },
     ],
+    closeLine:
+      'One judge passed and caught a bug. One judge failed and the study survived on counts. Same method both times — that is the point.',
   },
-  findingKicker: 'THE FINDING THAT MATTERS',
-  findingQuote:
-    'Prompting discipline buys precision — it cannot buy recall. 0.760 in both configurations, because every missing-authority failure traces to retrieval, not generation.',
   measuredLabel: 'Measured, not asserted', // design-authored §12
   howIWorkLabel: 'How I work', // design-authored §12
   methods: [
@@ -395,6 +443,244 @@ export const crosssource = {
 };
 
 // ---------------------------------------------------------------------------
+// MIRROR-EVAL — copy-pack-additions.md §12, added 2026-09-10. Same shape as
+// CrossSource (§3 above) section-for-section: masthead, Section blocks with
+// mark/label, DataTable, a bold lead-in finding paragraph, PullQuote, Related
+// writing cross-link, CTASlab. The kicker and specBlock values follow
+// CrossSource's own established pattern (case study · harness type · version
+// · language / a 4-item spec block) — the copy pack does not dictate that
+// exact wording, only the numbers, so these are structural labels, not
+// invented prose.
+// ---------------------------------------------------------------------------
+
+export const mirrorEval = {
+  kicker: 'Case study · Open evaluation harness · v1.0 · Python',
+  title: 'mirror-eval: pointing an eval harness at what AI search says about me',
+  standfirst:
+    'Same fixes, four engines, opposite outcomes — and a zero that turned out to be the most useful number in the study. An open harness for measuring what AI search engines say about a person, built to the CrossSource method: explicit ground truth, a failure taxonomy instead of a bare score, a judge whose agreement with a human is measured rather than assumed, and a limitations section that says what the numbers cannot support.',
+  specBlock: [
+    { label: 'Engines', value: '4' },
+    { label: 'Probes', value: '332 per wave' },
+    { label: 'Waves', value: '2' },
+    { label: 'Judge validated', value: '3/40 · 12/40' },
+  ],
+  repoHref: 'https://github.com/zoeb-nomi/mirror-eval',
+  repoLabel: 'github.com/zoeb-nomi/mirror-eval',
+
+  s1: {
+    mark: '§1',
+    label: 'Why this exists',
+    body:
+      "Recruiters, buyers and counterparties increasingly ask an AI engine about you before they ask you. The answer is assembled from whatever the crawlers found — a dead portfolio, a scraped aggregator, a job you left two years ago — and you cannot see it from inside your own account, cannot A/B it, and nobody sends you a report. Existing tooling measures whether you are mentioned. That is the easy half. The hard half is whether the mention is true, current, and sourced to something you control. That is a scoring problem, which makes it an eval problem — the same class of problem as asking whether a production LLM's citation actually supports its claim. So I pointed the harness at my own reflection.",
+  },
+
+  s2: {
+    mark: '§2',
+    label: 'Method',
+    rows: [
+      {
+        term: 'Subject',
+        kind: 'code' as const,
+        bodyPre: 'Me. ',
+        code: 'canon.yaml',
+        bodyPost:
+          ' holds the ground truth — true claims, stale claims, clean and poisoned sources — and is the only file with facts in it. Point it at anyone.',
+      },
+      {
+        term: 'Engines',
+        kind: 'plain' as const,
+        body:
+          "ChatGPT, Claude, Perplexity, Gemini, through each provider's own API and retrieval stack. Aggregators would bolt a third-party search layer onto the model and measure a system nobody uses.",
+      },
+      {
+        term: 'Battery',
+        kind: 'plain' as const,
+        body:
+          '83 probes per engine per wave — 63 search-mode, 20 knowledge-mode — 332 per wave. Prompts are derived from facets (scaffolding, prior, decision, output shape), not topics; every cell is repeated, because a single probe cannot tell "the fix worked" from "we resampled."',
+      },
+      {
+        term: 'Two waves',
+        kind: 'plain' as const,
+        body: 'Baseline 2026-08-06, lift 2026-09-04. Identical battery, canon, and composition.',
+      },
+      {
+        term: 'Between the waves (Aug 7–20)',
+        kind: 'plain' as const,
+        body:
+          'Six changes to the surfaces engines read — a Bing Webmaster submission, a homepage link to the CrossSource repo, LinkedIn and profile-page cleanup, a DOI and identifier records, a new /writing/ page. They landed as a cluster, and are attributed as one.',
+      },
+      {
+        term: 'Two judges from different model families',
+        kind: 'plain' as const,
+        body:
+          'Tag every answer against a claim-failure taxonomy; then a blind, stratified human-labelled sample of 40 decides whether any judged number can be cited.',
+      },
+      {
+        term: 'Two kinds of number',
+        kind: 'plain' as const,
+        body:
+          'Counted: which surfaces each engine actually cited — judge-free. Judged: taxonomy categories — reported as bands unless validation says otherwise.',
+      },
+    ],
+  },
+
+  s3: {
+    mark: '§3',
+    label: 'Findings',
+    intro: 'Probes citing an owned surface, of 63 search-mode probes per engine, Wave 1 → Wave 2:',
+    table1: {
+      caption: 'Table 1 — owned-surface citations by engine, Wave 1 → Wave 2',
+      columns: ['Engine', 'zoebnomi.com', 'github.com/zoeb-nomi', 'Owned (site or repo)'],
+      rows: [
+        { engine: 'ChatGPT', site: '62 → 54', repo: '0 → 25', owned: '62 → 63', bold: false },
+        { engine: 'Claude', site: '0 → 0', repo: '0 → 0', owned: '0 → 0', bold: true },
+        { engine: 'Perplexity', site: '13 → 63', repo: '0 → 0', owned: '13 → 63', bold: true },
+        { engine: 'Gemini', site: '61 → 63', repo: '0 → 32', owned: '61 → 63', bold: false },
+      ],
+    },
+    table2Intro: 'What filled the gap (citation counts, Wave 1 → Wave 2):',
+    table2: {
+      caption: 'Table 2 — what filled the gap, Wave 1 → Wave 2',
+      columns: ['Surface', 'Engine', 'Count'],
+      rows: [
+        { surface: 'Four poisoned name-etymology and job-board pages', engine: 'Claude', count: '79 → 11' },
+        { surface: 'zoominfo.com (data broker)', engine: 'Claude', count: '0 → 74' },
+        { surface: 'Wrong-person pages (imdb, nomi.ai, youtube)', engine: 'Perplexity', count: '228 → 36' },
+      ],
+    },
+    findingLeadIn: 'The finding that matters:',
+    findingBody:
+      " the same cluster of fixes produced a 13 → 63 lift on Perplexity and nothing at all on Claude — 0 of 63 in both waves, a true null at four weeks. One variable explains the split: index access. The Bing submission reached the index Perplexity reads; there is no equivalent path into Anthropic's. And Claude's zero is not silence. Its poisoned citations fell 79 → 11, and a data broker rose 0 → 74 to fill the vacuum. An engine that cannot find the authoritative page does not abstain. It substitutes.",
+  },
+
+  s4: {
+    mark: '§4',
+    label: 'The judge failed — because I checked the judge',
+    para1:
+      "CrossSource's judge passed its blind check at 15/15. This one did not. Against 40 blind human labels, the Claude judge matched the exact tag set on 3 (8%) and the Gemini judge on 12 (30%); the two judges agreed with each other on 117 of 332 answers (35%). Ten repetitions of an identical prompt changed the tag set 86% of the time. It was the third consecutive blind check to say the same thing.",
+    para2Pre:
+      'So no interpretive category on this page is a rate. Bands only — and every headline number is a count with a denominator. The one exception is ',
+    para2Code: 'poisoned_citation',
+    para2Post: ', 27% → 19%, which is computed against canon rather than judged.',
+    lessonQuote: 'It became a point estimate the moment it stopped being asked of a language model.',
+  },
+
+  s5: {
+    mark: '§5',
+    label: 'What this demonstrates',
+    body:
+      'The method survives the judge failing. When validation says the judge cannot be trusted, you do not soften the claim — you change what kind of number you publish. Instrument what can be counted; demote what must be interpreted; separate index-driven effects from model-driven ones so you know which fix owns the failure. It is the same discipline as CrossSource, and the opposite outcome, which is why the two belong together.',
+  },
+
+  s6: {
+    mark: '§6',
+    label: 'Limitations',
+    body:
+      'Engine versions are not verifiably frozen between waves (the citation trail is index-driven and robust to that; the taxonomy is not). The last fixes had about two weeks of recrawl, not four. The six interventions were a cluster, not isolated tests. Human validation covers 40 of 227 eligible items, stratified — not a full audit. Canon had a coverage gap: several "fabricated" numbers were true, published figures missing from canon.yaml. Verbatim engine answers are withheld because cited surfaces can include other people\'s public posts.',
+  },
+
+  s7: {
+    mark: '§7',
+    label: 'Predictions, scored',
+    body:
+      'PREDICTIONS.md was committed before Wave 1 ran and scored publicly, misses first: two of nine held. The misses changed the roadmap more than the hits did.',
+  },
+
+  s8: {
+    mark: '§8',
+    label: 'Next',
+    body:
+      'v1 is closed with this wave. A Claude-only mini-wave on the frozen instrument runs once a real crawler-access change has had time to land. v2 moves from chat engines to the agentic stacks that actually screen and source people — paired designs, counted metrics, human-gated labels.',
+  },
+
+  repoCta: [
+    { label: 'Read the code, run it on yourself →', href: 'https://github.com/zoeb-nomi/mirror-eval' },
+    { label: 'Release v1.0 →', href: 'https://github.com/zoeb-nomi/mirror-eval/releases/tag/v1.0' },
+    { label: 'Predictions →', href: 'https://github.com/zoeb-nomi/mirror-eval/blob/main/PREDICTIONS.md' },
+  ],
+
+  relatedWriting: {
+    mark: '§9',
+    text: 'I pointed an eval harness at my own reflection',
+    href: '/writing/eval-harness-at-my-own-reflection/',
+  },
+
+  ctaSlabBody: 'Read the code, run it on yourself →',
+};
+
+// ---------------------------------------------------------------------------
+// WRITING — "I pointed an eval harness at my own reflection" — copy-pack-
+// additions.md §13, added 2026-09-10. Body split into Sections at the three
+// numbered beats plus the closing "What I'd tell someone" section, per spec.
+// ---------------------------------------------------------------------------
+
+export const writingReflection = {
+  kicker: 'Eval methodology · mirror-eval',
+  title: 'I pointed an eval harness at my own reflection',
+  dek: 'What four AI search engines say about me, measured twice — and the three things that only showed up because the numbers were counted rather than scored.',
+  date: '2026-09-10',
+  readingTime: '5 min',
+  repoHref: 'https://github.com/zoeb-nomi/mirror-eval',
+
+  s1: {
+    mark: '§1',
+    label: 'Why I ran this',
+    paras: [
+      'Somewhere right now a recruiter is asking an AI engine about a candidate before opening the résumé. The candidate will never see the answer. They cannot A/B it, cannot check its sources, and nobody sends a report. I wanted to know what that answer looked like for me — and, more usefully, whether it could be changed on purpose.',
+      'So I built the same kind of harness I build at work and pointed it at my own name. Four engines — ChatGPT, Claude, Perplexity, Gemini — each asked 83 questions about me, 63 of them with search on, all of them repeated. Every answer tagged against a canon of verified facts. Every citation logged. Then a month of fixes to the pages those engines read, and the whole battery run again.',
+      'I expected a before-and-after chart. I got three things I did not expect, and each of them only surfaced because I counted instead of scored.',
+    ],
+  },
+
+  s2: {
+    mark: '§2',
+    label: "1. Engines don't abstain. They fill.",
+    paras: [
+      "The headline split cleanly by engine. Perplexity went from citing my site on 13 of 63 search probes to 63 of 63. Claude went from 0 to 0. Same fixes, same month, opposite outcomes — and one variable explains it: index access. A Bing Webmaster submission reached the index Perplexity reads. There is no equivalent door into Anthropic's.",
+      "But Claude's zero was not silence. The junk that used to feed its answers — name-etymology pages, a job-board scrape — dropped from 79 citations to 11. And a data broker rose from 0 to 74 to take their place. Claude's third most-cited source about me, after a month of cleanup, was a page I have never controlled and had asked to be removed.",
+      'That is the pattern worth naming. An engine that cannot find the authoritative page does not say "I couldn\'t find much." It assembles an answer from whatever it can find, with the same fluency it would use for the truth. Clearing the junk did not create room for the right source; it created a vacuum, and the vacuum filled. If you fix your surfaces without fixing the index, you have rearranged the substitutes.',
+    ],
+  },
+
+  s3: {
+    mark: '§3',
+    label: '2. "It\'s published by him, so it\'s his claim."',
+    paras: [
+      'While labelling answers by hand I kept meeting the same move. An engine would find my site, read a number on it — a metric from a project, a result from a harness — and then decline to stand behind it. Not because it was wrong, but because I was the one who had published it. The claim was treated as testimony rather than evidence.',
+      'The engines are right to do this, which is what makes it uncomfortable. Self-attestation is weak evidence. A harness result on my own site is a claim; the same result in a repository with commits, or in a piece someone else wrote about the work, is corroboration. The lesson for anyone whose work is mostly self-published is not to publish more. It is to get the claim restated somewhere you do not own — and to make the thing you own as easy to verify as possible: public code, public data, dated releases, a predictions file scored in the open.',
+      'I had a version of this belief before the study. Watching an engine apply the discount, sentence by sentence, turned it from a belief into a measurement I now want to run properly.',
+    ],
+  },
+
+  s4: {
+    mark: '§4',
+    label: "3. The judge failed. The study didn't.",
+    paras: [
+      'The harness uses two LLM judges from different model families to tag each answer with a failure category. Then it does the thing that makes a judge a judge: a blind, stratified sample of 40 answers, labelled by a human who cannot see the verdicts.',
+      "The judges failed. The Claude judge matched the human's exact tag set on 3 of 40. The Gemini judge on 12. The two judges agreed with each other on 35% of answers. Ten repetitions of an identical prompt changed the tag set 86% of the time. It was the third blind check in a row to say so.",
+      'In CrossSource, the same validation step came back 15 for 15 — and caught a real harness bug in the process. Here it came back a failure. I think the second result is the more useful one to have in public, because of what it forces. You cannot publish a failure rate on the strength of a judge that agrees with a human 8% of the time. So the interpretive categories became bands — a floor where both judges agree, a ceiling where either fires — and the headline numbers became counts: which surfaces each engine cited, of how many probes. The one category that survived as a point estimate, poisoned citations, did so because it was moved out of the judge entirely and computed against canon. It went from a 77%-agreement judgement to an exact calculation the moment it stopped being a question for a language model.',
+    ],
+    lessonQuote:
+      'The method did not soften the claim when the judge failed. It changed what kind of number was allowed to appear in a headline. That is what validation is for.',
+  },
+
+  s5: {
+    mark: '§5',
+    label: "What I'd tell someone running this on themselves",
+    paras: [
+      'Count before you score. The citation trail — which pages an engine actually read — is judge-free, cheap, and turned out to carry the whole story. Repeat every probe; a single-shot before/after is indistinguishable from resampling. Treat your own site as a claim, not a proof, and go get the corroboration. And when the validation step comes back ugly, publish that too. A harness that only reports the numbers its judge can be trusted with is worth more than one that reports everything.',
+      'The harness is public and entity-agnostic — canon.yaml is the only file with facts in it. Run it on yourself. I would like to know whether your engines fill the way mine did.',
+    ],
+  },
+
+  footer: [
+    { label: 'Case study →', href: '/mirror-eval/' },
+    { label: 'Repo →', href: 'https://github.com/zoeb-nomi/mirror-eval' },
+    { label: 'Related: The judge caught a bug →', href: '/writing/the-judge-caught-a-bug/' },
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // 4 · WORK — pack §4
 // ---------------------------------------------------------------------------
 
@@ -418,6 +704,33 @@ export const work = {
   standfirst: 'Four companies, two promotions, one through-line: quality you can measure.',
   arcClose: 'Mechanical engineering → enterprise product → AI product quality.',
   recordKicker: 'Public record',
+
+  // Open work — copy-pack-additions.md §15, added 2026-09-10. Rendered above
+  // the Instead entry via RecordList; `where` is left blank (not specified in
+  // the copy pack — these rows are cross-links, not third-party artefacts).
+  openWork: {
+    kicker: 'Open work',
+    note: 'Two public evaluation harnesses, built to one method.',
+    items: [
+      {
+        what: 'CrossSource — citation accuracy in legal RAG',
+        links: [
+          { label: 'Case study', href: '/crosssource/' },
+          { label: 'Repo', href: 'https://github.com/zoeb-nomi/crosssource' },
+        ],
+        where: '',
+      },
+      {
+        what: 'mirror-eval — what AI search engines say about a person',
+        links: [
+          { label: 'Case study', href: '/mirror-eval/' },
+          { label: 'Repo', href: 'https://github.com/zoeb-nomi/mirror-eval' },
+          { label: 'v1.0', href: 'https://github.com/zoeb-nomi/mirror-eval/releases/tag/v1.0' },
+        ],
+        where: '',
+      },
+    ],
+  },
 
   insteadNote:
     "Reviewer's note — every figure here is from a production eval set, not a demo. The open, reproducible version of the method is CrossSource.",
@@ -649,6 +962,20 @@ export const work = {
 };
 
 // ---------------------------------------------------------------------------
+// CONTRIBUTIONS GRAPH — placeholders pending copy-pack. Keep additions here,
+// not hard-coded in ContributionGraph.astro.
+// ---------------------------------------------------------------------------
+
+export const contributions = {
+  kicker: 'PM who ships code',
+  dek: 'Both harnesses are public repositories. This is the last year of commits, live from GitHub.',
+  captionLive: 'contributions in the last year · live from GitHub',
+  captionSnapshot: 'contributions in the last year · as of',
+  legendLess: 'Less',
+  legendMore: 'More',
+};
+
+// ---------------------------------------------------------------------------
 // 5 · ABOUT — pack §5
 // ---------------------------------------------------------------------------
 
@@ -740,6 +1067,7 @@ export const llmsTxt = `# Zoeb Nomi
 
 - Role: Product Manager, Instead (Sep 2025–present). Owns citation-accuracy evaluation, model benchmarking, and regression-catching eval loops for a production tax-research LLM. ~95% citation accuracy on the eval set.
 - Flagship public project: CrossSource (https://github.com/zoeb-nomi/crosssource) — open evaluation harness for citation accuracy in legal RAG. Citation precision 0.981 (baseline) → 0.994 (strict); recall 0.760; faithfulness 1.000; 100% (15/15) blind human–judge agreement. Corpus: 22 public-domain US court opinions; 25-question golden set; BM25 top-5 retrieval.
+- Second public project: mirror-eval (https://github.com/zoeb-nomi/mirror-eval) — open evaluation harness for what AI search engines say about a person; built to the CrossSource method. Two waves (2026-08-06, 2026-09-04), 332 probes each across ChatGPT, Claude, Perplexity, Gemini. Judge-free citation trail: Perplexity 13-of-63 → 63-of-63 search probes citing zoebnomi.com; Claude 0-of-63 → 0-of-63; CrossSource repo cited by ChatGPT 0 → 25-of-63 and Gemini 0 → 32-of-63. Blind human validation of the LLM judges: 3/40 and 12/40 — taxonomy reported as bands only. Release v1.0.
 - At Instead: fixed the "knowledge–citation gap" failure mode (plausible-but-wrong citations); cut workflow latency ~90% (10–15 min → under a minute); architected a 270K+-record RAG corpus across 100+ legal source types; fetchability harness across 378 sources; remediation of ~139K documents; Legal Support Matrix across 160+ tax strategies; shipped Source Explorer.
 - Previously: Multiplier (Value-Added Services vertical: $100K incremental revenue, 47% efficiency gain, partnership launched in 21 days). Keka HR (3 roles, 2 promotions: built Background Verification module zero-to-one on Checkr API — 28 US enterprise clients, $2.7M MRR, company's first US expansion; 6 SSO integrations, 27% adoption lift, $121K upsell; Exit Module revamp, offboarding time −28%, CSAT +80%). Hurix Digital (agile transformation, 43% faster delivery; 31% conversion growth).
 - Education: STOA General Management Program (2022); B.E. Mechanical Engineering, MIT Aurangabad (2019).
@@ -755,9 +1083,12 @@ export const llmsTxt = `# Zoeb Nomi
 ## Pages
 
 - Home: https://www.zoebnomi.com/
+- Evals index: https://www.zoebnomi.com/evals/
 - CrossSource case study: https://www.zoebnomi.com/crosssource/
+- mirror-eval case study: https://www.zoebnomi.com/mirror-eval/
 - Work: https://www.zoebnomi.com/work/
 - About: https://www.zoebnomi.com/about/
 - Writing (essays index): https://www.zoebnomi.com/writing/
 - Writing — "The judge caught a bug I didn't" (validating LLM-as-judge evals): https://www.zoebnomi.com/writing/the-judge-caught-a-bug/
+- Writing: https://www.zoebnomi.com/writing/eval-harness-at-my-own-reflection/
 `;

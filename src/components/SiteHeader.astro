@@ -1,5 +1,5 @@
 ---
-import { site, nav } from '../data/copy';
+import { site, nav, isNavCurrent } from '../data/copy';
 import MobileNav from './MobileNav.astro';
 
 interface Props {
@@ -17,8 +17,7 @@ const { currentPath } = Astro.props;
       <ul>
         {
           nav.map((item) => {
-            const isCurrent =
-              item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href);
+            const isCurrent = isNavCurrent(item, currentPath);
             return (
               <li>
                 <a href={item.href} aria-current={isCurrent ? 'page' : undefined} class:list={[{ current: isCurrent }]}>
