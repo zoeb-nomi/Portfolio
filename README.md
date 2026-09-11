@@ -1,35 +1,209 @@
-# zoebnomi.com — portfolio site
+# screener-eval
 
-Source of [zoebnomi.com](https://zoebnomi.com/?utm_source=github&utm_medium=readme&utm_campaign=portfolio), the personal site of **Zoeb Nomi** — AI Product Manager focused on eval-driven LLM/RAG output quality.
+**Zoeb Nomi — https://www.zoebnomi.com · case study: https://www.zoebnomi.com/screener-eval/**
 
-Built with Astro 5. All copy, meta, JSON-LD and llms.txt live in `src/data/copy.ts`. `scripts/geo-gate.mjs` gates the site against canon (46 required strings, 6 banned) — run it after every edit.
+**"I ran my résumé through an LLM screener N times."**
 
-Keystone project: [CrossSource](https://github.com/zoeb-nomi/crosssource) — eval methodology for RAG citation quality (precision 0.981 → 0.994, ~95% golden-set citation accuracy, 270K-record corpus).
+## Results (2026-09-11)
 
-## Deploy & rollback
+885 scored calls, 21 real open US AI PM postings, two cheap-tier screeners, 5 reps
+each, paired and interleaved, 0 parse errors. Swapping every employer on the résumé
+for a fictional one moved the fit score by less than a point on both screeners.
+Deleting every link moved it by less than a point on both screeners. Which screener
+read it moved the score by 22.3 points on average and flipped the majority verdict
+on 15 of 21 postings. Full write-up, both paired-delta tables, the cross-screener
+breakdown, the parser before/after table, and the privacy/cost accounting:
+**[reports/RESULTS.md](reports/RESULTS.md)**.
 
-Hosted on Cloudflare Pages. Build command `npm run build`, output directory `dist/`. Requires Node >= 20 (see `.nvmrc`).
+A small, reproducible case study on LLM résumé screening. One résumé (Zoeb Nomi's),
+two variants, run against real job descriptions through cheap-tier models from two
+providers, with the delta between variants measured per JD, per model, paired. Plus
+a separate, fully real test of five open-source PDF/résumé parsers against a
+hand-built ground truth.
 
-- **Production** — every commit to `main` builds and auto-deploys. There is no staging environment.
-- **Previews** — commits on any other branch get their own preview deployment at a generated URL.
-- **Rollback** — Cloudflare Pages → the project → **Deployments** → find the last good build → **Rollback to this deployment**. This repoints production immediately without a rebuild. Alternatively revert the offending commit on `main` and let the normal build redeploy.
+Every number in this repo is counted or computed from logged data. **No LLM ever
+grades another LLM's output.** The screening prompt asks a model for a fit score;
+nothing downstream of that is judged by a model — deltas, confidence intervals,
+sign tests, and parser error counts are all arithmetic over recorded facts.
 
-Run `node scripts/geo-gate.mjs` against `dist/` before deploying — it is the last gate between an edit and production.
+## The screening prompt is a proxy, not a vendor's algorithm
 
-## Contributions graph
+No ATS/LLM-screening vendor — Ashby, Greenhouse, Workday/HiredScore, LinkedIn Hiring
+Assistant, Eightfold, Paradox — publishes their actual scoring formula. `scripts/rubric.py`
+is a **published-research proxy**: it asks a model to score fit the way published
+literature says LLMs actually respond to résumé signal —
 
-`ContributionGraph.astro` renders a monochrome GitHub-style contribution heatmap. It has three layers, in order of trust:
+- **institution-name signal** moves scores independent of the work described (Iso,
+  Pezeshkpour, Bhutani & Hruschka / Megagon Labs, arXiv 2503.19182: 12 LLMs, 384,000
+  scored résumé-JD pairs, effect present in 20-40% of occupations tested)
+- JD-keyword/skill overlap, quantified-impact density, and claim verifiability, which
+  the broader LLM-screening literature converges on as score-moving features
 
-1. **Committed snapshot** — `src/data/contributions.json` is server-rendered into the page at build time, so the graph is a complete, correct picture with JS off and never disappears. It's regenerated automatically by the `prebuild` npm script (`scripts/fetch-contributions.mjs`), which runs before every `npm run build`.
-2. **Live Function** — `functions/api/contributions.ts` is a Cloudflare Pages Function at `GET /api/contributions`. It fetches GitHub's public, unauthenticated, undocumented HTML endpoint (`https://github.com/users/zoeb-nomi/contributions` — the same markup a logged-out browser gets, no token, no cookies), parses it, and returns `{ source: "live", fetched_at, total_last_year, days }`. A small inline script on the page calls this on load and, if it succeeds, re-renders the cells and caption over the snapshot.
-3. **Fallback** — if the live fetch or parse fails, the Function returns `503 { source: "unavailable" }` and the page just keeps showing the snapshot with an "as of \<date\>" caption. The client script never crashes or blanks the graph on a failed fetch.
+This is **not** a reconstruction of any real vendor's algorithm, and results from this
+repo should never be described as "how Ashby/Greenhouse/Workday scores résumés." See
+`scripts/rubric.py`'s docstring for the full citation trail.
 
-Both the Function and the prebuild script share one parser: `functions/_lib/parse-contributions.mjs`. It's dependency-free — regex over GitHub's `<td class="ContributionCalendar-day" data-date data-level id>` cells and the matching `<tool-tip for="...">N contributions on Month Dth.</tool-tip>` elements, plus the "N contributions in the last year" total. `scripts/test-parse-contributions.mjs` (`npm test`) runs it against the real fixture at `tests/fixtures/contributions.html`.
+## Design
 
-**Caching**: the Function caches successful responses at Cloudflare's edge (`caches.default`, keyed on the request URL) and sets `Cache-Control: public, max-age=3600, s-maxage=21600` — a 1h browser cache, 6h edge cache. A `503` is cached for only 60s, so a transient GitHub outage doesn't wedge the "unavailable" response in for hours.
+Paired: for each job description (JD), résumé A and résumé B go through the *same*
+screening prompt; the unit of analysis is the per-JD, per-model delta (B − A) in
+fit score, not the raw scores themselves. Conditions are interleaved within one run
+window — for each rep → shuffle JDs → for each JD → for each model → run A and B in
+random order — so any nondeterminism (model sampling, cross-run drift) hits both
+conditions roughly equally instead of confounding with which condition ran first or
+last.
 
-**Refreshing the snapshot**: `npm run build` does this automatically. To refresh it standalone, run `node scripts/fetch-contributions.mjs` — it writes `src/data/contributions.json` on success and, on any failure, prints a warning and leaves the existing file untouched (it never fails the build).
+**Ablation 1 (built, default): institution-name swap.** B replaces every employer/
+institution proper noun with a fictional, non-existent organization of matching
+description (`config/swap_map.yaml`) — e.g. "Keka HR" → "Ashvane HR", with the
+descriptor line ("India's leading HR technology platform...") left untouched. This
+replicates the Megagon design cited above. Fictional names were checked with a
+handful of web searches (not a trademark search) to confirm none collide with a real,
+currently-operating company or school under that exact name.
 
-**Known risk**: this endpoint is public but **undocumented and unversioned** — GitHub can change the contribution-calendar markup at any time with no notice. If the parser starts throwing (both the Function's 503 rate and `npm test` failing are the signal), the fix is in `functions/_lib/parse-contributions.mjs`: re-capture `tests/fixtures/contributions.html` from a real page load and update the regexes to match the new shape.
+**Ablation 2 (infra built, off by default): evidence-links on/off.** B strips every
+URL (GitHub, portfolio, LinkedIn, repo links) from the résumé text.
 
-**Auth note**: the endpoint's contribution count differs by viewer — an authenticated request (e.g. viewing your own profile logged in) includes private contributions; this Function's anonymous, cookie-free fetch only ever sees public ones, and that's the number the graph shows. Don't be surprised if it's lower than what you see logged into github.com yourself.
+Both variants are generated by `scripts/make_variants.py` from the résumé-A text
+named in `config/config.yaml`'s `paths.resume_a` (`resume/v4_2_A.txt` as of
+2026-09-10) + `config/swap_map.yaml`, with sanity checks (no real institution
+name leaks into the swap variant; no evidence-link domain survives the
+evidence-link strip).
+
+## What's real vs. mocked in this repo
+
+| Component | Status |
+|---|---|
+| Parser test (`parser_test/`) | **Real.** Runs today, no API keys, produces `reports/parser_test.md` from an actual PDF through five actual parsers. `--pdf` picks which résumé PDF (default `resume/v4_2.pdf`). |
+| `scripts/make_variants.py` | **Real.** Generates the committed `resume/v4_2_B_*.txt` files. |
+| Screening harness (`scripts/run_screen.py`) | Runs in `--mock` mode here (deterministic fake scores, no network) to prove the pipeline end to end. Real (API-backed) mode, `--preflight` (key + tiny-call check), and the real pilot (`analysis/pilot.py`) are implemented but untested against live provider endpoints from this environment — **no API keys live here**, and this harness is meant to run on the owner's machine (`make setup` → `make keys-check` → `make pilot`, see `START_HERE.md`). |
+| `results/mock-*/` + their analysis reports | **Committed**, generated by the mock run in this repo, proving `run_screen.py` → `analyze.py` works end to end. |
+| Real JD collection | Done for 21 JDs (`jds/COLLECTION_NOTES.md`); `jds/text/*.txt` itself is gitignored (JD text is copyrighted — the repo ships `jds/index.yaml` with URL + sha256 only), except three obviously-synthetic placeholder JDs used for the mock/pilot-mock path. |
+
+## Budget
+
+Cheap tier, two providers: `claude-haiku-4-5` (Anthropic), `gpt-5-mini` (OpenAI) —
+model ids and per-token prices live in `config/config.yaml`, easy to change. Prices
+there are **placeholders** — verify against current provider pricing pages before a
+real run; `scripts/estimate_cost.py` recomputes the projection from whatever is in
+the config, so fixing the config fixes every downstream cost number.
+
+A plausible real run — 20 JDs × 2 models × 2 conditions × 3 reps, one ablation —
+projects to about **$0.27** total at the placeholder prices
+(`python3 scripts/estimate_cost.py --jds 20 --reps 3 --ablations 1`). Both ablations,
+still comfortably under the **<$5 budget** this design targets even with a wide
+margin for the placeholder prices being wrong.
+
+## UI
+
+Non-technical Mac users can skip the Terminal entirely: double-click `Screener.command`
+at the repo root. It creates a local virtualenv on first run, starts `ui/server.py`
+(Python stdlib only — `http.server`, no Flask, no external assets) on
+`127.0.0.1:8765`, and opens it in the browser. The page has four tabs — **Keys**
+(save/check API keys, keys are masked on read and written to `.env` at file mode 600),
+**Run** (pilot, full run with an ablation dropdown, analyze — each shows a projected
+cost and requires a confirm click before spending anything), **Log** (live streaming
+output of whichever job is running, with a Stop button), and **Reports** (lists
+`reports/*.md` newest first, renders the chosen one, and can zip a results bundle to
+`~/Downloads`). The server only accepts requests with a localhost Host header and
+never echoes a full key back. See `START_HERE.md` for the exact click-through.
+
+## How to run
+
+Non-technical, on a Mac: see `START_HERE.md` — double-click `Screener.command` (or,
+via Terminal, `make setup` → paste keys into `.env` → `make keys-check` → `make pilot`).
+
+```bash
+pip3 install -r requirements.txt || pip3 install --user -r requirements.txt
+cd parser_test/node && npm install && cd ../..   # only needed for the parser test
+
+# 1. Generate résumé B variants from A + the swap map
+python3 scripts/make_variants.py
+
+# 2. Confirm your API keys work (real, tiny calls, a fraction of a cent)
+python3 scripts/run_screen.py --preflight
+
+# 3. Pilot: how many reps does a real run need? (real JD + real calls; add --mock for
+#    the old no-keys/no-network path)
+python3 analysis/pilot.py --jd anthropic-pm-beneficial-deployments-001 --reps 10
+#   -> prints a recommended rep count for the stated MDE (default 5 fit_score points,
+#      alpha 0.05, power 0.8) and a cost projection. Do this BEFORE committing reps.
+
+# 4. Run (mock, to prove the pipeline — drop --mock for real keys + real JDs)
+python3 scripts/run_screen.py --mock --reps 5 --ablation institution_swap
+python3 scripts/run_screen.py --mock --reps 5 --ablation evidence_links
+
+# 5. Analyze
+python3 analysis/analyze.py <run_id>          # writes reports/<run_id>_analysis.md
+
+# 6. Parser test (real, no keys needed)
+python3 parser_test/run_parsers.py            # writes reports/parser_test.md, vs. resume/v4_2.pdf by default
+```
+
+Or `make setup` / `make keys-check` / `make mock` / `make pilot` / `make pilot-mock`
+/ `make parser-test` / `make estimate` — see `Makefile`.
+
+For a **real** run: `make setup` copies `.env.example` to `.env` — fill in
+`ANTHROPIC_API_KEY` / `OPENAI_API_KEY`, run `make keys-check`, collect any additional
+real JDs into `jds/text/<jd_id>.txt` + append entries to `jds/index.yaml` (URL,
+employer, employer_class, sha256; 21 are already collected — see
+`jds/COLLECTION_NOTES.md`), then drop `--mock` from step 4 (`make run`). This harness
+makes network calls and needs keys the owner holds — it is designed to run on the
+owner's machine, not in this sandbox.
+
+## Repo layout
+
+```
+resume/            v4_2.pdf (current, Google Docs export, harness default), v4_2_A.txt
+                   (canon résumé text) + v4_2_B_*.txt (generated variants);
+                   v4_1_real.pdf + v4_1_A.txt/v4_1_B_*.txt (prior real-PDF round, kept
+                   for record — see reports/parser_test_v4_1_real.md);
+                   v4_1_reconstructed.pdf (superseded text-only rebuild, kept for record)
+config/            config.yaml (models/prices/ablations/paths), swap_map.yaml (institution-name swap)
+jds/                index.yaml (JD registry: URL + sha256, no text), text/ (gitignored except synthetic placeholders)
+scripts/            rubric.py (the screening prompt), make_variants.py, run_screen.py, estimate_cost.py
+analysis/           analyze.py (paired bootstrap + sign test), pilot.py (rep-count sizing)
+parser_test/        run_parsers.py, node/ (two npm parser runners + their package.json)
+canon/              resume_fields.yaml (hand-built ground truth for the parser test)
+results/            <run_id>/calls.jsonl + manifest.json — mock-* runs are committed
+reports/            generated markdown reports (analysis + parser test)
+```
+
+## Output schema (`results/<run_id>/calls.jsonl`)
+
+One JSON line per screening call: `run_id, ts, jd_id, employer, employer_class,
+model, condition (A|B), ablation, rep, order_index, fit_score, recommendation, raw
+(full model JSON), input_tokens, output_tokens, est_cost_usd, error`.
+`manifest.json` alongside it records the full config snapshot, model ids, résumé
+and JD sha256 hashes, and start/end timestamps — enough to know exactly what ran.
+
+## Assumptions made here that Zoeb should confirm
+
+- **`resume/v4_2.pdf` is now the harness default** (Google Docs export, the one Zoeb
+  uploads to ATSs) — as of 2026-09-10 it replaced `resume/v4_1_real.pdf` (kept for the
+  record), which itself had replaced an earlier text-only reconstruction
+  (`resume/v4_1_reconstructed.pdf`, also kept). v4.2's only content change vs. v4.1 is
+  the header: the LinkedIn/Portfolio/GitHub profile links are now printed as visible
+  plain text (`linkedin.com/in/zoebnomi · zoebnomi.com · github.com/zoeb-nomi`)
+  instead of bare hyperlink-annotation-only labels — every résumé body sentence,
+  number, and bullet is byte-identical to v4.1. This fixed two things at once: the
+  three raw-text extractors now recover all three link fields (previously all
+  `missing`), and the evidence-links ablation (`scripts/make_variants.py`) went from
+  a documented no-op (v4.1 had no visible URL text to strip) to actually stripping 4
+  domain occurrences and producing a real A/B contrast. See `reports/parser_test.md`
+  (current, v4.2, with a before/after table vs. v4.1) vs. `reports/parser_test_v4_1_real.md`
+  and `reports/parser_test_reconstructed_2026-09-10.md` (both archived).
+- **Institution-swap fictional names** (`config/swap_map.yaml`) were checked with a
+  handful of web searches, not a trademark search — reasonable diligence, not
+  exhaustive.
+- **Model prices in `config/config.yaml` are placeholders** (Haiku-tier and mini-tier
+  estimates), not fetched from live pricing pages — verify before a real run, though
+  the projected cost has enough margin under $5 that even a 5-10x pricing error
+  wouldn't blow the budget for the example run sized above.
+- **`gpt-5-mini`'s API call uses `max_completion_tokens` and no `temperature` override**
+  (provider default) — this matches current OpenAI API conventions but is untested
+  against the real endpoint from this environment.
+- **The screening prompt explicitly tells the model it may be influenced by
+  employer/school prestige and to score honestly rather than correct for it** — this
+  is intentional (we want to *measure* the bias, not suppress it), but it does mean
+  the prompt is not "a bias-free screener," by design.
