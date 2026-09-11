@@ -5,139 +5,131 @@ import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import EvalsSwitcher from '../components/EvalsSwitcher.astro';
-import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home } from '../data/copy';
+import { meta, screenerEval as se, screenerEvalJsonLd, cta, home } from '../data/copy';
 
-const table1Rows = me.s3.table1.rows.map((r) => ({
-  label: r.engine,
-  cells: [
-    { text: r.site, win: r.bold },
-    { text: r.repo, win: r.bold },
-    { text: r.owned, win: r.bold },
-  ],
+const table1Rows = se.s3.table1.rows.map((r) => ({
+  label: r.lever,
+  cells: [{ text: r.screener }, { text: r.delta }, { text: r.ci }, { text: r.p }],
 }));
 
-const table2Rows = me.s3.table2.rows.map((r) => ({
-  label: r.surface,
-  cells: [{ text: r.engine }, { text: r.count }],
+const table2Rows = se.s3.table2.rows.map((r) => ({
+  label: r.measure,
+  cells: [{ text: r.haiku }, { text: r.gpt }],
+}));
+
+const table3Rows = se.s5.table.rows.map((r) => ({
+  label: r.parser,
+  cells: [{ text: r.v41 }, { text: r.v42 }],
 }));
 ---
 
 <Base
-  title={meta.mirrorEval.title}
-  description={meta.mirrorEval.description}
-  path="/mirror-eval/"
-  ogImage="/og/mirror-eval.png"
+  title={meta.screenerEval.title}
+  description={meta.screenerEval.description}
+  path="/screener-eval/"
+  ogImage="/og/screener-eval.png"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(mirrorEvalJsonLd)} is:inline />
+  <script type="application/ld+json" set:html={JSON.stringify(screenerEvalJsonLd)} is:inline />
 
   <section class="masthead">
     <div class="masthead-inner">
       <aside class="margin-col" aria-label="Case study specification">
-        <p class="kicker">{me.kicker}</p>
+        <p class="kicker">{se.kicker}</p>
         <dl class="spec-block">
-          {me.specBlock.map((s) => (
+          {se.specBlock.map((s) => (
             <div class="spec-row">
               <dt>{s.label}</dt>
               <dd class="tabular">{s.value}</dd>
             </div>
           ))}
         </dl>
-        <EvalsSwitcher current="mirror-eval" />
-        <a class="repo-link" href={me.repoHref} target="_blank" rel="noopener noreferrer">{me.repoLabel}</a>
+        <EvalsSwitcher current="screener-eval" />
+        <a class="repo-link" href={se.repoHref} target="_blank" rel="noopener noreferrer">{se.repoLabel}</a>
       </aside>
       <div class="body-col">
-        <h1 class="page-h1">{me.title}</h1>
-        <p class="standfirst">{me.standfirst}</p>
+        <h1 class="page-h1">{se.title}</h1>
+        <p class="standfirst">{se.standfirst}</p>
       </div>
     </div>
   </section>
 
-  <Section mark={me.s1.mark} label={me.s1.label}>
-    <p class="prose">{me.s1.body}</p>
+  <Section mark={se.s1.mark} label={se.s1.label}>
+    <p class="prose">{se.s1.body}</p>
   </Section>
 
-  <Section mark={me.s2.mark} label={me.s2.label}>
+  <Section mark={se.s2.mark} label={se.s2.label}>
     <dl class="method-list">
-      {me.s2.rows.map((row) => (
+      {se.s2.rows.map((row) => (
         <div class="method-row">
           <dt>{row.term}</dt>
           <dd>
-            {row.kind === 'plain' && row.body}
-            {row.kind === 'code' && (
-              <>
-                {row.bodyPre}
-                <code>{row.code}</code>
-                {row.bodyPost}
-              </>
-            )}
+            {row.parts.map((part) => {
+              if ('code' in part) return <code>{part.code}</code>;
+              if ('strong' in part) return <strong>{part.strong}</strong>;
+              return part.text;
+            })}
           </dd>
         </div>
       ))}
     </dl>
   </Section>
 
-  <Section mark={me.s3.mark} label={me.s3.label}>
-    <p class="prose intro">{me.s3.intro}</p>
+  <Section mark={se.s3.mark} label={se.s3.label}>
+    <p class="prose intro">{se.s3.intro}</p>
     <div class="table-scroll">
-      <DataTable caption={me.s3.table1.caption} columns={me.s3.table1.columns} rows={table1Rows} />
+      <DataTable caption={se.s3.table1.caption} columns={se.s3.table1.columns} rows={table1Rows} />
     </div>
-    <p class="prose table-intro">{me.s3.table2Intro}</p>
+    <p class="prose table-intro">{se.s3.table2Intro}</p>
     <div class="table-scroll">
-      <DataTable caption={me.s3.table2.caption} columns={me.s3.table2.columns} rows={table2Rows} />
+      <DataTable caption={se.s3.table2.caption} columns={se.s3.table2.columns} rows={table2Rows} />
     </div>
+    <p class="prose between">{se.s3.betweenScreeners}</p>
     <p class="prose finding">
-      <strong>{me.s3.findingLeadIn}</strong>{me.s3.findingBody}
-    </p>
-  </Section>
-
-  <Section mark={me.s4.mark} label={me.s4.label}>
-    <p class="prose">{me.s4.para1}</p>
-    <p class="prose para2">
-      {me.s4.para2Pre}<code>{me.s4.para2Code}</code>{me.s4.para2Post}
+      <strong>{se.s3.findingLeadIn}</strong>{se.s3.findingBody}
     </p>
     <div class="lesson">
-      <PullQuote rule="red">{me.s4.lessonQuote}</PullQuote>
+      <PullQuote rule="red">{se.s3.lessonQuote}</PullQuote>
     </div>
   </Section>
 
-  <Section mark={me.s5.mark} label={me.s5.label}>
-    <p class="prose">{me.s5.body}</p>
+  <Section mark={se.s4.mark} label={se.s4.label}>
+    <p class="prose">{se.s4.body}</p>
   </Section>
 
-  <Section mark={me.s6.mark} label={me.s6.label}>
-    <p class="prose">{me.s6.body}</p>
+  <Section mark={se.s5.mark} label={se.s5.label}>
+    <p class="prose intro">{se.s5.intro}</p>
+    <div class="table-scroll">
+      <DataTable caption={se.s5.table.caption} columns={se.s5.table.columns} rows={table3Rows} />
+    </div>
+    <p class="prose close">{se.s5.close}</p>
   </Section>
 
-  <Section mark={me.s7.mark} label={me.s7.label}>
-    <p class="prose">{me.s7.body}</p>
+  <Section mark={se.s6.mark} label={se.s6.label}>
+    <p class="prose">{se.s6.body}</p>
   </Section>
 
-  <Section mark={me.s8.mark} label={me.s8.label}>
-    <p class="prose">{me.s8.body}</p>
+  <Section mark={se.s7.mark} label={se.s7.label}>
+    <p class="prose">{se.s7.body}</p>
+  </Section>
+
+  <Section mark={se.s8.mark} label={se.s8.label}>
+    <p class="prose">{se.s8.body}</p>
     <p class="prose repo-cta">
-      {me.repoCta.map((link, i) => (
-        <>
-          {i > 0 && <span class="sep" aria-hidden="true"> · </span>}
-          <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
-        </>
-      ))}
+      <a href={se.repoCta.href} target="_blank" rel="noopener noreferrer">{se.repoCta.label}</a>
     </p>
   </Section>
 
-  <Section mark={me.relatedWriting.mark} label="Related writing">
+  <Section mark={se.relatedWriting.mark} label="Related writing">
     <p class="prose related-writing">
-      <a href={me.relatedWriting.href}>{me.relatedWriting.text}</a>
-    </p>
-    <p class="prose related-writing">
-      <a href={me.relatedScreenerEval.href}>{me.relatedScreenerEval.text}</a>
+      <a href={se.relatedWriting.href}>{se.relatedWriting.text}</a>
     </p>
   </Section>
 
   <CTASlab
     marginLines={[home.eyebrow.toUpperCase()]}
-    body={me.ctaSlabBody}
+    body={se.ctaSlabBody}
     buttonLabel="View the repo →"
-    buttonHref={me.repoHref}
+    buttonHref={se.repoHref}
     secondaryLabel={cta.bookACall.label}
     secondaryHref={cta.bookACall.href}
   />
@@ -252,12 +244,21 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     margin-bottom: var(--s-5);
   }
 
-  /* Table 1's "github.com/zoeb-nomi" column header is one long unbroken
-     token — give both findings tables a scroll container rather than let
-     it force the page wider on narrow viewports. Grid items default to
-     min-width: auto (content-based), so the Section body-col itself has to
-     be told it is allowed to shrink below the table's content width before
-     overflow-x: auto on .table-scroll can do anything. */
+  .between {
+    margin-top: var(--s-8);
+  }
+
+  .finding {
+    margin-top: var(--s-8);
+  }
+
+  .close {
+    margin-top: var(--s-6);
+  }
+
+  /* Findings and parser tables can carry long tokens (repo paths, four-part
+     counts) — give them a scroll container rather than let the page grow
+     wider on narrow viewports. */
   .table-scroll {
     overflow-x: auto;
     max-width: 100%;
@@ -306,10 +307,6 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     max-width: 60ch;
   }
 
-  .finding {
-    margin-top: var(--s-8);
-  }
-
   .lesson {
     margin-top: var(--s-8);
   }
@@ -324,10 +321,6 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: 3px;
-  }
-
-  .repo-cta .sep {
-    color: var(--ink-muted);
   }
 
   @media (max-width: 899px) {

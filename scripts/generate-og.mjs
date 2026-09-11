@@ -16,6 +16,7 @@ const pages = [
   { id: 'home', title: 'Zoeb Nomi', kicker: 'AI Product Manager · LLM Evaluation & RAG Quality' },
   { id: 'crosssource', title: 'CrossSource', kicker: 'Open evaluation harness for legal RAG citation accuracy' },
   { id: 'mirror-eval', title: 'mirror-eval', kicker: 'What AI search engines say about a person, measured twice' },
+  { id: 'screener-eval', title: 'screener-eval', kicker: 'What LLM résumé screeners actually reward, counted 885 times' },
   { id: 'work', title: 'Work', kicker: 'Four companies, two promotions, one through-line' },
   { id: 'about', title: 'About', kicker: 'Zoeb Nomi · AI Product Manager' },
 ];

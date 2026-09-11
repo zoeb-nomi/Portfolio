@@ -1,10 +1,11 @@
 ---
 // Home — Evals block. Replaces the single FlagshipCard (copy-pack-additions.md
-// §11, added 2026-09-10). Two cards side by side on the body column at
-// >=900px, stacked below. Three line tiers only (--rule / --rule-strong via
-// the wrapping Section / --rule-accent — none introduced here); 400 weights
-// only (no font-weight declared — the site loads only the 400 weight of
-// each face, so anything else would fake-bold).
+// §11, added 2026-09-10; extended to three cards, copy-pack-s17.md §19, added
+// 2026-09-11). Three cards side by side on the body column at >=900px,
+// stacked below. Three line tiers only (--rule / --rule-strong via the
+// wrapping Section / --rule-accent — none introduced here); 400 weights only
+// (no font-weight declared — the site loads only the 400 weight of each
+// face, so anything else would fake-bold).
 interface Card {
   name: string;
   description: string;
@@ -64,8 +65,8 @@ const { h2, methodLine, cards, closeLine } = Astro.props;
 
   .evals-cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
     margin-bottom: var(--s-8);
   }
 
