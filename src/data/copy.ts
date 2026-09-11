@@ -37,7 +37,7 @@ export const site = {
 
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Evals', href: '/evals/', activePrefixes: ['/crosssource/', '/mirror-eval/'] },
+  { label: 'Evals', href: '/evals/', activePrefixes: ['/crosssource/', '/mirror-eval/', '/screener-eval/'] },
   { label: 'Writing', href: '/writing/' },
   { label: 'Work', href: '/work/' },
   { label: 'About', href: '/about/' },
@@ -48,6 +48,7 @@ export const nav: NavItem[] = [
 export const evalsSwitcher = [
   { name: 'CrossSource', href: '/crosssource/' },
   { name: 'mirror-eval', href: '/mirror-eval/' },
+  { name: 'screener-eval', href: '/screener-eval/' },
 ];
 
 export const cta = {
@@ -95,6 +96,16 @@ export const meta = {
     title: 'I pointed an eval harness at my own reflection — Zoeb Nomi',
     description:
       'Engines fill rather than abstain; self-published claims get discounted; the LLM judge failed blind validation and the study got stronger for it. Three findings from running an eval harness on my own name.',
+  },
+  screenerEval: {
+    title: 'screener-eval: what LLM résumé screeners reward — Zoeb Nomi',
+    description:
+      'One résumé, 21 open AI PM roles, two LLM screeners, 885 scored calls. Swapping employers for fictional ones and deleting links each moved the score under a point; the choice of screener moved it 22. Paired, repeated, counted — no judge.',
+  },
+  writingTwoLevers: {
+    title: '885 screenings, one résumé, and the two levers that did not move — Zoeb Nomi',
+    description:
+      "Employer names and evidence links did nothing measurable to an LLM screener's score; which screener read the résumé moved it 22 points, and its own noise was bigger than either lever.",
   },
   work: {
     title: 'Work — Zoeb Nomi · AI Product Manager',
@@ -209,6 +220,18 @@ export const mirrorEvalJsonLd = {
   author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
 };
 
+// screener-eval — copy-pack-s17.md §19, verbatim
+export const screenerEvalJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: 'screener-eval',
+  description:
+    'Paired, repeated evaluation harness for LLM résumé screeners: one résumé, 21 open job postings, two screening models, counted deltas with bootstrap confidence intervals, plus a deterministic parser test. No LLM judge.',
+  codeRepository: 'https://github.com/zoeb-nomi/screener-eval',
+  programmingLanguage: 'Python',
+  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+};
+
 // ---------------------------------------------------------------------------
 // 2 · HOME — pack §2 + build-spec §8.1
 // ---------------------------------------------------------------------------
@@ -253,7 +276,7 @@ export const home = {
   // added 2026-09-10. Rendered by EvalsBlock.astro inside Section §2.
   evals: {
     kicker: 'Evals',
-    h2: 'Two harnesses, one method.',
+    h2: 'Three harnesses, one method.',
     methodLine: 'Build the judge. Validate it blind against a human. Count what you can. Report the rest as bands.',
     cards: [
       {
@@ -270,9 +293,16 @@ export const home = {
         linkLabel: 'Read the case study →',
         linkHref: '/mirror-eval/',
       },
+      {
+        name: 'screener-eval',
+        description:
+          'The same résumé through two LLM screeners, 885 times, against 21 open AI PM roles. Swapping every employer for a fictional one moved the score by under a point; so did deleting every link. Which screener read it moved it by 22.',
+        linkLabel: 'Read the case study →',
+        linkHref: '/screener-eval/',
+      },
     ],
     closeLine:
-      'One judge passed and caught a bug. One judge failed and the study survived on counts. Same method both times — that is the point.',
+      'One judge passed and caught a bug. One judge failed and the study survived on counts. One needed no judge at all. Same method three times — that is the point.',
   },
   measuredLabel: 'Measured, not asserted', // design-authored §12
   howIWorkLabel: 'How I work', // design-authored §12
@@ -604,8 +634,244 @@ export const mirrorEval = {
     text: 'I pointed an eval harness at my own reflection',
     href: '/writing/eval-harness-at-my-own-reflection/',
   },
+  // Cross-link added with screener-eval, copy-pack-s17.md §19 — the "natural
+  // spot" in the existing related-writing style for this page.
+  relatedScreenerEval: {
+    text: 'screener-eval — the same counting discipline, no judge at all, pointed at LLM résumé screeners',
+    href: '/screener-eval/',
+  },
 
   ctaSlabBody: 'Read the code, run it on yourself →',
+};
+
+// ---------------------------------------------------------------------------
+// SCREENER-EVAL — copy-pack-s17.md §17, added 2026-09-11. Same shape as
+// CrossSource / mirror-eval: masthead (kicker, spec block, EvalsSwitcher,
+// repo link), numbered Sections, DataTable for the three findings tables,
+// PullQuote for "The finding that matters" (per build instructions — the
+// text itself is verbatim from the pack), related-writing cross-link,
+// CTASlab. Kicker and specBlock labels are structural, matching the
+// established CrossSource/mirror-eval pattern (case study · harness type ·
+// language; a small spec block of counts) — the pack dictates the numbers,
+// not this exact wording.
+// ---------------------------------------------------------------------------
+
+export const screenerEval = {
+  kicker: 'Case study · Open evaluation harness · Python',
+  title: 'screener-eval: I ran my résumé through an LLM screener 885 times',
+  standfirst:
+    'Same résumé, same 21 job descriptions, two LLM screeners, five repeats each. Swapping every employer on the résumé for a fictional one moved the fit score by less than a point. Deleting every link moved it by less than a point. Which screener read it moved it by 22.',
+  specBlock: [
+    { label: 'Postings', value: '21' },
+    { label: 'Screeners', value: '2' },
+    { label: 'Calls', value: '885' },
+    { label: 'Reps', value: '5' },
+  ],
+  repoHref: 'https://github.com/zoeb-nomi/screener-eval',
+  repoLabel: 'github.com/zoeb-nomi/screener-eval',
+
+  s1: {
+    mark: '§1',
+    label: 'Why this exists',
+    body:
+      'Before a person reads a résumé, a parser extracts it and, increasingly, a language model scores it. Nobody outside the vendor sees the score, and the advice industry around it — brand names up top, links to proof, keywords — is advice nobody has measured. This is the measurement: one real résumé, the currently open US AI product roles at large tech and frontier labs, two cheap screening models of the kind a vendor would actually run, and a paired design so the delta is the unit. The same eval discipline as CrossSource and mirror-eval, pointed at the one system where applications actually die.',
+  },
+
+  s2: {
+    mark: '§2',
+    label: 'Method',
+    rows: [
+      {
+        term: 'Résumé',
+        parts: [
+          { text: 'Mine, v4.2 (résumé A). Two variants, each generated by a script from A: ' },
+          { strong: 'B-institution' },
+          {
+            text: ' replaces every employer and institution name with a fictional unknown of matching description; ',
+          },
+          { strong: 'B-links' },
+          { text: ' deletes every URL (portfolio, GitHub, LinkedIn, repo).' },
+        ],
+      },
+      {
+        term: 'Job descriptions',
+        parts: [
+          {
+            text:
+              '21 open, US-based AI Product Manager postings retrieved 2026-09-10 — 12 at frontier labs (OpenAI 6, Anthropic 3, Google DeepMind 3), 9 at large tech (Google 2, Meta 2, Amazon 2, NVIDIA 2, Microsoft 1). Director, Principal and Head titles excluded. Posting text is used locally and never published; the repo ships URLs and hashes.',
+          },
+        ],
+      },
+      {
+        term: 'Screeners',
+        parts: [
+          { code: 'claude-haiku-4-5' },
+          { text: ' and ' },
+          { code: 'gpt-5-mini' },
+          {
+            text:
+              ' — the cheap tier, because that is what screening at volume runs on. The screening prompt is a rubric from published research on LLM résumé screening; no vendor publishes theirs, so this is a proxy and is labelled as one. Each call returns strict JSON: a 0–100 fit score, advance / hold / reject, reasons, objections, discounted claims.',
+          },
+        ],
+      },
+      {
+        term: 'Design',
+        parts: [
+          {
+            text:
+              'Paired. For every job description, A and B are scored by the same model in the same run window, order randomised; the unit of analysis is the per-JD delta (B − A). Conditions are interleaved within one window, not run on different days.',
+          },
+        ],
+      },
+      {
+        term: 'Reps',
+        parts: [
+          {
+            text:
+              'A 10-rep pilot on one posting put the run-to-run standard deviation at 3.7 (Haiku) and 4.4 (gpt-5-mini) points and recommended 12 reps; 5 were run, which resolves effects of about 3 points and up. 885 scored calls in total, 0 parse errors, under $4 in API calls.',
+          },
+        ],
+      },
+      {
+        term: 'Statistics',
+        parts: [
+          {
+            text:
+              'Mean paired delta with a 10,000-resample bootstrap 95% confidence interval and a two-sided sign test. Nothing here is judged by a model.',
+          },
+        ],
+      },
+      {
+        term: 'Parser test (separate, deterministic)',
+        parts: [
+          {
+            text:
+              'The résumé PDF through three plain text extractors and two open-source résumé parsers, field-level errors counted against a hand-written canon of 29 fields.',
+          },
+        ],
+      },
+    ],
+  },
+
+  s3: {
+    mark: '§3',
+    label: 'Findings',
+    intro: 'Paired delta in fit score, B − A, 21 job descriptions, 5 reps:',
+    table1: {
+      caption: 'Table 1 — paired delta by lever and screener',
+      columns: ['Lever', 'Screener', 'Mean delta', '95% CI', 'Sign test p'],
+      rows: [
+        {
+          lever: 'Every employer → fictional unknown',
+          screener: 'claude-haiku-4-5',
+          delta: '+0.07',
+          ci: '−3.05 to +2.76',
+          p: '1.00',
+        },
+        {
+          lever: 'Every employer → fictional unknown',
+          screener: 'gpt-5-mini',
+          delta: '−1.14',
+          ci: '−3.03 to +0.84',
+          p: '0.19',
+        },
+        {
+          lever: 'Every link deleted',
+          screener: 'claude-haiku-4-5',
+          delta: '−0.90',
+          ci: '−2.90 to +1.03',
+          p: '1.00',
+        },
+        {
+          lever: 'Every link deleted',
+          screener: 'gpt-5-mini',
+          delta: '+0.41',
+          ci: '−1.82 to +2.71',
+          p: '1.00',
+        },
+      ],
+    },
+    table2Intro: 'What did move the score — the same résumé, the same posting, condition A only:',
+    table2: {
+      caption: 'Table 2 — condition A, by screener',
+      columns: ['Measure', 'claude-haiku-4-5', 'gpt-5-mini'],
+      rows: [
+        { measure: 'Mean fit score', haiku: '44.8', gpt: '64.7' },
+        { measure: 'Most common verdict', haiku: 'reject (136 of 233)', gpt: 'hold (157 of 232)' },
+        { measure: 'Distinct scores given, across 233 calls', haiku: '10', gpt: '30' },
+        { measure: 'Postings where every rep returned the identical score', haiku: '17 of 42 cells', gpt: '0 of 42' },
+        { measure: 'Run-to-run SD, same posting, same résumé', haiku: '3.0', gpt: '4.8' },
+        { measure: "Postings where the screener flipped its own verdict across reps", haiku: '6 of 21', gpt: '12 of 21' },
+      ],
+    },
+    betweenScreeners:
+      'Between the two screeners, on the same résumé and the same posting: mean gap 22.3 points, largest 51.3; gpt-5-mini scored higher on 19 of 21 postings; the two agreed on the majority verdict for 6 of 21 postings; correlation between their per-posting scores 0.46.',
+    findingLeadIn: 'The finding that matters:',
+    findingBody:
+      " the two levers résumé advice is built on did nothing measurable. Replacing every employer with a company that does not exist, and deleting every link to proof, each moved the score by less than a point, with confidence intervals that straddle zero on both screeners. The choice of screener moved it by 22 points on average and flipped the verdict on 15 of 21 postings. And the screener's own noise — a 3-to-5-point wobble on identical input, a verdict that flips against itself on a third to a half of postings — is larger than either lever. A single-shot \"ATS score\" from any tool is a sample from that wobble.",
+    lessonQuote: 'The screener you get is the variable.',
+  },
+
+  s4: {
+    mark: '§4',
+    label: 'What the null does and does not say',
+    body:
+      'The employer swap replaced companies a US screener has not heard of with companies that do not exist. It says nothing about swapping in a famous name; that is the prestige test, and it needs a different résumé than mine to run. The link deletion removed URL text a language model cannot follow anyway; it tests whether the presence of links signals anything to the screener, and it did not. Both nulls are about this résumé, these 21 postings, this rubric, and these two cheap models. They are counted honestly and they are narrow.',
+  },
+
+  s5: {
+    mark: '§5',
+    label: 'The parser test',
+    intro:
+      'Before any model sees a résumé, an extractor does. Field-level extraction against a 29-field canon, résumé v4.1 → v4.2:',
+    table: {
+      caption: 'Table 3 — field-level extraction, v4.1 → v4.2',
+      columns: ['Parser', 'v4.1 (ok / missing / wrong / garbled)', 'v4.2'],
+      rows: [
+        { parser: 'pdftotext', v41: '26 / 3 / 0 / 0', v42: '29 / 0 / 0 / 0' },
+        { parser: 'PyMuPDF', v41: '26 / 3 / 0 / 0', v42: '29 / 0 / 0 / 0' },
+        { parser: 'pdfminer.six', v41: '26 / 3 / 0 / 0', v42: '29 / 0 / 0 / 0' },
+        { parser: 'resumix (npm)', v41: '7 / 9 / 12 / 1', v42: '9 / 8 / 11 / 1' },
+        { parser: 'resume-parser (npm)', v41: '2 / 4 / 1 / 22', v42: '2 / 2 / 1 / 24' },
+      ],
+    },
+    close:
+      'The three fields every plain extractor missed on v4.1 were the same three: LinkedIn, portfolio, GitHub. The links were hyperlink annotations under plain words, with no URL text on the page — invisible to anything that reads text. Printing the addresses fixed it: 29 of 29. The two résumé-specific parsers were worse than plain text extraction on both versions, and one of them read the two-column header as my name.',
+  },
+
+  s6: {
+    mark: '§6',
+    label: 'What this demonstrates',
+    body:
+      'Paired, repeated, counted. The experiment cost under $4 and a morning, and it replaces two pieces of received wisdom with two measured nulls and one measured effect nobody talks about: the screener you get is the variable. The same discipline as the other two harnesses — decide what is countable, count it, state what the count cannot support — with no judge in the loop at all.',
+  },
+
+  s7: {
+    mark: '§7',
+    label: 'Limitations',
+    body:
+      "One candidate's résumé. Twenty-one postings from eight employers, so shared boilerplate limits independence. Five reps against a pilot recommendation of twelve; the intervals are wide enough that effects under about three points are not excluded. The rubric is a published-research proxy, not any vendor's system. The institution-swap run was stopped after five complete reps and a partial sixth, which is included where both conditions of a pair completed. Cheap-tier models only; a frontier-tier screener may behave differently. Early in the pilot, gpt-5-mini returned empty content under a small output budget because its reasoning tokens consumed it — fixed before any counted run, disclosed because a screening vendor could make the same mistake.",
+  },
+
+  s8: {
+    mark: '§8',
+    label: 'Next',
+    body:
+      'A prestige arm (well-known employer names swapped in), a JD-vocabulary-alignment arm, and the same design on a second candidate\'s résumé — each is one config change on the public harness.',
+  },
+
+  repoCta: {
+    label: 'Read the code, run it on your own résumé →',
+    href: 'https://github.com/zoeb-nomi/screener-eval',
+  },
+
+  relatedWriting: {
+    mark: '§9',
+    text: '885 screenings, one résumé, and the two levers that did not move',
+    href: '/writing/two-levers-that-did-not-move/',
+  },
+
+  ctaSlabBody: 'Read the code, run it on your own résumé →',
 };
 
 // ---------------------------------------------------------------------------
@@ -681,6 +947,74 @@ export const writingReflection = {
 };
 
 // ---------------------------------------------------------------------------
+// WRITING — "885 screenings, one résumé, and the two levers that did not
+// move" — copy-pack-s17.md §18, added 2026-09-11. Same masthead shape as the
+// mirror-eval reflection piece (kicker, byline with date + reading time).
+// The pack's body is one continuous ~650-word piece with no numbered
+// sub-heads of its own; it is split here into Sections at its natural
+// paragraph beats (design-authored grouping only — every word of every
+// paragraph is verbatim from the pack).
+// ---------------------------------------------------------------------------
+
+export const writingTwoLevers = {
+  kicker: 'Eval methodology · screener-eval',
+  title: '885 screenings, one résumé, and the two levers that did not move',
+  dek: 'I ran my own résumé through two LLM screeners against 21 open AI PM roles, five times each, with the employers swapped for fictional ones and the links deleted. Neither mattered. Something else did.',
+  date: '2026-09-11',
+  readingTime: '3 min',
+  repoHref: 'https://github.com/zoeb-nomi/screener-eval',
+
+  s1: {
+    mark: '§1',
+    label: 'The setup',
+    paras: [
+      'Every piece of résumé advice I have ever been given comes down to two levers. Put the recognisable names where the eye lands first. Link to the proof. I had never seen either one measured against the thing that actually reads a résumé now, so I measured them.',
+      'The setup is small on purpose. One résumé — mine. Twenty-one job descriptions, every open US AI product manager role I could find at the frontier labs and large tech. Two cheap screening models, the tier a vendor would run at volume, given a scoring rubric from published research and asked for a 0–100 fit score and a verdict. Then the two levers, one at a time: a copy of the résumé with every employer replaced by a company that does not exist, and a copy with every link deleted. Same job description, both versions, same model, same hour, five times over. 885 scored calls, under four dollars.',
+    ],
+  },
+
+  s2: {
+    mark: '§2',
+    label: 'What did not move',
+    paras: [
+      'Swapping every employer for a fiction moved the score by 0.07 points on one screener and −1.1 on the other. Deleting every link: −0.9 and +0.4. All four confidence intervals straddle zero. On this résumé, against these postings, the two levers did nothing a counting method could see.',
+    ],
+  },
+
+  s3: {
+    mark: '§3',
+    label: 'What did',
+    paras: [
+      'What did move the score was the screener. On the same résumé and the same posting, the two models disagreed by 22 points on average and by 51 at the extreme. One rejected me 58% of the time; the other put me on hold 68% of the time. They agreed on the verdict for six postings out of twenty-one. One of them handed out only ten distinct scores across 233 calls, and gave exactly 28 to eighty-four of them. That is not a scale. That is a rubric leaking through.',
+      'And under all of it, the noise. Ask the same model the same question about the same résumé five times and the score wobbles by three to five points. On a third to a half of the postings, the screener flipped its own verdict between reps. Every free "ATS score" tool I have seen returns one number from one call. That number is a sample from the wobble.',
+    ],
+  },
+
+  s4: {
+    mark: '§4',
+    label: 'What the nulls do not say',
+    paras: [
+      'I want to be careful about what the nulls mean. The employer swap replaced companies a US screener has not heard of with companies nobody has heard of; it says nothing about whether a famous name would help, and I cannot run that test on my own résumé. The deleted links were text a language model cannot follow anyway, so the test was whether the presence of links signals anything, and it did not. These are narrow, honest results about one candidate and two cheap models.',
+    ],
+  },
+
+  s5: {
+    mark: '§5',
+    label: 'The wider lesson',
+    paras: [
+      'The wider lesson is not about résumés. It is that the interesting variable in an LLM-mediated system is rarely the one people are optimising. I spent a week making sure my evidence links were printed as text after finding that every extractor dropped them as invisible annotations — that fix was real, 26 of 29 fields to 29 of 29, and it is the one change in this study I would tell anyone to make. But once the text is in, the score belongs to the screener, and the screener belongs to whoever chose it.',
+      'The harness is public. Point it at your own résumé; the only thing you need to change is the PDF.',
+    ],
+  },
+
+  footer: [
+    { label: 'Case study →', href: '/screener-eval/' },
+    { label: 'Repo →', href: 'https://github.com/zoeb-nomi/screener-eval' },
+    { label: 'Related: I pointed an eval harness at my own reflection →', href: '/writing/eval-harness-at-my-own-reflection/' },
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // 4 · WORK — pack §4
 // ---------------------------------------------------------------------------
 
@@ -710,7 +1044,7 @@ export const work = {
   // the copy pack — these rows are cross-links, not third-party artefacts).
   openWork: {
     kicker: 'Open work',
-    note: 'Two public evaluation harnesses, built to one method.',
+    note: 'Three public evaluation harnesses, built to one method.',
     items: [
       {
         what: 'CrossSource — citation accuracy in legal RAG',
@@ -726,6 +1060,14 @@ export const work = {
           { label: 'Case study', href: '/mirror-eval/' },
           { label: 'Repo', href: 'https://github.com/zoeb-nomi/mirror-eval' },
           { label: 'v1.0', href: 'https://github.com/zoeb-nomi/mirror-eval/releases/tag/v1.0' },
+        ],
+        where: '',
+      },
+      {
+        what: 'screener-eval — what LLM résumé screeners actually reward',
+        links: [
+          { label: 'Case study', href: '/screener-eval/' },
+          { label: 'Repo', href: 'https://github.com/zoeb-nomi/screener-eval' },
         ],
         where: '',
       },
@@ -968,7 +1310,7 @@ export const work = {
 
 export const contributions = {
   kicker: 'PM who ships code',
-  dek: 'Both harnesses are public repositories. This is the last year of commits, live from GitHub.',
+  dek: 'All three harnesses are public repositories. This is the last year of commits, live from GitHub.',
   captionLive: 'contributions in the last year · live from GitHub',
   captionSnapshot: 'contributions in the last year · as of',
   legendLess: 'Less',
@@ -1068,6 +1410,7 @@ export const llmsTxt = `# Zoeb Nomi
 - Role: Product Manager, Instead (Sep 2025–present). Owns citation-accuracy evaluation, model benchmarking, and regression-catching eval loops for a production tax-research LLM. ~95% citation accuracy on the eval set.
 - Flagship public project: CrossSource (https://github.com/zoeb-nomi/crosssource) — open evaluation harness for citation accuracy in legal RAG. Citation precision 0.981 (baseline) → 0.994 (strict); recall 0.760; faithfulness 1.000; 100% (15/15) blind human–judge agreement. Corpus: 22 public-domain US court opinions; 25-question golden set; BM25 top-5 retrieval.
 - Second public project: mirror-eval (https://github.com/zoeb-nomi/mirror-eval) — open evaluation harness for what AI search engines say about a person; built to the CrossSource method. Two waves (2026-08-06, 2026-09-04), 332 probes each across ChatGPT, Claude, Perplexity, Gemini. Judge-free citation trail: Perplexity 13-of-63 → 63-of-63 search probes citing zoebnomi.com; Claude 0-of-63 → 0-of-63; CrossSource repo cited by ChatGPT 0 → 25-of-63 and Gemini 0 → 32-of-63. Blind human validation of the LLM judges: 3/40 and 12/40 — taxonomy reported as bands only. Release v1.0.
+- Third public project: screener-eval (https://github.com/zoeb-nomi/screener-eval) — paired, repeated evaluation of LLM résumé screeners. One résumé, 21 open US AI PM postings, two cheap-tier screeners, 5 reps, 885 calls. Employer-name swap: +0.07 / −1.14 points (95% CIs straddle zero). Link deletion: −0.90 / +0.41. Cross-screener gap on the same input: 22.3 points mean, verdicts agree on 6 of 21 postings. Parser test: plain extractors 26/29 → 29/29 after printing URLs as text.
 - At Instead: fixed the "knowledge–citation gap" failure mode (plausible-but-wrong citations); cut workflow latency ~90% (10–15 min → under a minute); architected a 270K+-record RAG corpus across 100+ legal source types; fetchability harness across 378 sources; remediation of ~139K documents; Legal Support Matrix across 160+ tax strategies; shipped Source Explorer.
 - Previously: Multiplier (Value-Added Services vertical: $100K incremental revenue, 47% efficiency gain, partnership launched in 21 days). Keka HR (3 roles, 2 promotions: built Background Verification module zero-to-one on Checkr API — 28 US enterprise clients, $2.7M MRR, company's first US expansion; 6 SSO integrations, 27% adoption lift, $121K upsell; Exit Module revamp, offboarding time −28%, CSAT +80%). Hurix Digital (agile transformation, 43% faster delivery; 31% conversion growth).
 - Education: STOA General Management Program (2022); B.E. Mechanical Engineering, MIT Aurangabad (2019).
@@ -1086,9 +1429,11 @@ export const llmsTxt = `# Zoeb Nomi
 - Evals index: https://www.zoebnomi.com/evals/
 - CrossSource case study: https://www.zoebnomi.com/crosssource/
 - mirror-eval case study: https://www.zoebnomi.com/mirror-eval/
+- screener-eval case study: https://www.zoebnomi.com/screener-eval/
 - Work: https://www.zoebnomi.com/work/
 - About: https://www.zoebnomi.com/about/
 - Writing (essays index): https://www.zoebnomi.com/writing/
 - Writing — "The judge caught a bug I didn't" (validating LLM-as-judge evals): https://www.zoebnomi.com/writing/the-judge-caught-a-bug/
 - Writing: https://www.zoebnomi.com/writing/eval-harness-at-my-own-reflection/
+- Writing: https://www.zoebnomi.com/writing/two-levers-that-did-not-move/
 `;

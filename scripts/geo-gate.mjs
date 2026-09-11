@@ -76,8 +76,22 @@ const POSITIVES = [
   '63 search-mode probes',
   '332 per wave',
   'two of nine',
-  'Two harnesses, one method',
   'PM who ships code',
+
+  // screener-eval — copy-pack-s17.md §19, added 2026-09-11.
+  'screener-eval',
+  'github.com/zoeb-nomi/screener-eval',
+  '885',
+  '21 open',
+  '+0.07',
+  '−1.14',
+  '−0.90',
+  '+0.41',
+  '22.3',
+  '6 of 21',
+  '19 of 21',
+  '29 / 0 / 0 / 0',
+  'Three harnesses, one method',
 ];
 
 // Simple literal-string negatives.
@@ -93,6 +107,10 @@ const NEGATIVE_LITERALS = [
   '+1.41',
   '+0.65',
   '−0.25',
+
+  // screener-eval — copy-pack-s17.md §19 negative checks, added 2026-09-11.
+  // "Two harnesses, one method" is retired now that a third harness exists.
+  'Two harnesses, one method',
 ];
 
 // "Filed" as a standalone product name — must not match the common word
