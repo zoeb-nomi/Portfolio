@@ -5,6 +5,7 @@ import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import EvalsSwitcher from '../components/EvalsSwitcher.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
 import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home } from '../data/copy';
 
 const table1Rows = me.s3.table1.rows.map((r) => ({
@@ -34,7 +35,7 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     <div class="masthead-inner">
       <aside class="margin-col" aria-label="Case study specification">
         <p class="kicker">{me.kicker}</p>
-        <dl class="spec-block">
+        <dl class="spec-block" data-narr="s0-stats">
           {me.specBlock.map((s) => (
             <div class="spec-row">
               <dt>{s.label}</dt>
@@ -46,18 +47,19 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
         <a class="repo-link" href={me.repoHref} target="_blank" rel="noopener noreferrer">{me.repoLabel}</a>
       </aside>
       <div class="body-col">
-        <h1 class="page-h1">{me.title}</h1>
-        <p class="standfirst">{me.standfirst}</p>
+        <h1 class="page-h1" data-narr="s0-title">{me.title}</h1>
+        <p class="standfirst" data-narr="s0-dek">{me.standfirst}</p>
+        {me.audio && <AudioPlayer audio={me.audio} articleId="mirror-eval" />}
       </div>
     </div>
   </section>
 
-  <Section mark={me.s1.mark} label={me.s1.label}>
-    <p class="prose">{me.s1.body}</p>
+  <Section mark={me.s1.mark} label={me.s1.label} narrId="s1-cue">
+    <p class="prose" data-narr="s1-p0">{me.s1.body}</p>
   </Section>
 
-  <Section mark={me.s2.mark} label={me.s2.label}>
-    <dl class="method-list">
+  <Section mark={me.s2.mark} label={me.s2.label} narrId="s2-cue">
+    <dl class="method-list" data-narr="s2-list">
       {me.s2.rows.map((row) => (
         <div class="method-row">
           <dt>{row.term}</dt>
@@ -76,44 +78,44 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     </dl>
   </Section>
 
-  <Section mark={me.s3.mark} label={me.s3.label}>
-    <p class="prose intro">{me.s3.intro}</p>
-    <div class="table-scroll">
+  <Section mark={me.s3.mark} label={me.s3.label} narrId="s3-cue">
+    <p class="prose intro" data-narr="s3-p0">{me.s3.intro}</p>
+    <div class="table-scroll" data-narr="s3-table1" tabindex="0">
       <DataTable caption={me.s3.table1.caption} columns={me.s3.table1.columns} rows={table1Rows} />
     </div>
-    <p class="prose table-intro">{me.s3.table2Intro}</p>
-    <div class="table-scroll">
+    <p class="prose table-intro" data-narr="s3-p1">{me.s3.table2Intro}</p>
+    <div class="table-scroll" data-narr="s3-table2" tabindex="0">
       <DataTable caption={me.s3.table2.caption} columns={me.s3.table2.columns} rows={table2Rows} />
     </div>
-    <p class="prose finding">
+    <p class="prose finding" data-narr="s3-p2">
       <strong>{me.s3.findingLeadIn}</strong>{me.s3.findingBody}
     </p>
   </Section>
 
-  <Section mark={me.s4.mark} label={me.s4.label}>
-    <p class="prose">{me.s4.para1}</p>
-    <p class="prose para2">
+  <Section mark={me.s4.mark} label={me.s4.label} narrId="s4-cue">
+    <p class="prose" data-narr="s4-p0">{me.s4.para1}</p>
+    <p class="prose para2" data-narr="s4-p1">
       {me.s4.para2Pre}<code>{me.s4.para2Code}</code>{me.s4.para2Post}
     </p>
-    <div class="lesson">
+    <div class="lesson" data-narr="s4-quote">
       <PullQuote rule="red">{me.s4.lessonQuote}</PullQuote>
     </div>
   </Section>
 
-  <Section mark={me.s5.mark} label={me.s5.label}>
-    <p class="prose">{me.s5.body}</p>
+  <Section mark={me.s5.mark} label={me.s5.label} narrId="s5-cue">
+    <p class="prose" data-narr="s5-p0">{me.s5.body}</p>
   </Section>
 
-  <Section mark={me.s6.mark} label={me.s6.label}>
-    <p class="prose">{me.s6.body}</p>
+  <Section mark={me.s6.mark} label={me.s6.label} narrId="s6-cue">
+    <p class="prose" data-narr="s6-p0">{me.s6.body}</p>
   </Section>
 
-  <Section mark={me.s7.mark} label={me.s7.label}>
-    <p class="prose">{me.s7.body}</p>
+  <Section mark={me.s7.mark} label={me.s7.label} narrId="s7-cue">
+    <p class="prose" data-narr="s7-p0">{me.s7.body}</p>
   </Section>
 
-  <Section mark={me.s8.mark} label={me.s8.label}>
-    <p class="prose">{me.s8.body}</p>
+  <Section mark={me.s8.mark} label={me.s8.label} narrId="s8-cue">
+    <p class="prose" data-narr="s8-p0">{me.s8.body}</p>
     <p class="prose repo-cta">
       {me.repoCta.map((link, i) => (
         <>
@@ -202,6 +204,10 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
   }
 
   .body-col {
+    /* min-width: 0 so the audio player's chapter-chip row (flex-nowrap +
+       overflow-x: auto) can scroll on its own instead of stretching this
+       grid item once chapters are filled in. */
+    min-width: 0;
     padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
   }
 
