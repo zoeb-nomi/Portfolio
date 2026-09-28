@@ -44,32 +44,32 @@ const articleLd = {
         <p class="kicker">{wt.kicker}</p>
       </aside>
       <div class="body-col">
-        <h1 class="page-h1">{wt.title}</h1>
-        <p class="standfirst">{wt.dek}</p>
+        <h1 class="page-h1" data-narr="s0-title">{wt.title}</h1>
+        <p class="standfirst" data-narr="s0-dek">{wt.dek}</p>
         <p class="byline tabular">{wt.date} · {wt.readingTime} read</p>
         {wt.audio && <AudioPlayer audio={wt.audio} articleId="two-levers" />}
       </div>
     </div>
   </section>
 
-  <Section mark={wt.s1.mark} label={wt.s1.label}>
-    {wt.s1.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wt.s1.mark} label={wt.s1.label} narrId="s1-cue">
+    {wt.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wt.s2.mark} label={wt.s2.label}>
-    {wt.s2.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wt.s2.mark} label={wt.s2.label} narrId="s2-cue">
+    {wt.s2.paras.map((p, i) => <p class="prose" data-narr={`s2-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wt.s3.mark} label={wt.s3.label}>
-    {wt.s3.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wt.s3.mark} label={wt.s3.label} narrId="s3-cue">
+    {wt.s3.paras.map((p, i) => <p class="prose" data-narr={`s3-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wt.s4.mark} label={wt.s4.label}>
-    {wt.s4.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wt.s4.mark} label={wt.s4.label} narrId="s4-cue">
+    {wt.s4.paras.map((p, i) => <p class="prose" data-narr={`s4-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wt.s5.mark} label={wt.s5.label}>
-    {wt.s5.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wt.s5.mark} label={wt.s5.label} narrId="s5-cue">
+    {wt.s5.paras.map((p, i) => <p class="prose" data-narr={`s5-p${i}`}>{p}</p>)}
     <p class="prose links-line">
       {wt.footer.map((link, i) => (
         <>
