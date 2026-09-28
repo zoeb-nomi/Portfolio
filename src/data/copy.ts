@@ -80,7 +80,7 @@ export const meta = {
   },
   writingIndex: {
     title: 'Writing — Zoeb Nomi',
-    description: 'Notes on LLM evaluation, LLM-as-judge reliability, and RAG output quality — from CrossSource and production eval work.',
+    description: 'Notes on LLM evaluation, LLM-as-judge reliability, and RAG output quality — from CrossSource and production eval work — and the occasional industry thesis, written so it can be wrong.',
   },
   evals: {
     title: 'Evals — Zoeb Nomi · AI Product Manager',
@@ -106,6 +106,11 @@ export const meta = {
     title: '885 screenings, one résumé, and the two levers that did not move — Zoeb Nomi',
     description:
       "Employer names and evidence links did nothing measurable to an LLM screener's score; which screener read the résumé moved it 22 points, and its own noise was bigger than either lever.",
+  },
+  writingBusStop: {
+    title: 'The bus stop nobody notices — Zoeb Nomi',
+    description:
+      'How Vijayanand Travels built a fifty-year moat in Indian intercity bus travel, what the market data says about premiumisation, and a ₹50,000 pre-registered experiment — four positions, thesis metrics, a control group — to test whether the thesis is right.',
   },
   work: {
     title: 'Work — Zoeb Nomi · AI Product Manager',
@@ -1015,6 +1020,208 @@ export const writingTwoLevers = {
 };
 
 // ---------------------------------------------------------------------------
+// 3d · WRITING — "The Bus Stop Nobody Notices" (industry thesis, 2026-09-28)
+// Numbers audited 2026-09-20 against redBus BusTrack H2 FY26, CARE Ratings
+// (Mar 2025), company filings and SIAM/OEM monthly releases. Every figure
+// below is dated in the text; nothing is from memory.
+// ---------------------------------------------------------------------------
+
+export const writingBusStop = {
+  kicker: 'Industry thesis · Mobility',
+  title: 'The bus stop nobody notices',
+  dek: 'A family business from Hubli built a fifty-year moat in Indian transport and just placed the largest private Volvo order in the country. What that says about premium intercity bus travel — and the ₹50,000 experiment I am running to find out whether I actually understand it.',
+  date: '2026-09-28',
+  readingTime: '11 min',
+
+  s1: {
+    mark: '§1',
+    label: 'The bus stop',
+    paras: [
+      'There is a bus stop near Majestic in Bengaluru that most people walk past without a second thought. It belongs to Vijayanand Travels, the bus arm of the VRL group: a dedicated terminal, a ticket counter, a waiting area, branded signage, Volvo coaches leaving all evening.',
+      'No other private operator in the city has anything like it. SRS, Sugama, Kallada, Orange — all of them work from shared pickup points or the roadside. What looks like a mundane piece of real estate is a competitive advantage decades in the making, and on 4 September 2026 the company behind it placed the largest single order any private Indian operator has ever placed with Volvo: 150 Volvo 9600 sleeper coaches, seventy to eighty of them fitted with onboard washrooms.',
+      'That is not fleet replacement. It is a signal about where a private, promoter-funded company thinks the next decade of intercity travel is going. I wanted to know whether the signal was right, and whether there was a way to be paid for being right about it.',
+    ],
+  },
+
+  s2: {
+    mark: '§2',
+    label: 'The demand picture',
+    intro:
+      'The intercity bus market is growing faster than most people in tech-adjacent Bengaluru realise, because most of the growth is happening outside the metros and outside the apps they use. The most recent industry count is redBus BusTrack for the second half of FY26 (October 2025 to March 2026):',
+    stats: [
+      { value: '147M', label: 'passenger journeys, H2 FY26', provenance: 'redBus BusTrack H2 FY26' },
+      { value: '+24%', label: 'growth in journeys, year on year', provenance: 'redBus BusTrack H2 FY26' },
+      { value: '₹14,216 Cr', label: 'gross ticketing value in the half-year', provenance: 'redBus BusTrack H2 FY26' },
+      { value: '72%', label: 'of journeys on AC buses; 52% on sleepers', provenance: 'redBus BusTrack H2 FY26' },
+      { value: '62%', label: 'of digital bookings from tier-2 and tier-3 towns', provenance: 'redBus BusTrack H2 FY26' },
+    ],
+    paras: [
+      'Three shifts sit underneath those numbers. Smaller towns are now the centre of gravity, and not only because they got smartphones: new highways under Bharatmala and the state expressways have made corridors viable that did not exist five years ago. The customer is premiumising — the choice on a Bengaluru–Hubli night is between a ₹1,200 Volvo sleeper you can sleep through and a ₹4,500 flight that still costs an hour at each end. And digital ticketing has professionalised the trade: rated, dynamically priced inventory rewards the bigger, better-run operators with occupancy and yield the roadside never gave them.',
+      'One honesty note before going further. The 24% is growth in online-booked journeys, and part of it is the offline market migrating online rather than the market itself growing. The only sourced forecast for the whole market I could find, a VIDEC ground-transport study, puts intercity bus at roughly ₹539 billion in FY23 and ₹688 billion by FY26 — an 8.5% annual rate. The platform layer grows at one speed, the market at another, and the bus factories at a third. That distinction ends up mattering for the trades.',
+    ],
+  },
+
+  s3: {
+    mark: '§3',
+    label: 'The case study',
+    paras: [
+      'Vijayanand Travels did not start as a startup. It started as a line item inside a logistics company, and how it became a standalone ₹500 crore business is one of the more instructive restructurings in Indian transport.',
+      'Vijay Sankeshwar started VRL in 1976 with one truck. By the mid-nineties VRL Logistics was the largest private fleet owner in the country; in 1996 Sankeshwar, by then a sitting MP from Dharwad, bought four passenger buses and put them on Hubli–Bengaluru. The bus division grew inside the listed company for twenty-five years and never crossed nine percent of its revenue. By FY22 it had become a drag: fuel had risen from 37% to 47% of bus revenue, average revenue per passenger had fallen from ₹1,000 to ₹924, and most of the 277 buses were past six years old. The division needed a capex cycle that public shareholders did not want to fund.',
+      'So in September 2022 VRL Logistics sold the whole bus business to a new private company owned by the same family, for ₹230 crore against a net worth of ₹35 crore — the difference being what the brand and the route network were judged to be worth. The listed company took the cash and bought trucks. The bus company, now private, could spend without a quarterly audience.',
+      'What the Sankeshwars did next was aggressive. They put in ₹314 crore of their own money as interest-free loans, subordinated to the banks and treated as equity by the rating agency. They replaced the fleet: 118 new buses in FY24, 44 more in the first ten months of FY25, then a 550-bus order in August 2024. Revenue went from ₹75 crore in the partial first year to ₹351 crore to ₹504 crore; EBITDA margin from 13.2% to 14.9% to 19.5%. CARE upgraded them to BBB+ in March 2025 and noted, approvingly, that they had deferred an aircraft purchase in favour of buses. The fleet today is around 1,550 buses, 742 of them Volvos, on 350 routes at an average occupancy of 83%.',
+    ],
+    quote: 'The bus business grew for two decades inside a ₹3,000 crore logistics company. The brand, the driver pipeline, the route knowledge, the workshops — all of it was shared overhead. No standalone bus startup gets that.',
+  },
+
+  s4: {
+    mark: '§4',
+    label: 'What makes the moat',
+    paras: [
+      'Why can’t someone raise ₹500 crore and do the same? Because the defensibility is not in the coaches. It is in a stack of advantages that took decades to build and cannot be bought at today’s prices.',
+      'The terminal near Majestic was secured in the late nineties, when commercial property beside a major transit hub cost a fraction of what it does now. The founder was a three-term Lok Sabha member who sat on the parliamentary committee for transport; permits, clearances and route licences in India are not purely market outcomes. A dedicated terminal costs several lakh a month — spread over three hundred passengers a day it disappears into the ticket, spread over a hundred it eats the margin, which is a scale economy with a natural-monopoly shape. And the rating agency specifically credits VTPL’s dynamic pricing for passing fuel costs through immediately, something the roadside operator cannot do without losing the passenger to the next bus.',
+      'None of this is replicable by a well-funded entrant. It is only replicable by time.',
+    ],
+  },
+
+  s5: {
+    mark: '§5',
+    label: 'Who else is here',
+    table: {
+      caption: 'Premium intercity bus operators, September 2026',
+      columns: ['Player', 'Model', 'Scale', 'Note'],
+      rows: [
+        { label: 'Vijayanand Travels', cells: [{ text: 'Asset-heavy operator' }, { text: '₹504 Cr revenue, ~1,550 buses' }, { text: 'Private. Promoter-funded. Fifty-year brand.' }] },
+        { label: 'IntrCity SmartBus', cells: [{ text: 'Asset-light platform' }, { text: '~₹500 Cr revenue, 600 daily runs' }, { text: 'VC-backed; partners with 50+ operators.' }] },
+        { label: 'SRS Travels', cells: [{ text: 'Traditional operator' }, { text: '~5,500 vehicles' }, { text: 'Largest fleet by count; less premium.' }] },
+        { label: 'FlixBus', cells: [{ text: 'European asset-light' }, { text: 'Early stage in India' }, { text: 'Entered 2024; unproven here.' }] },
+        { label: 'Zingbus, FreshBus', cells: [{ text: 'New-age startups' }, { text: 'Early growth' }, { text: 'Niche routes; FreshBus part-owned by ixigo.' }] },
+      ],
+    },
+    paras: [
+      'The interesting tension is between operators who own the passenger experience end to end and platforms that aggregate everyone else’s buses with software. IntrCity reached roughly the same revenue as VTPL in FY25 owning far fewer buses. The 150-Volvo-with-washrooms order is a bet that in a premiumising market, controlling the experience is what wins.',
+    ],
+  },
+
+  s6: {
+    mark: '§6',
+    label: 'The hypothesis',
+    paras: [
+      'Stated so it can be wrong: premium intercity bus travel in India is in a structural growth phase, and each layer of the value chain is paid for it at a different rate. Online ticketing platforms grow at 20–25% a year because they compound the market’s growth with the migration from roadside to app. The market itself grows at high single digits. Bus manufacturers grow with the commercial-vehicle cycle, and the bus line is a minority of their business. The operators who capture the most value are almost all private.',
+      'That framing rules things out before it rules anything in. It rules out betting on the operators, because you cannot. It rules out expressing “redBus is dominant” through MakeMyTrip, whose bus segment is 14% of revenue and whose profit fell 46% last year for reasons that have nothing to do with buses — and which cannot be bought on an Indian broker anyway. It rules out the electric-bus lottery tickets: the maker I first shortlisted turned out to have a 9.5% share, not the 40% I had written down. And it rules out the manufacturer that makes the very Volvos VTPL is buying, because that company’s valuation is a motorcycle business with a bus plant attached — and its heavy-duty bus sales fell 36% in the June quarter, which is the single number most likely to falsify the whole thesis.',
+      'What survives is small. One bus maker that also happens to own the largest electric-bus maker in the country. One listed platform where bus is a quarter of revenue and grew 51% last year. A rail-capex position that I am carrying as a separate hypothesis rather than pretending it is the same one.',
+    ],
+  },
+
+  s7: {
+    mark: '§7',
+    label: 'The experiment',
+    intro:
+      'I am putting ₹50,000 of my own money behind this, in four positions plus a reserve, on a twelve-month clock. Prices are the 18 September 2026 closes; the limits are where I am willing to buy, not where the stock is. What makes it an experiment rather than a punt is the last column: each position has a thesis metric that has nothing to do with its price, and if that metric breaks, the position goes, whatever the P&L says.',
+    table: {
+      caption: 'The basket, as placed — ₹50,000 on Zerodha, delivery',
+      columns: ['Position', 'Layer', 'Size', 'Buy at or below', 'Twelve-month target', 'Hard stop', 'Kill trigger'],
+      rows: [
+        {
+          label: 'Ashok Leyland (ASHOKLEY)',
+          cells: [
+            { text: 'Bus manufacturer (OEM); owns Switch Mobility, India’s largest e-bus maker' },
+            { text: '105 shares · ₹17,325 · 35%' },
+            { text: '₹165' },
+            { text: '₹195 (+18%)' },
+            { text: '₹132' },
+            { text: 'SIAM medium-and-heavy (M&HCV) bus dispatches negative year on year for two consecutive months' },
+          ],
+        },
+        {
+          label: 'ixigo (IXIGO)',
+          cells: [
+            { text: 'Platform; AbhiBus is 24% of revenue' },
+            { text: '72 shares · ₹12,240 · 24%' },
+            { text: '₹170' },
+            { text: '₹230 (+35%)' },
+            { text: '₹140' },
+            { text: 'Bus revenue growth below 25% year on year for two quarters' },
+          ],
+        },
+        {
+          label: 'Titagarh Rail (TITAGARH)',
+          cells: [
+            { text: 'Separate hypothesis: rail capex' },
+            { text: '10 shares · ₹8,400 · 17%' },
+            { text: '₹840' },
+            { text: '₹990 (+18%)' },
+            { text: '₹690' },
+            { text: 'Vande Bharat sleeper prototype slips past March 2027, or passenger-rail revenue under ₹200 Cr in any quarter' },
+          ],
+        },
+        {
+          label: 'JBM Auto (JBMA) — undecided',
+          cells: [
+            { text: 'Electric-bus tenders; 10,000+ bus order book' },
+            { text: '10 shares · ₹6,100 · 12%' },
+            { text: '₹610' },
+            { text: '₹720 (+18%)' },
+            { text: '₹510' },
+            { text: 'No award from CESL (the central e-bus tendering agency) in its 6,230-bus tender by March 2027' },
+          ],
+        },
+        {
+          label: 'Cash reserve',
+          cells: [{ text: 'Fuel for the add rule' }, { text: '~₹6,000 · 12%' }, { text: '—' }, { text: '—' }, { text: '—' }, { text: 'Deployed only at a green quarterly gate' }],
+        },
+      ],
+    },
+    paras: [
+      'Ashok Leyland is the honest version of a bus stock: buses are a minority of its 220,000 vehicles a year, and in August its trucks grew 60% while buses grew 12%. I am holding it as a commercial-vehicle upcycle with a bus kicker, and I will judge it on the bus dispatch number, not the share price. ixigo is there instead of the redBus parent because thesis-driven investing means buying the instrument most sensitive to the thesis, not the brand you use most. Titagarh’s order book is ₹26,635 crore against ₹3,186 crore of annual revenue, with the first sleeper trainset due before the year ends; it is a good position and it is not a bus position, so it gets its own label and its own scorecard.',
+      'Four names I decided against get tracked on paper as a control group: MakeMyTrip, Olectra, Tata Motors CV and Eicher. If the control beats the basket for two quarters, the hypothesis is wrong, whether or not the basket is up. Before every quarterly result I write down the number I expect; after it, I score myself. The calibration record is the point of the exercise. The P&L is the scoreboard.',
+      'The first gate is mid-November 2026, when all four report the September quarter. Green on the thesis metric means up to ₹3,000 from the reserve goes into that position; amber means hold; red means out at the next open. New money only after two consecutive green quarters across the basket. Scale-or-kill in September 2027.',
+    ],
+  },
+
+  s8: {
+    mark: '§8',
+    label: 'What would prove me wrong',
+    paras: [
+      'The heavy-duty bus number. If VECV’s Volvo and Eicher heavy buses keep shrinking at double digits while the light and medium segment grows, then premiumisation is a redBus-app phenomenon and not a factory-floor one, and the manufacturer leg fails on its own terms even if the platform leg works.',
+      'Fuel. Diesel is 30–45% of an operator’s cost; dynamic pricing passes it through until passengers stop paying, and nobody knows precisely where that is.',
+      'Rail. Vande Bharat on the 200–400 km corridors where premium buses make their money — Bengaluru–Hubli, Mumbai–Pune, Hyderabad–Bengaluru — changes the arithmetic. Railway capacity is added in decades and bus routes are changed overnight, which is why I hold both, but I hold the rail position as a hedge on my own thesis, not a confirmation of it.',
+      'Permits. State transport authorities can revoke a route. The founder’s political capital is real and it is not permanent.',
+      'And the base rate. Most people who write up a thesis and then trade it lose money on the trade and keep the thesis. The twelve-month clock, the pre-registered numbers and the control group are there so that in September 2027 I cannot tell myself a story.',
+    ],
+  },
+
+  photo: {
+    src: '/img/vijayanand-majestic.jpg',
+    alt: 'Vijayanand Travels terminal near Majestic, Bengaluru, with Volvo coaches lined up in the evening',
+    caption: 'The bus stop. Vijayanand Travels’ own terminal near Majestic — the only one of its kind among Bengaluru’s private operators.',
+    credit: 'Photo: Zoeb Nomi',
+    enabled: false,
+  },
+  watch: {
+    mark: '§9',
+    label: 'Watch',
+    intro: 'If you want the industry in an evening rather than a decade, three things worth your time — a delivery run, a product teardown, and the founder in his own words.',
+    items: [
+      { youtubeId: 'NcC1mQWYXtk', title: 'VRL Vijayanand — Volvo 9600S delivery programme at the Volvo factory', channel: 'THE ARUJ GURAV · YouTube', why: 'The order in this article, being collected. Watch how a private operator takes delivery of sleeper coaches at scale.' },
+      { youtubeId: 'OD_tyyhLCro', title: 'Volvo 9600 sleeper coach — the ₹2 crore passenger bus with global standards', channel: 'Motown India · YouTube', why: 'What VTPL is actually buying 150 of, and why a coach costs what a small apartment costs.' },
+      { youtubeId: 'Tdyv1Y59id8', title: 'Nanna Kathe — Vijay Sankeshwar, VRL Group, in his own words', channel: 'TV9 Kannada · YouTube', why: 'The founder’s account of one truck in 1976 to the largest private fleet in India. In Kannada; the arc needs no subtitles.' },
+    ],
+  },
+
+  disclaimer:
+    'This is a personal experiment with my own money, written up in public so that I can be held to it. It is not investment advice. I am not a SEBI-registered adviser, nothing here is a recommendation to buy or sell anything, and the numbers are dated because they will be wrong soon.',
+
+  sources: [
+    { label: 'redBus BusTrack H2 FY26 (via Autocar Professional) →', href: 'https://www.autocarpro.in/news/intercity-bus-passenger-volumes-rise-24-percent-in-second-half-of-fy2026-redbus-report-132718' },
+    { label: 'VECV heavy-bus sales, June 2026 →', href: 'https://www.autocarpro.in/news/eicher-heavy-duty-bus-sales-plummet-267-percent-as-domestic-slump-deepens-133329' },
+    { label: 'MakeMyTrip FY26 results (bus segment) →', href: 'https://investors.mmtcdn.com/MMYT_Earnings_Release_8fdc23d364.pdf' },
+    { label: 'ixigo Q4 FY26 release (AbhiBus) →', href: 'https://investors-site-api.ixigo.workers.dev/files/1779367038875-q4-fy26-media-release-ixigo-reports-all-time-high-pat-in-q4-fy26-delivers-strong-fy26-revenue-gtv-and-cash-flows.pdf' },
+    { label: 'India e-bus registrations, H1 2026 →', href: 'https://www.sustainable-bus.com/news/india-electric-bus-market-first-half-2026/' },
+    { label: 'Titagarh Q1 FY27 investor presentation →', href: 'https://www.investywise.com/titagarh-rail-systems-limited-investor-presentation-q1-fy27/' },
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // 4 · WORK — pack §4
 // ---------------------------------------------------------------------------
 
@@ -1436,4 +1643,5 @@ export const llmsTxt = `# Zoeb Nomi
 - Writing — "The judge caught a bug I didn't" (validating LLM-as-judge evals): https://www.zoebnomi.com/writing/the-judge-caught-a-bug/
 - Writing: https://www.zoebnomi.com/writing/eval-harness-at-my-own-reflection/
 - Writing: https://www.zoebnomi.com/writing/two-levers-that-did-not-move/
+- Writing — "The bus stop nobody notices" (industry thesis on premium intercity bus travel in India, with a pre-registered ₹50,000 experiment): https://www.zoebnomi.com/writing/the-bus-stop-nobody-notices/
 `;
