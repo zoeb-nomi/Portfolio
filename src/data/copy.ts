@@ -895,7 +895,6 @@ export const writingJudgeBugAudio = {
   label: 'Listen to this piece',
   note: 'Read by a synthetic voice (Kokoro).',
   chapters: [
-    { id: 's0', title: "The judge caught a bug I didn't", start: 0.0 },
     { id: 's1', title: 'What I checked', start: 12.3 },
     { id: 's2', title: 'The bug the validation surfaced', start: 52.8 },
     { id: 's3', title: 'Why this keeps happening', start: 86.2 },
@@ -917,7 +916,6 @@ export const writingReflection = {
     label: 'Listen to this piece',
     note: 'Read by a synthetic voice (Kokoro).',
     chapters: [
-      { id: 's0', title: 'I pointed an eval harness at my own reflection', start: 0.0 },
       { id: 's1', title: 'Why I ran this', start: 13.2 },
       { id: 's2', title: "1. Engines don't abstain. They fill.", start: 69.8 },
       { id: 's3', title: '2. "It\'s published by him, so it\'s his claim."', start: 143.1 },
@@ -1008,7 +1006,6 @@ export const writingTwoLevers = {
     label: 'Listen to this piece',
     note: 'Read by a synthetic voice (Kokoro).',
     chapters: [
-      { id: 's0', title: '885 screenings, one résumé, and the two levers that did not move', start: 0.0 },
       { id: 's1', title: 'The setup', start: 20.3 },
       { id: 's2', title: 'What did not move', start: 78.5 },
       { id: 's3', title: 'What did', start: 103.0 },
