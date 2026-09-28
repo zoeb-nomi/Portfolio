@@ -223,6 +223,13 @@ export const mirrorEvalJsonLd = {
   programmingLanguage: 'Python',
   version: '1.0',
   author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+  audio: {
+    '@type': 'AudioObject',
+    contentUrl: 'https://www.zoebnomi.com/audio/mirror-eval.mp3',
+    encodingFormat: 'audio/mpeg',
+    duration: 'PT7M25S',
+    name: 'mirror-eval — narration',
+  },
 };
 
 // screener-eval — copy-pack-s17.md §19, verbatim
@@ -235,6 +242,13 @@ export const screenerEvalJsonLd = {
   codeRepository: 'https://github.com/zoeb-nomi/screener-eval',
   programmingLanguage: 'Python',
   author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+  audio: {
+    '@type': 'AudioObject',
+    contentUrl: 'https://www.zoebnomi.com/audio/screener-eval.mp3',
+    encodingFormat: 'audio/mpeg',
+    duration: 'PT9M20S',
+    name: 'screener-eval — narration',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -502,6 +516,34 @@ export const mirrorEval = {
   repoHref: 'https://github.com/zoeb-nomi/mirror-eval',
   repoLabel: 'github.com/zoeb-nomi/mirror-eval',
 
+  audio: {
+    src: '/audio/mirror-eval.mp3',
+    duration: 445,
+    label: 'Listen to this piece',
+    note: 'Read by a synthetic voice (Kokoro).',
+    chapters: [
+      { id: 's1', title: 'Why this exists', start: 43.9 },
+      { id: 's2', title: 'Method', start: 89.4 },
+      { id: 's3', title: 'Findings', start: 174.0 },
+      { id: 's4', title: 'The judge failed — because I checked the judge', start: 285.8 },
+      { id: 's5', title: 'What this demonstrates', start: 343.1 },
+      { id: 's6', title: 'Limitations', start: 371.3 },
+      { id: 's7', title: 'Predictions, scored', start: 411.0 },
+      { id: 's8', title: 'Next', start: 424.5 },
+    ],
+    cues: [
+      ['s0-title', 0.0, 4.27], ['s0-dek', 4.87, 31.17], ['s0-stats', 31.77, 42.65],
+      ['s1-cue', 43.85, 46.03], ['s1-p0', 46.63, 88.18],
+      ['s2-cue', 89.38, 91.11], ['s2-list', 91.71, 172.76],
+      ['s3-cue', 173.96, 175.81], ['s3-p0', 176.41, 182.66], ['s3-table1', 183.26, 219.62], ['s3-p1', 220.22, 223.63], ['s3-table2', 224.23, 248.17], ['s3-p2', 248.77, 284.56],
+      ['s4-cue', 285.76, 289.26], ['s4-p0', 289.86, 320.97], ['s4-p1', 321.57, 336.9], ['s4-quote', 337.5, 341.9],
+      ['s5-cue', 343.1, 345.45], ['s5-p0', 346.05, 370.07],
+      ['s6-cue', 371.27, 373.27], ['s6-p0', 373.87, 409.82],
+      ['s7-cue', 411.02, 413.32], ['s7-p0', 413.92, 423.33],
+      ['s8-cue', 424.53, 426.3], ['s8-p0', 426.9, 445.46],
+    ] as Cue[],
+  },
+
   s1: {
     mark: '§1',
     label: 'Why this exists',
@@ -674,6 +716,34 @@ export const screenerEval = {
   ],
   repoHref: 'https://github.com/zoeb-nomi/screener-eval',
   repoLabel: 'github.com/zoeb-nomi/screener-eval',
+
+  audio: {
+    src: '/audio/screener-eval.mp3',
+    duration: 560,
+    label: 'Listen to this piece',
+    note: 'Read by a synthetic voice (Kokoro).',
+    chapters: [
+      { id: 's1', title: 'Why this exists', start: 31.0 },
+      { id: 's2', title: 'Method', start: 72.7 },
+      { id: 's3', title: 'Findings', start: 175.0 },
+      { id: 's4', title: 'What the null does and does not say', start: 350.7 },
+      { id: 's5', title: 'The parser test', start: 387.6 },
+      { id: 's6', title: 'What this demonstrates', start: 468.1 },
+      { id: 's7', title: 'Limitations', start: 495.2 },
+      { id: 's8', title: 'Next', start: 544.6 },
+    ],
+    cues: [
+      ['s0-title', 0.0, 5.44], ['s0-dek', 6.04, 22.94], ['s0-stats', 23.54, 29.77],
+      ['s1-cue', 30.97, 33.14], ['s1-p0', 33.74, 71.46],
+      ['s2-cue', 72.66, 74.39], ['s2-list', 74.99, 173.76],
+      ['s3-cue', 174.96, 176.82], ['s3-p0', 177.42, 182.47], ['s3-table1', 183.07, 230.45], ['s3-p1', 231.05, 235.77], ['s3-table2', 236.37, 285.31], ['s3-p2', 285.91, 307.07], ['s3-p3', 307.67, 346.92], ['s3-quote', 347.52, 349.46],
+      ['s4-cue', 350.66, 353.59], ['s4-p0', 354.19, 386.44],
+      ['s5-cue', 387.64, 389.67], ['s5-p0', 390.27, 400.51], ['s5-table', 401.11, 439.06], ['s5-p1', 439.66, 466.86],
+      ['s6-cue', 468.06, 470.43], ['s6-p0', 471.03, 494.01],
+      ['s7-cue', 495.21, 497.25], ['s7-p0', 497.85, 543.36],
+      ['s8-cue', 544.56, 546.33], ['s8-p0', 546.93, 559.79],
+    ] as Cue[],
+  },
 
   s1: {
     mark: '§1',
@@ -885,6 +955,11 @@ export const screenerEval = {
 // numbered beats plus the closing "What I'd tell someone" section, per spec.
 // ---------------------------------------------------------------------------
 
+// Read-along cue tuple: [data-narr id, start seconds, end seconds]. One
+// entry per narrated DOM anchor; see AudioPlayer.astro for how these drive
+// the active-paragraph highlight, follow-scroll and click-to-seek.
+export type Cue = [string, number, number];
+
 // "The judge caught a bug I didn't" keeps its title/standfirst/body as local
 // consts in the page itself (no writing* object above) — this is just the
 // audio player data for it.
@@ -900,6 +975,15 @@ export const writingJudgeBugAudio = {
     { id: 's3', title: 'Why this keeps happening', start: 86.2 },
     { id: 's4', title: 'More', start: 111.0 },
   ],
+  // Read-along cues — narration timing per DOM anchor (data-narr id). Source:
+  // audio/the-judge-caught-a-bug.cues.json, generated with the narration.
+  cues: [
+    ['s0-title', 0.0, 1.69], ['s0-dek', 2.29, 11.14],
+    ['s1-cue', 12.34, 14.34], ['s1-p0', 14.94, 20.0], ['s1-p1', 20.6, 37.39], ['s1-p2', 37.99, 47.03], ['s1-quote', 47.63, 51.56],
+    ['s2-cue', 52.76, 55.64], ['s2-p0', 56.24, 85.0],
+    ['s3-cue', 86.2, 88.63], ['s3-p0', 89.23, 109.75],
+    ['s4-cue', 110.95, 112.66], ['s4-p0', 113.26, 119.34], ['s4-quote', 119.94, 126.15],
+  ] as Cue[],
 };
 
 export const writingReflection = {
@@ -922,6 +1006,14 @@ export const writingReflection = {
       { id: 's4', title: "3. The judge failed. The study didn't.", start: 210.8 },
       { id: 's5', title: "What I'd tell someone running this on themselves", start: 311.4 },
     ],
+    cues: [
+      ['s0-title', 0.0, 2.73], ['s0-dek', 3.33, 12.01],
+      ['s1-cue', 13.21, 15.35], ['s1-p0', 15.95, 35.15], ['s1-p1', 35.75, 59.83], ['s1-p2', 60.43, 68.65],
+      ['s2-cue', 69.85, 73.09], ['s2-p0', 73.69, 96.32], ['s2-p1', 96.92, 118.98], ['s2-p2', 119.58, 141.92],
+      ['s3-cue', 143.12, 146.27], ['s3-p0', 146.87, 165.71], ['s3-p1', 166.31, 199.02], ['s3-p2', 199.62, 209.64],
+      ['s4-cue', 210.84, 214.06], ['s4-p0', 214.66, 230.6], ['s4-p1', 231.2, 250.63], ['s4-p2', 251.23, 301.41], ['s4-quote', 302.01, 310.25],
+      ['s5-cue', 311.45, 314.67], ['s5-p0', 315.27, 344.34], ['s5-p1', 344.94, 355.18],
+    ] as Cue[],
   },
 
   s1: {
@@ -1012,6 +1104,14 @@ export const writingTwoLevers = {
       { id: 's4', title: 'What the nulls do not say', start: 157.7 },
       { id: 's5', title: 'The wider lesson', start: 190.1 },
     ],
+    cues: [
+      ['s0-title', 0.0, 4.86], ['s0-dek', 5.46, 19.12],
+      ['s1-cue', 20.32, 22.13], ['s1-p0', 22.73, 37.17], ['s1-p1', 37.77, 77.35],
+      ['s2-cue', 78.55, 80.66], ['s2-p0', 81.26, 101.8],
+      ['s3-cue', 103.0, 104.79], ['s3-p0', 105.39, 135.6], ['s3-p1', 136.2, 156.49],
+      ['s4-cue', 157.69, 160.17], ['s4-p0', 160.77, 188.86],
+      ['s5-cue', 190.06, 192.15], ['s5-p0', 192.75, 225.09], ['s5-p1', 225.69, 231.86],
+    ] as Cue[],
   },
 
   s1: {
@@ -1094,6 +1194,18 @@ export const writingBusStop = {
       { id: 's8', title: 'What would prove me wrong', start: 844.7 },
       { id: 's9', title: 'Watch', start: 941.5 },
     ],
+    cues: [
+      ['s0-title', 0.0, 1.83], ['s0-dek', 2.43, 19.2],
+      ['s1-cue', 20.4, 22.39], ['s1-p0', 22.99, 40.67], ['s1-p1', 41.27, 73.12], ['s1-p2', 73.72, 87.53],
+      ['s2-cue', 88.73, 90.9], ['s2-p0', 91.5, 113.35], ['s2-stats', 113.95, 137.93], ['s2-p1', 138.53, 179.34], ['s2-p2', 179.94, 218.08],
+      ['s3-cue', 219.28, 221.31], ['s3-p0', 221.91, 236.31], ['s3-p1', 236.91, 285.63], ['s3-p2', 286.23, 311.11], ['s3-p3', 311.71, 374.47], ['s3-fig', 375.07, 397.04], ['s3-quote', 397.64, 410.51],
+      ['s4-cue', 411.71, 413.9], ['s4-p0', 414.5, 426.6], ['s4-p1', 427.2, 475.95], ['s4-p2', 476.55, 481.67],
+      ['s5-cue', 482.87, 484.91], ['s5-table', 485.51, 520.6], ['s5-p0', 521.2, 545.88],
+      ['s6-cue', 547.08, 549.26], ['s6-fig', 549.86, 568.36], ['s6-p0', 568.96, 600.74], ['s6-p1', 601.34, 652.76], ['s6-p2', 653.36, 672.04],
+      ['s7-cue', 673.24, 675.33], ['s7-p0', 675.93, 703.63], ['s7-table', 704.23, 746.16], ['s7-p1', 746.76, 795.1], ['s7-p2', 795.7, 820.28], ['s7-p3', 820.88, 843.49],
+      ['s8-cue', 844.69, 846.95], ['s8-p0', 847.55, 866.03], ['s8-p1', 866.63, 878.06], ['s8-p2', 878.66, 904.03], ['s8-p3', 904.63, 911.73], ['s8-p4', 912.33, 927.95], ['s8-disclaimer', 928.55, 940.28],
+      ['s9-cue', 941.48, 943.27], ['s9-gallery', 943.87, 946.28],
+    ] as Cue[],
   },
 
   s1: {
