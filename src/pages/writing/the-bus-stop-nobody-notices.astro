@@ -47,16 +47,16 @@ const articleLd = {
         <p class="kicker">{wb.kicker}</p>
       </aside>
       <div class="body-col">
-        <h1 class="page-h1">{wb.title}</h1>
-        <p class="standfirst">{wb.dek}</p>
+        <h1 class="page-h1" data-narr="s0-title">{wb.title}</h1>
+        <p class="standfirst" data-narr="s0-dek">{wb.dek}</p>
         <p class="byline tabular">{wb.date} · {wb.readingTime} read</p>
         {wb.audio && <AudioPlayer audio={wb.audio} articleId="bus-stop" />}
       </div>
     </div>
   </section>
 
-  <Section mark={wb.s1.mark} label={wb.s1.label}>
-    {wb.s1.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wb.s1.mark} label={wb.s1.label} narrId="s1-cue">
+    {wb.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
     {wb.photo.enabled && (
       <figure class="photo">
         <img
@@ -72,17 +72,17 @@ const articleLd = {
     )}
   </Section>
 
-  <Section mark={wb.s2.mark} label={wb.s2.label}>
-    <p class="prose">{wb.s2.intro}</p>
-    <div class="stats">
+  <Section mark={wb.s2.mark} label={wb.s2.label} narrId="s2-cue">
+    <p class="prose" data-narr="s2-p0">{wb.s2.intro}</p>
+    <div class="stats" data-narr="s2-stats">
       {wb.s2.stats.map((s) => <StatRow value={s.value} label={s.label} provenance={s.provenance} />)}
     </div>
-    {wb.s2.paras.map((p) => <p class="prose">{p}</p>)}
+    {wb.s2.paras.map((p, i) => <p class="prose" data-narr={`s2-p${i + 1}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wb.s3.mark} label={wb.s3.label}>
-    {wb.s3.paras.map((p) => <p class="prose">{p}</p>)}
-    <figure class="fig">
+  <Section mark={wb.s3.mark} label={wb.s3.label} narrId="s3-cue">
+    {wb.s3.paras.map((p, i) => <p class="prose" data-narr={`s3-p${i}`}>{p}</p>)}
+    <figure class="fig" data-narr="s3-fig">
       <svg viewBox="0 0 380 320" width="100%" role="img" aria-labelledby="fig1-title">
         <title id="fig1-title">Vijayanand Travels after the carve-out</title>
         <line class="fig-axis" x1="10" y1="260" x2="370" y2="260" />
@@ -105,24 +105,24 @@ const articleLd = {
       </svg>
       <figcaption>Revenue, ₹ crore, and EBITDA margin · CARE Ratings (Mar 2025), Tracxn</figcaption>
     </figure>
-    <div class="quote-gap">
+    <div class="quote-gap" data-narr="s3-quote">
       <PullQuote rule="red">{wb.s3.quote}</PullQuote>
     </div>
   </Section>
 
-  <Section mark={wb.s4.mark} label={wb.s4.label}>
-    {wb.s4.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wb.s4.mark} label={wb.s4.label} narrId="s4-cue">
+    {wb.s4.paras.map((p, i) => <p class="prose" data-narr={`s4-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wb.s5.mark} label={wb.s5.label}>
-    <div class="textual table-wrap">
+  <Section mark={wb.s5.mark} label={wb.s5.label} narrId="s5-cue">
+    <div class="textual table-wrap" data-narr="s5-table">
       <DataTable caption={wb.s5.table.caption} columns={wb.s5.table.columns} rows={wb.s5.table.rows} />
     </div>
-    {wb.s5.paras.map((p) => <p class="prose table-follow">{p}</p>)}
+    {wb.s5.paras.map((p, i) => <p class="prose table-follow" data-narr={`s5-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wb.s6.mark} label={wb.s6.label}>
-    <figure class="fig">
+  <Section mark={wb.s6.mark} label={wb.s6.label} narrId="s6-cue">
+    <figure class="fig" data-narr="s6-fig">
       <p id="fig2-title" class="visually-hidden">One market, four growth rates</p>
       <div class="hbars" role="list" aria-labelledby="fig2-title">
         <div class="hrow" role="listitem" aria-label="ixigo bus revenue, FY26: +51%">
@@ -186,12 +186,12 @@ const articleLd = {
       </div>
       <figcaption>Latest reported growth, year on year · company releases, redBus BusTrack, VIDEC</figcaption>
     </figure>
-    {wb.s6.paras.map((p) => <p class="prose">{p}</p>)}
+    {wb.s6.paras.map((p, i) => <p class="prose" data-narr={`s6-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wb.s7.mark} label={wb.s7.label} note={wb.disclaimer}>
-    <p class="prose">{wb.s7.intro}</p>
-    <div class="table-gap basket textual">
+  <Section mark={wb.s7.mark} label={wb.s7.label} note={wb.disclaimer} narrId="s7-cue">
+    <p class="prose" data-narr="s7-p0">{wb.s7.intro}</p>
+    <div class="table-gap basket textual" data-narr="s7-table">
       <div class="table-wrap basket-table-wrap">
         <DataTable caption={wb.s7.table.caption} columns={wb.s7.table.columns} rows={wb.s7.table.rows} />
       </div>
@@ -214,12 +214,12 @@ const articleLd = {
         </ul>
       </div>
     </div>
-    {wb.s7.paras.map((p) => <p class="prose">{p}</p>)}
+    {wb.s7.paras.map((p, i) => <p class="prose" data-narr={`s7-p${i + 1}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wb.s8.mark} label={wb.s8.label}>
-    {wb.s8.paras.map((p) => <p class="prose">{p}</p>)}
-    <p class="prose disclaimer">{wb.disclaimer}</p>
+  <Section mark={wb.s8.mark} label={wb.s8.label} narrId="s8-cue">
+    {wb.s8.paras.map((p, i) => <p class="prose" data-narr={`s8-p${i}`}>{p}</p>)}
+    <p class="prose disclaimer" data-narr="s8-disclaimer">{wb.disclaimer}</p>
     <p class="prose links-line">
       {wb.sources.map((link, i) => (
         <>
@@ -237,9 +237,9 @@ const articleLd = {
     </p>
   </Section>
 
-  <Section mark={wb.watch.mark} label={wb.watch.label}>
+  <Section mark={wb.watch.mark} label={wb.watch.label} narrId="s9-cue">
     <p class="prose">{wb.watch.intro}</p>
-    <div class="watch-grid">
+    <div class="watch-grid" data-narr="s9-gallery">
       {wb.watch.items.map((item) => (
         <div
           class="watch-card"
