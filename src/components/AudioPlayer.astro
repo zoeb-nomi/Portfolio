@@ -660,12 +660,28 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         document.body.classList.add('audio-narr-ready');
         // A click that's really the end of a text-selection drag (or a
         // link/button/iframe/input inside the anchor, or a keyboard-
-        // triggered click) must never seek.
+        // triggered click) must never seek. This guard is scoped to the
+        // single gesture it belongs to (pointerdown -> click), not to
+        // whatever selection happens to exist elsewhere on the page: a
+        // leftover selection from an earlier, unrelated drag must never
+        // block a later plain click.
         let downX = 0;
         let downY = 0;
+        let downAt = 0; // 0 = no pointerdown currently on record
+        let downSelection = ''; // selection string as of that pointerdown
+        const PD_WINDOW_MS = 1500;
+        const currentSelectionText = () => {
+          try {
+            return window.getSelection ? window.getSelection().toString() : '';
+          } catch {
+            return '';
+          }
+        };
         const onPointerDown = (evt) => {
           downX = evt.clientX;
           downY = evt.clientY;
+          downAt = performance.now();
+          downSelection = currentSelectionText();
         };
         for (const [id] of cues) {
           const el = narrEls.get(id);
@@ -675,13 +691,23 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
           el.addEventListener('click', (evt) => {
             const target = evt.target;
             if (target instanceof Element && target.closest('a, button, iframe, input')) return;
-            if (evt.detail === 0) return; // keyboard-triggered click, not a pointer click
+
+            const now = performance.now();
+            const hadPointerdown = downAt > 0 && now - downAt < PD_WINDOW_MS;
             const dx = evt.clientX - downX;
             const dy = evt.clientY - downY;
-            if (Math.sqrt(dx * dx + dy * dy) > 6) return; // pointer moved: a drag, not a click
-            const selection = window.getSelection ? window.getSelection() : null;
-            if (selection && selection.toString().length > 0) return; // text was selected
-            const now = performance.now();
+            const drifted = hadPointerdown && Math.sqrt(dx * dx + dy * dy) > 6;
+            const selectionAtDown = downSelection;
+            // This click has consumed the recorded gesture — clear it so a
+            // later, unrelated click never reuses a stale pointerdown.
+            downAt = 0;
+            downSelection = '';
+
+            if (drifted) return; // (a) pointer moved during a recent pointerdown: a drag, not a click
+            const curSelection = currentSelectionText();
+            if (curSelection.length > 0 && curSelection !== selectionAtDown) return; // (b) a selection was made during THIS gesture
+            if (evt.detail === 0 && !hadPointerdown) return; // (c) keyboard/synthetic click, no real gesture behind it
+
             if (now - lastSeekAt < 80) return; // guard: once per click
             lastSeekAt = now;
             const cue = cues.find((c) => c[0] === id);
