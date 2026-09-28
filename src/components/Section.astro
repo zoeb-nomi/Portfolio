@@ -6,15 +6,19 @@ interface Props {
   label: string;
   note?: string;
   as?: 'section' | 'div';
+  // Read-along anchor id (e.g. "s3-cue") for the section's own mark/label —
+  // narration for a section's spoken cue line. Omitted on pages/sections with
+  // no narration.
+  narrId?: string;
 }
 
-const { mark, label, note, as: Tag = 'section' } = Astro.props;
+const { mark, label, note, as: Tag = 'section', narrId } = Astro.props;
 ---
 
 <Tag class="rp-section">
   <div class="section-inner">
     <aside class="margin-col" aria-label={label}>
-      <h2 class="mark-label">
+      <h2 class="mark-label" data-narr={narrId}>
         <span class="mark" aria-hidden="true">{mark}</span> <span class="label">{label}</span>
       </h2>
       <slot name="margin" />
