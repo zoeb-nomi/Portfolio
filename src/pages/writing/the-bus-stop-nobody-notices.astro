@@ -5,6 +5,7 @@ import StatRow from '../../components/StatRow.astro';
 import DataTable from '../../components/DataTable.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
+import AudioPlayer from '../../components/AudioPlayer.astro';
 import { meta, cta, home, writingBusStop as wb } from '../../data/copy';
 
 const articleLd = {
@@ -19,6 +20,15 @@ const articleLd = {
   dateModified: wb.date,
   about: 'Indian intercity bus industry, Vijayanand Travels, premiumisation, hypothesis-driven investing, Vijayanand Travels video coverage',
   isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+  ...(wb.audio && {
+    audio: {
+      '@type': 'AudioObject',
+      contentUrl: 'https://www.zoebnomi.com/audio/the-bus-stop-nobody-notices.mp3',
+      encodingFormat: 'audio/mpeg',
+      duration: 'PT15M46S',
+      name: 'The bus stop nobody notices — narration',
+    },
+  }),
 };
 ---
 
@@ -40,6 +50,7 @@ const articleLd = {
         <h1 class="page-h1">{wb.title}</h1>
         <p class="standfirst">{wb.dek}</p>
         <p class="byline tabular">{wb.date} · {wb.readingTime} read</p>
+        {wb.audio && <AudioPlayer audio={wb.audio} articleId="bus-stop" />}
       </div>
     </div>
   </section>
@@ -337,6 +348,13 @@ const articleLd = {
   }
 
   .body-col {
+    /* min-width: 0 lets the audio player's chapter-chip row (flex-nowrap +
+       overflow-x: auto, so it can scroll horizontally on its own) actually
+       scroll instead of stretching this grid item — and the whole masthead
+       row with it — to the chips' unwrapped min-content width. Same fix as
+       :global(.body-col:has(.table-wrap)) further down, needed here too
+       because this is the masthead's own (non-Section) body-col. */
+    min-width: 0;
     padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
   }
 
