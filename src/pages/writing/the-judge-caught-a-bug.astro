@@ -51,33 +51,33 @@ const articleLd = {
         <p class="kicker">{kicker}</p>
       </aside>
       <div class="body-col">
-        <h1 class="page-h1">{title}</h1>
-        <p class="standfirst">{standfirst}</p>
+        <h1 class="page-h1" data-narr="s0-title">{title}</h1>
+        <p class="standfirst" data-narr="s0-dek">{standfirst}</p>
         {audio && <AudioPlayer audio={audio} articleId="judge-bug" />}
       </div>
     </div>
   </section>
 
-  <Section mark="§1" label="What I checked">
-    <p class="prose">
+  <Section mark="§1" label="What I checked" narrId="s1-cue">
+    <p class="prose" data-narr="s1-p0">
       My eval judge agreed with me 15 times out of 15. That's not the interesting part.
     </p>
-    <p class="prose">
+    <p class="prose" data-narr="s1-p1">
       For CrossSource — an open harness I built to measure citation accuracy in legal RAG — I use an
       LLM judge to score whether each cited passage actually supports the claim. Standard practice.
       Also the part of the pipeline everyone trusts by default.
     </p>
-    <p class="prose">
+    <p class="prose" data-narr="s1-p2">
       I didn't want to trust it by default. So I hand-graded a blind, stratified sample of its
       verdicts: 15/15 agreement. Validation passed.
     </p>
-    <div class="lesson">
+    <div class="lesson" data-narr="s1-quote">
       <PullQuote rule="red">The judge didn't catch the bug. The act of checking the judge caught the bug.</PullQuote>
     </div>
   </Section>
 
-  <Section mark="§2" label="The bug the validation surfaced">
-    <p class="prose">
+  <Section mark="§2" label="The bug the validation surfaced" narrId="s2-cue">
+    <p class="prose" data-narr="s2-p0">
       But the validation pass itself surfaced something the judge and I had both been getting wrong:
       consecutive citations were producing punctuation-only claim spans — fragments like "." — which
       the judge was dutifully scoring as citation failures. A harness bug, not a model failure. Fixing
@@ -86,8 +86,8 @@ const articleLd = {
     </p>
   </Section>
 
-  <Section mark="§3" label="Why this keeps happening">
-    <p class="prose">
+  <Section mark="§3" label="Why this keeps happening" narrId="s3-cue">
+    <p class="prose" data-narr="s3-p0">
       That's the lesson I keep re-learning: an unvalidated eval reports wrong numbers with full
       confidence — which is precisely the failure mode the eval exists to catch. A 15/15 validation
       and a broken instrument can coexist in the same pipeline. You only find out which world you're
@@ -95,15 +95,15 @@ const articleLd = {
     </p>
   </Section>
 
-  <Section mark="§4" label="More">
-    <p class="prose">
+  <Section mark="§4" label="More" narrId="s4-cue">
+    <p class="prose" data-narr="s4-p0">
       The harness, data, and method are public — including the failure taxonomy and the validation
       protocol.
     </p>
     <p class="prose links-line">
       <a href="/crosssource/">Read the CrossSource case study</a> · <a href={repoHref} target="_blank" rel="noopener noreferrer">Read the code</a>
     </p>
-    <div class="lesson">
+    <div class="lesson" data-narr="s4-quote">
       <PullQuote>If you own eval quality for an LLM product: what's your validation protocol for the judge itself?</PullQuote>
     </div>
   </Section>
