@@ -45,35 +45,35 @@ const articleLd = {
         <p class="kicker">{wr.kicker}</p>
       </aside>
       <div class="body-col">
-        <h1 class="page-h1">{wr.title}</h1>
-        <p class="standfirst">{wr.dek}</p>
+        <h1 class="page-h1" data-narr="s0-title">{wr.title}</h1>
+        <p class="standfirst" data-narr="s0-dek">{wr.dek}</p>
         <p class="byline tabular">{wr.date} · {wr.readingTime} read</p>
         {wr.audio && <AudioPlayer audio={wr.audio} articleId="eval-harness-reflection" />}
       </div>
     </div>
   </section>
 
-  <Section mark={wr.s1.mark} label={wr.s1.label}>
-    {wr.s1.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wr.s1.mark} label={wr.s1.label} narrId="s1-cue">
+    {wr.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wr.s2.mark} label={wr.s2.label}>
-    {wr.s2.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wr.s2.mark} label={wr.s2.label} narrId="s2-cue">
+    {wr.s2.paras.map((p, i) => <p class="prose" data-narr={`s2-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wr.s3.mark} label={wr.s3.label}>
-    {wr.s3.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wr.s3.mark} label={wr.s3.label} narrId="s3-cue">
+    {wr.s3.paras.map((p, i) => <p class="prose" data-narr={`s3-p${i}`}>{p}</p>)}
   </Section>
 
-  <Section mark={wr.s4.mark} label={wr.s4.label}>
-    {wr.s4.paras.map((p) => <p class="prose">{p}</p>)}
-    <div class="lesson">
+  <Section mark={wr.s4.mark} label={wr.s4.label} narrId="s4-cue">
+    {wr.s4.paras.map((p, i) => <p class="prose" data-narr={`s4-p${i}`}>{p}</p>)}
+    <div class="lesson" data-narr="s4-quote">
       <PullQuote rule="red">{wr.s4.lessonQuote}</PullQuote>
     </div>
   </Section>
 
-  <Section mark={wr.s5.mark} label={wr.s5.label}>
-    {wr.s5.paras.map((p) => <p class="prose">{p}</p>)}
+  <Section mark={wr.s5.mark} label={wr.s5.label} narrId="s5-cue">
+    {wr.s5.paras.map((p, i) => <p class="prose" data-narr={`s5-p${i}`}>{p}</p>)}
     <p class="prose links-line">
       {wr.footer.map((link, i) => (
         <>
