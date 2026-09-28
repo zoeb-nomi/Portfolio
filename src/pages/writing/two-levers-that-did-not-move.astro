@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Section from '../../components/Section.astro';
 import CTASlab from '../../components/CTASlab.astro';
+import AudioPlayer from '../../components/AudioPlayer.astro';
 import { meta, cta, home, writingTwoLevers as wt } from '../../data/copy';
 
 const articleLd = {
@@ -16,6 +17,15 @@ const articleLd = {
   dateModified: wt.date,
   about: 'LLM résumé screening, paired evaluation design, screener noise',
   isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+  ...(wt.audio && {
+    audio: {
+      '@type': 'AudioObject',
+      contentUrl: 'https://www.zoebnomi.com/audio/two-levers-that-did-not-move.mp3',
+      encodingFormat: 'audio/mpeg',
+      duration: 'PT3M52S',
+      name: '885 screenings, one résumé, and the two levers that did not move — narration',
+    },
+  }),
 };
 ---
 
@@ -37,6 +47,7 @@ const articleLd = {
         <h1 class="page-h1">{wt.title}</h1>
         <p class="standfirst">{wt.dek}</p>
         <p class="byline tabular">{wt.date} · {wt.readingTime} read</p>
+        {wt.audio && <AudioPlayer audio={wt.audio} articleId="two-levers" />}
       </div>
     </div>
   </section>
@@ -100,6 +111,10 @@ const articleLd = {
   }
 
   .body-col {
+    /* min-width: 0 so the audio player's chapter-chip row (flex-nowrap +
+       overflow-x: auto) can scroll on its own instead of stretching this
+       grid item once chapters are filled in. */
+    min-width: 0;
     padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
   }
 
