@@ -112,37 +112,67 @@ const articleLd = {
 
   <Section mark={wb.s6.mark} label={wb.s6.label}>
     <figure class="fig">
-      <svg viewBox="0 0 420 365" width="100%" role="img" aria-labelledby="fig2-title">
-        <title id="fig2-title">One market, four growth rates</title>
-        <line class="fig-axis" x1="180" y1="20" x2="180" y2="354" />
+      <p id="fig2-title" class="visually-hidden">One market, four growth rates</p>
+      <div class="hbars" role="list" aria-labelledby="fig2-title">
+        <div class="hrow" role="listitem" aria-label="ixigo bus revenue, FY26: +51%">
+          <p class="hbar-cat" aria-hidden="true">ixigo bus revenue, FY26</p>
+          <div class="hbar-track">
+            <div class="hbar-bar-area" style="--v:51">
+              <span class="hbar-bar" aria-hidden="true"></span>
+              <span class="hbar-value" aria-hidden="true">+51%</span>
+            </div>
+          </div>
+        </div>
 
-        <text class="hbar-cat" x="10" y="22">ixigo bus revenue, FY26</text>
-        <rect class="fig-bar" x="180" y="28" width="170" height="16" />
-        <text class="hbar-value" x="356" y="40">+51%</text>
+        <div class="hrow" role="listitem" aria-label="Online bus journeys (redBus BusTrack), H2 FY26: +24%">
+          <p class="hbar-cat" aria-hidden="true">Online bus journeys (redBus BusTrack), H2 FY26</p>
+          <div class="hbar-track">
+            <div class="hbar-bar-area" style="--v:24">
+              <span class="hbar-bar" aria-hidden="true"></span>
+              <span class="hbar-value" aria-hidden="true">+24%</span>
+            </div>
+          </div>
+        </div>
 
-        <text class="hbar-cat" x="10" y="74">Online bus journeys</text>
-        <text class="hbar-cat" x="10" y="88">(redBus BusTrack), H2 FY26</text>
-        <rect class="fig-bar" x="180" y="94" width="80" height="16" />
-        <text class="hbar-value" x="266" y="106">+24%</text>
+        <div class="hrow" role="listitem" aria-label="MakeMyTrip bus revenue, Q1 FY27: +16%">
+          <p class="hbar-cat" aria-hidden="true">MakeMyTrip bus revenue, Q1 FY27</p>
+          <div class="hbar-track">
+            <div class="hbar-bar-area" style="--v:16">
+              <span class="hbar-bar" aria-hidden="true"></span>
+              <span class="hbar-value" aria-hidden="true">+16%</span>
+            </div>
+          </div>
+        </div>
 
-        <text class="hbar-cat" x="10" y="140">MakeMyTrip bus revenue, Q1 FY27</text>
-        <rect class="fig-bar" x="180" y="146" width="53.33" height="16" />
-        <text class="hbar-value" x="239.33" y="158">+16%</text>
+        <div class="hrow" role="listitem" aria-label={"Ashok Leyland M&HCV bus dispatches, Aug 2026: +12%"}>
+          <p class="hbar-cat" aria-hidden="true">{"Ashok Leyland M&HCV bus dispatches, Aug 2026"}</p>
+          <div class="hbar-track">
+            <div class="hbar-bar-area" style="--v:12">
+              <span class="hbar-bar" aria-hidden="true"></span>
+              <span class="hbar-value" aria-hidden="true">+12%</span>
+            </div>
+          </div>
+        </div>
 
-        <text class="hbar-cat" x="10" y="192">Ashok Leyland M&amp;HCV bus dispatches,</text>
-        <text class="hbar-cat" x="10" y="206">Aug 2026</text>
-        <rect class="fig-bar" x="180" y="212" width="40" height="16" />
-        <text class="hbar-value" x="226" y="224">+12%</text>
+        <div class="hrow" role="listitem" aria-label="Whole intercity bus market, forecast CAGR FY23–26 (VIDEC): +8.5%">
+          <p class="hbar-cat" aria-hidden="true">Whole intercity bus market, forecast CAGR FY23–26 (VIDEC)</p>
+          <div class="hbar-track">
+            <div class="hbar-bar-area" style="--v:8.5">
+              <span class="hbar-bar" aria-hidden="true"></span>
+              <span class="hbar-value" aria-hidden="true">+8.5%</span>
+            </div>
+          </div>
+        </div>
 
-        <text class="hbar-cat" x="10" y="258">Whole intercity bus market,</text>
-        <text class="hbar-cat" x="10" y="272">forecast CAGR FY23–26 (VIDEC)</text>
-        <rect class="fig-bar" x="180" y="278" width="28.33" height="16" />
-        <text class="hbar-value" x="214.33" y="290">+8.5%</text>
-
-        <text class="hbar-cat" x="10" y="324">VECV heavy-duty buses, Q1 FY27</text>
-        <rect class="fig-bar fig-bar--accent" x="60" y="330" width="120" height="16" />
-        <text class="hbar-value" x="54" y="342" text-anchor="end">−36%</text>
-      </svg>
+        <div class="hrow" role="listitem" aria-label="VECV heavy-duty buses, Q1 FY27: −36%">
+          <p class="hbar-cat" aria-hidden="true">VECV heavy-duty buses, Q1 FY27</p>
+          <div class="hbar-track">
+            <div class="hbar-bar-area" style="--v:-36">
+              <span class="hbar-bar hbar-bar--accent" aria-hidden="true">−36%</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <figcaption>Latest reported growth, year on year · company releases, redBus BusTrack, VIDEC</figcaption>
     </figure>
     {wb.s6.paras.map((p) => <p class="prose">{p}</p>)}
@@ -428,19 +458,11 @@ const articleLd = {
     fill: var(--red-ink);
   }
 
-  .fig-value,
-  .hbar-value {
+  .fig-value {
     font-family: var(--font-mono);
     font-weight: 600;
     fill: var(--ink);
-  }
-
-  .fig-value {
     font-size: 20px;
-  }
-
-  .hbar-value {
-    font-size: 15px;
   }
 
   .fig-margin {
@@ -461,10 +483,105 @@ const articleLd = {
     fill: var(--ink-muted);
   }
 
+  /* §6 growth rows: HTML/CSS, not SVG, so label and value text sit at
+     fixed rem sizes and never shrink with an SVG viewBox on narrow
+     phones. Scale is symmetric (min -36, max +51, range 87); the zero
+     axis sits at 36/87 = 41.3793% from the left of each bar-area, and
+     --v (set once per row, on .hbar-bar-area, inherited by its
+     children) drives both the bar and its value via calc()/abs() so
+     the markup keeps the underlying numbers legible. The value sits
+     right at the bar's outer end (inside the accent bar for the one
+     negative row); .hbar-track keeps a 3.6em blank reserve past the
+     scale so the +51% value's overflow past the right edge is never
+     clipped. */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .hbars {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .hrow {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
   .hbar-cat {
     font-family: var(--font-mono);
-    font-size: 13px;
-    fill: var(--ink-body);
+    font-size: 0.85rem;
+    line-height: 1.35;
+    color: var(--ink-body);
+  }
+
+  .hbar-track {
+    padding-right: 3.6em;
+  }
+
+  .hbar-bar-area {
+    position: relative;
+    height: 15px;
+  }
+
+  .hbar-bar-area::before {
+    content: '';
+    position: absolute;
+    left: 41.3793%;
+    top: -3px;
+    bottom: -3px;
+    width: 1px;
+    background: var(--ink-muted);
+    z-index: 1;
+  }
+
+  .hbar-bar {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: var(--ink);
+    left: calc(41.3793% + min(0%, var(--v) * (100% / 87)));
+    width: calc(abs(var(--v)) * (100% / 87));
+  }
+
+  .hbar-bar--accent {
+    display: flex;
+    align-items: center;
+    background: var(--red-ink);
+    padding-left: 0.5em;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--on-red);
+    white-space: nowrap;
+  }
+
+  .hbar-value {
+    position: absolute;
+    top: 50%;
+    left: calc(41.3793% + var(--v) * (100% / 87) + 0.5em);
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 900px) {
+    .hbar-bar-area {
+      height: 17px;
+    }
   }
 
   @media (max-width: 899px) {
@@ -677,6 +794,20 @@ const articleLd = {
     width: 100%;
     height: 100%;
     cursor: pointer;
+  }
+
+  /* .watch-frame clips overflow for its 16:9 crop, which clips the global
+     :focus-visible ring (drawn outside, offset 3px) to invisibility. Draw
+     this one inside the frame instead, over the poster or the empty
+     poster box alike. :global() because the inline script below replaces
+     the <a class="watch-facade"> with a plain document.createElement
+     ('button') that copies the className string but not Astro's scoped
+     data-astro-cid attribute — a scoped selector here would silently
+     stop matching that swapped-in button. */
+  :global(.watch-facade:focus-visible) {
+    outline: 2px solid var(--red);
+    outline-offset: -4px;
+    box-shadow: inset 0 0 0 6px var(--paper-raised);
   }
 
   .watch-poster {
