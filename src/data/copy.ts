@@ -885,6 +885,24 @@ export const screenerEval = {
 // numbered beats plus the closing "What I'd tell someone" section, per spec.
 // ---------------------------------------------------------------------------
 
+// "The judge caught a bug I didn't" keeps its title/standfirst/body as local
+// consts in the page itself (no writing* object above) — this is just the
+// audio player data for it.
+// PLACEHOLDER: duration/chapters are filled in once narration is generated.
+export const writingJudgeBugAudio = {
+  src: '/audio/the-judge-caught-a-bug.mp3',
+  duration: 126,
+  label: 'Listen to this piece',
+  note: 'Read by a synthetic voice (Kokoro).',
+  chapters: [
+    { id: 's0', title: "The judge caught a bug I didn't", start: 0.0 },
+    { id: 's1', title: 'What I checked', start: 12.3 },
+    { id: 's2', title: 'The bug the validation surfaced', start: 52.8 },
+    { id: 's3', title: 'Why this keeps happening', start: 86.2 },
+    { id: 's4', title: 'More', start: 111.0 },
+  ],
+};
+
 export const writingReflection = {
   kicker: 'Eval methodology · mirror-eval',
   title: 'I pointed an eval harness at my own reflection',
@@ -892,6 +910,21 @@ export const writingReflection = {
   date: '2026-09-10',
   readingTime: '5 min',
   repoHref: 'https://github.com/zoeb-nomi/mirror-eval',
+
+  audio: {
+    src: '/audio/eval-harness-at-my-own-reflection.mp3',
+    duration: 355,
+    label: 'Listen to this piece',
+    note: 'Read by a synthetic voice (Kokoro).',
+    chapters: [
+      { id: 's0', title: 'I pointed an eval harness at my own reflection', start: 0.0 },
+      { id: 's1', title: 'Why I ran this', start: 13.2 },
+      { id: 's2', title: "1. Engines don't abstain. They fill.", start: 69.8 },
+      { id: 's3', title: '2. "It\'s published by him, so it\'s his claim."', start: 143.1 },
+      { id: 's4', title: "3. The judge failed. The study didn't.", start: 210.8 },
+      { id: 's5', title: "What I'd tell someone running this on themselves", start: 311.4 },
+    ],
+  },
 
   s1: {
     mark: '§1',
@@ -969,6 +1002,21 @@ export const writingTwoLevers = {
   readingTime: '3 min',
   repoHref: 'https://github.com/zoeb-nomi/screener-eval',
 
+  audio: {
+    src: '/audio/two-levers-that-did-not-move.mp3',
+    duration: 232,
+    label: 'Listen to this piece',
+    note: 'Read by a synthetic voice (Kokoro).',
+    chapters: [
+      { id: 's0', title: '885 screenings, one résumé, and the two levers that did not move', start: 0.0 },
+      { id: 's1', title: 'The setup', start: 20.3 },
+      { id: 's2', title: 'What did not move', start: 78.5 },
+      { id: 's3', title: 'What did', start: 103.0 },
+      { id: 's4', title: 'What the nulls do not say', start: 157.7 },
+      { id: 's5', title: 'The wider lesson', start: 190.1 },
+    ],
+  },
+
   s1: {
     mark: '§1',
     label: 'The setup',
@@ -1032,6 +1080,24 @@ export const writingBusStop = {
   dek: 'A family business from Hubli built a fifty-year moat in Indian transport and just placed the largest private Volvo order in the country. What that says about premium intercity bus travel — and the ₹50,000 experiment I am running to find out whether I actually understand it.',
   date: '2026-09-28',
   readingTime: '11 min',
+
+  audio: {
+    src: '/audio/the-bus-stop-nobody-notices.mp3',
+    duration: 946,
+    label: 'Listen to this piece',
+    note: 'Read by a synthetic voice (Kokoro).',
+    chapters: [
+      { id: 's1', title: 'The bus stop', start: 20.4 },
+      { id: 's2', title: 'The demand picture', start: 88.7 },
+      { id: 's3', title: 'The case study', start: 219.3 },
+      { id: 's4', title: 'What makes the moat', start: 411.7 },
+      { id: 's5', title: 'Who else is here', start: 482.9 },
+      { id: 's6', title: 'The hypothesis', start: 547.1 },
+      { id: 's7', title: 'The experiment', start: 673.2 },
+      { id: 's8', title: 'What would prove me wrong', start: 844.7 },
+      { id: 's9', title: 'Watch', start: 941.5 },
+    ],
+  },
 
   s1: {
     mark: '§1',
