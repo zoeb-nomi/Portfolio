@@ -5,6 +5,7 @@ import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import EvalsSwitcher from '../components/EvalsSwitcher.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
 import { meta, screenerEval as se, screenerEvalJsonLd, cta, home } from '../data/copy';
 
 const table1Rows = se.s3.table1.rows.map((r) => ({
@@ -35,7 +36,7 @@ const table3Rows = se.s5.table.rows.map((r) => ({
     <div class="masthead-inner">
       <aside class="margin-col" aria-label="Case study specification">
         <p class="kicker">{se.kicker}</p>
-        <dl class="spec-block">
+        <dl class="spec-block" data-narr="s0-stats">
           {se.specBlock.map((s) => (
             <div class="spec-row">
               <dt>{s.label}</dt>
@@ -47,18 +48,19 @@ const table3Rows = se.s5.table.rows.map((r) => ({
         <a class="repo-link" href={se.repoHref} target="_blank" rel="noopener noreferrer">{se.repoLabel}</a>
       </aside>
       <div class="body-col">
-        <h1 class="page-h1">{se.title}</h1>
-        <p class="standfirst">{se.standfirst}</p>
+        <h1 class="page-h1" data-narr="s0-title">{se.title}</h1>
+        <p class="standfirst" data-narr="s0-dek">{se.standfirst}</p>
+        {se.audio && <AudioPlayer audio={se.audio} articleId="screener-eval" />}
       </div>
     </div>
   </section>
 
-  <Section mark={se.s1.mark} label={se.s1.label}>
-    <p class="prose">{se.s1.body}</p>
+  <Section mark={se.s1.mark} label={se.s1.label} narrId="s1-cue">
+    <p class="prose" data-narr="s1-p0">{se.s1.body}</p>
   </Section>
 
-  <Section mark={se.s2.mark} label={se.s2.label}>
-    <dl class="method-list">
+  <Section mark={se.s2.mark} label={se.s2.label} narrId="s2-cue">
+    <dl class="method-list" data-narr="s2-list">
       {se.s2.rows.map((row) => (
         <div class="method-row">
           <dt>{row.term}</dt>
@@ -74,46 +76,46 @@ const table3Rows = se.s5.table.rows.map((r) => ({
     </dl>
   </Section>
 
-  <Section mark={se.s3.mark} label={se.s3.label}>
-    <p class="prose intro">{se.s3.intro}</p>
-    <div class="table-scroll">
+  <Section mark={se.s3.mark} label={se.s3.label} narrId="s3-cue">
+    <p class="prose intro" data-narr="s3-p0">{se.s3.intro}</p>
+    <div class="table-scroll" data-narr="s3-table1" tabindex="0">
       <DataTable caption={se.s3.table1.caption} columns={se.s3.table1.columns} rows={table1Rows} />
     </div>
-    <p class="prose table-intro">{se.s3.table2Intro}</p>
-    <div class="table-scroll">
+    <p class="prose table-intro" data-narr="s3-p1">{se.s3.table2Intro}</p>
+    <div class="table-scroll" data-narr="s3-table2" tabindex="0">
       <DataTable caption={se.s3.table2.caption} columns={se.s3.table2.columns} rows={table2Rows} />
     </div>
-    <p class="prose between">{se.s3.betweenScreeners}</p>
-    <p class="prose finding">
+    <p class="prose between" data-narr="s3-p2">{se.s3.betweenScreeners}</p>
+    <p class="prose finding" data-narr="s3-p3">
       <strong>{se.s3.findingLeadIn}</strong>{se.s3.findingBody}
     </p>
-    <div class="lesson">
+    <div class="lesson" data-narr="s3-quote">
       <PullQuote rule="red">{se.s3.lessonQuote}</PullQuote>
     </div>
   </Section>
 
-  <Section mark={se.s4.mark} label={se.s4.label}>
-    <p class="prose">{se.s4.body}</p>
+  <Section mark={se.s4.mark} label={se.s4.label} narrId="s4-cue">
+    <p class="prose" data-narr="s4-p0">{se.s4.body}</p>
   </Section>
 
-  <Section mark={se.s5.mark} label={se.s5.label}>
-    <p class="prose intro">{se.s5.intro}</p>
-    <div class="table-scroll">
+  <Section mark={se.s5.mark} label={se.s5.label} narrId="s5-cue">
+    <p class="prose intro" data-narr="s5-p0">{se.s5.intro}</p>
+    <div class="table-scroll" data-narr="s5-table" tabindex="0">
       <DataTable caption={se.s5.table.caption} columns={se.s5.table.columns} rows={table3Rows} />
     </div>
-    <p class="prose close">{se.s5.close}</p>
+    <p class="prose close" data-narr="s5-p1">{se.s5.close}</p>
   </Section>
 
-  <Section mark={se.s6.mark} label={se.s6.label}>
-    <p class="prose">{se.s6.body}</p>
+  <Section mark={se.s6.mark} label={se.s6.label} narrId="s6-cue">
+    <p class="prose" data-narr="s6-p0">{se.s6.body}</p>
   </Section>
 
-  <Section mark={se.s7.mark} label={se.s7.label}>
-    <p class="prose">{se.s7.body}</p>
+  <Section mark={se.s7.mark} label={se.s7.label} narrId="s7-cue">
+    <p class="prose" data-narr="s7-p0">{se.s7.body}</p>
   </Section>
 
-  <Section mark={se.s8.mark} label={se.s8.label}>
-    <p class="prose">{se.s8.body}</p>
+  <Section mark={se.s8.mark} label={se.s8.label} narrId="s8-cue">
+    <p class="prose" data-narr="s8-p0">{se.s8.body}</p>
     <p class="prose repo-cta">
       <a href={se.repoCta.href} target="_blank" rel="noopener noreferrer">{se.repoCta.label}</a>
     </p>
@@ -194,6 +196,10 @@ const table3Rows = se.s5.table.rows.map((r) => ({
   }
 
   .body-col {
+    /* min-width: 0 so the audio player's chapter-chip row (flex-nowrap +
+       overflow-x: auto) can scroll on its own instead of stretching this
+       grid item once chapters are filled in. */
+    min-width: 0;
     padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
   }
 
