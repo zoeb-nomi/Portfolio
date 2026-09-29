@@ -290,35 +290,23 @@ export const home = {
       provenance: null as string | null,
     },
   ],
-  // Evals block — replaces the single flagship card, copy-pack-additions.md §11,
-  // added 2026-09-10. Rendered by EvalsBlock.astro inside Section §2.
+  // Evals block — rendered by HarnessLedger.astro (compact variant on the home
+  // §2, full ledger + comparison table on /evals/). The per-harness data lives
+  // in `evalsLedger` below; only page-level strings are here.
   evals: {
     kicker: 'Evals',
     h2: 'Three harnesses, one method.',
     methodLine: 'Build the judge. Validate it blind against a human. Count what you can. Report the rest as bands.',
-    cards: [
-      {
-        name: 'CrossSource',
-        description:
-          'An open evaluation harness for citation accuracy in legal RAG. 22 public court opinions, a 25-question golden set, an LLM judge validated blind against a human — 100% (15/15) — and a real harness bug caught by that validation.',
-        linkLabel: 'Read the case study →',
-        linkHref: '/crosssource/',
-      },
-      {
-        name: 'mirror-eval',
-        description:
-          'The same method pointed at what AI search engines say about me. Four engines, 63 search probes each, two waves a month apart. The judges failed blind validation — 3/40 and 12/40 — so the study stands on counted citations instead: Perplexity 13 → 63 of 63, Claude 0 → 0.',
-        linkLabel: 'Read the case study →',
-        linkHref: '/mirror-eval/',
-      },
-      {
-        name: 'screener-eval',
-        description:
-          'The same résumé through two LLM screeners, 885 times, against 21 open AI PM roles. Swapping every employer for a fictional one moved the score by under a point; so did deleting every link. Which screener read it moved it by 22.',
-        linkLabel: 'Read the case study →',
-        linkHref: '/screener-eval/',
-      },
-    ],
+    // /evals/ masthead standfirst — the methodLine is rendered once, as the
+    // method strip under the comparison table, so it is not repeated here.
+    standfirst:
+      'Three open eval harnesses, side by side: legal RAG citations, what AI search says about a person, and LLM résumé screeners. Each row is one harness — the question it answers, the number it stands on, how it was run.',
+    ledgerLabel: 'Harnesses',
+    tableLabel: 'Shared method',
+    tableCaption: 'Table — the three harnesses compared',
+    tableColumns: ['Harness', 'Question', 'Judge', 'Counted metric', 'Sample', 'Verdict'],
+    linkCase: 'Case study →',
+    linkRepo: 'Repo →',
     closeLine:
       'One judge passed and caught a bug. One judge failed and the study survived on counts. One needed no judge at all. Same method three times — that is the point.',
   },
@@ -947,6 +935,96 @@ export const screenerEval = {
 
   ctaSlabBody: 'Read the code, run it on your own résumé →',
 };
+
+// ---------------------------------------------------------------------------
+// EVALS LEDGER — one entry per harness. Rendered by HarnessLedger.astro (home
+// §2 compact, /evals/ full ledger) and by the /evals/ comparison table. Adding
+// a fourth harness is one more object here. Every number below is lifted from
+// the `crosssource`, `mirrorEval` and `screenerEval` case-study objects above:
+//   CrossSource   0.994 / 0.981 — crosssource.s3.table1 (precision, strict / baseline)
+//                 22, 25, BM25 top-5, 15/15 — crosssource.specBlock, s2.rows, s4.statQuote
+//   mirror-eval   13 → 63, 0 → 0 — mirrorEval.s3.table1 (Perplexity / Claude, of 63 search-mode probes)
+//                 4 engines, 63 probes, 3/40, 12/40 — mirrorEval.specBlock, s2.rows, s4.para1
+//                 2026-08-06, 2026-09-04 — mirrorEval.s2.rows ('Two waves')
+//   screener-eval < 1 pt, 21, 2, 885, 5 reps, CIs straddle zero, 22 — screenerEval.standfirst, specBlock, s3.findingBody
+// ---------------------------------------------------------------------------
+
+export interface HarnessEntry {
+  id: string;
+  name: string;
+  /** The question the harness answers — one sans line. */
+  question: string;
+  /** The one headline numeral, set in the display face. */
+  numeral: string;
+  /** Mono caption stating exactly what the numeral is. */
+  caption: string;
+  /** Annotation mark, e.g. [counted]. */
+  status: string;
+  /** Run rail: sample · judge · when — 3-4 short mono lines. */
+  rail: string[];
+  /** Fuller cell text for the comparison table. */
+  table: { judge: string; metric: string; sample: string; verdict: string };
+  caseHref: string;
+  repoHref: string;
+}
+
+export const evalsLedger: HarnessEntry[] = [
+  {
+    id: 'crosssource',
+    name: 'CrossSource',
+    question: 'When the RAG cites a court opinion, does that opinion support the claim?',
+    numeral: '0.994',
+    caption: 'citation precision, strict prompt (baseline 0.981) · n=25 · judge 15/15 vs human',
+    status: '[judged]',
+    rail: ['22 opinions · 25 questions', 'LLM judge, blind-validated 15/15', 'BM25 top-5 · baseline vs strict'],
+    table: {
+      judge: 'LLM judge, blind-validated against a human: 100% (15/15)',
+      metric: 'Claim-level citation precision, 0.981 → 0.994; recall 0.760 in both configurations',
+      sample: '22 opinions · 25 questions',
+      verdict: 'Judge passed and caught a harness bug; prompting buys precision, retrieval owns recall',
+    },
+    caseHref: '/crosssource/',
+    repoHref: crosssource.repoHref,
+  },
+  {
+    id: 'mirror-eval',
+    name: 'mirror-eval',
+    question: 'What do AI search engines say about me, and is it true and sourced to something I control?',
+    numeral: '13 → 63',
+    caption: 'Perplexity citations, wave 1 → wave 2, of 63 probes · Claude 0 → 0',
+    status: '[counted]',
+    rail: [
+      '4 engines · 63 search probes each',
+      'judges failed 3/40, 12/40 → counted instead',
+      '2 waves · Aug → Sep 2026',
+    ],
+    table: {
+      judge: 'Two LLM judges from different model families — failed blind validation, 3/40 and 12/40',
+      metric: 'Probes citing an owned surface, of 63 search-mode probes per engine — counted, judge-free',
+      sample: '4 engines · 63 search probes each · 2 waves',
+      verdict: 'Perplexity 13 → 63, Claude 0 → 0; index access explains the split',
+    },
+    caseHref: '/mirror-eval/',
+    repoHref: mirrorEval.repoHref,
+  },
+  {
+    id: 'screener-eval',
+    name: 'screener-eval',
+    question: 'Do employer names and evidence links change what an LLM résumé screener scores?',
+    numeral: '< 1 pt',
+    caption: 'score shift when every employer is swapped · 885 calls · 21 postings',
+    status: '[null]',
+    rail: ['21 postings · 2 screeners · 5 reps', 'no judge in the loop', '95% CIs straddle zero'],
+    table: {
+      judge: 'None — nothing is judged by a model',
+      metric: 'Paired delta in fit score (B − A), 10,000-resample bootstrap 95% CI',
+      sample: '1 résumé · 21 postings · 2 screeners · 885 calls',
+      verdict: 'Employer swap and link deletion each moved the score under a point; which screener read it moved it 22',
+    },
+    caseHref: '/screener-eval/',
+    repoHref: screenerEval.repoHref,
+  },
+];
 
 // ---------------------------------------------------------------------------
 // WRITING — "I pointed an eval harness at my own reflection" — copy-pack-

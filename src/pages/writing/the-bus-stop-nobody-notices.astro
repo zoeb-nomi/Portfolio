@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import StatRow from '../../components/StatRow.astro';
 import DataTable from '../../components/DataTable.astro';
@@ -42,19 +43,10 @@ const articleLd = {
 >
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
 
-  <section class="masthead">
-    <div class="masthead-inner">
-      <aside class="margin-col" aria-label="Article kicker">
-        <p class="kicker">{wb.kicker}</p>
-      </aside>
-      <div class="body-col">
-        <h1 class="page-h1" data-narr="s0-title">{wb.title}</h1>
-        <p class="standfirst" data-narr="s0-dek">{wb.dek}</p>
-        <p class="byline tabular"><time datetime={wb.date}>{formatDate(wb.date)}</time> · {wb.readingTime} read</p>
-        {wb.audio && <AudioPlayer audio={wb.audio} articleId="bus-stop" />}
-      </div>
-    </div>
-  </section>
+  <Masthead kicker={wb.kicker} h1={wb.title} standfirst={wb.dek} h1Max="24ch" narr>
+    <Fragment slot="byline"><time datetime={wb.date}>{formatDate(wb.date)}</time> · {wb.readingTime} read</Fragment>
+    {wb.audio && <AudioPlayer audio={wb.audio} articleId="bus-stop" />}
+  </Masthead>
 
   <Section mark={wb.s1.mark} label={wb.s1.label} narrId="s1-cue">
     {wb.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
@@ -342,64 +334,9 @@ const articleLd = {
 </Base>
 
 <style>
-  .masthead-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
-  }
-
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: var(--t-label);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
-  }
-
-  .body-col {
-    /* min-width: 0 lets the audio player's chapter-chip row (flex-nowrap +
-       overflow-x: auto, so it can scroll horizontally on its own) actually
-       scroll instead of stretching this grid item — and the whole masthead
-       row with it — to the chips' unwrapped min-content width. Same fix as
-       :global(.body-col:has(.table-wrap)) further down, needed here too
-       because this is the masthead's own (non-Section) body-col. */
-    min-width: 0;
-    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
-  }
-
-  .page-h1 {
-    font-family: var(--font-display);
-    font-size: var(--t-page);
-    line-height: 1.02;
-    letter-spacing: -.015em;
-    color: var(--ink);
-    margin-bottom: var(--s-6);
-    max-width: 24ch;
-  }
-
-  .standfirst {
-    font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 62ch;
-    margin-bottom: var(--s-4);
-  }
-
-  .byline {
-    font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    color: var(--ink-muted);
-  }
-
   .prose {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.62;
     color: var(--ink-body);
     max-width: 68ch;
@@ -424,7 +361,7 @@ const articleLd = {
 
   .disclaimer {
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
+    font-size: var(--t-micro);
     color: var(--ink-muted);
     margin-top: var(--s-7);
   }
@@ -432,7 +369,7 @@ const articleLd = {
   .links-line {
     margin-top: var(--s-6);
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
+    font-size: var(--t-micro);
   }
 
   .links-line a {
@@ -471,8 +408,8 @@ const articleLd = {
   .fig figcaption {
     margin-top: var(--s-3);
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    letter-spacing: .04em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: var(--ink-muted);
   }
@@ -499,19 +436,19 @@ const articleLd = {
 
   .fig-margin {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--t-note);
     fill: var(--ink-muted);
   }
 
   .fig-year {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--t-data);
     fill: var(--ink-body);
   }
 
   .fig-note {
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: var(--t-micro);
     fill: var(--ink-muted);
   }
 
@@ -526,33 +463,21 @@ const articleLd = {
      negative row); .hbar-track keeps a 3.6em blank reserve past the
      scale so the +51% value's overflow past the right edge is never
      clipped. */
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
   .hbars {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: var(--s-3);
   }
 
   .hrow {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--s-1);
   }
 
   .hbar-cat {
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: var(--t-data);
     line-height: 1.35;
     color: var(--ink-body);
   }
@@ -592,7 +517,7 @@ const articleLd = {
     background: var(--red-ink);
     padding-left: 0.5em;
     font-family: var(--font-mono);
-    font-size: 0.95rem;
+    font-size: var(--t-small);
     font-weight: 500;
     color: var(--on-red);
     white-space: nowrap;
@@ -604,7 +529,7 @@ const articleLd = {
     left: calc(41.3793% + var(--v) * (100% / 87) + 0.5em);
     transform: translateY(-50%);
     font-family: var(--font-mono);
-    font-size: 0.95rem;
+    font-size: var(--t-small);
     font-weight: 500;
     color: var(--ink);
     white-space: nowrap;
@@ -613,22 +538,6 @@ const articleLd = {
   @media (min-width: 900px) {
     .hbar-bar-area {
       height: 17px;
-    }
-  }
-
-  @media (max-width: 899px) {
-    .masthead-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .margin-col {
-      border-right: 0;
-      border-bottom: 1px solid var(--rule);
-      padding: var(--s-6) var(--gutter);
-    }
-
-    .body-col {
-      padding: var(--s-7) var(--gutter);
     }
   }
 
@@ -652,28 +561,10 @@ const articleLd = {
     overflow-x: auto;
   }
 
-  /* Section's .body-col is a CSS grid item (grid-template-columns: 1fr
-     below 900px, sharing its track with .margin-col). A grid item's
-     automatic minimum size defaults to its content's min-content width —
-     table-wrap's own overflow-x:auto does NOT stop that, because the
-     min-size-zero-on-overflow rule only applies to the item that is
-     itself the grid item, not to a scrolling descendant. The §5/§7
-     DataTables are wide enough to blow that min-content past 360–390px,
-     stretching the whole shared column (and margin-col with it) beyond
-     the viewport. Overriding min-width to 0 on the body-col that holds
-     our table-wrap lets the track size to the available space instead,
-     so table-wrap's own overflow-x:auto can actually do its job.
-     :global() is required since body-col belongs to Section.astro, not
-     this file; :has(.table-wrap) keeps it scoped to columns that hold
-     one of THIS page's tables ("table-wrap" is not used elsewhere). */
-  :global(.body-col:has(.table-wrap)) {
-    min-width: 0;
-  }
-
   @media (max-width: 899px) {
     .textual :global(.data-table th),
     .textual :global(.data-table td) {
-      padding-block: 8px;
+      padding-block: var(--s-2);
       padding-inline: 2px;
     }
   }
@@ -695,8 +586,8 @@ const articleLd = {
 
   .basket-cards-caption {
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    letter-spacing: .04em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: var(--ink-muted);
     padding-bottom: var(--s-3);
@@ -719,7 +610,7 @@ const articleLd = {
 
   .basket-card-heading {
     font-family: var(--font-body);
-    font-size: var(--t-body);
+    font-size: var(--t-small);
     font-weight: 500;
     color: var(--ink);
     margin: 0 0 var(--s-3);
@@ -740,8 +631,8 @@ const articleLd = {
   }
 
   .basket-card-field dt {
-    font-size: var(--t-caption);
-    letter-spacing: .04em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: var(--ink-muted);
     flex-shrink: 0;
@@ -776,14 +667,14 @@ const articleLd = {
     width: 100%;
     height: auto;
     border: 1px solid var(--rule);
-    border-radius: 0;
+    border-radius: var(--radius);
   }
 
   .photo figcaption {
     margin-top: var(--s-3);
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    letter-spacing: .04em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: var(--ink-muted);
   }
@@ -858,11 +749,11 @@ const articleLd = {
     position: absolute;
     left: var(--s-3);
     bottom: var(--s-3);
-    padding: 4px var(--s-2);
+    padding: var(--s-1) var(--s-2);
     background: var(--red-ink);
     font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: .08em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     color: var(--on-red);
   }
 
@@ -877,7 +768,7 @@ const articleLd = {
 
   .watch-title {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     font-weight: 500;
     color: var(--ink);
     margin: 0;
@@ -885,8 +776,8 @@ const articleLd = {
 
   .watch-channel {
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    letter-spacing: .04em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: var(--ink-muted);
     margin: 0;
@@ -894,7 +785,7 @@ const articleLd = {
 
   .watch-why {
     font-family: var(--font-body);
-    font-size: var(--t-caption);
+    font-size: var(--t-note); /* sans floor is 12px */
     line-height: 1.5;
     color: var(--ink-body);
     margin: 0;

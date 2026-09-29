@@ -15,7 +15,8 @@
     "test": "node scripts/test-parse-contributions.mjs",
     "check": "astro check",
     "gate": "node scripts/geo-gate.mjs",
-    "qa": "node scripts/qa-sweep.mjs"
+    "qa": "node scripts/qa-sweep.mjs",
+    "tokens": "node scripts/tokens-audit.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

@@ -1,10 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import '../styles/case-study.css';
+import Masthead from '../components/Masthead.astro';
 import Section from '../components/Section.astro';
 import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
-import EvalsSwitcher from '../components/EvalsSwitcher.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
 import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home } from '../data/copy';
 
@@ -31,28 +32,19 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 >
   <script type="application/ld+json" set:html={JSON.stringify(mirrorEvalJsonLd)} is:inline />
 
-  <section class="masthead">
-    <div class="masthead-inner">
-      <aside class="margin-col" aria-label="Case study specification">
-        <p class="kicker">{me.kicker}</p>
-        <dl class="spec-block" data-narr="s0-stats">
-          {me.specBlock.map((s) => (
-            <div class="spec-row">
-              <dt>{s.label}</dt>
-              <dd class="tabular">{s.value}</dd>
-            </div>
-          ))}
-        </dl>
-        <EvalsSwitcher current="mirror-eval" />
-        <a class="repo-link" href={me.repoHref} target="_blank" rel="noopener noreferrer">{me.repoLabel}</a>
-      </aside>
-      <div class="body-col">
-        <h1 class="page-h1" data-narr="s0-title">{me.title}</h1>
-        <p class="standfirst" data-narr="s0-dek">{me.standfirst}</p>
-        {me.audio && <AudioPlayer audio={me.audio} articleId="mirror-eval" />}
-      </div>
-    </div>
-  </section>
+  <Masthead
+    label="Case study specification"
+    kicker={me.kicker}
+    h1={me.title}
+    standfirst={me.standfirst}
+    h1Max="26ch"
+    spec={me.specBlock}
+    switcher="mirror-eval"
+    repo={{ href: me.repoHref, label: me.repoLabel }}
+    narr
+  >
+    {me.audio && <AudioPlayer audio={me.audio} articleId="mirror-eval" />}
+  </Masthead>
 
   <Section mark={me.s1.mark} label={me.s1.label} narrId="s1-cue">
     <p class="prose" data-narr="s1-p0">{me.s1.body}</p>
@@ -144,220 +136,3 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     secondaryHref={cta.bookACall.href}
   />
 </Base>
-
-<style>
-  .masthead-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
-  }
-
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: var(--t-label);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
-    margin-bottom: var(--s-7);
-  }
-
-  .spec-block {
-    margin-bottom: var(--s-6);
-  }
-
-  .spec-row {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--s-3);
-    padding-block: var(--s-2);
-    border-top: 1px solid var(--rule);
-    font-family: var(--font-mono);
-    font-size: var(--t-data);
-  }
-
-  .spec-row:first-child {
-    border-top: 0;
-  }
-
-  .spec-row dt {
-    color: var(--ink-muted);
-  }
-
-  .spec-row dd {
-    color: var(--ink);
-  }
-
-  .repo-link {
-    display: inline-block;
-    /* Hit area >= 24px tall (WCAG 2.5.8): padding added, margin-top reduced by
-       the same amount so the layout does not move. */
-    padding-block: var(--s-1);
-    min-height: 24px;
-    margin-top: calc(var(--s-6) - var(--s-1));
-    font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    color: var(--red-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    overflow-wrap: anywhere;
-  }
-
-  .body-col {
-    /* min-width: 0 so the audio player's chapter-chip row (flex-nowrap +
-       overflow-x: auto) can scroll on its own instead of stretching this
-       grid item once chapters are filled in. */
-    min-width: 0;
-    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
-  }
-
-  .page-h1 {
-    font-family: var(--font-display);
-    font-size: var(--t-page);
-    line-height: 1.02;
-    letter-spacing: -.015em;
-    color: var(--ink);
-    margin-bottom: var(--s-6);
-    max-width: 26ch;
-  }
-
-  .standfirst {
-    font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 62ch;
-  }
-
-  .prose {
-    font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 68ch;
-  }
-
-  .prose + .prose {
-    margin-top: var(--s-6);
-  }
-
-  .prose code,
-  .method-row code {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    background: var(--paper-raised);
-    padding: 2px 4px;
-  }
-
-  .intro {
-    margin-bottom: var(--s-5);
-  }
-
-  .table-intro {
-    margin-top: var(--s-9);
-    margin-bottom: var(--s-5);
-  }
-
-  /* Table 1's "github.com/zoeb-nomi" column header is one long unbroken
-     token — give both findings tables a scroll container rather than let
-     it force the page wider on narrow viewports. Grid items default to
-     min-width: auto (content-based), so the Section body-col itself has to
-     be told it is allowed to shrink below the table's content width before
-     overflow-x: auto on .table-scroll can do anything. */
-  .table-scroll {
-    overflow-x: auto;
-    max-width: 100%;
-  }
-
-  :global(.rp-section .body-col) {
-    min-width: 0;
-  }
-
-  .related-writing a {
-    color: var(--red-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .method-list {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .method-row {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: var(--s-6);
-    padding-block: var(--s-6);
-    border-top: 1px solid var(--rule);
-  }
-
-  .method-row:first-child {
-    border-top: 0;
-  }
-
-  .method-row dt {
-    font-family: var(--font-mono);
-    font-size: var(--t-label);
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
-  }
-
-  .method-row dd {
-    font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.6;
-    color: var(--ink-body);
-    max-width: 60ch;
-  }
-
-  .finding {
-    margin-top: var(--s-8);
-  }
-
-  .lesson {
-    margin-top: var(--s-8);
-  }
-
-  .repo-cta {
-    margin-top: var(--s-6);
-    font-family: var(--font-mono);
-    font-size: var(--t-caption);
-  }
-
-  .repo-cta a {
-    color: var(--red-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .repo-cta .sep {
-    color: var(--ink-muted);
-  }
-
-  @media (max-width: 899px) {
-    .masthead-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .margin-col {
-      border-right: 0;
-      border-bottom: 1px solid var(--rule);
-      padding: var(--s-6) var(--gutter);
-    }
-
-    .body-col {
-      padding: var(--s-7) var(--gutter);
-    }
-
-    .method-row {
-      grid-template-columns: 1fr;
-      gap: var(--s-2);
-    }
-  }
-</style>

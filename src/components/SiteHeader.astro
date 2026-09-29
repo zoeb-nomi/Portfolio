@@ -44,7 +44,7 @@ const { currentPath } = Astro.props;
     .site-header {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: var(--z-nav);
     }
   }
 
@@ -64,7 +64,7 @@ const { currentPath } = Astro.props;
   .wordmark {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .16em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     text-decoration: none;
     color: var(--ink);
@@ -95,11 +95,11 @@ const { currentPath } = Astro.props;
     display: inline-block;
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .16em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     text-decoration: none;
     color: var(--ink-muted);
-    padding-bottom: 4px;
+    padding-bottom: var(--s-1);
     /* Top padding lifts the hit area to >= 24px (WCAG 2.5.8); the negative
        margin keeps the bar's layout and the underline position unchanged. */
     padding-top: var(--s-1);
@@ -117,7 +117,7 @@ const { currentPath } = Astro.props;
     background: var(--red);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 120ms var(--ease-draw);
+    transition: transform var(--dur-fast) var(--ease-draw);
   }
 
   .primary-nav a:hover { color: var(--ink); }

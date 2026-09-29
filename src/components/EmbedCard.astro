@@ -5,6 +5,7 @@
 // and the article's hero image, which happens to be the same headshot the site
 // already ships. Rules and type only; no card background, no new colours.
 import Button from './Button.astro';
+import Headshot from './Headshot.astro';
 
 interface Logo {
   src: string;
@@ -70,20 +71,7 @@ const titleHtml = escapeHtml(title).replace(
       </div>
     </div>
 
-    <picture class="card-photo">
-      <source type="image/avif" srcset="/img/headshot-480.avif 480w, /img/headshot-960.avif 960w" sizes="300px" />
-      <source type="image/webp" srcset="/img/headshot-480.webp 480w, /img/headshot-960.webp 960w" sizes="300px" />
-      <img
-        src="/img/headshot-960.jpg"
-        srcset="/img/headshot-480.jpg 480w, /img/headshot-960.jpg 960w"
-        sizes="300px"
-        width="960"
-        height="960"
-        alt={imageAlt}
-        loading="lazy"
-        decoding="async"
-      />
-    </picture>
+    <Headshot size="card" class="card-photo" alt={imageAlt} />
   </div>
 </section>
 
@@ -120,17 +108,17 @@ const titleHtml = escapeHtml(title).replace(
   .kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .1em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
-    color: var(--red-ink);
+    color: var(--ink-muted);
     line-height: 1.7;
   }
 
   .title {
     font-family: var(--font-display);
-    font-size: clamp(26px, 2.8vw, 34px);
+    font-size: var(--t-h3);
     line-height: 1.15;
-    letter-spacing: -.01em;
+    letter-spacing: var(--track-tight);
     color: var(--ink);
     text-wrap: balance;
   }
@@ -152,7 +140,7 @@ const titleHtml = escapeHtml(title).replace(
 
   .excerpt {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.62;
     color: var(--ink-body);
     max-width: 54ch;
@@ -175,26 +163,13 @@ const titleHtml = escapeHtml(title).replace(
 
   .byline-text {
     font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: .04em;
+    font-size: var(--t-note);
+    letter-spacing: var(--track-wide);
     color: var(--ink-muted);
   }
 
   .cta {
     margin-top: var(--s-2);
-  }
-
-  /* Unboxed, like every other plate on the site. */
-  .card-photo,
-  .card-photo img {
-    display: block;
-    width: 300px;
-    height: 300px;
-  }
-
-  .card-photo img {
-    object-fit: cover;
-    object-position: center 12%;
   }
 
   @media (max-width: 899px) {
@@ -235,8 +210,8 @@ const titleHtml = escapeHtml(title).replace(
       margin-top: 0;
     }
 
-    .card-photo,
-    .card-photo img {
+    .card-grid :global(.card-photo),
+    .card-grid :global(.card-photo img) {
       grid-area: photo;
       width: 120px;
       height: 120px;

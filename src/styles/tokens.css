@@ -13,7 +13,10 @@
   --ink: #191713;
   --ink-body: #3b362e;
   --ink-muted: #6d675e;
-  --rule: #d5cfc2;
+  /* --rule: 1.89:1 on --paper (was #d5cfc2 at 1.38:1, which read as a lighter
+     line weight next to the 1px ink rule). Same hue as paper (42deg), 14%
+     saturation, so it stays warm-neutral rather than grey. */
+  --rule: #b8b1a0;
   /* Each oklch() token has an sRGB hex fallback declared first (culori) for
      browsers without oklch support; the second declaration wins where supported. */
   --red: #be241f;
@@ -37,19 +40,31 @@
   --rule-strong: var(--ink);
   --rule-accent: var(--red);
 
-  /* §4 — Type scale (fluid 390px -> 1200px) */
+  /* §4 — Type scale (fluid 390px -> 1200px)
+     Naming: --t-body is the real reading size (the 17px clamp on <body>);
+     --t-small is the 15px secondary size. (v1.0 had these inverted as
+     --t-lead / --t-body; renamed in PR2 with no change to any rendered size.)
+
+     Floors — nothing on the site renders below these:
+       mono  >= 11px  (--t-micro)
+       sans  >= 12px  (--t-note)
+       serif >= 20px  (Instrument Serif is a display face; below that its
+                       hairlines break up at 1x DPR) */
   --t-hero: clamp(46px, 8vw, 88px);
   --t-page: clamp(38px, 5.4vw, 64px);
   --t-stat: clamp(52px, 7vw, 84px);
   --t-h2: clamp(32px, 4vw, 52px);
   --t-h3: clamp(24px, 2.6vw, 30px);
   --t-quote: clamp(21px, 2.4vw, 27px);
-  --t-lead: clamp(15.5px, 1.5vw, 17px);
-  --t-body: 15px;
+  --t-body: clamp(15.5px, 1.5vw, 17px);
+  --t-small: 15px;
   --t-data: 13px;
   --t-label: 11px;
   --t-label-lg: 12.5px;
-  --t-caption: 10.5px;
+  --t-display-xl: clamp(44px, 5.8vw, 60px); /* /work/ company h2 */
+  --t-slab: clamp(26px, 3.2vw, 40px);       /* CTASlab body */
+  --t-note: 12px;                           /* MarginNote, bylines, RecordList .where */
+  --t-micro: 11px;                          /* hard floor for mono captions/labels */
 
   /* §5 — Space scale (4px base) */
   --s-1: 4px;
@@ -72,23 +87,64 @@
   --gutter: 44px;
   --body-inset: 40px;
 
+  /* Letter-spacing — the three dominant values in src, plus zero.
+     tight  display serif at large sizes (headings, quotes)
+     caps   mono UPPERCASE labels and kickers
+     wide   mono captions / small-caps-ish metadata */
+  --track-tight: -.015em;
+  --track-normal: 0;
+  --track-caps: .12em;
+  --track-wide: .04em;
+
+  /* Line-height — dominant values in src (1.02 / 1.62 / 1.6 / 1.7 cluster). */
+  --lh-tight: 1.05;    /* display numerals, hero */
+  --lh-heading: 1.15;  /* h2 / h3 */
+  --lh-body: 1.6;      /* running prose */
+  --lh-loose: 1.75;    /* long-form writing */
+
+  /* Shape — the system is square. */
+  --radius: 0;
+
   /* Motion */
   --ease-draw: cubic-bezier(.2, .7, .2, 1);
+  --dur-fast: 120ms;   /* hover / colour */
+  --dur-base: 200ms;   /* position / layout-ish moves */
+  --dur-slow: 600ms;   /* line-draw animations */
+
+  /* Stacking */
+  --z-nav: 100;
+  --z-sheet: 200;
+  --z-top: 1000;       /* skip-link */
+
+  /* TODO(PR2-C): apply --track-*, --lh-*, --dur-*, --z-*, --radius across
+     src/pages and the remaining components. PR2-B applies them only in
+     base.css, AudioPlayer, StatRow and Button. body line-height is still the
+     old 1.55 in base.css (not --lh-body) so PR2-B changes no page height. */
 
   /* §6 — Contribution heatmap. Monochrome, derived from --ink so it reads as
      the same instrument as everything else on the page — never GitHub green.
      Five steps: 0 (no contributions, a bare rule-tint square) through 4
      (heaviest day, full --ink). */
-  --heat-0: var(--rule);
-  --heat-1: #a9a1a3;
-  --heat-2: #7b7476;
-  --heat-3: #4c4648;
+  /* heat-0 keeps the old, lighter #d5cfc2 (1.38:1) rather than following the
+     darkened --rule (1.89:1): at 1.89 the empty->first step would be 0.34
+     apart in contrast ratio and read as one colour. Steps vs paper:
+     1.38 / 2.23 / 4.01 / 8.10 / 15.87 — monotonic, no two adjacent alike. */
+  --heat-0: #d5cfc2;
+  --heat-1: #a6a39d;
+  --heat-2: #797671;
+  --heat-3: #4a4843;
   --heat-1: color-mix(in oklch, var(--ink) 32%, var(--paper));
   --heat-2: color-mix(in oklch, var(--ink) 52%, var(--paper));
   --heat-3: color-mix(in oklch, var(--ink) 74%, var(--paper));
   --heat-4: var(--ink);
 }
 
+/* Breakpoints — canonical set. CSS custom properties cannot be used inside
+   @media conditions, so these are documented here and written as literals:
+     599px   phone / small  (max-width: 599px)
+     899px   tablet / stacked layout (max-width: 899px) — margin column drops
+     1099px  narrow desktop (max-width: 1099px) — margin column narrows
+   Do not introduce other breakpoints. */
 @media (max-width: 1099px) {
   :root {
     --margin-col: 200px;

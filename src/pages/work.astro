@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
 import TimelineEntry from '../components/TimelineEntry.astro';
 import RecordList from '../components/RecordList.astro';
 import VideoEmbed from '../components/VideoEmbed.astro';
@@ -8,18 +9,10 @@ import { meta, work, cta, home } from '../data/copy';
 ---
 
 <Base title={meta.work.title} description={meta.work.description} path="/work/" ogImage="/og/work.png">
-  <section class="masthead">
-    <div class="masthead-inner">
-      <div class="margin-col" aria-hidden="true"></div>
-      <div class="body-col">
-        <h1 class="page-h1">Work</h1>
-        <p class="standfirst">{work.standfirst}</p>
-      </div>
-    </div>
-  </section>
+  <Masthead variant="plain" h1="Work" standfirst={work.standfirst} standfirstMax="60ch" />
 
   <section class="open-work">
-    <div class="open-work-inner">
+    <div class="open-work-inner grid-margin">
       <div class="margin-col" aria-hidden="true"></div>
       <div class="body-col">
         <h2 class="visually-hidden">{work.openWork.kicker}</h2>
@@ -116,60 +109,14 @@ import { meta, work, cta, home } from '../data/copy';
 </Base>
 
 <style>
-  /* Masthead sits on the same margin-col | body-col grid as every other page,
-     so the h1 starts at the site's body x. */
-  .masthead-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .margin-col {
-    border-right: 1px solid var(--rule);
-  }
-
-  .body-col {
-    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
-  }
-
-  /* Open work — same margin-col | body-col grid, its own closing rule
-     (RecordList supplies the visible content and its own top rule). */
+  /* Open work — same margin-col | body-col grid as the masthead, its own
+     closing rule (RecordList supplies the visible content and its own top
+     rule). The margin column is only the rule, so it is hidden when stacked.
+     The h2 inside is `.visually-hidden` (layout.css): it keeps h1 -> h2 -> h3
+     order intact, since RecordList's own kicker renders as an h3. */
   .open-work-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
     border-bottom: 1px solid var(--rule-strong);
-  }
-
-  /* Keeps h1 -> h2 -> h3 order intact: RecordList's own kicker renders as an
-     h3, so this establishes the h2 the outline needs without a second
-     visible "Open work" label. */
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .page-h1 {
-    font-family: var(--font-display);
-    font-size: var(--t-page);
-    line-height: 1.02;
-    letter-spacing: -.015em;
-    color: var(--ink);
-    margin-bottom: var(--s-4);
-  }
-
-  .standfirst {
-    font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 60ch;
+    --body-pad-end: var(--s-11);
   }
 
   .arc-close {
@@ -182,7 +129,7 @@ import { meta, work, cta, home } from '../data/copy';
     font-family: var(--font-display);
     font-size: var(--t-h2);
     line-height: 1.1;
-    letter-spacing: -.015em;
+    letter-spacing: var(--track-tight);
     color: var(--ink);
     max-width: 42ch;
     margin-inline: auto;
@@ -190,17 +137,8 @@ import { meta, work, cta, home } from '../data/copy';
   }
 
   @media (max-width: 899px) {
-    .masthead-inner,
-    .open-work-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .margin-col {
+    .open-work-inner > .margin-col {
       display: none;
-    }
-
-    .body-col {
-      padding: var(--s-7) var(--gutter);
     }
   }
 

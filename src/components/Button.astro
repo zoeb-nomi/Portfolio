@@ -27,13 +27,13 @@ const isExternal = /^https?:\/\//.test(href);
     padding: 13px 22px;
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
-    letter-spacing: .06em;
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     text-decoration: none;
-    border-radius: 0;
+    border-radius: var(--radius);
     border: 1px solid transparent;
-    transition: background-color 120ms var(--ease-draw), color 120ms var(--ease-draw),
-      border-color 120ms var(--ease-draw), transform 120ms var(--ease-draw);
+    transition: background-color var(--dur-fast) var(--ease-draw), color var(--dur-fast) var(--ease-draw),
+      border-color var(--dur-fast) var(--ease-draw), transform var(--dur-fast) var(--ease-draw);
   }
 
   .rp-button:active {
@@ -54,7 +54,7 @@ const isExternal = /^https?:\/\//.test(href);
   .rp-button--secondary {
     background: transparent;
     color: var(--ink);
-    border-color: var(--ink);
+    border-color: var(--rule-strong);
   }
 
   .rp-button--secondary:hover {
@@ -69,6 +69,6 @@ const isExternal = /^https?:\/\//.test(href);
   }
 
   .rp-button--inverse:hover {
-    background: #ffffff;
+    background: var(--paper-raised);
   }
 </style>

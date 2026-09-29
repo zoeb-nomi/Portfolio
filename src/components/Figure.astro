@@ -1,4 +1,6 @@
 ---
+import Headshot from './Headshot.astro';
+
 interface Props {
   caption: string;
   alt: string;
@@ -7,27 +9,10 @@ interface Props {
 }
 
 const { caption, alt, eager = false, size = 'small' } = Astro.props;
-
-const srcset = (ext: string) => `/img/headshot-480.${ext} 480w, /img/headshot-960.${ext} 960w`;
-// The plate renders ~240 CSS px wide, so 480w covers 2x DPR.
-const sizes = '240px';
 ---
 
 <figure class:list={['rp-figure', `rp-figure--${size}`]}>
-  <picture>
-    <source type="image/avif" srcset={srcset('avif')} sizes={sizes} />
-    <source type="image/webp" srcset={srcset('webp')} sizes={sizes} />
-    <img
-      src="/img/headshot-960.jpg"
-      srcset={srcset('jpg')}
-      sizes={sizes}
-      width="960"
-      height="960"
-      alt={alt}
-      loading={eager ? 'eager' : 'lazy'}
-      decoding={eager ? 'sync' : 'async'}
-    />
-  </picture>
+  <Headshot size="hero" {alt} loading={eager ? 'eager' : 'lazy'} />
   <figcaption>{caption}</figcaption>
 </figure>
 
@@ -64,37 +49,15 @@ const sizes = '240px';
     }
   }
 
-  /* Unboxed: the plate is the photograph, not a framed exhibit. The only
-     lines on the page are the grid's own. */
-  .rp-figure picture {
-    display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-  }
-
-  .rp-figure img {
-    display: block;
-    width: 100%;
-    /* The HTML width/height attributes (kept for CLS prevention before the
-       image loads) otherwise win over `aspect-ratio` for a replaced element —
-       height must be forced back to auto so aspect-ratio can take over. */
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    object-position: center 12%;
-  }
-
   .rp-figure figcaption {
     margin-top: var(--s-3);
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    letter-spacing: .04em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     color: var(--ink-muted);
   }
 
-  /* Mobile: the plate becomes a thumbnail beside the parent's kicker (same
-     pattern as the About masthead). The <figure> dissolves into its parent's
+  /* Mobile: the plate becomes a thumbnail beside the parent's kicker. The <figure> dissolves into its parent's
      grid: picture -> column 2 / row 1, caption -> full-width row 2. The
      parent (.margin-col) must be a two-column grid on this breakpoint. */
   @media (max-width: 899px) {
@@ -103,7 +66,7 @@ const sizes = '240px';
       display: contents;
     }
 
-    .rp-figure picture {
+    .rp-figure :global(.headshot) {
       grid-column: 2;
       grid-row: 1;
       width: var(--s-13);

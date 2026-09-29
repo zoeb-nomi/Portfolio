@@ -54,7 +54,7 @@ const weekCount = cells.length ? Math.max(...cells.map((c) => c.col)) + 1 : 0;
 const recentWeeksStart = Math.max(0, weekCount - 26);
 
 // Month labels: one per column where the month changes from the previous
-// labelled column, with a minimum 2-column gap so short months don't crowd.
+// labelled column, with a minimum 3-column gap so short months don't crowd.
 const monthLabels: { col: number; label: string }[] = [];
 {
   let lastCol = -99;
@@ -63,7 +63,7 @@ const monthLabels: { col: number; label: string }[] = [];
     const sundayCell = cells.find((c) => c.col === col && c.row === 0) ?? cells.find((c) => c.col === col);
     if (!sundayCell) continue;
     const month = utcDate(sundayCell.date).getUTCMonth();
-    if (month !== lastMonth && col - lastCol >= 2) {
+    if (month !== lastMonth && col - lastCol >= 3) {
       monthLabels.push({ col, label: MONTH_ABBR[month] });
       lastMonth = month;
       lastCol = col;
@@ -203,7 +203,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
   .cg-kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: 0.12em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     color: var(--ink-muted);
     margin-bottom: var(--s-4);
@@ -224,7 +224,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
        24px + 3px/week = weekday column, layout gap and inter-cell gaps. */
     --cg-cell: clamp(8px, calc((100cqw - 24px - var(--weeks) * 3px) / var(--weeks)), 11px);
     display: flex;
-    gap: 6px;
+    gap: var(--s-1);
     width: max-content;
   }
 
@@ -237,7 +237,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-weekday-label {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: var(--t-micro);
     line-height: var(--cg-cell);
     color: var(--ink-muted);
     white-space: nowrap;
@@ -254,7 +254,8 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-month-label {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: var(--t-micro);
+    line-height: 1;
     color: var(--ink-muted);
     align-self: end;
     white-space: nowrap;
@@ -263,7 +264,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
   .cg-cell {
     width: var(--cg-cell);
     height: var(--cg-cell);
-    border-radius: 2px;
+    border-radius: var(--radius);
     background: var(--heat-0);
   }
 
@@ -291,7 +292,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-caption {
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
+    font-size: var(--t-micro);
     color: var(--ink-muted);
   }
 
@@ -303,14 +304,14 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-legend-label {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: var(--t-micro);
     color: var(--ink-muted);
   }
 
   .cg-legend-swatch {
     width: 10px;
     height: 10px;
-    border-radius: 2px;
+    border-radius: var(--radius);
     background: var(--heat-0);
   }
   .cg-legend-swatch[data-level='1'] {
