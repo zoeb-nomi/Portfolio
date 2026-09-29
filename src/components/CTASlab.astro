@@ -14,7 +14,7 @@ const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHre
 ---
 
 <div class="cta-slab">
-  <div class="slab-inner">
+  <div class="slab-inner grid-margin">
     <aside class="margin-col">
       {marginLines.map((line) => <p>{line}</p>)}
     </aside>
@@ -35,26 +35,21 @@ const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHre
     background: var(--red);
   }
 
-  .slab-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
-  }
-
+  /* The slab draws no column rule. */
   .margin-col {
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+    border: 0;
   }
 
   .margin-col p {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .1em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     color: var(--on-red-muted);
     line-height: 1.7;
   }
 
   .body-col {
-    padding: var(--s-9) var(--gutter) var(--s-9) var(--body-inset);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -64,7 +59,7 @@ const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHre
 
   .slab-body {
     font-family: var(--font-display);
-    font-size: 40px;
+    font-size: var(--t-slab);
     line-height: 1.15;
     color: var(--on-red);
     max-width: 26ch;
@@ -77,22 +72,9 @@ const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHre
   }
 
   @media (max-width: 899px) {
-    .slab-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .margin-col {
-      padding: var(--s-6) var(--gutter);
-    }
-
     .body-col {
-      padding: var(--s-7) var(--gutter);
       flex-direction: column;
       align-items: flex-start;
-    }
-
-    .slab-body {
-      font-size: clamp(26px, 6vw, 34px);
     }
   }
 

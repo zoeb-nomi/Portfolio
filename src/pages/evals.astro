@@ -1,26 +1,46 @@
 ---
 import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
 import Section from '../components/Section.astro';
-import EvalsBlock from '../components/EvalsBlock.astro';
+import HarnessLedger from '../components/HarnessLedger.astro';
+import DataTable from '../components/DataTable.astro';
+import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
-import { meta, home, cta } from '../data/copy';
+import { meta, home, cta, evalsLedger } from '../data/copy';
+
+// One table row per ledger entry — a fourth harness adds a row here too.
+const tableRows = evalsLedger.map((e) => ({
+  label: e.name,
+  cells: [
+    { text: e.question },
+    { text: e.table.judge },
+    { text: e.table.metric },
+    { text: e.table.sample },
+    { text: e.table.verdict },
+  ],
+}));
 ---
 
 <Base title={meta.evals.title} description={meta.evals.description} path="/evals/" ogImage="/og/evals.png">
-  <section class="masthead">
-    <div class="masthead-inner">
-      <aside class="margin-col" aria-label="Article kicker">
-        <p class="kicker">{home.evals.kicker}</p>
-      </aside>
-      <div class="body-col">
-        <h1 class="page-h1">{home.evals.h2}</h1>
-        <p class="standfirst">{home.evals.methodLine}</p>
-      </div>
-    </div>
-  </section>
+  <Masthead
+    kicker={home.evals.kicker}
+    h1={home.evals.h2}
+    standfirst={home.evals.standfirst}
+    h1Max="20ch"
+    standfirstMax="58ch"
+  />
 
-  <Section mark="§1" label="Harnesses">
-    <EvalsBlock cards={home.evals.cards} closeLine={home.evals.closeLine} />
+  <Section mark="§1" label={home.evals.ledgerLabel}>
+    <HarnessLedger entries={evalsLedger} closeLine={home.evals.closeLine} />
+  </Section>
+
+  <Section mark="§2" label={home.evals.tableLabel}>
+    <div class="compare">
+      <DataTable caption={home.evals.tableCaption} columns={home.evals.tableColumns} rows={tableRows} />
+    </div>
+    <div class="method-strip">
+      <PullQuote rule="ink">{home.evals.methodLine}</PullQuote>
+    </div>
   </Section>
 
   <CTASlab
@@ -32,60 +52,53 @@ import { meta, home, cta } from '../data/copy';
 </Base>
 
 <style>
-  .masthead-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--rule-strong);
+  /* The comparison table is prose in cells, not numerals: left-aligned, top-
+     aligned, sans-width-friendly columns, scrolling sideways inside its own
+     box below ~760px (DataTable owns the scroll wrapper). */
+  .compare :global(.data-table) {
+    min-width: 700px;
   }
 
-  .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+  .compare :global(.data-table th),
+  .compare :global(.data-table td) {
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.5;
+    padding-inline-start: var(--s-3);
   }
 
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: var(--t-label);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
-  }
-
-  .body-col {
-    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
-  }
-
-  .page-h1 {
-    font-family: var(--font-display);
-    font-size: var(--t-page);
-    line-height: 1.02;
-    letter-spacing: -.015em;
-    color: var(--ink);
-    margin-bottom: var(--s-6);
-    max-width: 20ch;
-  }
-
-  .standfirst {
+  .compare :global(.data-table td) {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.62;
+    font-size: var(--t-small);
+    line-height: var(--lh-body);
     color: var(--ink-body);
-    max-width: 58ch;
+    padding-block: var(--s-4);
   }
 
-  @media (max-width: 899px) {
-    .masthead-inner {
-      grid-template-columns: 1fr;
-    }
+  .compare :global(.data-table th[scope='row']) {
+    padding-block: var(--s-3);
+  }
 
-    .margin-col {
-      border-right: 0;
-      border-bottom: 1px solid var(--rule);
-      padding: var(--s-6) var(--gutter);
-    }
+  .compare :global(.data-table th[scope='row']) {
+    font-family: var(--font-display);
+    font-size: var(--t-quote);
+    line-height: var(--lh-heading);
+    color: var(--ink);
+    white-space: nowrap;
+    padding-inline-start: 0;
+  }
 
-    .body-col {
-      padding: var(--s-7) var(--gutter);
-    }
+  .compare :global(.data-table td:last-child) {
+    color: var(--ink);
+  }
+
+  /* The PullQuote's strong rule closes the table — drop the last row's
+     hairline so only one line sits between the two blocks. */
+  .compare :global(.data-table tbody tr:last-child) {
+    border-bottom: 0;
+  }
+
+  .method-strip {
+    margin-top: var(--s-6);
   }
 </style>

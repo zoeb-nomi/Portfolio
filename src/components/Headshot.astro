@@ -1,0 +1,82 @@
+---
+// The one headshot <picture>. Three presets, each a different rendered size:
+//   hero  ~240px plate (home hero, Figure)      — fills its container, square
+//   thumb  120px (About masthead)
+//   card   300px (EmbedCard)                    — the parent shrinks it on phones
+// avif -> webp -> jpg, from the same 480w/960w files everywhere. The parent
+// owns placement (margins, grid areas) via the `class` it passes in; this
+// component owns the picture's own box and crop.
+type Size = 'hero' | 'thumb' | 'card';
+
+interface Props {
+  size?: Size;
+  alt: string;
+  loading?: 'eager' | 'lazy';
+  class?: string;
+}
+
+const { size = 'hero', alt, loading = 'lazy', class: className } = Astro.props;
+
+const PRESETS: Record<Size, { sizes: string; src: string; dim: number }> = {
+  hero: { sizes: '240px', src: '960', dim: 960 },
+  thumb: { sizes: '120px', src: '480', dim: 480 },
+  card: { sizes: '300px', src: '960', dim: 960 },
+};
+const { sizes, src, dim } = PRESETS[size];
+
+const srcset = (ext: string) => `/img/headshot-480.${ext} 480w, /img/headshot-960.${ext} 960w`;
+const eager = loading === 'eager';
+---
+
+<picture class:list={['headshot', `headshot--${size}`, className]}>
+  <source type="image/avif" srcset={srcset('avif')} sizes={sizes} />
+  <source type="image/webp" srcset={srcset('webp')} sizes={sizes} />
+  <img
+    src={`/img/headshot-${src}.jpg`}
+    srcset={srcset('jpg')}
+    sizes={sizes}
+    width={dim}
+    height={dim}
+    alt={alt}
+    loading={loading}
+    decoding={eager ? 'sync' : 'async'}
+  />
+</picture>
+
+<style>
+  .headshot img {
+    display: block;
+    object-fit: cover;
+    object-position: center 12%;
+  }
+
+  /* hero: the plate is the photograph — a square that fills its container.
+     The HTML width/height attributes (kept for CLS) otherwise win over
+     `aspect-ratio` on a replaced element, so height is forced back to auto. */
+  .headshot--hero {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .headshot--hero img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .headshot--thumb,
+  .headshot--thumb img {
+    display: block;
+    width: 120px;
+    height: 120px;
+  }
+
+  .headshot--card,
+  .headshot--card img {
+    display: block;
+    width: 300px;
+    height: 300px;
+  }
+</style>

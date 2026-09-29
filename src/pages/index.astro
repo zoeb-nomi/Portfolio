@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import MarginNote from '../components/MarginNote.astro';
 import StatRow from '../components/StatRow.astro';
-import EvalsBlock from '../components/EvalsBlock.astro';
+import HarnessLedger from '../components/HarnessLedger.astro';
 import ContributionGraph from '../components/ContributionGraph.astro';
 import Button from '../components/Button.astro';
 import Figure from '../components/Figure.astro';
@@ -13,7 +13,7 @@ import { meta, home, cta, contributions } from '../data/copy';
 
 <Base title={meta.home.title} description={meta.home.description} path="/" ogImage="/og/home.png">
   <section class="hero">
-    <div class="hero-inner">
+    <div class="hero-inner grid-margin">
       <aside class="margin-col" aria-label="Profile photo and role">
         <p class="eyebrow">{home.eyebrow}</p>
         <Figure caption={home.figure1Caption} alt="Zoeb Nomi" eager />
@@ -21,8 +21,10 @@ import { meta, home, cta, contributions } from '../data/copy';
       <div class="body-col">
         <h1 class="hero-h1">
           <span class="line1"
-            >LLM products fail <span class="underline-wrap"
-              >quietly.<span class="underline" aria-hidden="true"></span></span
+            >LLM products <span class="nowrap"
+              >fail <span class="underline-wrap"
+                >quietly.<span class="underline" aria-hidden="true"></span></span
+              ></span
             > <span class="unflagged" aria-hidden="true">{home.unflaggedMark}</span></span
           >
           <span class="line2">{home.h1Line2}</span>
@@ -51,10 +53,10 @@ import { meta, home, cta, contributions } from '../data/copy';
   </Section>
 
   <Section mark="§2" label={home.evals.kicker}>
-    <EvalsBlock
+    <HarnessLedger
+      variant="compact"
       h2={home.evals.h2}
       methodLine={home.evals.methodLine}
-      cards={home.evals.cards}
       closeLine={home.evals.closeLine}
     />
   </Section>
@@ -86,35 +88,25 @@ import { meta, home, cta, contributions } from '../data/copy';
 
 <style>
   .hero-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
     border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+    --body-pad-end: var(--s-11);
   }
 
   .eyebrow {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .12em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     color: var(--ink-muted);
     line-height: 1.7;
     margin-bottom: var(--s-7);
   }
 
-  .body-col {
-    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
-  }
-
   .hero-h1 {
     font-family: var(--font-display);
     font-size: var(--t-hero);
     line-height: 0.98;
-    letter-spacing: -.015em;
+    letter-spacing: var(--track-tight);
     color: var(--ink);
     max-width: 18ch;
     margin-bottom: var(--s-8);
@@ -129,6 +121,11 @@ import { meta, home, cta, contributions } from '../data/copy';
     font-style: italic;
   }
 
+  /* "fail quietly." never splits: "fail" must not be stranded at a line end. */
+  .nowrap {
+    white-space: nowrap;
+  }
+
   .underline-wrap {
     position: relative;
     display: inline-block;
@@ -139,11 +136,11 @@ import { meta, home, cta, contributions } from '../data/copy';
     left: 0;
     bottom: 0.06em;
     width: 100%;
-    height: 3px;
-    background: var(--red);
+    height: 2px;
+    background: var(--rule-accent);
     transform: scaleX(0);
     transform-origin: left;
-    animation: draw-underline 600ms var(--ease-draw) 250ms forwards;
+    animation: draw-underline var(--dur-slow) var(--ease-draw) 250ms forwards;
   }
 
   @keyframes draw-underline {
@@ -162,8 +159,8 @@ import { meta, home, cta, contributions } from '../data/copy';
   .unflagged {
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: 0.22em;
-    letter-spacing: .04em;
+    font-size: var(--t-body);
+    letter-spacing: var(--track-wide);
     color: var(--red-ink);
     vertical-align: super;
     margin-left: 0.15em;
@@ -172,13 +169,13 @@ import { meta, home, cta, contributions } from '../data/copy';
   .hero-lower {
     display: grid;
     grid-template-columns: 1fr 268px;
-    gap: 44px;
+    gap: var(--s-10);
     margin-bottom: var(--s-9);
   }
 
   .subhead {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.62;
     color: var(--ink-body);
     max-width: 68ch;
@@ -196,7 +193,7 @@ import { meta, home, cta, contributions } from '../data/copy';
 
   .contrib-dek {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.6;
     color: var(--ink-body);
     max-width: 56ch;
@@ -211,15 +208,6 @@ import { meta, home, cta, contributions } from '../data/copy';
     display: none;
   }
 
-  /* Grid items default to min-width: auto (content-based). The heatmap's
-     fixed-width week columns are wider than Section's body-col track at
-     mobile, so without this the grid track — and the page — grows to fit
-     it instead of letting ContributionGraph's own .cg-scroll overflow-x:
-     auto contain it. */
-  :global(.rp-section .body-col) {
-    min-width: 0;
-  }
-
   .methods {
     list-style: none;
   }
@@ -227,7 +215,7 @@ import { meta, home, cta, contributions } from '../data/copy';
   .method-row {
     display: grid;
     grid-template-columns: 46px 260px 1fr;
-    gap: 24px;
+    gap: var(--s-6);
     align-items: baseline;
     padding-block: var(--s-7);
     border-top: 1px solid var(--rule);
@@ -251,7 +239,7 @@ import { meta, home, cta, contributions } from '../data/copy';
 
   .method-desc {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.6;
     color: var(--ink-body);
     max-width: 52ch;
@@ -264,10 +252,6 @@ import { meta, home, cta, contributions } from '../data/copy';
   }
 
   @media (max-width: 899px) {
-    .hero-inner {
-      grid-template-columns: 1fr;
-    }
-
     /* Kicker left, thumbnail right (Figure.astro dissolves into this grid),
        caption on its own row beneath — the H1 follows straight after. */
     .margin-col {
@@ -275,8 +259,6 @@ import { meta, home, cta, contributions } from '../data/copy';
       grid-template-columns: minmax(0, 1fr) var(--s-13);
       column-gap: var(--s-4);
       align-items: start;
-      border-right: 0;
-      border-bottom: 1px solid var(--rule);
       padding: var(--s-5) var(--gutter);
     }
 
@@ -287,7 +269,6 @@ import { meta, home, cta, contributions } from '../data/copy';
     }
 
     .body-col {
-      padding: var(--s-7) var(--gutter);
       display: flex;
       flex-direction: column;
     }

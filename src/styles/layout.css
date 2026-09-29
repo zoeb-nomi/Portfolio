@@ -1,0 +1,77 @@
+/* zoebnomi.com — layout primitives · The Red Pen v1.0
+   The one place the `margin-col | body-col` grid is declared. Every section,
+   masthead, timeline entry, slab and page body puts `.grid-margin` on its
+   wrapper and `.margin-col` / `.body-col` on the two children; the pieces
+   below supply the canonical geometry (Section's).
+
+   All selectors are wrapped in :where() so they carry ZERO specificity: a
+   component or page overrides any single property with a plain class rule
+   (a timeline entry's tighter padding, a slab's borderless margin column)
+   without a specificity fight, and without !important. */
+
+/* ---- The grid ---- */
+:where(.grid-margin) {
+  display: grid;
+  grid-template-columns: var(--margin-col) 1fr;
+}
+
+/* The margin column: a --rule edge, indented by --gutter on the left. */
+:where(.grid-margin) > :where(.margin-col) {
+  border-right: 1px solid var(--rule);
+  padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
+}
+
+/* The body column. `--body-pad-end` lets a wrapper that closes a block (a
+   masthead, a page body) leave more room under its content than a section
+   does, without restating the whole padding shorthand. min-width: 0 lets a
+   wide child (table, heatmap, chip row) scroll inside the column instead of
+   stretching the grid track. */
+:where(.grid-margin) > :where(.body-col) {
+  min-width: 0;
+  padding: var(--s-9) var(--gutter) var(--body-pad-end, var(--s-9)) var(--body-inset);
+}
+
+/* Below 900px the two columns stack and the margin column becomes a
+   labelled band above the body. */
+@media (max-width: 899px) {
+  :where(.grid-margin) {
+    grid-template-columns: 1fr;
+  }
+
+  :where(.grid-margin) > :where(.margin-col) {
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+    padding: var(--s-6) var(--gutter);
+  }
+
+  :where(.grid-margin) > :where(.body-col) {
+    padding: var(--s-7) var(--gutter);
+  }
+}
+
+/* Sections (the article rhythm) tighten one more step on phones. Opt-in so
+   mastheads, timeline entries and page bodies keep their 899px padding. */
+@media (max-width: 599px) {
+  :where(.grid-margin--compact) > :where(.margin-col) {
+    padding: var(--s-5) var(--gutter);
+  }
+
+  :where(.grid-margin--compact) > :where(.body-col) {
+    padding: var(--s-6) var(--gutter);
+  }
+}
+
+/* ---- Utilities ---- */
+
+/* Keeps h1 -> h2 -> h3 order intact where a visible label would repeat. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

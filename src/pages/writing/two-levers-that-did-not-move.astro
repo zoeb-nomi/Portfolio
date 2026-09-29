@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
@@ -39,19 +40,16 @@ const articleLd = {
 >
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
 
-  <section class="masthead">
-    <div class="masthead-inner">
-      <aside class="margin-col" aria-label="Article kicker">
-        <p class="kicker">{wt.kicker}</p>
-      </aside>
-      <div class="body-col">
-        <h1 class="page-h1" data-narr="s0-title">{wt.title}</h1>
-        <p class="standfirst" data-narr="s0-dek">{wt.dek}</p>
-        <p class="byline tabular"><time datetime={wt.date}>{formatDate(wt.date)}</time> · {wt.readingTime} read</p>
-        {wt.audio && <AudioPlayer audio={wt.audio} articleId="two-levers" />}
-      </div>
-    </div>
-  </section>
+  <Masthead
+    kicker={wt.kicker}
+    h1={wt.title}
+    standfirst={wt.dek}
+    h1Max="24ch"
+    narr
+  >
+    <Fragment slot="byline"><time datetime={wt.date}>{formatDate(wt.date)}</time> · {wt.readingTime} read</Fragment>
+    {wt.audio && <AudioPlayer audio={wt.audio} articleId="two-levers" />}
+  </Masthead>
 
   <Section mark={wt.s1.mark} label={wt.s1.label} narrId="s1-cue">
     {wt.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
@@ -92,61 +90,9 @@ const articleLd = {
 </Base>
 
 <style>
-  .masthead-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
-    border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
-  }
-
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: var(--t-label);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
-  }
-
-  .body-col {
-    /* min-width: 0 so the audio player's chapter-chip row (flex-nowrap +
-       overflow-x: auto) can scroll on its own instead of stretching this
-       grid item once chapters are filled in. */
-    min-width: 0;
-    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
-  }
-
-  .page-h1 {
-    font-family: var(--font-display);
-    font-size: var(--t-page);
-    line-height: 1.02;
-    letter-spacing: -.015em;
-    color: var(--ink);
-    margin-bottom: var(--s-6);
-    max-width: 24ch;
-  }
-
-  .standfirst {
-    font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 62ch;
-    margin-bottom: var(--s-4);
-  }
-
-  .byline {
-    font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    color: var(--ink-muted);
-  }
-
   .prose {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.62;
     color: var(--ink-body);
     max-width: 68ch;
@@ -159,7 +105,7 @@ const articleLd = {
   .links-line {
     margin-top: var(--s-6);
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
+    font-size: var(--t-micro);
   }
 
   .links-line a {
@@ -170,21 +116,5 @@ const articleLd = {
 
   .links-line .sep {
     color: var(--ink-muted);
-  }
-
-  @media (max-width: 899px) {
-    .masthead-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .margin-col {
-      border-right: 0;
-      border-bottom: 1px solid var(--rule);
-      padding: var(--s-6) var(--gutter);
-    }
-
-    .body-col {
-      padding: var(--s-7) var(--gutter);
-    }
   }
 </style>

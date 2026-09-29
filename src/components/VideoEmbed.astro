@@ -128,13 +128,13 @@ const playLabel = `Play: ${title}`;
     justify-content: center;
     width: 64px;
     height: 64px;
-    border-radius: 50%;
+    border-radius: var(--radius);
     background: var(--ink);
     color: var(--paper);
     /* A paper hairline so the disc still reads against a dark frame of the
        poster — or against the ink ground when the poster does not load. */
     box-shadow: 0 0 0 1px var(--paper);
-    transition: background-color 120ms var(--ease-draw);
+    transition: background-color var(--dur-fast) var(--ease-draw);
   }
 
   .facade:hover .glyph,
@@ -148,11 +148,11 @@ const playLabel = `Play: ${title}`;
     position: absolute;
     left: var(--s-3);
     bottom: var(--s-3);
-    padding: 4px var(--s-2);
+    padding: var(--s-1) var(--s-2);
     background: var(--ink);
     font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: .08em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     color: var(--on-red-muted);
   }
 
@@ -167,9 +167,9 @@ const playLabel = `Play: ${title}`;
 
   figcaption {
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
+    font-size: var(--t-micro);
     line-height: 1.5;
-    letter-spacing: .04em;
+    letter-spacing: var(--track-wide);
     color: var(--ink-muted);
     max-width: 60ch;
   }
@@ -181,8 +181,8 @@ const playLabel = `Play: ${title}`;
     padding-block: var(--s-1);
     margin-block: calc(-1 * var(--s-1));
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
-    letter-spacing: .04em;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: 3px;

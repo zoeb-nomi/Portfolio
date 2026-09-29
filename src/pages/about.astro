@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
 import EmbedCard from '../components/EmbedCard.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, about, cta, home } from '../data/copy';
@@ -16,31 +17,15 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 ---
 
 <Base title={meta.about.title} description={meta.about.description} path="/about/" ogImage="/og/about.png">
-  <section class="masthead">
-    <div class="masthead-inner">
-      <picture class="masthead-photo">
-        <source type="image/avif" srcset="/img/headshot-480.avif 480w, /img/headshot-960.avif 960w" sizes="120px" />
-        <source type="image/webp" srcset="/img/headshot-480.webp 480w, /img/headshot-960.webp 960w" sizes="120px" />
-        <img
-          src="/img/headshot-480.jpg"
-          srcset="/img/headshot-480.jpg 480w, /img/headshot-960.jpg 960w"
-          sizes="120px"
-          width="480"
-          height="480"
-          alt={about.photoAlt}
-          loading="eager"
-          decoding="sync"
-        />
-      </picture>
-      <div class="masthead-text">
-        <h1 class="page-h1">{about.h1}</h1>
-        <p class="dek">{about.dek}</p>
-      </div>
-    </div>
-  </section>
+  <Masthead
+    h1={about.h1}
+    standfirst={about.dek}
+    thumbnail={{ alt: about.photoAlt }}
+    standfirstMax="640px"
+  />
 
   <section class="body-section">
-    <div class="body-inner">
+    <div class="body-inner grid-margin">
       <div class="margin-col" aria-hidden="true"></div>
 
       <div class="body-col">
@@ -128,62 +113,6 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 </Base>
 
 <style>
-  /* Direction B masthead: no margin column, a small square photo and the
-     title bottom-aligned with it. The photo column is sized so the text column
-     starts at the site's body x (--margin-col + --body-inset from the shell
-     edge), which the masthead's own --gutter padding and the 32px gap eat
-     into — so the photo sits inside the margin column's footprint and the h1
-     lines up with the body text of every other page. */
-  .masthead {
-    border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .masthead-inner {
-    display: grid;
-    grid-template-columns:
-      calc(var(--margin-col) + var(--body-inset) - var(--gutter) - var(--s-8))
-      minmax(0, 1fr);
-    gap: var(--s-8);
-    align-items: end;
-    padding: var(--s-9) var(--gutter) var(--s-11);
-  }
-
-  .masthead-photo {
-    display: block;
-    width: 120px;
-    height: 120px;
-  }
-
-  .masthead-photo img {
-    display: block;
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    object-position: center 12%;
-  }
-
-  .masthead-text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
-  }
-
-  .page-h1 {
-    font-family: var(--font-display);
-    font-size: var(--t-page);
-    line-height: 1.02;
-    letter-spacing: -.015em;
-    color: var(--ink);
-  }
-
-  .dek {
-    font-family: var(--font-body);
-    font-size: var(--t-lead);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 640px;
-  }
-
   /* The body sits on the site's grid — same margin-col | body-col split as
      every other page — so its text starts at the same x as Work and Home. */
   .body-section {
@@ -191,22 +120,12 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   }
 
   .body-inner {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
-  }
-
-  .body-inner .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
-  }
-
-  .body-inner .body-col {
-    padding: var(--s-9) var(--gutter) var(--s-11) var(--body-inset);
+    --body-pad-end: var(--s-11);
   }
 
   .prose {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.62;
     color: var(--ink-body);
     max-width: 68ch;
@@ -241,14 +160,14 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   .timeline-year {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .08em;
-    color: var(--red-ink);
+    letter-spacing: var(--track-wide);
+    color: var(--ink-muted);
     font-variant-numeric: tabular-nums;
   }
 
   .timeline-body {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.5;
     color: var(--ink-body);
   }
@@ -339,7 +258,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   .link-label {
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
-    letter-spacing: .06em;
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: 4px;
@@ -357,7 +276,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   .links-list .arrow {
     color: var(--red-ink);
     transform: translateX(-4px);
-    transition: transform 120ms var(--ease-draw);
+    transition: transform var(--dur-fast) var(--ease-draw);
   }
 
   .links-list a:hover .arrow {
@@ -365,28 +284,6 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   }
 
   @media (max-width: 899px) {
-    /* Stack: photo above the title, at the same 120px. */
-    .masthead-inner {
-      grid-template-columns: 1fr;
-      gap: var(--s-6);
-      align-items: start;
-      padding: var(--s-7) var(--gutter);
-    }
-
-    .body-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .body-inner .margin-col {
-      border-right: 0;
-      border-bottom: 1px solid var(--rule);
-      padding: var(--s-6) var(--gutter);
-    }
-
-    .body-inner .body-col {
-      padding: var(--s-7) var(--gutter);
-    }
-
     .facts-row ul {
       grid-template-columns: 1fr;
     }

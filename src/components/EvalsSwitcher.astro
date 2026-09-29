@@ -41,7 +41,7 @@ const { current } = Astro.props;
   .switch-label {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .12em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     color: var(--ink-muted);
     margin-bottom: var(--s-3);
@@ -50,11 +50,11 @@ const { current } = Astro.props;
   .switch-list {
     list-style: none;
     font-family: var(--font-mono);
-    font-size: var(--t-caption);
+    font-size: var(--t-micro);
   }
 
   .switch-list li {
-    padding-block: 3px;
+    padding-block: var(--s-1);
   }
 
   .switch-list a {

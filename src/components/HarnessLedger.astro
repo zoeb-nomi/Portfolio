@@ -1,0 +1,261 @@
+---
+// The harness ledger — one row per eval harness, N rows, no fixed count.
+// Replaces the three side-by-side prose cards (EvalsBlock). Data is
+// `evalsLedger` in copy.ts; adding a harness there adds a row here.
+//
+//   variant="full"     /evals/  — name + question · headline numeral · run rail
+//                                 · Case study / Repo links   (4 columns >=1100px)
+//   variant="compact"  home §2  — name · numeral + caption · Case study link
+//                                 (3 columns >=1100px); the whole row is the link.
+//
+// Rows are separated by --rule hairlines only; the wrapping Section supplies
+// the strong rules at the top and bottom of the block, so none is added here.
+// The one red on a row is the status annotation ([counted] / [judged] /
+// [null]) and the link text. 400 weights only (none declared).
+import { evalsLedger, home } from '../data/copy';
+import type { HarnessEntry } from '../data/copy';
+
+interface Props {
+  entries?: HarnessEntry[];
+  variant?: 'full' | 'compact';
+  // Optional heading + method line + close line (home §2 uses all three; the
+  // /evals/ page carries the first two in its masthead / method strip).
+  h2?: string;
+  methodLine?: string;
+  closeLine?: string;
+}
+
+const { entries = evalsLedger, variant = 'full', h2, methodLine, closeLine } = Astro.props;
+const compact = variant === 'compact';
+const { linkCase, linkRepo } = home.evals;
+---
+
+<div class:list={['ledger-block', `is-${variant}`]}>
+  {h2 && <h2 class="ledger-h2">{h2}</h2>}
+  {methodLine && <p class="ledger-method">{methodLine}</p>}
+  <ul class="ledger" role="list">
+    {
+      entries.map((e) => (
+        <li class="row" data-harness={e.id}>
+          <div class="cell-name">
+            <h3 class="name" id={`ledger-${variant}-${e.id}`}>{e.name}</h3>
+            {!compact && <p class="question">{e.question}</p>}
+          </div>
+          <div class="cell-result">
+            <p class="status">{e.status}</p>
+            <p class="numeral">{e.numeral}</p>
+            <p class="caption">{e.caption}</p>
+          </div>
+          {!compact && (
+            <ul class="rail" role="list" aria-label={`${e.name} — run details`}>
+              {e.rail.map((line) => <li>{line}</li>)}
+            </ul>
+          )}
+          <div class="cell-actions">
+            <a class="act act-case" href={e.caseHref} aria-describedby={`ledger-${variant}-${e.id}`}>{linkCase}</a>
+            {!compact && (
+              <a class="act" href={e.repoHref} target="_blank" rel="noopener noreferrer" aria-describedby={`ledger-${variant}-${e.id}`}>{linkRepo}</a>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+  {closeLine && <p class="ledger-close">{closeLine}</p>}
+</div>
+
+<style>
+  .ledger-h2 {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    max-width: 20ch;
+    margin-bottom: var(--s-4);
+  }
+
+  .ledger-method {
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
+    max-width: 58ch;
+    margin-bottom: var(--s-8);
+  }
+
+  .ledger {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Every row carries the same top hairline; the first is transparent because
+     the Section's strong rule (or the masthead's) already opens the block. */
+  .row {
+    position: relative;
+    display: grid;
+    align-items: start;
+    column-gap: var(--s-6);
+    row-gap: var(--s-4);
+    padding-block: var(--s-6);
+    border-top: 1px solid var(--rule);
+    transition: border-color var(--dur-fast) var(--ease-draw);
+  }
+
+  .row:first-child {
+    border-top-color: transparent;
+    padding-top: 0;
+  }
+
+  .row:hover {
+    border-top-color: var(--rule-strong);
+  }
+
+  .is-full .row {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.05fr) minmax(0, 1.25fr) max-content;
+  }
+
+  .is-compact .row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) max-content;
+    padding-block: var(--s-5);
+  }
+
+  .is-compact .row:first-child {
+    padding-top: 0;
+  }
+
+  /* (a) name + question */
+  .name {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+  }
+
+  .question {
+    font-family: var(--font-body);
+    font-size: var(--t-small);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
+    margin-top: var(--s-2);
+    max-width: 34ch;
+  }
+
+  /* (b) headline result */
+  .status {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    line-height: 1;
+    color: var(--red-ink);
+    margin-bottom: var(--s-2);
+  }
+
+  .numeral {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    white-space: nowrap;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .caption {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    line-height: 1.5;
+    color: var(--ink-muted);
+    margin-top: var(--s-2);
+    max-width: 40ch;
+  }
+
+  /* (c) run rail */
+  .rail {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+
+  .rail li + li {
+    margin-top: var(--s-1);
+  }
+
+  /* (d) actions */
+  .cell-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-1);
+  }
+
+  .act {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    font-family: var(--font-mono);
+    font-size: var(--t-label-lg);
+    letter-spacing: var(--track-wide);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+
+  .act:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* Compact: the whole row is the click target (one link, so no nesting). */
+  .is-compact .act-case::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .is-compact .row:hover .act-case {
+    text-decoration-thickness: 2px;
+  }
+
+  .ledger-close {
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
+    border-top: 1px solid var(--rule);
+    padding-top: var(--s-6);
+    padding-right: max(0px, calc(100% - 60ch));
+    margin-top: var(--s-2);
+  }
+
+  /* Below the wide desktop layout (<=1099px): one column — name, question, numeral + caption, rail, links. */
+  @media (max-width: 1099px) {
+    .is-full .row,
+    .is-compact .row {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--s-4);
+    }
+
+    .question,
+    .caption {
+      max-width: 60ch;
+    }
+
+    .cell-actions {
+      flex-direction: row;
+      gap: var(--s-6);
+    }
+
+    .is-compact .row {
+      row-gap: var(--s-3);
+    }
+  }
+</style>

@@ -27,19 +27,21 @@ import { notFound } from '../data/copy';
     padding: var(--s-13) var(--gutter);
   }
 
+  /* Same setting as every other page h1 (Masthead .page-h1). */
   .code {
-    font-family: var(--font-mono);
-    font-size: var(--t-h3);
-    /* 500 is the heaviest mono face that ships — 700 would be synthesised. */
-    font-weight: 500;
-    letter-spacing: .02em;
-    color: var(--red-ink);
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    max-width: 20ch;
+    text-wrap: balance;
   }
 
   .home-link {
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
-    letter-spacing: .06em;
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: 3px;

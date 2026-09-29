@@ -39,7 +39,7 @@ const {
 } = Astro.props;
 ---
 
-<div class:list={['entry', { primary }]}>
+<div class:list={['entry', 'grid-margin', { primary }]}>
   <aside class="margin-col" aria-label={`${company} — ${dateRange}`}>
     {logo && (
       <img
@@ -78,14 +78,7 @@ const {
 
 <style>
   .entry {
-    display: grid;
-    grid-template-columns: var(--margin-col) 1fr;
     border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .margin-col {
-    border-right: 1px solid var(--rule);
-    padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
   }
 
   .company-logo {
@@ -100,13 +93,9 @@ const {
   .role {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .08em;
+    letter-spacing: var(--track-wide);
     color: var(--ink-muted);
     line-height: 1.7;
-  }
-
-  .body-col {
-    padding: var(--s-9) var(--gutter) var(--s-9) var(--body-inset);
   }
 
   .entry.primary .body-col {
@@ -115,7 +104,7 @@ const {
   }
 
   .entry.primary .company {
-    font-size: clamp(40px, 4.6vw, 60px);
+    font-size: var(--t-display-xl);
   }
 
   .company {
@@ -126,23 +115,27 @@ const {
     margin-bottom: var(--s-4);
   }
 
-  .descriptor {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: var(--t-lead);
-    color: var(--ink-body);
-    max-width: 60ch;
+  /* One lede setting for every employer: sans at body size (V12). Serif is
+     display-only and needs >= 20px, so a body-size italic dek does not fit. */
+  .descriptor,
+  .standfirst {
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    line-height: 1.62;
     margin-bottom: var(--s-7);
   }
 
+  .descriptor {
+    color: var(--ink-body);
+  }
+
   .standfirst {
-    font-family: var(--font-display);
-    font-size: var(--t-quote);
-    line-height: 1.35;
-    letter-spacing: -.01em;
     color: var(--ink);
-    max-width: 58ch;
-    margin-bottom: var(--s-7);
+  }
+
+  /* One measure for every paragraph in the entry (was 58/60/68ch). */
+  .entry p {
+    max-width: 68ch;
   }
 
   .achievements {
@@ -161,15 +154,15 @@ const {
   .kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .1em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
-    color: var(--red-ink);
+    color: var(--ink-muted);
     margin-bottom: var(--s-2);
   }
 
   .achievement-text {
     font-family: var(--font-body);
-    font-size: var(--t-lead);
+    font-size: var(--t-body);
     line-height: 1.62;
     color: var(--ink-body);
     max-width: 68ch;
@@ -183,14 +176,7 @@ const {
   }
 
   @media (max-width: 899px) {
-    .entry {
-      grid-template-columns: 1fr;
-    }
-
     .margin-col {
-      border-right: 0;
-      border-bottom: 1px solid var(--rule);
-      padding: var(--s-6) var(--gutter);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -207,10 +193,6 @@ const {
     .company-logo {
       height: 18px;
       margin-bottom: 0;
-    }
-
-    .body-col {
-      padding: var(--s-7) var(--gutter);
     }
   }
 </style>

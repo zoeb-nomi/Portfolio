@@ -7,15 +7,16 @@ interface Props {
 const { kicker, rule = 'ink' } = Astro.props;
 ---
 
-<blockquote class:list={['pull-quote', `rule-${rule}`, { 'no-kicker': !kicker }]}>
-  {kicker && <p class="kicker">{kicker}</p>}
-  <p class="quote"><slot /></p>
+<blockquote class:list={['pull-quote', `rule-${rule}`, { 'no-kicker': !kicker, 'grid-margin': kicker }]}>
+  {kicker && <p class="kicker margin-col">{kicker}</p>}
+  <p class:list={['quote', { 'body-col': kicker }]}><slot /></p>
 </blockquote>
 
 <style>
+  /* With a kicker the quote sits on the site grid (layout.css): kicker in the
+     margin column, quote in the body column. The columns are bare — no rule,
+     no padding — because the quote is already inside a body column. */
   .pull-quote {
-    display: grid;
-    grid-template-columns: 200px 1fr;
     gap: var(--s-6);
     border-top: 1px solid var(--rule-strong);
     padding-top: var(--s-7);
@@ -27,8 +28,10 @@ const { kicker, rule = 'ink' } = Astro.props;
     border-top-width: 2px;
   }
 
-  .pull-quote.no-kicker {
-    grid-template-columns: 1fr;
+  .pull-quote > .margin-col,
+  .pull-quote > .body-col {
+    border: 0;
+    padding: 0;
   }
 
   .pull-quote.no-kicker .quote {
@@ -38,7 +41,7 @@ const { kicker, rule = 'ink' } = Astro.props;
   .kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: .12em;
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     color: var(--red-ink);
     line-height: 1.7;
@@ -48,13 +51,12 @@ const { kicker, rule = 'ink' } = Astro.props;
     font-family: var(--font-display);
     font-size: var(--t-quote);
     line-height: 1.3;
-    letter-spacing: -.01em;
+    letter-spacing: var(--track-tight);
     color: var(--ink);
   }
 
   @media (max-width: 899px) {
     .pull-quote {
-      grid-template-columns: 1fr;
       gap: var(--s-3);
     }
   }

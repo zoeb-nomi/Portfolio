@@ -1,0 +1,272 @@
+---
+// The page masthead: a kicker in the margin column, an h1 + standfirst in the
+// body column, closed by a strong rule. One component for every interior page.
+//
+//   default   kicker in the margin column (Writing, Evals, posts, case studies)
+//             — add `spec` / `switcher` / `repo` for the case-study margin
+//   plain     empty margin column, hidden on phones (Work)
+//   photo     pass `thumbnail`: a 120px headshot in the margin column, no kicker,
+//             stacked above the title on phones (About)
+//
+// Slots: `byline` (a dated line under the standfirst) and the default slot
+// (anything under that — the read-along AudioPlayer). The AudioPlayer finds its
+// float anchor via `.masthead-inner > .margin-col`; keep both class names.
+import Headshot from './Headshot.astro';
+import EvalsSwitcher from './EvalsSwitcher.astro';
+
+interface SpecRow {
+  label: string;
+  value: string;
+}
+
+interface Props {
+  h1: string;
+  kicker?: string;
+  standfirst?: string;
+  /** Accessible name for the margin-column aside. */
+  label?: string;
+  variant?: 'default' | 'plain';
+  thumbnail?: { alt: string };
+  /** Any CSS length; ch is relative to the h1's own font size. */
+  h1Max?: string;
+  standfirstMax?: string;
+  /** Read-along anchors (data-narr) on the h1, standfirst and spec block. */
+  narr?: boolean;
+  spec?: SpecRow[];
+  switcher?: 'CrossSource' | 'mirror-eval' | 'screener-eval';
+  /** `bare` keeps the pre-WCAG-2.5.8 link (no 24px hit area); see .repo-link--bare. */
+  repo?: { href: string; label: string; bare?: boolean };
+}
+
+const {
+  h1,
+  kicker,
+  standfirst,
+  label = 'Article kicker',
+  variant = 'default',
+  thumbnail,
+  h1Max,
+  standfirstMax,
+  narr = false,
+  spec,
+  switcher,
+  repo,
+} = Astro.props;
+
+const photo = Boolean(thumbnail);
+const plain = variant === 'plain';
+const hasByline = Astro.slots.has('byline');
+const hasMarginExtras = Boolean(spec || switcher || repo);
+
+const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:${standfirstMax}`]
+  .filter(Boolean)
+  .join(';');
+---
+
+<section class="masthead">
+  <div
+    class:list={['masthead-inner', 'grid-margin', { 'is-photo': photo, 'is-plain': plain }]}
+    style={vars || undefined}
+  >
+    {
+      photo ? (
+        <div class="margin-col">
+          <Headshot size="thumb" alt={thumbnail!.alt} loading="eager" />
+        </div>
+      ) : plain ? (
+        <div class="margin-col" aria-hidden="true" />
+      ) : (
+        <aside class="margin-col" aria-label={label}>
+          <p class:list={['kicker', { 'kicker--stacked': hasMarginExtras }]}>{kicker}</p>
+          {spec && (
+            <dl class="spec-block" data-narr={narr ? 's0-stats' : undefined}>
+              {spec.map((s) => (
+                <div class="spec-row">
+                  <dt>{s.label}</dt>
+                  <dd class="tabular">{s.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {switcher && <EvalsSwitcher current={switcher} />}
+          {repo && (
+            <a class:list={['repo-link', { 'repo-link--bare': repo.bare }]} href={repo.href} target="_blank" rel="noopener noreferrer">
+              {repo.label}
+            </a>
+          )}
+        </aside>
+      )
+    }
+    <div class="body-col">
+      <h1 class="page-h1" data-narr={narr ? 's0-title' : undefined}>{h1}</h1>
+      {
+        standfirst && (
+          <p
+            class:list={['standfirst', { 'standfirst--above-byline': hasByline }]}
+            data-narr={narr ? 's0-dek' : undefined}
+          >
+            {standfirst}
+          </p>
+        )
+      }
+      {
+        hasByline && (
+          <p class="byline tabular">
+            <slot name="byline" />
+          </p>
+        )
+      }
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .masthead-inner {
+    border-bottom: 1px solid var(--rule-strong);
+    --body-pad-end: var(--s-11);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .kicker--stacked {
+    margin-bottom: var(--s-7);
+  }
+
+  .page-h1 {
+    font-family: var(--font-display);
+    font-size: var(--t-page);
+    line-height: 1.02;
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    margin-bottom: var(--s-6);
+    max-width: var(--h1-max, none);
+  }
+
+  .standfirst {
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: var(--standfirst-max, 62ch);
+  }
+
+  .standfirst--above-byline {
+    margin-bottom: var(--s-4);
+  }
+
+  .byline {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  /* Case-study margin column: the spec block, the evals switcher, the repo link. */
+  .spec-block {
+    margin-bottom: var(--s-6);
+  }
+
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding-block: var(--s-2);
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+  }
+
+  .spec-row:first-child {
+    border-top: 0;
+  }
+
+  .spec-row dt {
+    color: var(--ink-muted);
+  }
+
+  .spec-row dd {
+    color: var(--ink);
+  }
+
+  .repo-link {
+    display: inline-block;
+    /* Hit area >= 24px tall (WCAG 2.5.8): padding added, margin-top reduced by
+       the same amount so the layout does not move. */
+    padding-block: var(--s-1);
+    min-height: 24px;
+    margin-top: calc(var(--s-6) - var(--s-1));
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  /* CrossSource's original link: no padded hit area. Kept so the refactor moves
+     no pixel; drop the flag (and this rule) to give it the 24px target. */
+  .repo-link--bare {
+    padding-block: 0;
+    min-height: 0;
+    margin-top: var(--s-6);
+  }
+
+  /* plain: the margin column is only the rule; it has no content to stack. */
+  .is-plain .page-h1 {
+    margin-bottom: var(--s-4);
+  }
+
+  @media (max-width: 899px) {
+    .is-plain > .margin-col {
+      display: none;
+    }
+  }
+
+  /* photo: no margin-column rule. The photo sits in the margin column's
+     footprint and the title is bottom-aligned with it, starting at the same
+     body x as every other page. Stacked (photo above title) below 900px. */
+  .is-photo {
+    align-items: end;
+  }
+
+  .is-photo > .margin-col {
+    border-right: 0;
+    padding: var(--s-9) 0 var(--s-11) var(--gutter);
+  }
+
+  .is-photo > .body-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .is-photo .page-h1 {
+    margin-bottom: 0;
+  }
+
+  .is-photo .standfirst {
+    /* About's dek was never balanced — keep its rag. */
+    text-wrap: pretty;
+  }
+
+  @media (max-width: 899px) {
+    .is-photo {
+      align-items: start;
+    }
+
+    .is-photo > .margin-col {
+      border-bottom: 0;
+      padding: var(--s-7) var(--gutter) 0;
+    }
+
+    .is-photo > .body-col {
+      padding: var(--s-6) var(--gutter) var(--s-7);
+    }
+  }
+</style>
