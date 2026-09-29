@@ -4,6 +4,7 @@ import Section from '../../components/Section.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { formatDate } from '../../lib/formatDate';
 import { meta, cta, home, writingReflection as wr } from '../../data/copy';
 
 const articleLd = {
@@ -34,7 +35,7 @@ const articleLd = {
   title={meta.writingReflection.title}
   description={meta.writingReflection.description}
   path="/writing/eval-harness-at-my-own-reflection/"
-  ogImage="/og/crosssource.png"
+  ogImage="/og/eval-harness.png"
   ogType="article"
 >
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
@@ -47,7 +48,7 @@ const articleLd = {
       <div class="body-col">
         <h1 class="page-h1" data-narr="s0-title">{wr.title}</h1>
         <p class="standfirst" data-narr="s0-dek">{wr.dek}</p>
-        <p class="byline tabular">{wr.date} · {wr.readingTime} read</p>
+        <p class="byline tabular"><time datetime={wr.date}>{formatDate(wr.date)}</time> · {wr.readingTime} read</p>
         {wr.audio && <AudioPlayer audio={wr.audio} articleId="eval-harness-reflection" />}
       </div>
     </div>

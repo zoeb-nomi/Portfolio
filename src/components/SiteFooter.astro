@@ -77,10 +77,14 @@ import { site, cta } from '../data/copy';
 
   .footer-ctas a:hover,
   .llms-link:hover {
-    color: var(--red-ink);
+    color: var(--red);
+    text-decoration-thickness: 2px;
   }
 
   .llms-link {
+    /* WCAG 2.5.8: 24px minimum hit area. */
+    min-height: 24px;
+    padding-block: var(--s-1);
     color: var(--ink-muted);
     text-transform: none;
     font-size: var(--t-caption);

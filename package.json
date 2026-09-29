@@ -12,7 +12,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "node scripts/test-parse-contributions.mjs"
+    "test": "node scripts/test-parse-contributions.mjs",
+    "check": "astro check",
+    "gate": "node scripts/geo-gate.mjs",
+    "qa": "node scripts/qa-sweep.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

@@ -2,13 +2,21 @@
 
 Source of [zoebnomi.com](https://zoebnomi.com/?utm_source=github&utm_medium=readme&utm_campaign=portfolio), the personal site of **Zoeb Nomi** — AI Product Manager focused on eval-driven LLM/RAG output quality.
 
-Built with Astro 5. All copy, meta, JSON-LD and llms.txt live in `src/data/copy.ts`. `scripts/geo-gate.mjs` gates the site against canon (46 required strings, 6 banned) — run it after every edit.
+Built with Astro 5. All copy, meta, JSON-LD and llms.txt live in `src/data/copy.ts`. `scripts/geo-gate.mjs` gates the site against canon (74 required strings, 11 banned) — run it after every edit.
 
 Keystone project: [CrossSource](https://github.com/zoeb-nomi/crosssource) — eval methodology for RAG citation quality (precision 0.981 → 0.994, ~95% golden-set citation accuracy, 270K-record corpus).
 
 ## Deploy & rollback
 
-Hosted on Cloudflare Pages. Build command `npm run build`, output directory `dist/`. Requires Node >= 20 (see `.nvmrc`).
+Hosted on Cloudflare Pages. Build command `npm run build`, output directory `dist/`. Node version is pinned in `.nvmrc` (22; `engines` allows >= 20).
+
+**Publish rule** — `main` is live. Zoeb commits via the GitHub web UI; Claude never pushes. Every change goes through a branch and PR, and CI (`.github/workflows/ci.yml`) must be green first.
+
+**Checks** (all run in CI):
+
+- `npm run check` — `astro check` (types).
+- `npm run gate` — `scripts/geo-gate.mjs` against `dist/` (run `npm run build` first).
+- `npm run qa` — `scripts/qa-sweep.mjs`: Playwright sweep of every page for horizontal overflow (360–1920px), axe violations, font-weight > 500, off-scale font sizes (warn only), console errors and 4xx/5xx requests. Needs a running site (`npx astro preview --host 127.0.0.1 --port 4321`, or set `BASE_URL`); report written to `.astro/qa-report.json`.
 
 - **Production** — every commit to `main` builds and auto-deploys. There is no staging environment.
 - **Previews** — commits on any other branch get their own preview deployment at a generated URL.

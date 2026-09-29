@@ -1,7 +1,6 @@
 # TODO — Content-Security-Policy. When it lands, the video facade on /work/
 # needs: frame-src https://www.youtube-nocookie.com
-# Nothing else: the poster is self-hosted, so img-src 'self' suffices and the
-# page makes no third-party request until someone clicks play.
+# Nothing else, except: posters are self-hosted, but one bus-stop Watch card hotlinks its poster from i.ytimg.com (Zoeb's decision), so a future CSP also needs img-src https://i.ytimg.com.
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: DENY

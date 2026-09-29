@@ -14,10 +14,16 @@
   --ink-body: #3b362e;
   --ink-muted: #6d675e;
   --rule: #d5cfc2;
+  /* Each oklch() token has an sRGB hex fallback declared first (culori) for
+     browsers without oklch support; the second declaration wins where supported. */
+  --red: #be241f;
   --red: oklch(0.52 0.19 28);
+  --red-ink: #a91515;
   --red-ink: oklch(0.47 0.18 28);
+  --red-tint: #be241f2e;
   --red-tint: oklch(0.52 0.19 28 / .18);
   --on-red: #f4f1ea;
+  --on-red-muted: #fceeec;
   --on-red-muted: oklch(0.96 0.015 30);
 
   /* §3b — Line tiers. Exactly three; nothing else draws a line.
@@ -74,6 +80,9 @@
      Five steps: 0 (no contributions, a bare rule-tint square) through 4
      (heaviest day, full --ink). */
   --heat-0: var(--rule);
+  --heat-1: #a9a1a3;
+  --heat-2: #7b7476;
+  --heat-3: #4c4648;
   --heat-1: color-mix(in oklch, var(--ink) 32%, var(--paper));
   --heat-2: color-mix(in oklch, var(--ink) 52%, var(--paper));
   --heat-3: color-mix(in oklch, var(--ink) 74%, var(--paper));

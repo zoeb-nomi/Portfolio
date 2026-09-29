@@ -8,7 +8,7 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2212, U+2700-27BF, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -17,7 +17,7 @@
   font-weight: 400;
   font-style: italic;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2212, U+2700-27BF, U+FEFF, U+FFFD;
 }
 
 /* ---- IBM Plex Sans (body) ---- */
@@ -27,7 +27,7 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+20B9, U+2100-214F, U+2190-21FF, U+2212, U+2248, U+25B6, U+2700-27BF, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -36,7 +36,7 @@
   font-weight: 500;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+20B9, U+2100-214F, U+2190-21FF, U+2212, U+2248, U+25B6, U+2700-27BF, U+FEFF, U+FFFD;
 }
 
 /* ---- IBM Plex Mono (labels, data, code) ---- */
@@ -46,7 +46,7 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+20B9, U+2100-214F, U+2190-21FF, U+2212, U+2248, U+25B6, U+2700-27BF, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -55,7 +55,7 @@
   font-weight: 500;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+2100-214F, U+2190-21FF, U+2700-27BF, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2070-209C, U+20AC, U+20B9, U+2100-214F, U+2190-21FF, U+2212, U+2248, U+25B6, U+2700-27BF, U+FEFF, U+FFFD;
 }
 
 /* ---- Metric-matched local fallbacks — hold layout while webfonts swap in ---- */
@@ -142,6 +142,23 @@ ul, ol {
 
 a {
   color: inherit;
+}
+
+/* ---- Text-link hover — one rule for every prose link in <main> ----
+   Red-ink (or ink) at rest -> full red and a 2px underline on hover. The
+   :not() chain is deliberate: each :not(.x) adds class-level specificity, so
+   this rule outranks Astro's scoped component rules (.class[data-astro-cid])
+   without !important. Anchors that are not text links are excluded by class. */
+main a:hover:not(.rp-button):not(.facade):not(.watch-facade):not(.skip-link):not(.cta-slab a):not(.post-list a):not([class*='card']):not(.audio-chip):not(.evals-switch a) {
+  color: var(--red);
+  text-decoration-thickness: 2px;
+}
+
+/* Scrollable regions made keyboard-reachable (tabindex="0" role="region"):
+   the global :focus-visible ring above applies; keep it inside the box so
+   overflow clipping never hides it. */
+[role='region'][tabindex='0']:focus-visible {
+  outline-offset: -2px;
 }
 
 button {

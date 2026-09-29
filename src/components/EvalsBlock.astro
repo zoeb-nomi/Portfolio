@@ -30,13 +30,12 @@ const { h2, methodLine, cards, closeLine } = Astro.props;
   {methodLine && <p class="evals-method">{methodLine}</p>}
   <div class="evals-cards">
     {
-      cards.map((c) => (
-        <article class="evals-card">
-          <h3 class="evals-card-name">{c.name}</h3>
-          <p class="evals-card-desc">
-            {c.description} <a class="evals-card-link" href={c.linkHref}>{c.linkLabel}</a>
-          </p>
-        </article>
+      cards.map((c, i) => (
+        <a class="evals-card" href={c.linkHref} aria-labelledby={`evals-card-name-${i}`}>
+          <h3 class="evals-card-name" id={`evals-card-name-${i}`}>{c.name}</h3>
+          <p class="evals-card-desc">{c.description}</p>
+          <span class="evals-card-link" aria-hidden="true">{c.linkLabel}</span>
+        </a>
       ))
     }
   </div>
@@ -70,9 +69,28 @@ const { h2, methodLine, cards, closeLine } = Astro.props;
     margin-bottom: var(--s-8);
   }
 
+  /* The whole card is the link (title = accessible name); the visible link
+     label inside is decoration, so there are no nested links. Hover moves the
+     top rule up a tier and thickens the label underline — no lift. */
   .evals-card {
+    display: block;
     border-top: 1px solid var(--rule);
     padding-top: var(--s-5);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 120ms var(--ease-draw);
+  }
+
+  .evals-card:hover {
+    border-top-color: var(--rule-strong);
+  }
+
+  .evals-card:hover .evals-card-name {
+    color: var(--red);
+  }
+
+  .evals-card:hover .evals-card-link {
+    text-decoration-thickness: 2px;
   }
 
   .evals-card-name {
@@ -81,6 +99,7 @@ const { h2, methodLine, cards, closeLine } = Astro.props;
     line-height: 1.1;
     color: var(--ink);
     margin-bottom: var(--s-3);
+    transition: color 120ms var(--ease-draw);
   }
 
   .evals-card-desc {
@@ -93,6 +112,7 @@ const { h2, methodLine, cards, closeLine } = Astro.props;
 
   .evals-card-link {
     display: inline-block;
+    margin-top: var(--s-3);
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
     letter-spacing: .04em;

@@ -217,11 +217,10 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
      artefact exists, a source. A row with no source is a claim on trust. */
   .timeline {
     list-style: none;
-    /* The embed card closes with a strong rule; the timeline opens with one.
-       56px of paper keeps them from reading as a doubled rule. */
-    margin-top: var(--s-11);
+    /* The embed card's bottom strong rule is the only rule above the
+       timeline — no second strong line here. */
+    margin-top: var(--s-9);
     margin-bottom: var(--s-9);
-    border-top: 1px solid var(--rule-strong);
   }
 
   .timeline-row {
@@ -359,14 +358,6 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
     color: var(--red-ink);
     transform: translateX(-4px);
     transition: transform 120ms var(--ease-draw);
-  }
-
-  .links-list a:hover {
-    color: var(--red-ink);
-  }
-
-  .links-list a:hover .link-label {
-    text-decoration-color: currentColor;
   }
 
   .links-list a:hover .arrow {

@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Section from '../../components/Section.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { formatDate } from '../../lib/formatDate';
 import { meta, cta, home, writingTwoLevers as wt } from '../../data/copy';
 
 const articleLd = {
@@ -33,7 +34,7 @@ const articleLd = {
   title={meta.writingTwoLevers.title}
   description={meta.writingTwoLevers.description}
   path="/writing/two-levers-that-did-not-move/"
-  ogImage="/og/screener-eval.png"
+  ogImage="/og/two-levers.png"
   ogType="article"
 >
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
@@ -46,7 +47,7 @@ const articleLd = {
       <div class="body-col">
         <h1 class="page-h1" data-narr="s0-title">{wt.title}</h1>
         <p class="standfirst" data-narr="s0-dek">{wt.dek}</p>
-        <p class="byline tabular">{wt.date} · {wt.readingTime} read</p>
+        <p class="byline tabular"><time datetime={wt.date}>{formatDate(wt.date)}</time> · {wt.readingTime} read</p>
         {wt.audio && <AudioPlayer audio={wt.audio} articleId="two-levers" />}
       </div>
     </div>

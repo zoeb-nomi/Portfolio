@@ -19,6 +19,7 @@ const { caption, columns, rows } = Astro.props;
 const [labelHeader, ...dataHeaders] = columns;
 ---
 
+<div class="data-table-wrap" tabindex="0" role="region" aria-label={caption}>
 <table class="data-table">
   <caption>{caption}</caption>
   <thead>
@@ -40,8 +41,16 @@ const [labelHeader, ...dataHeaders] = columns;
     }
   </tbody>
 </table>
+</div>
 
 <style>
+  /* Wide tables (5-7 columns) scroll sideways inside their own box on narrow
+     screens instead of squeezing headers into each other. */
+  .data-table-wrap {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
   .data-table {
     width: 100%;
     font-family: var(--font-mono);
@@ -61,8 +70,29 @@ const [labelHeader, ...dataHeaders] = columns;
   .data-table th,
   .data-table td {
     padding-block: 11px;
+    padding-inline-start: var(--s-4);
     text-align: right;
     font-weight: 400;
+    vertical-align: baseline;
+  }
+
+  /* Headers may wrap between words but never mid-word; the inline gap above
+     keeps neighbouring right-aligned headers ("BASELINE" | "STRICT") apart. */
+  .data-table thead th {
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .data-table th[scope='col']:first-child,
+  .data-table th[scope='row'] {
+    padding-inline-start: 0;
+  }
+
+  @media (max-width: 599px) {
+    .data-table thead th {
+      letter-spacing: .04em;
+    }
   }
 
   .data-table thead th {

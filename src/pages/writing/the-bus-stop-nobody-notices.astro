@@ -7,6 +7,7 @@ import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
 import { meta, cta, home, writingBusStop as wb } from '../../data/copy';
+import { formatDate } from '../../lib/formatDate';
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -49,7 +50,7 @@ const articleLd = {
       <div class="body-col">
         <h1 class="page-h1" data-narr="s0-title">{wb.title}</h1>
         <p class="standfirst" data-narr="s0-dek">{wb.dek}</p>
-        <p class="byline tabular">{wb.date} · {wb.readingTime} read</p>
+        <p class="byline tabular"><time datetime={wb.date}>{formatDate(wb.date)}</time> · {wb.readingTime} read</p>
         {wb.audio && <AudioPlayer audio={wb.audio} articleId="bus-stop" />}
       </div>
     </div>
@@ -115,7 +116,13 @@ const articleLd = {
   </Section>
 
   <Section mark={wb.s5.mark} label={wb.s5.label} narrId="s5-cue">
-    <div class="textual table-wrap" data-narr="s5-table">
+    <div
+      class="textual table-wrap"
+      data-narr="s5-table"
+      tabindex="0"
+      role="region"
+      aria-label="Operators table, scrollable"
+    >
       <DataTable caption={wb.s5.table.caption} columns={wb.s5.table.columns} rows={wb.s5.table.rows} />
     </div>
     {wb.s5.paras.map((p, i) => <p class="prose table-follow" data-narr={`s5-p${i}`}>{p}</p>)}
@@ -192,7 +199,12 @@ const articleLd = {
   <Section mark={wb.s7.mark} label={wb.s7.label} note={wb.disclaimer} narrId="s7-cue">
     <p class="prose" data-narr="s7-p0">{wb.s7.intro}</p>
     <div class="table-gap basket textual" data-narr="s7-table">
-      <div class="table-wrap basket-table-wrap">
+      <div
+        class="table-wrap basket-table-wrap"
+        tabindex="0"
+        role="region"
+        aria-label="The basket as placed, table, scrollable"
+      >
         <DataTable caption={wb.s7.table.caption} columns={wb.s7.table.columns} rows={wb.s7.table.rows} />
       </div>
       <div class="basket-cards">
@@ -205,7 +217,7 @@ const articleLd = {
                 {row.cells.map((cell, i) => (
                   <div class="basket-card-field">
                     <dt>{wb.s7.table.columns.slice(1)[i]}</dt>
-                    <dd class:list={[{ win: cell.win }]}>{cell.text}</dd>
+                    <dd class:list={[{ win: (cell as { text: string; win?: boolean }).win }]}>{cell.text}</dd>
                   </div>
                 ))}
               </dl>
@@ -260,7 +272,7 @@ const articleLd = {
             >
               <img
                 class="watch-poster"
-                src={`/img/watch/${item.youtubeId}.jpg`}
+                src={item.poster ?? `/img/watch/${item.youtubeId}.jpg`}
                 alt=""
                 width="1280"
                 height="720"
@@ -292,11 +304,13 @@ const articleLd = {
 
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = anchor.className;
-      button.setAttribute('aria-label', card.dataset.playLabel || 'Play video');
-      for (const attr of anchor.attributes) {
-        if (attr.name.startsWith('data-umami-')) button.setAttribute(attr.name, attr.value);
+      // Copy every attribute except link-only ones, so the button keeps the
+      // class AND Astro's data-astro-cid-* scoping attribute (scoped styles apply).
+      for (const attr of Array.from(anchor.attributes)) {
+        if (attr.name === 'href' || attr.name === 'target' || attr.name === 'rel') continue;
+        button.setAttribute(attr.name, attr.value);
       }
+      button.setAttribute('aria-label', card.dataset.playLabel || 'Play video');
       while (anchor.firstChild) button.appendChild(anchor.firstChild);
       anchor.replaceWith(button);
 
@@ -478,7 +492,7 @@ const articleLd = {
 
   .fig-value {
     font-family: var(--font-mono);
-    font-weight: 600;
+    font-weight: 500;
     fill: var(--ink);
     font-size: 20px;
   }
@@ -579,7 +593,7 @@ const articleLd = {
     padding-left: 0.5em;
     font-family: var(--font-mono);
     font-size: 0.95rem;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--on-red);
     white-space: nowrap;
   }
@@ -591,7 +605,7 @@ const articleLd = {
     transform: translateY(-50%);
     font-family: var(--font-mono);
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--ink);
     white-space: nowrap;
   }
@@ -706,7 +720,7 @@ const articleLd = {
   .basket-card-heading {
     font-family: var(--font-body);
     font-size: var(--t-body);
-    font-weight: 600;
+    font-weight: 500;
     color: var(--ink);
     margin: 0 0 var(--s-3);
   }
@@ -864,7 +878,7 @@ const articleLd = {
   .watch-title {
     font-family: var(--font-body);
     font-size: var(--t-lead);
-    font-weight: 600;
+    font-weight: 500;
     color: var(--ink);
     margin: 0;
   }

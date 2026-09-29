@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { meta } from '../../data/copy';
+import { formatDate } from '../../lib/formatDate';
 
 const kicker = 'Writing';
 const title = 'Writing';
@@ -39,7 +40,7 @@ const posts = [
 ];
 ---
 
-<Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/home.png">
+<Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/writing.png">
   <section class="masthead">
     <div class="masthead-inner">
       <aside class="margin-col" aria-label="Article kicker">
@@ -59,9 +60,13 @@ const posts = [
           <a href={p.href}>
             <div class="post-inner">
               <p class="post-kicker">{p.kicker}</p>
-              <h2 class="post-title">{p.title}</h2>
-              <p class="post-dek">{p.dek}</p>
-              <p class="post-date tabular">{p.date}</p>
+              <div class="post-body">
+                <h2 class="post-title">{p.title}</h2>
+                <p class="post-dek">{p.dek}</p>
+                <p class="post-date tabular">
+                  <time datetime={p.date}>{formatDate(p.date)}</time>
+                </p>
+              </div>
             </div>
           </a>
         </li>
@@ -166,8 +171,12 @@ const posts = [
     color: var(--ink-muted);
   }
 
-  .post-title {
+  .post-body {
     padding: 0 var(--gutter) 0 var(--body-inset);
+    min-width: 0;
+  }
+
+  .post-title {
     font-family: var(--font-display);
     font-size: var(--t-h2);
     line-height: 1.1;
@@ -182,7 +191,6 @@ const posts = [
   }
 
   .post-dek {
-    padding: 0 var(--gutter) 0 var(--body-inset);
     font-family: var(--font-body);
     font-size: var(--t-lead);
     line-height: 1.5;
@@ -192,14 +200,14 @@ const posts = [
   }
 
   .post-date {
-    padding: 0 var(--gutter) 0 var(--body-inset);
     font-family: var(--font-mono);
     font-size: var(--t-caption);
     color: var(--ink-muted);
   }
 
+  /* Card-level hover: the title colour follows the whole-card link. */
   .post-list a:hover .post-title {
-    color: var(--red-ink);
+    color: var(--red);
   }
 
   @media (max-width: 899px) {
@@ -213,9 +221,7 @@ const posts = [
       margin-bottom: var(--s-3);
     }
 
-    .post-title,
-    .post-dek,
-    .post-date {
+    .post-body {
       padding: 0 var(--gutter);
     }
   }

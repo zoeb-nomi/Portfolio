@@ -69,6 +69,11 @@ const { currentPath } = Astro.props;
     text-decoration: none;
     color: var(--ink);
     white-space: nowrap;
+    /* Hit area >= 24px tall (WCAG 2.5.8): padding grows the target, the
+       negative margin returns the space so the bar's height is unchanged. */
+    display: inline-block;
+    padding-block: var(--s-2);
+    margin-block: calc(-1 * var(--s-2));
   }
 
   .primary-nav {
@@ -95,6 +100,10 @@ const { currentPath } = Astro.props;
     text-decoration: none;
     color: var(--ink-muted);
     padding-bottom: 4px;
+    /* Top padding lifts the hit area to >= 24px (WCAG 2.5.8); the negative
+       margin keeps the bar's layout and the underline position unchanged. */
+    padding-top: var(--s-1);
+    margin-top: calc(-1 * var(--s-1));
     white-space: nowrap;
   }
 
@@ -118,5 +127,9 @@ const { currentPath } = Astro.props;
 
   @media (max-width: 899px) {
     .primary-nav { display: none; }
+
+    /* Lets the JS-off <noscript> nav (MobileNav) drop onto its own row. */
+    .bar { flex-wrap: wrap; }
+    .bar > :global(noscript) { flex: 1 0 100%; }
   }
 </style>

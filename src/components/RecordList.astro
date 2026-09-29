@@ -116,15 +116,18 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
     color: var(--ink);
   }
 
+  /* Hit area >= 24px (WCAG 2.5.8): the padding grows the target, the equal
+     negative margin hands the space back so row rhythm is unchanged. Hover
+     colour + thickness come from the global text-link rule in base.css. */
   .what a {
+    display: inline-block;
+    padding-block: var(--s-1);
+    margin-block: calc(-1 * var(--s-1));
+    min-height: 24px; /* WCAG 2.5.8 floor */
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: 3px;
     overflow-wrap: anywhere;
-  }
-
-  .what a:hover {
-    text-decoration-thickness: 2px;
   }
 
   .sep {

@@ -80,11 +80,11 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 
   <Section mark={me.s3.mark} label={me.s3.label} narrId="s3-cue">
     <p class="prose intro" data-narr="s3-p0">{me.s3.intro}</p>
-    <div class="table-scroll" data-narr="s3-table1" tabindex="0">
+    <div class="table-scroll" data-narr="s3-table1">
       <DataTable caption={me.s3.table1.caption} columns={me.s3.table1.columns} rows={table1Rows} />
     </div>
     <p class="prose table-intro" data-narr="s3-p1">{me.s3.table2Intro}</p>
-    <div class="table-scroll" data-narr="s3-table2" tabindex="0">
+    <div class="table-scroll" data-narr="s3-table2">
       <DataTable caption={me.s3.table2.caption} columns={me.s3.table2.columns} rows={table2Rows} />
     </div>
     <p class="prose finding" data-narr="s3-p2">
@@ -194,7 +194,11 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 
   .repo-link {
     display: inline-block;
-    margin-top: var(--s-6);
+    /* Hit area >= 24px tall (WCAG 2.5.8): padding added, margin-top reduced by
+       the same amount so the layout does not move. */
+    padding-block: var(--s-1);
+    min-height: 24px;
+    margin-top: calc(var(--s-6) - var(--s-1));
     font-family: var(--font-mono);
     font-size: var(--t-caption);
     color: var(--red-ink);

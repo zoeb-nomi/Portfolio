@@ -92,4 +92,28 @@ const sizes = '240px';
     letter-spacing: .04em;
     color: var(--ink-muted);
   }
+
+  /* Mobile: the plate becomes a thumbnail beside the parent's kicker (same
+     pattern as the About masthead). The <figure> dissolves into its parent's
+     grid: picture -> column 2 / row 1, caption -> full-width row 2. The
+     parent (.margin-col) must be a two-column grid on this breakpoint. */
+  @media (max-width: 899px) {
+    .rp-figure--small,
+    .rp-figure--large {
+      display: contents;
+    }
+
+    .rp-figure picture {
+      grid-column: 2;
+      grid-row: 1;
+      width: var(--s-13);
+      height: var(--s-13);
+    }
+
+    .rp-figure figcaption {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      margin-top: var(--s-3);
+    }
+  }
 </style>

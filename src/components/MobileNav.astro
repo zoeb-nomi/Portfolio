@@ -20,6 +20,32 @@ const { currentPath } = Astro.props;
   <span class="bar" aria-hidden="true"></span>
 </button>
 
+<noscript>
+  <!-- JS off: the menu button cannot open the sheet, so hide it and show the
+       primary nav as a plain list below 900px (>=900px the desktop nav shows). -->
+  <style is:inline>
+    .nav-toggle {
+      display: none !important;
+    }
+  </style>
+  <nav class="noscript-nav" aria-label="Primary">
+    <ul>
+      {
+        nav.map((item) => {
+          const isCurrent = isNavCurrent(item, currentPath);
+          return (
+            <li>
+              <a href={item.href} aria-current={isCurrent ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </nav>
+</noscript>
+
 <div id="mobile-sheet" class="mobile-sheet" hidden>
   <nav aria-label="Mobile">
     <ul class="sheet-links">
@@ -76,6 +102,40 @@ const { currentPath } = Astro.props;
 
   .nav-toggle[aria-expanded='true'] .bar:last-child {
     transform: translateY(-3.5px) rotate(-45deg);
+  }
+
+  .noscript-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .noscript-nav a {
+    display: inline-block;
+    padding-block: var(--s-2); /* hit area >= 24px tall (WCAG 2.5.8) */
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-muted);
+  }
+
+  .noscript-nav a:hover {
+    color: var(--ink);
+  }
+
+  .noscript-nav a[aria-current='page'] {
+    color: var(--red-ink);
+  }
+
+  @media (min-width: 900px) {
+    .noscript-nav {
+      display: none;
+    }
   }
 
   .mobile-sheet {

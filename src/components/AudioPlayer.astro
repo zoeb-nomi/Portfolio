@@ -63,7 +63,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         <svg class="audio-icon audio-icon-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
           <path d="M4 2.5v11l10-5.5z" fill="currentColor" />
         </svg>
-        <svg class="audio-icon audio-icon-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false" hidden>
+        <svg class="audio-icon audio-icon-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style="display:none">
           <rect x="3.5" y="2.5" width="3" height="11" fill="currentColor" />
           <rect x="9.5" y="2.5" width="3" height="11" fill="currentColor" />
         </svg>
@@ -119,7 +119,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       <svg class="audio-icon audio-icon-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
         <path d="M4 2.5v11l10-5.5z" fill="currentColor" />
       </svg>
-      <svg class="audio-icon audio-icon-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false" hidden>
+      <svg class="audio-icon audio-icon-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style="display:none">
         <rect x="3.5" y="2.5" width="3" height="11" fill="currentColor" />
         <rect x="9.5" y="2.5" width="3" height="11" fill="currentColor" />
       </svg>
@@ -175,12 +175,12 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       let firedPlay = false;
       let firedComplete = false;
 
-      // SVG elements don't support the HTML `hidden` IDL property (it's
-      // defined on HTMLElement, not SVGElement/HTMLOrSVGElement), so the
-      // play/pause icon swap uses the attribute directly.
+      // SVG elements don't support the HTML `hidden` attribute/IDL property
+      // (it's defined on HTMLElement only, and Astro's SVGAttributes type
+      // rejects it), so the play/pause icon swap toggles inline display. The
+      // pause icons ship with style="display:none" as their initial state.
       function setHidden(el, isHidden) {
-        if (isHidden) el.setAttribute('hidden', '');
-        else el.removeAttribute('hidden');
+        el.style.display = isHidden ? 'none' : '';
       }
 
       function track_(name, data) {
@@ -839,13 +839,6 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     margin-left: 1px;
   }
 
-  /* Browsers don't reliably apply the UA [hidden] { display: none } rule
-     to inline <svg> (its own default stylesheet competes), so the
-     play/pause icon swap needs an explicit rule here. */
-  .audio-icon[hidden] {
-    display: none;
-  }
-
   .audio-track-wrap {
     flex: 1 1 auto;
     min-width: 0;
@@ -916,13 +909,15 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+    min-width: 24px; /* WCAG 2.5.8 minimum target width — was 18px wide */
+    justify-content: center;
     font-family: var(--font-mono);
     font-size: var(--t-caption);
     letter-spacing: .02em;
     color: var(--ink-body);
     background: transparent;
     border: 0;
-    padding: 0 2px;
+    padding: 0 var(--s-2);
     text-decoration: none;
     text-underline-offset: 3px;
     cursor: pointer;
@@ -1012,7 +1007,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   .audio-chip[aria-current='true'] {
     border-color: var(--ink);
     color: var(--ink);
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: underline;
     text-decoration-color: var(--red);
     text-decoration-thickness: 2px;
@@ -1146,10 +1141,6 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     height: 14px;
   }
 
-  .audio-float-play .audio-icon[hidden] {
-    display: none;
-  }
-
   .audio-float-time {
     font-family: var(--font-mono);
     font-size: var(--t-caption);
@@ -1195,7 +1186,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
 
   .audio-float-follow[aria-pressed='true'] {
     color: var(--ink);
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .audio-float-follow[aria-pressed='true'] .audio-float-dot {

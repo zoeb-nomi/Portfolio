@@ -268,14 +268,48 @@ import { meta, home, cta, contributions } from '../data/copy';
       grid-template-columns: 1fr;
     }
 
+    /* Kicker left, thumbnail right (Figure.astro dissolves into this grid),
+       caption on its own row beneath — the H1 follows straight after. */
     .margin-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--s-13);
+      column-gap: var(--s-4);
+      align-items: start;
       border-right: 0;
       border-bottom: 1px solid var(--rule);
-      padding: var(--s-6) var(--gutter);
+      padding: var(--s-5) var(--gutter);
+    }
+
+    .eyebrow {
+      grid-column: 1;
+      grid-row: 1;
+      margin-bottom: 0;
     }
 
     .body-col {
       padding: var(--s-7) var(--gutter);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* CTAs before the reviewer's note so "Book a call" lands in the first
+       viewport; DOM order (and desktop) unchanged. */
+    .hero-lower {
+      display: contents;
+    }
+
+    .subhead {
+      order: 1;
+      margin-bottom: var(--s-6);
+    }
+
+    .hero-ctas {
+      order: 2;
+    }
+
+    .hero-lower > :global(.margin-note) {
+      order: 3;
+      margin-top: var(--s-7);
     }
 
     .method-row {

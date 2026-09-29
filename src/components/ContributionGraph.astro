@@ -103,8 +103,8 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 <div class="cg" data-contrib-graph data-recent-start={recentWeeksStart}>
   <p class="cg-kicker">{copy.kicker}</p>
 
-  <div class="cg-scroll">
-    <div class="cg-layout">
+  <div class="cg-scroll" tabindex="0" role="region" aria-label="GitHub contribution calendar, scrollable">
+    <div class="cg-layout" style={`--weeks: ${weekCount};`}>
       <div class="cg-weekday-col" aria-hidden="true">
         <div class="cg-weekday-spacer"></div>
         {WEEKDAY_LABELS.map((label) => <div class="cg-weekday-label">{label}</div>)}
@@ -212,9 +212,17 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
   .cg-scroll {
     overflow-x: auto;
     padding-bottom: var(--s-1);
+    /* Container-size units below resolve against this box, so the cell size
+       can track the space actually available. */
+    container-type: inline-size;
   }
 
   .cg-layout {
+    /* Cell shrinks from 11px down to a floor of 8px so the whole year fits
+       its container (no hidden few-px scroll at ~1024px); below the floor the
+       grid scrolls and the script parks it on the most recent weeks.
+       24px + 3px/week = weekday column, layout gap and inter-cell gaps. */
+    --cg-cell: clamp(8px, calc((100cqw - 24px - var(--weeks) * 3px) / var(--weeks)), 11px);
     display: flex;
     gap: 6px;
     width: max-content;
@@ -222,7 +230,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-weekday-col {
     display: grid;
-    grid-template-rows: 14px repeat(7, 11px);
+    grid-template-rows: 14px repeat(7, var(--cg-cell));
     gap: 3px;
     flex: 0 0 auto;
   }
@@ -230,16 +238,16 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
   .cg-weekday-label {
     font-family: var(--font-mono);
     font-size: 9px;
-    line-height: 11px;
+    line-height: var(--cg-cell);
     color: var(--ink-muted);
     white-space: nowrap;
   }
 
   .cg-grid {
     display: grid;
-    grid-template-columns: repeat(var(--weeks), 11px);
-    grid-auto-rows: 11px;
-    grid-template-rows: 14px repeat(7, 11px);
+    grid-template-columns: repeat(var(--weeks), var(--cg-cell));
+    grid-auto-rows: var(--cg-cell);
+    grid-template-rows: 14px repeat(7, var(--cg-cell));
     gap: 3px;
     flex: 0 0 auto;
   }
@@ -253,8 +261,8 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
   }
 
   .cg-cell {
-    width: 11px;
-    height: 11px;
+    width: var(--cg-cell);
+    height: var(--cg-cell);
     border-radius: 2px;
     background: var(--heat-0);
   }

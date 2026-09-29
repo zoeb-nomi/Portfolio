@@ -29,8 +29,6 @@ export interface CtaLink {
 
 export const site = {
   name: 'Zoeb Nomi',
-  titleSuffix: 'Zoeb Nomi · AI Product Manager',
-  titlePattern: (page: string) => `${page} — Zoeb Nomi · AI Product Manager`,
     footerLine:
       'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to US relocation',
 };
@@ -64,58 +62,59 @@ export const cta = {
 
 export const meta = {
   home: {
-    title: 'Zoeb Nomi — AI Product Manager at Instead | LLM Evaluation & RAG Quality',
+    title: 'Zoeb Nomi — AI Product Manager, LLM Evaluation & RAG Quality',
     description:
       'AI product manager at Instead, in Bengaluru. I own LLM output quality for a production tax-research system — eval loops, citation accuracy — and CrossSource.',
   },
   crosssource: {
     title: 'CrossSource: RAG citation evaluation — Zoeb Nomi',
     description:
-      'Open harness measuring citation accuracy in legal RAG: 0.981→0.994 precision, validated LLM judge (100% blind agreement, 15/15), and a failure taxonomy that separates prompting from retrieval.',
+      'Open harness for legal-RAG citation accuracy: precision 0.981→0.994, a blind-validated LLM judge (15/15), and a taxonomy splitting prompting from retrieval.',
   },
   writingJudgeBug: {
     title: "The judge caught a bug I didn't — Zoeb Nomi",
     description:
-      "Validating an LLM-as-judge: a blind human check that agreed 15/15 still caught a real harness bug the judge couldn't see — and why 15/15 and a broken instrument can coexist. From CrossSource, an open RAG citation-evaluation harness.",
+      'A blind human check agreed 15/15 with an LLM judge and still caught a harness bug the judge could not see. From CrossSource, an open RAG evaluation harness.',
   },
   writingIndex: {
     title: 'Writing — Zoeb Nomi',
-    description: 'Notes on LLM evaluation, LLM-as-judge reliability, and RAG output quality — from CrossSource and production eval work — and the occasional industry thesis, written so it can be wrong.',
+    description:
+      'Notes on LLM evaluation, LLM-as-judge reliability and RAG output quality from CrossSource and production eval work, plus the occasional industry thesis.',
   },
   evals: {
-    title: 'Evals — Zoeb Nomi · AI Product Manager',
+    title: 'Evals — Zoeb Nomi',
     description:
-      'Two open evaluation harnesses built to one method: CrossSource (citation accuracy in legal RAG) and mirror-eval (what AI search engines say about a person). Judges validated blind; numbers counted, not scored.',
+      'Three open eval harnesses, one method: CrossSource (legal RAG citations), mirror-eval (AI search answers about a person), screener-eval (LLM résumé screeners).',
   },
   mirrorEval: {
     title: 'mirror-eval: what AI search says about a person — Zoeb Nomi',
     description:
-      'Open harness measuring what four AI search engines say about a person, twice: Perplexity 13→63 of 63 probes citing the canonical site, Claude 0→0, a data broker filling the gap, and a judge that failed blind validation — so the numbers are counts, not scores.',
+      'What four AI search engines say about a person, measured twice: Perplexity cited the canonical site on 13 → 63 of 63 probes, Claude 0 → 0. Counted, not scored.',
   },
   writingReflection: {
     title: 'I pointed an eval harness at my own reflection — Zoeb Nomi',
     description:
-      'Engines fill rather than abstain; self-published claims get discounted; the LLM judge failed blind validation and the study got stronger for it. Three findings from running an eval harness on my own name.',
+      'Engines fill rather than abstain, self-published claims get discounted, and the LLM judge failed blind validation. Three findings from an eval run on my name.',
   },
   screenerEval: {
     title: 'screener-eval: what LLM résumé screeners reward — Zoeb Nomi',
     description:
-      'One résumé, 21 open AI PM roles, two LLM screeners, 885 scored calls. Swapping employers for fictional ones and deleting links each moved the score under a point; the choice of screener moved it 22. Paired, repeated, counted — no judge.',
+      'One résumé, 21 open AI PM roles, two LLM screeners, 885 calls. Fictional employers and deleted links moved scores under a point; the screener moved them 22.',
   },
   writingTwoLevers: {
-    title: '885 screenings, one résumé, and the two levers that did not move — Zoeb Nomi',
+    title: '885 screenings, two levers that did not move — Zoeb Nomi',
     description:
-      "Employer names and evidence links did nothing measurable to an LLM screener's score; which screener read the résumé moved it 22 points, and its own noise was bigger than either lever.",
+      "Employer names and evidence links did nothing measurable to an LLM screener's score. Which screener read the résumé moved it 22 points; noise beat both.",
   },
   writingBusStop: {
     title: 'The bus stop nobody notices — Zoeb Nomi',
     description:
-      'How Vijayanand Travels built a fifty-year moat in Indian intercity bus travel, what the market data says about premiumisation, and a ₹50,000 pre-registered experiment — four positions, thesis metrics, a control group — to test whether the thesis is right.',
+      'How Vijayanand Travels built a fifty-year moat in Indian intercity buses, what the data says about premiumisation, and a ₹50,000 pre-registered test.',
   },
   work: {
-    title: 'Work — Zoeb Nomi · AI Product Manager',
+    title: 'Work — Zoeb Nomi',
     description:
-      'Instead (LLM output quality), Multiplier (global employment), Keka HR (zero-to-one BGV, $2.7M MRR), Hurix. Four companies, two promotions, quality you can measure.',
+      'Instead (LLM output quality), Multiplier (global employment), Keka HR (zero-to-one BGV, $2.7M MRR), Hurix. Four companies, two promotions, measurable quality.',
   },
   about: {
     title: 'About Zoeb Nomi — AI Product Manager at Instead, Bengaluru',
@@ -963,7 +962,6 @@ export type Cue = [string, number, number];
 // "The judge caught a bug I didn't" keeps its title/standfirst/body as local
 // consts in the page itself (no writing* object above) — this is just the
 // audio player data for it.
-// PLACEHOLDER: duration/chapters are filled in once narration is generated.
 export const writingJudgeBugAudio = {
   src: '/audio/the-judge-caught-a-bug.mp3',
   duration: 126,
@@ -1379,7 +1377,7 @@ export const writingBusStop = {
     items: [
       { youtubeId: 'NcC1mQWYXtk', title: 'VRL Vijayanand — Volvo 9600S delivery programme at the Volvo factory', channel: 'THE ARUJ GURAV · YouTube', why: 'The order in this article, being collected. Watch how a private operator takes delivery of sleeper coaches at scale.' },
       { youtubeId: 'OD_tyyhLCro', title: 'Volvo 9600 sleeper coach — the ₹2 crore passenger bus with global standards', channel: 'Motown India · YouTube', why: 'What VTPL is actually buying 150 of, and why a coach costs what a small apartment costs.' },
-      { youtubeId: 'Tdyv1Y59id8', title: 'Nanna Kathe — Vijay Sankeshwar, VRL Group, in his own words', channel: 'TV9 Kannada · YouTube', why: 'The founder’s account of one truck in 1976 to the largest private fleet in India. In Kannada; the arc needs no subtitles.' },
+      { youtubeId: 'Tdyv1Y59id8', poster: 'https://i.ytimg.com/vi/Tdyv1Y59id8/hqdefault.jpg', title: 'Nanna Kathe — Vijay Sankeshwar, VRL Group, in his own words', channel: 'TV9 Kannada · YouTube', why: 'The founder’s account of one truck in 1976 to the largest private fleet in India. In Kannada; the arc needs no subtitles.' },
     ],
   },
 
