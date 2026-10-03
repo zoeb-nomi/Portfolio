@@ -452,6 +452,23 @@ const articleLd = {
     fill: var(--ink-muted);
   }
 
+  /* SVG text scales with the figure (viewBox 380 wide): about 0.92 at 390px and
+     0.84 at 360px, which would put the 11-13px labels under the 11px mono floor.
+     On phones the small labels step up so they still render at 11px or more. */
+  @media (max-width: 599px) {
+    .fig-margin,
+    .fig-year,
+    .fig-note {
+      font-size: var(--t-small);
+    }
+
+    /* "(partial year)" is centred on the first bar, which sits near the left edge;
+       at the larger size it would start left of the viewBox. */
+    .fig-note {
+      transform: translateX(var(--s-2));
+    }
+  }
+
   /* §6 growth rows: HTML/CSS, not SVG, so label and value text sit at
      fixed rem sizes and never shrink with an SVG viewBox on narrow
      phones. Scale is symmetric (min -36, max +51, range 87); the zero
