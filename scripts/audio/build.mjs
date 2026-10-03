@@ -17,7 +17,7 @@ import { CACHE, ROOT, pageFor, outPaths } from './lib/config.mjs';
 import { prepare } from './lib/prepare.mjs';
 import { sha, hashSegments } from './lib/hash.mjs';
 import { layout, toCues, toChapters, toCaptionCues, GAPS } from './lib/timeline.mjs';
-import { gainFor } from './lib/loudness.mjs';
+import { normalize } from './lib/loudness.mjs';
 import { toVtt } from './lib/vtt.mjs';
 import { id3v23 } from './lib/id3.mjs';
 
@@ -126,18 +126,18 @@ const { segments: timed, placements, totalSamples } = layout(segments, SR);
 const mix = new Float32Array(totalSamples);
 for (const p of placements) mix.set(segments[p.segIndex].sentences[p.sentIndex].audio, p.offset);
 
-const g = gainFor(mix, SR, page.targetLufs, -1);
-for (let i = 0; i < mix.length; i++) mix[i] *= g.gain;
+const norm = normalize(mix, SR, page.targetLufs, -1.5);
+const final = norm.samples;
 const fadeOut = Math.round(0.08 * SR);
-for (let i = 0; i < fadeOut; i++) mix[mix.length - 1 - i] *= i / fadeOut;
-console.log(`loudness ${g.measuredLufs.toFixed(1)} -> ${g.resultLufs.toFixed(1)} LUFS (target ${page.targetLufs}), peak ${g.resultPeakDbfs.toFixed(1)} dBFS${g.limited ? ' [peak-limited]' : ''}`);
-writeFileSync(path.join(CACHE, slug, 'final.f32'), Buffer.from(mix.buffer, mix.byteOffset, mix.byteLength)); // read by audio:verify
+for (let i = 0; i < fadeOut; i++) final[final.length - 1 - i] *= i / fadeOut;
+console.log(`loudness ${norm.lufs.toFixed(1)} LUFS (target ${page.targetLufs}; mono, so ${page.targetLufs + 3} when played through two speakers), peak ${norm.peakDbfs.toFixed(1)} dBFS, input gain ${norm.gainDb.toFixed(1)} dB, ${norm.iterations} pass(es)`);
+writeFileSync(path.join(CACHE, slug, 'final.f32'), Buffer.from(final.buffer, final.byteOffset, final.byteLength)); // read by audio:verify
 
 const lame = await import('@breezystack/lamejs');
 const Mp3Encoder = lame.Mp3Encoder ?? lame.default?.Mp3Encoder;
 const enc = new Mp3Encoder(1, SR, page.bitrateKbps);
-const pcm = new Int16Array(mix.length);
-for (let i = 0; i < mix.length; i++) pcm[i] = Math.max(-32768, Math.min(32767, Math.round(mix[i] * 32767)));
+const pcm = new Int16Array(final.length);
+for (let i = 0; i < final.length; i++) pcm[i] = Math.max(-32768, Math.min(32767, Math.round(final[i] * 32767)));
 const frames = [];
 for (let i = 0; i < pcm.length; i += 1152) {
   const b = enc.encodeBuffer(pcm.subarray(i, i + 1152));
@@ -169,7 +169,7 @@ const manifest = {
     speed,
     sampleRate: SR,
     bitrateKbps: page.bitrateKbps,
-    lufs: Math.round(g.resultLufs * 10) / 10,
+    lufs: Math.round(norm.lufs * 10) / 10,
     gaps: GAPS,
     modelSha256: existsSync(modelFile) ? sha(readFileSync(modelFile)) : null,
     ...hashSegments(segments),

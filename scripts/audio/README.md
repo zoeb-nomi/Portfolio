@@ -12,7 +12,7 @@ built page (dist/)                       scripts/audio/                         
                                           └─ sentence split
                                   ──Kokoro──▶ audio per sentence (cached)
                                   ──layout──▶ exact timeline (no alignment guesswork)
-                                  ──mix────▶ loudness-normalised (-16 LUFS), mp3 + ID3  ─▶ public/audio/<slug>.mp3
+                                  ──mix────▶ loudness-normalised (-19 LUFS mono), mp3 + ID3  ─▶ public/audio/<slug>.mp3
                                   ──derive─▶ captions                                    ─▶ public/audio/<slug>.vtt
                                   ──derive─▶ cues, chapters, hashes                      ─▶ src/data/audio/<slug>.json
 ```
@@ -71,9 +71,13 @@ anchors that changed), a file is missing, or the cues are not exactly the page's
   counts, so cue times are arithmetic, not forced alignment. Gaps: 0.6 s between
   paragraphs, 1.2 s before a section heading (an audible chapter break), 0.28 s
   between sentences.
-- **Loudness** is normalised to -16 LUFS integrated (ITU-R BS.1770-4, implemented in
-  `lib/loudness.mjs` and tested against the reference tone), with the peak held
-  under -1 dBFS. The mp3 is 24 kHz mono, 64 kbps, with ID3 title/artist/album.
+- **Loudness** is normalised to -19 LUFS integrated for the mono file, which is the
+  usual -16 LUFS podcast level once a browser plays it through two speakers
+  (ITU-R BS.1770-4, implemented in `lib/loudness.mjs` and tested against the
+  reference tone). TTS output is evenly leveled but has rare spikes, so a look-ahead
+  limiter holds the peaks at -1.5 dBFS and the gain is solved so the *limited* result
+  lands on target (without it the spikes force the whole file quiet). The mp3 is
+  24 kHz mono, 64 kbps, with ID3 title/artist/album.
 - **Voice** defaults to `af_heart`. Change `voice` / `speed` per page in `pages.json`
   or with `--voice` / `--speed`. A different voice or speed re-synthesises (the cache
   is keyed on voice, speed and text).

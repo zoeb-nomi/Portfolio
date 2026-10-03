@@ -3,7 +3,7 @@
     "voice": "af_heart",
     "speed": 1.0,
     "bitrateKbps": 64,
-    "targetLufs": -16,
+    "targetLufs": -19,
     "label": "Listen to this piece",
     "note": "Read by a synthetic voice (Kokoro)."
   },
