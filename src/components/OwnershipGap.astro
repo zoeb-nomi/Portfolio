@@ -1,0 +1,81 @@
+---
+// Illustration (not data): the ownership chart from the KYB example. It reads
+// as complete because nothing on it is wrong; the red node is what never made
+// it onto the page. Built from boxes and hairlines so the type stays on the
+// site's scale. The visible text carries the meaning.
+interface Node {
+  label: string;
+  mark?: string;
+  missing?: boolean;
+}
+
+interface Props {
+  nodes: Node[];
+}
+
+const { nodes } = Astro.props;
+---
+
+<ol class="og">
+  {
+    nodes.map((n) => (
+      <li class:list={['og-node', { 'og-missing': n.missing }]}>
+        <span class="og-label">{n.label}</span>
+        {n.mark && <span class="og-mark">{n.mark}</span>}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .og {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 24rem;
+  }
+
+  .og-node {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink);
+  }
+
+  /* The connector between one node and the next: a hairline. */
+  .og-node + .og-node {
+    margin-top: var(--s-6);
+  }
+
+  .og-node + .og-node::before {
+    content: '';
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: var(--s-6);
+    block-size: var(--s-6);
+    border-inline-start: 1px solid var(--ink);
+  }
+
+  /* A reviewer's mark: the part that is not on the page. */
+  .og-missing {
+    border: 2px dashed var(--red);
+    color: var(--red-ink);
+  }
+
+  .og-mark {
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    color: var(--ink-muted);
+  }
+
+  .og-missing .og-mark {
+    color: var(--red-ink);
+  }
+</style>
