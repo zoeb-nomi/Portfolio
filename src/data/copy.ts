@@ -1481,6 +1481,17 @@ export const writingBusStop = {
 // Writing — Nobody Reports the Misses (2026-10-04). Text-only; no audio yet.
 // ---------------------------------------------------------------------------
 
+type MissesFigure = 'crosssource' | 'judges' | 'flips' | 'summary';
+
+interface MissesSection {
+  id: string;
+  mark: string;
+  label: string;
+  paras: string[];
+  /** Figure to place after the paragraph at this index. */
+  after?: Record<number, MissesFigure>;
+}
+
 export const writingMisses = {
   kicker: 'Eval methodology · Regulated work',
   title: 'Nobody Reports the Misses: Counting False Passes in AI for Regulated Work',
@@ -1507,6 +1518,7 @@ export const writingMisses = {
         `The third: two frontier models, the same 21 screening cases, one verdict each. The verdict flipped on 15 of 21 depending on which model ran it. That doesn't tell you which model was right. It tells you the choice of model can move outcomes more than the inputs you think you're testing, and a single-model pass rate hides that.`,
         `The errors that cost money are the ones nobody sees, and the tools that grade them need grading too. Here is what that looks like in six kinds of regulated work.`,
       ],
+      after: { 0: 'crosssource', 1: 'judges', 2: 'flips', 3: 'summary' },
     },
     {
       id: 'kyb',
@@ -1575,7 +1587,84 @@ export const writingMisses = {
         `If you're measuring misses in production, in any of these domains or one I haven't listed, I'd like to compare notes: what you label, who labels it, and where you set the bar. Most dashboards count what the system said. I'm more interested in what it didn't.`,
       ],
     },
-  ],
+  ] as MissesSection[],
+
+  // Figures. Every number is from the site's own harness pages, linked in each
+  // source line; nothing here is new data. Fig. 1 is an illustration, not data.
+  figures: {
+    gap: {
+      n: 1,
+      title: 'The chart that looks complete',
+      source: 'Illustration, not data: the ownership chart from the KYB example below.',
+      nodes: [
+        { label: 'Customer', mark: 'on the chart' },
+        { label: 'Holding company, another jurisdiction', mark: 'on the chart' },
+        { label: 'Significant holder', mark: 'never on the page', missing: true },
+      ],
+    },
+    crosssource: {
+      n: 2,
+      title: 'Precision looks fine. Recall does not.',
+      source: 'CrossSource, strict configuration, 25-question golden set.',
+      href: '/crosssource/',
+      hrefLabel: 'Method and data →',
+      scores: {
+        heading: 'Score, 0 to 1',
+        max: 1,
+        rows: [
+          { label: 'Citation precision', value: 0.994, text: '0.994' },
+          { label: 'Citation recall', value: 0.76, text: '0.760', note: 'the same 0.760 under both prompt configurations' },
+        ],
+      },
+      failures: {
+        heading: 'Failures by type, count',
+        max: 6,
+        rows: [
+          { label: 'Missing authority', value: 6, text: '6', note: 'omission: the dominant failure' },
+          { label: 'Right document, wrong passage', value: 1, text: '1' },
+          { label: 'Wrong document', value: 0, text: '0' },
+          { label: 'Unsupported claim', value: 0, text: '0' },
+        ],
+      },
+    },
+    judges: {
+      n: 3,
+      title: 'Two LLM judges against my blind labels',
+      source: '40 answers from mirror-eval: labelled blind by me, then tagged by two LLM judges.',
+      href: '/mirror-eval/',
+      hrefLabel: 'Method and data →',
+      cols: 20,
+      rows: [
+        { label: 'Judge A', filled: 3, of: 40, text: '3 of 40 · 8%' },
+        { label: 'Judge B', filled: 12, of: 40, text: '12 of 40 · 30%' },
+      ],
+      filledMeans: "judge's tags matched mine exactly",
+      emptyMeans: 'did not match',
+    },
+    flips: {
+      n: 4,
+      title: 'Same 21 cases, two models, one verdict each',
+      source: 'screener-eval: the same 21 postings screened by two models.',
+      href: '/screener-eval/',
+      hrefLabel: 'Method and data →',
+      cols: 21,
+      rows: [{ label: 'Verdicts', filled: 6, of: 21, text: '6 agreed · 15 flipped' }],
+      filledMeans: 'both models gave the same verdict',
+      emptyMeans: 'the verdict flipped',
+    },
+    summary: {
+      caption: 'Table 1 — The six at a glance',
+      columns: ['Kind of work', 'Who labels', 'What gets counted', 'Passes only if'],
+      rows: [
+        { label: 'Compliance and KYB', cells: ['A compliance analyst', 'Owner-level recall', 'Every owner above the threshold is found'] },
+        { label: 'Audit and controls', cells: ['An experienced auditor', 'Exception recall', 'No seeded failure is called "effective"'] },
+        { label: 'Insurance', cells: ['A senior broker or claims reviewer', 'Gap recall', 'Every material exclusion or sublimit is flagged'] },
+        { label: 'Legal', cells: ["A lawyer, against the client's playbook", 'Recall per clause type', 'Every playbook deviation the lawyer marked is surfaced'] },
+        { label: 'Patents', cells: ['Examiner citations, or a patent professional', 'Whether the hidden decisive reference is found', 'It lands in what a reviewer actually reads'] },
+        { label: 'Regulated voice agents', cells: ['A compliance reviewer', 'Disclosure recall per call', 'Every required disclosure is present, at the right point'] },
+      ],
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------
