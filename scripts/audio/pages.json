@@ -1,0 +1,29 @@
+{
+  "defaults": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "bitrateKbps": 64,
+    "targetLufs": -16,
+    "label": "Listen to this piece",
+    "note": "Read by a synthetic voice (Kokoro)."
+  },
+  "pages": [
+    {
+      "slug": "nobody-reports-the-misses",
+      "path": "/writing/nobody-reports-the-misses/",
+      "title": "Nobody Reports the Misses: Counting False Passes in AI for Regulated Work",
+      "chapterTitles": {
+        "s1": "What I measured",
+        "s2": "KYB",
+        "s3": "Audit and controls",
+        "s4": "Insurance",
+        "s5": "Legal",
+        "s6": "Patents",
+        "s7": "Voice agents",
+        "s8": "Setting the bar",
+        "s9": "Compare notes"
+      },
+      "overrides": {}
+    }
+  ]
+}

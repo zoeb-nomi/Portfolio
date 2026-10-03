@@ -1,0 +1,23 @@
+{
+  "_comment": "Whole-word, case-sensitive replacements applied before synthesis. Key = how it is written on the page, value = how it should be said. Add a line whenever the ASR verify step (npm run audio:verify) or your ears catch a mispronunciation.",
+  "words": {
+    "KYB": "K Y B",
+    "KYC": "K Y C",
+    "SOX": "sox",
+    "AI": "A I",
+    "LLM": "L L M",
+    "LLMs": "L L Ms",
+    "RAG": "rag",
+    "PM": "P M",
+    "IRS": "I R S",
+    "SEBI": "seb-ee",
+    "BGV": "B G V",
+    "BM25": "B M twenty-five",
+    "ASR": "A S R",
+    "CrossSource": "Cross Source",
+    "mirror-eval": "mirror eval",
+    "screener-eval": "screener eval",
+    "LLM-as-judge": "L L M as judge",
+    "n=25": "n equals 25"
+  }
+}
