@@ -96,7 +96,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
         </li>
       ))}
       <li>
-        <a href={about.profileRow.href} target="_blank" rel="noopener noreferrer">
+        <a class="has-detail" href={about.profileRow.href} target="_blank" rel="noopener noreferrer">
           <span class="link-label">{about.profileRow.label}</span>
           <span class="link-detail">{about.profileRow.detail}</span>
         </a>
@@ -253,6 +253,9 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
     padding-block: 14px;
     padding-inline: var(--gutter);
     color: var(--ink);
+    /* The label carries the (red) underline; without this the anchor's own ink
+       underline stacks under it and every label reads as double-underlined. */
+    text-decoration: none;
   }
 
   .link-label {
@@ -306,10 +309,17 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
       text-align: left;
     }
 
-    .links-list a {
+    /* Only the row that carries a detail line stacks; the arrow rows keep the
+       arrow on the label's line. */
+    .links-list a.has-detail {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--s-2);
+    }
+
+    /* The empty margin column would render as a ruled band under the masthead. */
+    .body-inner > .margin-col {
+      display: none;
     }
 
     .link-detail {

@@ -12,9 +12,12 @@ interface Props {
   note?: string;
   // Disambiguates the landmark when several entries each carry a record.
   context?: string;
+  // Drop the block's own top rule and spacing when it directly follows another
+  // strong rule (e.g. a masthead): at most ONE strong rule between blocks.
+  flush?: boolean;
 }
 
-const { kicker, items, note, context } = Astro.props;
+const { kicker, items, note, context, flush = false } = Astro.props;
 const regionLabel = context ? `Public record — ${context}` : 'Public record';
 
 const isReady = (item: RecordItem) =>
@@ -26,7 +29,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 
 {
   rows.length > 0 && (
-    <section class="record" aria-label={regionLabel}>
+    <section class:list={['record', { 'record--flush': flush }]} aria-label={regionLabel}>
       <div class="record-head">
         <h3 class="record-kicker">{kicker}</h3>
         {note && <p class="record-note">{note}</p>}
@@ -63,6 +66,12 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
     border-top: 1px solid var(--rule-strong);
     padding-top: var(--s-4);
     margin-top: var(--s-8);
+  }
+
+  .record--flush {
+    border-top: 0;
+    padding-top: 0;
+    margin-top: 0;
   }
 
   .record-head {
