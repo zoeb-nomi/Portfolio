@@ -166,8 +166,12 @@ const { currentPath } = Astro.props;
     text-decoration: none;
   }
 
+  /* Colour alone is not enough to say "you are here": add an underline. */
   .sheet-links a[aria-current='page'] {
     color: var(--red-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
   }
 
   .sheet-ctas {
