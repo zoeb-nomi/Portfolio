@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import Masthead from '../../components/Masthead.astro';
+import Section from '../../components/Section.astro';
+import { formatDate } from '../../lib/formatDate';
+import { meta, writingMisses as wm } from '../../data/copy';
+
+const url = 'https://www.zoebnomi.com/writing/nobody-reports-the-misses/';
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: wm.title,
+  description: meta.writingMisses.description,
+  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+  url,
+  mainEntityOfPage: url,
+  datePublished: wm.date,
+  dateModified: wm.date,
+  about: 'Counting missed items (false passes) in AI systems used for regulated work',
+  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+};
+---
+
+<Base
+  title={meta.writingMisses.title}
+  description={meta.writingMisses.description}
+  path="/writing/nobody-reports-the-misses/"
+  ogImage="/og/misses.png"
+  ogType="article"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+
+  <Masthead kicker={wm.kicker} h1={wm.title} standfirst={wm.dek} h1Max="24ch" narr>
+    <Fragment slot="byline"><time datetime={wm.date}>{formatDate(wm.date)}</time> · {wm.readingTime} read</Fragment>
+    <div class="intro">
+      {wm.intro.map((p, i) => <p class="prose" data-narr={`s0-p${i}`}>{p}</p>)}
+    </div>
+  </Masthead>
+
+  {
+    wm.sections.map((s, i) => (
+      <Section mark={s.mark} label={s.label} anchorId={s.id} narrId={`s${i + 1}-cue`}>
+        {s.paras.map((p, j) => <p class="prose" data-narr={`s${i + 1}-p${j}`}>{p}</p>)}
+      </Section>
+    ))
+  }
+</Base>
+
+<style>
+  .prose {
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    line-height: 1.62;
+    color: var(--ink-body);
+    max-width: 68ch;
+  }
+
+  .prose + .prose {
+    margin-top: var(--s-6);
+  }
+
+  .intro {
+    margin-top: var(--s-8);
+  }
+
+  /* Deep links (#kyb, #sox, ...): below 900px the header scrolls away, so keep
+     the section band's own top padding in view; from 900px it is sticky, so
+     leave room for it plus the section's top rule. Scoped to this page;
+     headings without an id are untouched. */
+  :global(.mark-label[id]) {
+    scroll-margin-top: var(--s-6);
+  }
+
+  @media (min-width: 900px) {
+    :global(.mark-label[id]) {
+      scroll-margin-top: calc(var(--s-9) + var(--s-11));
+    }
+  }
+</style>
