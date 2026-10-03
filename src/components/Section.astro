@@ -10,15 +10,18 @@ interface Props {
   // narration for a section's spoken cue line. Omitted on pages/sections with
   // no narration.
   narrId?: string;
+  // Deep-link anchor: becomes the id of the section's <h2>. Omitted (no id
+  // attribute at all) on sections that are not meant to be linked to.
+  anchorId?: string;
 }
 
-const { mark, label, note, as: Tag = 'section', narrId } = Astro.props;
+const { mark, label, note, as: Tag = 'section', narrId, anchorId } = Astro.props;
 ---
 
 <Tag class="rp-section">
   <div class="section-inner grid-margin grid-margin--compact">
     <aside class="margin-col" aria-label={label}>
-      <h2 class="mark-label" data-narr={narrId}>
+      <h2 class="mark-label" id={anchorId} data-narr={narrId}>
         <span class="mark" aria-hidden="true">{mark}</span> <span class="label">{label}</span>
       </h2>
       <slot name="margin" />

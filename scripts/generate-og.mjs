@@ -54,6 +54,9 @@ const pages = [
   { id: 'bus-stop', // meta.writingBusStop
     title: 'The bus stop nobody notices',
     sub: 'Vijayanand Travels’ fifty-year moat in Indian intercity buses.' },
+  { id: 'misses', // meta.writingMisses
+    title: 'Nobody Reports the Misses: Counting False Passes in AI',
+    sub: 'Wrong AI answers get caught. Missed items don’t.' },
   { id: '404', // notFound.message
     title: '404', sub: 'No source found for that claim.' },
 ];

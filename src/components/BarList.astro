@@ -1,0 +1,114 @@
+---
+// Horizontal bars for a short list of values on one scale. Each row is
+// "label, bar, value" in a real list, so the numbers are text first; the bar is
+// decoration. An optional note is a reviewer's annotation (red) on that row.
+interface Row {
+  label: string;
+  value: number;
+  text: string;
+  note?: string;
+}
+
+interface Props {
+  rows: Row[];
+  /** The value that fills the whole track. */
+  max: number;
+  heading?: string;
+}
+
+const { rows, max, heading } = Astro.props;
+---
+
+<div class="bl">
+  {heading && <p class="bl-heading">{heading}</p>}
+  <ul class="bl-list">
+    {
+      rows.map((r) => (
+        <li class="bl-row">
+          <span class="bl-label">{r.label}</span>
+          <span class="bl-track" aria-hidden="true">
+            <span class="bl-fill" style={`inline-size:${Math.min(100, (r.value / max) * 100)}%`} />
+          </span>
+          <span class="bl-value tabular">{r.text}</span>
+          {r.note && <span class="bl-note">{r.note}</span>}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .bl + .bl {
+    margin-top: var(--s-6);
+  }
+
+  .bl-heading {
+    margin-bottom: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    color: var(--ink-muted);
+  }
+
+  .bl-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bl-row {
+    display: grid;
+    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--s-4);
+    row-gap: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink);
+  }
+
+  .bl-row + .bl-row {
+    margin-top: var(--s-3);
+  }
+
+  .bl-track {
+    display: block;
+    block-size: var(--s-3);
+    border: 1px solid var(--ink);
+  }
+
+  .bl-fill {
+    display: block;
+    block-size: 100%;
+    background: var(--ink);
+  }
+
+  .bl-note {
+    grid-column: 2 / -1;
+    font-size: var(--t-micro);
+    color: var(--red-ink);
+  }
+
+  @media (max-width: 599px) {
+    .bl-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .bl-label {
+      grid-column: 1;
+    }
+
+    .bl-value {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .bl-track {
+      grid-column: 1 / -1;
+    }
+
+    .bl-note {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

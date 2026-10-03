@@ -111,6 +111,11 @@ export const meta = {
     description:
       'How Vijayanand Travels built a fifty-year moat in Indian intercity buses, what the data says about premiumisation, and a ₹50,000 pre-registered test.',
   },
+  writingMisses: {
+    title: 'Nobody Reports the Misses: Counting False Passes in AI',
+    description:
+      "Wrong AI answers get caught. Missed items don't. How to count false passes in KYB, audit, insurance, contracts, patents and voice agents.",
+  },
   work: {
     title: 'Work — Zoeb Nomi',
     description:
@@ -1470,6 +1475,196 @@ export const writingBusStop = {
     { label: 'India e-bus registrations, H1 2026 →', href: 'https://www.sustainable-bus.com/news/india-electric-bus-market-first-half-2026/' },
     { label: 'Titagarh Q1 FY27 investor presentation →', href: 'https://www.investywise.com/titagarh-rail-systems-limited-investor-presentation-q1-fy27/' },
   ],
+};
+
+// ---------------------------------------------------------------------------
+// Writing — Nobody Reports the Misses (2026-10-04). Text-only; no audio yet.
+// ---------------------------------------------------------------------------
+
+type MissesFigure = 'crosssource' | 'judges' | 'flips' | 'summary';
+
+interface MissesSection {
+  id: string;
+  mark: string;
+  label: string;
+  paras: string[];
+  /** Figure to place after the paragraph at this index. */
+  after?: Record<number, MissesFigure>;
+}
+
+export const writingMisses = {
+  kicker: 'Eval methodology · Regulated work',
+  title: 'Nobody Reports the Misses: Counting False Passes in AI for Regulated Work',
+  dek: "Wrong AI answers get caught. Missed items don't. How I'd count false passes in six kinds of regulated work.",
+  date: '2026-10-04',
+  readingTime: '5 min',
+
+  // Unlabelled opening: three paragraphs before the first section.
+  intro: [
+    `When an AI system gives a wrong answer, someone usually notices. The analyst reads it, frowns, fixes it. That error gets logged and shows up in the next quality review.`,
+    `When the system leaves something out, nobody notices, because there is nothing on the screen to frown at. The beneficial owner who was never listed. The exclusion nobody flagged. The clause the review skipped. The output looks complete, so it passes, and the cost arrives months later as a fine, a denied claim or a deal that falls over.`,
+    `Most accuracy numbers count the first kind of error. The work I care about is counting the second, and setting the bar for when a step can run without a human.`,
+  ],
+
+  // Nine sections. `id` is the deep-link anchor on the section's <h2>.
+  sections: [
+    {
+      id: 'what-i-measured',
+      mark: '§1',
+      label: `What I measured`,
+      paras: [
+        `I learned this from harnesses I built myself. CrossSource is a public one that checks, across models, whether a legal research answer's citations actually support its claims. I expected the main failure to be wrong citations. It wasn't; the citations the answers gave mostly held up. The dominant failure was omission. The authority a lawyer would have needed often never made it into the retrieved set, so no amount of model quality could have cited it. What that shows: a precision-style score flatters a system that misses things. What it doesn't show: how often this happens in any given production product. It is one harness, on public case law.`,
+        `The second number is about judges. In a separate audit of AI search answers, I labelled 40 answers blind, then had two LLM judges tag the same answers. Exact agreement with my labels: 8% for one judge, 30% for the other. That doesn't make LLM judges useless. A good part of the gap was definitional; the judges and I read some failure categories differently. It does mean a judge's agreement with humans is a property of the task, and you measure it before you trust a single number the judge produces.`,
+        `The third: two frontier models, the same 21 screening cases, one verdict each. The verdict flipped on 15 of 21 depending on which model ran it. That doesn't tell you which model was right. It tells you the choice of model can move outcomes more than the inputs you think you're testing, and a single-model pass rate hides that.`,
+        `The errors that cost money are the ones nobody sees, and the tools that grade them need grading too. Here is what that looks like in six kinds of regulated work.`,
+      ],
+      after: { 0: 'crosssource', 1: 'judges', 2: 'flips', 3: 'summary' },
+    },
+    {
+      id: 'kyb',
+      mark: '§2',
+      label: `Compliance and KYB: the missed beneficial owner`,
+      paras: [
+        `An onboarding agent reads the registry filings and returns a clean ownership chart. It is wrong by omission: a significant holder sits two layers up, behind a holding company in another jurisdiction, and never appears. Nobody flags a person who isn't on the page. The customer pays when a regulator or a partner bank finds that owner later and asks why the file passed. To count it: take a sample of entities, have a compliance analyst build the full ownership tree from source documents, and measure owner-level recall against it. A file passes only if every owner above the threshold is found.`,
+      ],
+    },
+    {
+      id: 'sox',
+      mark: '§3',
+      label: `Audit and controls: the false pass on a control`,
+      paras: [
+        `An agent tests a control, say approvals on payments above a threshold, and marks it effective. The sample it pulled missed the exceptions, or it accepted an approval dated after the payment went out. The workpaper says pass. The customer pays at the next external audit, when a deficiency surfaces that the tool had already signed off. To count it: seed a test population with known exceptions, have an experienced auditor label which items fail, and measure exception recall. Any run that calls a seeded failure "effective" is a false pass, and one false pass fails the test.`,
+      ],
+    },
+    {
+      id: 'claims',
+      mark: '§4',
+      label: `Insurance: the coverage gap the proposal never flagged`,
+      paras: [
+        `A broker's AI compares a client's exposures to a proposed policy and writes a clean summary. It never mentions that flood is excluded at the client's main warehouse, or that the cyber sublimit sits below the cost of their last incident. The client signs. The gap shows up as a denied claim, and the broker's errors-and-omissions carrier hears about it. To count it: take past proposals where a senior broker or claims reviewer has listed the real gaps, run the system on them, and measure gap recall. A proposal passes only if every material exclusion or sublimit the reviewer found is flagged.`,
+      ],
+    },
+    {
+      id: 'contracts',
+      mark: '§5',
+      label: `Legal: the clause the review didn't surface`,
+      paras: [
+        `A contract review tool returns a tidy issues list: indemnity, liability cap, governing law. What it didn't surface is the auto-renewal with a 90-day notice window, or the assignment clause that blocks the client's planned acquisition. The lawyer trusted the list because it looked complete. The client pays when the window closes or the deal stalls. To count it: have a lawyer mark up a sample of contracts against the client's playbook, issue by issue, and measure recall per clause type. A review passes when it surfaces every playbook deviation the lawyer marked. Extra comments don't buy back a missed one.`,
+      ],
+    },
+    {
+      id: 'patents',
+      mark: '§6',
+      label: `Patents: the prior art the search never found`,
+      paras: [
+        `A prior art search returns twenty strong references. The one that matters, an old filing in another language or a conference paper using different terms, isn't among them. The customer pays when that reference turns up in an opposition or invalidity challenge, after the filing and prosecution money is spent. To count it: use cases where the decisive art is already known from examiner citations or past challenges, hide it, and check whether the search finds it. The record, or a patent professional, is the label. A search passes only if the decisive reference lands in what a reviewer actually reads.`,
+      ],
+    },
+    {
+      id: 'voice',
+      mark: '§7',
+      label: `Regulated voice agents: the disclosure the agent skipped`,
+      paras: [
+        `A voice agent handles a collections or insurance call well. Tone and payment plan are right. It never said the call was recorded, or it dropped a required disclosure when the caller interrupted. Nobody listens to the calls that went well. The customer carries the regulatory exposure, call by call. Healthcare admin has the same shape: the prior-auth request filed without the one document the payer needed. To count it: have a compliance reviewer label a call sample for each required disclosure, and measure disclosure recall per call. A call passes only if every required item is present, at the right point.`,
+      ],
+    },
+    {
+      id: 'how-id-set-the-bar',
+      mark: '§8',
+      label: `How I'd set the bar`,
+      paras: [
+        `Ground truth per failure type, not one gold answer per case. A missed owner, a missed exception and a missed disclosure need different labellers, and the labeller has to be someone the customer would trust to sign the file.`,
+        `An acceptance bar written as a number before launch. "Owner recall at or above an agreed figure on the labelled sample, with zero misses above the reporting threshold" is a bar. "High accuracy" is not. Writing it first stops the bar drifting toward whatever the system scores.`,
+        `A short list of the failure modes that matter, ranked by what they cost the customer. A misspelled name and a missing owner shouldn't share a metric.`,
+        `A rule for autonomy. A step runs without a human only when its miss rate on the labelled sample holds under the bar across releases, and any judge used to score it has its own measured agreement with humans. Until then a human reviews it, and every review is kept as new labels.`,
+      ],
+    },
+    {
+      id: 'compare-notes',
+      mark: '§9',
+      label: `Compare notes`,
+      paras: [
+        `If you're measuring misses in production, in any of these domains or one I haven't listed, I'd like to compare notes: what you label, who labels it, and where you set the bar. Most dashboards count what the system said. I'm more interested in what it didn't.`,
+      ],
+    },
+  ] as MissesSection[],
+
+  // Figures. Every number is from the site's own harness pages, linked in each
+  // source line; nothing here is new data. Fig. 1 is an illustration, not data.
+  figures: {
+    gap: {
+      n: 1,
+      title: 'The chart that looks complete',
+      source: 'Illustration, not data: the ownership chart from the KYB example below.',
+      nodes: [
+        { label: 'Customer', mark: 'on the chart' },
+        { label: 'Holding company, another jurisdiction', mark: 'on the chart' },
+        { label: 'Significant holder', mark: 'never on the page', missing: true },
+      ],
+    },
+    crosssource: {
+      n: 2,
+      title: 'Precision looks fine. Recall does not.',
+      source: 'CrossSource, strict configuration, 25-question golden set.',
+      href: '/crosssource/',
+      hrefLabel: 'Method and data →',
+      scores: {
+        heading: 'Score, 0 to 1',
+        max: 1,
+        rows: [
+          { label: 'Citation precision', value: 0.994, text: '0.994' },
+          { label: 'Citation recall', value: 0.76, text: '0.760', note: 'the same 0.760 under both prompt configurations' },
+        ],
+      },
+      failures: {
+        heading: 'Failures by type, count',
+        max: 6,
+        rows: [
+          { label: 'Missing authority', value: 6, text: '6', note: 'omission: the dominant failure' },
+          { label: 'Right document, wrong passage', value: 1, text: '1' },
+          { label: 'Wrong document', value: 0, text: '0' },
+          { label: 'Unsupported claim', value: 0, text: '0' },
+        ],
+      },
+    },
+    judges: {
+      n: 3,
+      title: 'Two LLM judges against my blind labels',
+      source: '40 answers from mirror-eval: labelled blind by me, then tagged by two LLM judges.',
+      href: '/mirror-eval/',
+      hrefLabel: 'Method and data →',
+      cols: 20,
+      rows: [
+        { label: 'Judge A', filled: 3, of: 40, text: '3 of 40 · 8%' },
+        { label: 'Judge B', filled: 12, of: 40, text: '12 of 40 · 30%' },
+      ],
+      filledMeans: "judge's tags matched mine exactly",
+      emptyMeans: 'did not match',
+    },
+    flips: {
+      n: 4,
+      title: 'Same 21 cases, two models, one verdict each',
+      source: 'screener-eval: the same 21 postings screened by two models.',
+      href: '/screener-eval/',
+      hrefLabel: 'Method and data →',
+      cols: 21,
+      rows: [{ label: 'Verdicts', filled: 6, of: 21, text: '6 agreed · 15 flipped' }],
+      filledMeans: 'both models gave the same verdict',
+      emptyMeans: 'the verdict flipped',
+    },
+    summary: {
+      caption: 'Table 1 — The six at a glance',
+      columns: ['Kind of work', 'Who labels', 'What gets counted', 'Passes only if'],
+      rows: [
+        { label: 'Compliance and KYB', cells: ['A compliance analyst', 'Owner-level recall', 'Every owner above the threshold is found'] },
+        { label: 'Audit and controls', cells: ['An experienced auditor', 'Exception recall', 'No seeded failure is called "effective"'] },
+        { label: 'Insurance', cells: ['A senior broker or claims reviewer', 'Gap recall', 'Every material exclusion or sublimit is flagged'] },
+        { label: 'Legal', cells: ["A lawyer, against the client's playbook", 'Recall per clause type', 'Every playbook deviation the lawyer marked is surfaced'] },
+        { label: 'Patents', cells: ['Examiner citations, or a patent professional', 'Whether the hidden decisive reference is found', 'It lands in what a reviewer actually reads'] },
+        { label: 'Regulated voice agents', cells: ['A compliance reviewer', 'Disclosure recall per call', 'Every required disclosure is present, at the right point'] },
+      ],
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------
