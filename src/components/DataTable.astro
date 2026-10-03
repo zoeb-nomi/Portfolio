@@ -20,9 +20,13 @@ const [labelHeader, ...dataHeaders] = columns;
 ---
 
 <div class="data-table-scroll">
+{/* The visible caption sits outside the scroller so it is as wide as the visible
+    box (not the whole table) and can leave room for the "scroll" hint beside it.
+    The <caption> inside the table stays, visually hidden, for assistive tech. */}
+<p class="dt-caption" aria-hidden="true">{caption}</p>
 <div class="data-table-wrap" tabindex="0" role="region" aria-label={caption}>
 <table class="data-table">
-  <caption>{caption}</caption>
+  <caption class="visually-hidden">{caption}</caption>
   <thead>
     <tr>
       <th scope="col">{labelHeader}</th>
@@ -117,14 +121,19 @@ const [labelHeader, ...dataHeaders] = columns;
     font-size: var(--t-data);
   }
 
-  .data-table caption {
-    caption-side: top;
+  .dt-caption {
     text-align: left;
+    font-family: var(--font-mono);
     font-size: var(--t-micro);
     letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: var(--ink-muted);
     padding-bottom: var(--s-3);
+    /* Matches the wrap's inline padding so the caption stays aligned with the table. */
+    padding-inline: var(--s-1);
+    /* Room for the "scroll" hint at the block's top-right (it is absolutely
+       positioned): a long caption wraps before it rather than printing under it. */
+    padding-inline-end: var(--s-12);
   }
 
   .data-table th,
