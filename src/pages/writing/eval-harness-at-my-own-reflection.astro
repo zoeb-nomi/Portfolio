@@ -9,6 +9,7 @@ import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
 import { isExternal } from '../../lib/isExternal';
 import { meta, cta, home, writingReflection as wr } from '../../data/copy';
+import { jsonLdString } from '../../lib/jsonLdString';
 
 const articleLd = articleJsonLd({
   slug: 'eval-harness-at-my-own-reflection',
@@ -27,7 +28,7 @@ const articleLd = articleJsonLd({
   ogImage="/og/eval-harness.png"
   ogType="article"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
   <Masthead
     kicker={wr.kicker}

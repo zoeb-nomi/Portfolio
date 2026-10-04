@@ -8,6 +8,7 @@ import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
 import { meta, cta, home, writingJudgeBug as wj, writingJudgeBugAudio as audio } from '../../data/copy';
+import { jsonLdString } from '../../lib/jsonLdString';
 
 const { kicker, title, dek: standfirst } = wj;
 const repoHref = 'https://github.com/zoeb-nomi/crosssource';
@@ -29,7 +30,7 @@ const articleLd = articleJsonLd({
   ogImage="/og/judge.png"
   ogType="article"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
   <Masthead kicker={kicker} h1={title} standfirst={standfirst} h1Max="22ch" narr>
     <Fragment slot="byline"><time datetime={wj.date}>{formatDate(wj.date)}</time> · {wj.readingTime} read</Fragment>

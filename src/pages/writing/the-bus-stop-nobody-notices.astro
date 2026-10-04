@@ -10,6 +10,7 @@ import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
 import { meta, cta, home, writingBusStop as wb } from '../../data/copy';
 import { formatDate } from '../../lib/formatDate';
+import { jsonLdString } from '../../lib/jsonLdString';
 
 const articleLd = articleJsonLd({
   slug: 'the-bus-stop-nobody-notices',
@@ -28,7 +29,7 @@ const articleLd = articleJsonLd({
   ogImage="/og/bus-stop.png"
   ogType="article"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
   <Masthead kicker={wb.kicker} h1={wb.title} standfirst={wb.dek} h1Max="24ch" narr>
     <Fragment slot="byline"><time datetime={wb.date}>{formatDate(wb.date)}</time> · {wb.readingTime} read</Fragment>

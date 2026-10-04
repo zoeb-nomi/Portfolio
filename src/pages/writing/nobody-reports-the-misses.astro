@@ -11,6 +11,7 @@ import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
 import { meta, writingMisses as wm } from '../../data/copy';
+import { jsonLdString } from '../../lib/jsonLdString';
 
 const f = wm.figures;
 const summaryRows = f.summary.rows.map((r) => ({ label: r.label, cells: r.cells.map((text) => ({ text })) }));
@@ -32,7 +33,7 @@ const articleLd = articleJsonLd({
   ogImage="/og/misses.png"
   ogType="article"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
   <Masthead kicker={wm.kicker} h1={wm.title} standfirst={wm.dek} h1Max="24ch" narr>
     <Fragment slot="byline"><time datetime={wm.date}>{formatDate(wm.date)}</time> · {wm.readingTime} read</Fragment>

@@ -4,3 +4,5 @@ dist/
 screenshots/
 audit-report.json
 .audio-cache/
+.env
+.env.*

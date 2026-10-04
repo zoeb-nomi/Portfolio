@@ -12,6 +12,7 @@ import {
   googleSiteVerification,
   cloudflareBeaconToken,
 } from '../data/copy';
+import { jsonLdString } from '../lib/jsonLdString';
 
 interface Props {
   title: string;
@@ -92,10 +93,10 @@ const ogImageURL = new URL(ogImage, Astro.site);
 
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 
-    <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} is:inline />
+    <script type="application/ld+json" set:html={jsonLdString(personJsonLd)} is:inline />
     {
       includeSoftwareSourceCode && (
-        <script type="application/ld+json" set:html={JSON.stringify(softwareSourceCodeJsonLd)} is:inline />
+        <script type="application/ld+json" set:html={jsonLdString(softwareSourceCodeJsonLd)} is:inline />
       )
     }
 

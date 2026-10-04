@@ -8,6 +8,7 @@ import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
 import { meta, screenerEval as se, screenerEvalJsonLd, cta, home } from '../data/copy';
+import { jsonLdString } from '../lib/jsonLdString';
 
 const table1Rows = se.s3.table1.rows.map((r) => ({
   label: r.lever,
@@ -31,7 +32,7 @@ const table3Rows = se.s5.table.rows.map((r) => ({
   path="/screener-eval/"
   ogImage="/og/screener-eval.png"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(screenerEvalJsonLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(screenerEvalJsonLd)} is:inline />
 
   <Masthead
     label="Case study specification"
