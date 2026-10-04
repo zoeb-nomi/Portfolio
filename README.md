@@ -12,7 +12,7 @@ Hosted on Cloudflare Pages. Build command `npm run build`, output directory `dis
 
 - **Production** — every commit to `main` builds and auto-deploys. There is no staging environment.
 - **Previews** — commits on any other branch get their own preview deployment at a generated URL. Previews send `X-Robots-Tag: noindex`.
-- **Rollback** — Cloudflare Pages → the project → **Deployments** → find the last good build → **Rollback to this deployment**. This repoints production immediately without a rebuild. Alternatively revert the offending commit on `main` and let the normal build redeploy.
+- **Rollback** — Cloudflare Pages → the project → **Deployments** → find the last good build → **Rollback to this deployment**. This repoints production immediately without a rebuild. Alternatively revert on `main` and let the normal build redeploy. PRs land as merge commits, so use the **Revert** button on the merged PR, or `git revert -m 1 <merge commit>`; each PR reverts on its own.
 - **Which project?** At the time of writing two Cloudflare Pages projects (`zoebnomi` and `portfolio`) are connected to this repo and both post a preview on every PR. Check in the dashboard which one owns the `zoebnomi.com` domain before following the rollback steps.
 
 **Publish rule** — `main` is live and only Zoeb merges to it. Zoeb commits via the GitHub web UI; Claude does not push to `main` or merge, and does not push at all unless Zoeb explicitly asks in that session, in which case it pushes a feature branch and opens a **draft** PR for him to review. Every change goes through a branch and PR, and CI (`.github/workflows/ci.yml`) must be green first.
@@ -21,14 +21,15 @@ Run `node scripts/geo-gate.mjs` against `dist/` before deploying — it is the l
 
 ## Checks
 
-All of these run in CI, in this order (`.github/workflows/ci.yml`): `npm ci`, `npm run build`, `npm run gate`, `npm run check`, then `npm run qa` and `npm run tokens` against a running preview.
+All of these run in CI, in this order (`.github/workflows/ci.yml`): `npm ci`, `npm run build`, `npm run gate`, `npm run check`, `npm run lint`, then `npm run qa` and `npm run tokens` against a running preview, then `npm run audio:check`.
 
 - `npm run check` — `astro check` (types).
 - `npm run gate` — `scripts/geo-gate.mjs` against `dist/` (run `npm run build` first).
-- `npm run qa` — `scripts/qa-sweep.mjs`: Playwright sweep of every page for horizontal overflow (360–1920px), axe violations (at 390 and 1440), font-weight > 500, off-scale font sizes (warn only), console errors and 4xx/5xx requests. Needs a running site (`npx astro preview --host 127.0.0.1 --port 4321`, or set `BASE_URL`); report written to `.astro/qa-report.json`.
-- `npm run tokens` — `scripts/tokens-audit.mjs`: the rendered site against the design tokens, at 1440 and 390. **Fails** on font-weight > 500 and on any text or background colour outside the palette; **warns** on font sizes outside the type tokens, line styles other than {1px ink, 1px rule, 2px red}, and border-radius other than 0. Same running-site requirement; report in `.astro/tokens-report.json`.
+- `npm run lint` — `scripts/lint-source.mjs`: reads `src/**/*.{astro,css}` and fails on a media query off the 599/600, 899/900, 1099/1100 grid, a raw colour outside `tokens.css`, or a raw line-height, underline offset, hit-area height or font-size that has a token. Needs no build and no dependencies.
+- `npm run qa` — `scripts/qa-sweep.mjs`: Playwright sweep of every page for horizontal overflow (14 widths from 360 to 1920px, including both sides of each breakpoint), axe violations (at 390, 768, 1024 and 1440), font-weight > 500, off-scale font sizes (warn only), console errors and 4xx/5xx requests. Needs a running site (`npx astro preview --host 127.0.0.1 --port 4321`, or set `BASE_URL`); report written to `.astro/qa-report.json`.
+- `npm run tokens` — `scripts/tokens-audit.mjs`: the rendered site against the design tokens, at 1440, 1024 and 390. **Fails** on font-weight > 500 and on any text or background colour outside the palette; **warns** on font sizes outside the type tokens, line styles other than {1px ink, 1px rule, 2px red}, and border-radius other than 0. Same running-site requirement; report in `.astro/tokens-report.json`.
 
-**Both sweeps use a hard-coded list of pages** (`PAGES` at the top of `scripts/qa-sweep.mjs` and `scripts/tokens-audit.mjs`). A new page is not checked until it is added to both.
+**Both sweeps read their page list from the build** (`dist/sitemap-0.xml`, plus `/404.html`, via `scripts/lib/pages.mjs`), so a new page is checked as soon as it is in the sitemap. A page left out of the sitemap is not swept. They need a local `npm run build` even when `BASE_URL` points at a remote site.
 
 ## Local setup
 
@@ -48,11 +49,11 @@ Essays are hand-built `.astro` pages in `src/pages/writing/`, not Markdown and n
 
 1. **Copy** — add a `meta.<key>` entry (`title`, `description`) and an essay object (`kicker`, `title`, `dek`, `date` as ISO `YYYY-MM-DD`, `readingTime`, sections) to `src/data/copy.ts`. `Base` uses one `title` for both `<title>` and `og:title`, so keep it at 60 characters or fewer; keep the description at 155 or fewer. Use straight quotes and apostrophes.
 2. **Page** — `src/pages/writing/<slug>.astro`. Give each `Section` an `anchorId` for a stable, human deep link (`#kyb`); without one its heading gets `sec-<label>`. Each section heading is an `h2`, so the page has one `h1` (the masthead) and no skipped levels.
-3. **Index** — add the entry to `posts` in `src/pages/writing/index.astro`, newest first.
+3. **Index** — add the essay to the `essays` array in `src/pages/writing/index.astro`. The list is sorted by date, and each card's title, dek, date, reading time and narration length come from the essay's own data object, so there is no second copy to keep in step.
 4. **llms.txt** — add the essay to the list in `src/pages/llms.txt.ts`.
 5. **Sitemap** — add the URL to `src/data/lastmod.json` (and bump `/writing/`). A route with no entry gets no `lastmod`; the build date is never used.
 6. **OG card** — add an entry to `scripts/generate-og.mjs` and run `node scripts/generate-og.mjs`. It re-renders every card with tiny byte differences, so commit only the PNGs you meant to change (`git checkout -- public/og/<other>.png`).
-7. **Checks** — add the URL to `PAGES` in `scripts/qa-sweep.mjs` and `scripts/tokens-audit.mjs` (see above), then run build, gate, check, qa and tokens.
+7. **Checks** — nothing to register: `qa` and `tokens` pick the page up from the sitemap (see above). Run build, gate, check, lint, qa and tokens.
 8. **Audio (optional)** — see "Narration audio" below.
 
 **Figures.** `EssayFigure` (a numbered, captioned frame with a source line) wraps `UnitChart` (one square per case), `BarList` (label / bar / value rows), `OwnershipGap` (a chain-of-ownership illustration), or the existing `DataTable`. They are built from HTML and hairlines, not SVG, so type stays on the token scale and above the 11px floor; the numbers in them come from the site's own harness pages and each figure links its source. For a wide text table on phones, render a stacked-card version below 900px (see Table 1 in `nobody-reports-the-misses.astro`).
@@ -91,7 +92,7 @@ npm run audio:test                           # unit tests; no model, no network
 - **Anchors.** The page is the script: every element with `data-narr` is narrated, in document order. `Masthead narr` anchors the title and standfirst, `Section narrId="sN-cue"` the section headings, and `data-narr="sN-pK"` each paragraph. Tables, lists and figures cannot be read verbatim: extraction stops and names the anchors until `scripts/audio/pages.json` supplies a spoken version of each in `overrides` (`/crosssource/` has six; review them like copy). `moveAfter` changes the spoken order when the markup order is wrong for the ear (the margin spec block comes after the standfirst).
 - **Register the page** in `scripts/audio/pages.json` (slug, path, title, optional `chapterTitles`), then wire the generated data in like `nobody-reports-the-misses` does: an `audio` object in `src/data/copy.ts`, `<AudioPlayer />` in the Masthead slot, and the `AudioObject` in the page's JSON-LD.
 - **Pronunciation** lives in `scripts/audio/lexicon.json`. Add a line when `audio:verify` (or your ears) catches a mispronounced word; only the sentences that change are re-synthesised.
-- **Keeping it honest.** `audio:check` fails when the page text changes after the audio was built and names the anchors that changed. It is not wired into CI (it needs the generated files and a build), so run it after editing any essay that has audio.
+- **Keeping it honest.** `audio:check` fails when the page text changes after the audio was built and names the anchors that changed. It runs in CI after the QA sweep (it reads `dist/` and the committed manifests, and needs no model), but only for the pages listed in `scripts/audio/pages.json`. The older narrated essays use hand-uploaded mp3s with no manifest, so nothing checks them: re-listen after editing one.
 - **What it can't tell you** is whether it sounds good: `audio:verify` measures intelligibility and cue alignment, not taste. Listen before merging.
 
 How the pipeline works, and its quality gates, are in [`scripts/audio/README.md`](scripts/audio/README.md).
