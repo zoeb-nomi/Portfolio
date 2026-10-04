@@ -1,0 +1,163 @@
+---
+// Who can fix each failure. Every failure is a square: ink if a prompt can fix it, red if only retrieval can.
+// The strict prompt row shows the same squares with the ones it fixed left as dashed outlines. It plays once as
+// it scrolls into view: the strict row starts identical to the baseline row, then the fixed squares empty out.
+interface Count {
+  prompt: number;
+  retrieval: number;
+}
+
+interface Props {
+  baseline: Count;
+  strict: Count;
+  precision: { from: string; to: string };
+  recall: { from: string; to: string };
+}
+
+const { baseline, strict, precision, recall } = Astro.props;
+const fixed = baseline.prompt - strict.prompt;
+const cols = baseline.prompt + baseline.retrieval;
+const baselineCells = [...Array(baseline.prompt).fill('prompt'), ...Array(baseline.retrieval).fill('retrieval')];
+const strictCells = [
+  ...Array(strict.prompt).fill('prompt'),
+  ...Array(Math.max(0, fixed)).fill('fixed'),
+  ...Array(strict.retrieval).fill('retrieval'),
+];
+const total = (c: Count) => c.prompt + c.retrieval;
+---
+
+<div class="fo" data-fig="owners" style={`--cols:${cols}`}>
+  <div class="fo-row">
+    <p class="fo-head"><span>Baseline prompt</span><span class="tabular">{total(baseline)} failures</span></p>
+    <div class="fo-cells" aria-hidden="true">{baselineCells.map((k, i) => <span class={`fo-cell is-${k}`} style={`--i:${i}`} />)}</div>
+  </div>
+  <div class="fo-row">
+    <p class="fo-head"><span>Strict prompt</span><span class="tabular">{total(strict)} failures</span></p>
+    <div class="fo-cells" aria-hidden="true">{strictCells.map((k, i) => <span class={`fo-cell is-${k}`} style={`--i:${i}`} />)}</div>
+  </div>
+  <p class="fo-key" aria-hidden="true">
+    <span><i class="fo-cell is-prompt" /> a prompt can fix it</span>
+    <span><i class="fo-cell is-retrieval" /> only retrieval can fix it</span>
+    <span><i class="fo-cell is-fixed" /> fixed by the strict prompt</span>
+  </p>
+  <dl class="fo-stats">
+    <div><dt>Citation precision</dt><dd class="tabular">{precision.from} {'→'} {precision.to}</dd></div>
+    <div><dt>Citation recall</dt><dd class="tabular">{recall.from} {'→'} {recall.to}</dd></div>
+  </dl>
+  <p class="fo-anno">
+    The strict prompt fixed {fixed} of the {baseline.prompt} failures a prompt can reach. The {strict.retrieval} that remain are retrieval's, and no prompt touches them.
+  </p>
+</div>
+
+<script>
+  import { mountFigures } from '../scripts/figure-motion';
+  mountFigures('[data-fig="owners"]');
+</script>
+
+<style>
+  .fo-row + .fo-row {
+    margin-top: var(--s-5);
+  }
+
+  .fo-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+    margin-bottom: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink);
+  }
+
+  .fo-cells {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, var(--s-6)));
+    gap: var(--s-1);
+  }
+
+  .fo-cell {
+    display: block;
+    aspect-ratio: 1;
+    border: 1px solid var(--ink);
+    transition: background var(--dur-slow) ease, border-color var(--dur-slow) ease;
+    transition-delay: calc(var(--i, 0) * 60ms + 500ms);
+  }
+
+  .fo-cell.is-prompt {
+    background: var(--ink);
+  }
+
+  .fo-cell.is-retrieval {
+    border: 0;
+    background: var(--red);
+  }
+
+  .fo-cell.is-fixed {
+    border-style: dashed;
+    background: transparent;
+  }
+
+  /* Start frame: the fixed squares are still failures, then they empty out. */
+  .fo[data-state='pre'] .fo-cells .fo-cell.is-fixed {
+    border-style: solid;
+    background: var(--ink);
+    transition: none;
+  }
+
+  .fo-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+    margin-top: var(--s-5);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .fo-key span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .fo-key .fo-cell {
+    inline-size: var(--s-3);
+    block-size: var(--s-3);
+    aspect-ratio: auto;
+  }
+
+  .fo-stats {
+    display: grid;
+    gap: var(--s-2);
+    margin: var(--s-6) 0 0;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+  }
+
+  .fo-stats > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+  }
+
+  .fo-stats dt {
+    color: var(--ink-muted);
+  }
+
+  .fo-stats dd {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .fo-anno {
+    margin-top: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    line-height: var(--lh-snug);
+    color: var(--red-ink);
+  }
+</style>

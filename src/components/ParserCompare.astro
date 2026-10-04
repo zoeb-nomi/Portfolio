@@ -1,0 +1,267 @@
+---
+// Two résumé versions, one row of 29 squares each, per parser. Both versions are shown at rest; the two
+// checkboxes grey a version out so the other can be read alone. v4.1 is drawn in ink and v4.2 in red (the
+// reviewer's colour for "after"). The squares are grouped by outcome, not by field order. Every count is also
+// written out as text, so nothing depends on colour.
+interface Row {
+  label: string;
+  sub: string;
+  v1: number[];
+  v2: number[];
+}
+
+interface Props {
+  rows: Row[];
+  v1Label?: string;
+  v2Label?: string;
+}
+
+const { rows, v1Label = 'Résumé v4.1', v2Label = 'Résumé v4.2' } = Astro.props;
+const states = ['ok', 'missing', 'wrong', 'garbled'];
+const cells = (counts: number[]) => counts.flatMap((n, k) => Array.from({ length: n }, () => states[k]));
+const total = rows[0].v1.reduce((a, b) => a + b, 0);
+let line = 0;
+---
+
+<div class="pc" data-fig="parser" data-v1="on" data-v2="on" style={`--cols:${total}`}>
+  <div class="pc-show" role="group" aria-label="Show résumé versions">
+    <span class="pc-legend">Show</span>
+    <label class="pc-check"><input type="checkbox" checked data-pc="v1" /><span class="pc-sw pc-sw--v1" aria-hidden="true"></span>{v1Label}</label>
+    <label class="pc-check"><input type="checkbox" checked data-pc="v2" /><span class="pc-sw pc-sw--v2" aria-hidden="true"></span>{v2Label}</label>
+  </div>
+  {
+    rows.map((r) => (
+      <div class="pc-parser">
+        <p class="pc-name">{r.label}<small>{r.sub}</small></p>
+        {[
+          { k: 'v1', short: 'v4.1', counts: r.v1 },
+          { k: 'v2', short: 'v4.2', counts: r.v2 },
+        ].map((v) => {
+          const n = line++;
+          return (
+            <div class={`pc-line pc-line--${v.k}`} style={`--line:${n}`}>
+              <span class="pc-ver">{v.short}</span>
+              <div class="pc-cells" aria-hidden="true">
+                {cells(v.counts).map((s, i) => <span class={`pc-cell is-${s}`} style={`--i:${i}`} />)}
+              </div>
+              <span class="pc-text">{v.counts[0]} ok · {v.counts[1]} missing · {v.counts[2]} wrong · {v.counts[3]} garbled</span>
+            </div>
+          );
+        })}
+      </div>
+    ))
+  }
+  <p class="pc-key" aria-hidden="true">
+    <span><i class="pc-cell is-ok" /> ok</span>
+    <span><i class="pc-cell is-missing" /> missing</span>
+    <span><i class="pc-cell is-wrong" /> wrong</span>
+    <span><i class="pc-cell is-garbled" /> garbled</span>
+  </p>
+</div>
+
+<script>
+  import { mountFigures } from '../scripts/figure-motion';
+
+  document.querySelectorAll<HTMLElement>('[data-fig="parser"]').forEach((root) => {
+    root.querySelectorAll<HTMLInputElement>('input[data-pc]').forEach((box) => {
+      box.addEventListener('change', () => {
+        root.dataset[box.dataset.pc as 'v1' | 'v2'] = box.checked ? 'on' : 'off';
+      });
+    });
+  });
+  mountFigures('[data-fig="parser"]');
+</script>
+
+<style>
+  .pc {
+    --pc-1: var(--ink);
+    --pc-2: var(--red);
+  }
+
+  .pc-show {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-6);
+    margin: 0 0 var(--s-5);
+  }
+
+  .pc-legend {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .pc-check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-block-size: var(--hit-min);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .pc-check input {
+    inline-size: var(--s-4);
+    block-size: var(--s-4);
+    margin: 0;
+    accent-color: var(--ink);
+  }
+
+  .pc-sw {
+    inline-size: var(--s-3);
+    block-size: var(--s-3);
+  }
+
+  .pc-sw--v1 {
+    background: var(--pc-1);
+  }
+
+  .pc-sw--v2 {
+    background: var(--pc-2);
+  }
+
+  .pc-parser + .pc-parser {
+    margin-top: var(--s-5);
+  }
+
+  .pc-name {
+    margin-bottom: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink);
+  }
+
+  .pc-name small {
+    margin-inline-start: var(--s-2);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .pc-line {
+    display: grid;
+    grid-template-columns: var(--s-9) minmax(0, 1fr);
+    column-gap: var(--s-2);
+    row-gap: var(--s-1);
+    align-items: center;
+    --c: var(--pc-1);
+  }
+
+  .pc-line + .pc-line {
+    margin-top: var(--s-2);
+  }
+
+  .pc-line--v2 {
+    --c: var(--pc-2);
+  }
+
+  .pc-ver {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--c);
+    transition: color var(--dur-base) ease;
+  }
+
+  .pc-cells {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, var(--s-4)));
+    gap: 3px;
+    transition: opacity var(--dur-base) ease, filter var(--dur-base) ease;
+  }
+
+  .pc-text {
+    grid-column: 2;
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  /* One square per field. ok: solid. missing: hollow. wrong: hollow with a cross. garbled: a square inside a square. */
+  .pc-cell {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    border: 1px solid var(--c, var(--ink));
+    background: transparent;
+    transition: opacity var(--dur-base) ease;
+    transition-delay: calc(var(--line, 0) * 260ms + var(--i, 0) * 12ms);
+  }
+
+  .pc-cell.is-ok {
+    border: 0;
+    background: var(--c, var(--ink));
+  }
+
+  .pc-cell.is-garbled {
+    border: 0;
+    background: var(--c, var(--ink));
+    box-shadow: inset 0 0 0 3px var(--paper);
+  }
+
+  /* The v4.2 colour is the 2px red line tier, so its hollow squares are drawn at 2px. */
+  .pc-line--v2 .pc-cell.is-missing,
+  .pc-line--v2 .pc-cell.is-wrong {
+    border-width: 2px;
+  }
+
+  .pc-line--v2 .pc-cell.is-wrong::before,
+  .pc-line--v2 .pc-cell.is-wrong::after {
+    border-top-width: 2px;
+  }
+
+  .pc-cell.is-wrong::before,
+  .pc-cell.is-wrong::after {
+    content: '';
+    position: absolute;
+    inset: 50% -1px auto;
+    border-top: 1px solid var(--c, var(--ink));
+    transform: rotate(45deg);
+  }
+
+  .pc-cell.is-wrong::after {
+    transform: rotate(-45deg);
+  }
+
+  .pc-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+    margin-top: var(--s-5);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .pc-key span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .pc-key .pc-cell {
+    inline-size: var(--s-3);
+    block-size: var(--s-3);
+    aspect-ratio: auto;
+  }
+
+  /* A version that is unticked is greyed out, so the other reads alone. */
+  .pc[data-v1='off'] .pc-line--v1 .pc-cells,
+  .pc[data-v2='off'] .pc-line--v2 .pc-cells {
+    opacity: 0.2;
+    filter: grayscale(1);
+  }
+
+  .pc[data-v1='off'] .pc-line--v1 .pc-ver,
+  .pc[data-v2='off'] .pc-line--v2 .pc-ver {
+    color: var(--ink-muted);
+  }
+
+  .pc[data-state='pre'] .pc-line .pc-cell {
+    opacity: 0;
+    transition: none;
+  }
+</style>

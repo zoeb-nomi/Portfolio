@@ -1,6 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
+import EssayThumb from '../../components/EssayThumb.astro';
+import ReadAlongDemo from '../../components/ReadAlongDemo.astro';
 import {
   meta,
   writingMisses,
@@ -20,16 +22,17 @@ const standfirst =
 // One source of truth: each essay's own data object in copy.ts (title, dek, kicker, date, reading
 // time, narration length). Newest first.
 const essays = [
-  { slug: 'nobody-reports-the-misses', e: writingMisses, audio: writingMisses.audio.duration },
-  { slug: 'the-bus-stop-nobody-notices', e: writingBusStop, audio: writingBusStop.audio?.duration },
-  { slug: 'two-levers-that-did-not-move', e: writingTwoLevers, audio: writingTwoLevers.audio?.duration },
-  { slug: 'eval-harness-at-my-own-reflection', e: writingReflection, audio: writingReflection.audio?.duration },
-  { slug: 'the-judge-caught-a-bug', e: writingJudgeBug, audio: writingJudgeBugAudio.duration },
-];
+  { slug: 'nobody-reports-the-misses', thumb: 'misses', e: writingMisses, audio: writingMisses.audio.duration },
+  { slug: 'the-bus-stop-nobody-notices', thumb: 'bus', e: writingBusStop, audio: writingBusStop.audio?.duration },
+  { slug: 'two-levers-that-did-not-move', thumb: 'levers', e: writingTwoLevers, audio: writingTwoLevers.audio?.duration },
+  { slug: 'eval-harness-at-my-own-reflection', thumb: 'waves', e: writingReflection, audio: writingReflection.audio?.duration },
+  { slug: 'the-judge-caught-a-bug', thumb: 'judge', e: writingJudgeBug, audio: writingJudgeBugAudio.duration },
+] as const;
 
 const posts = essays
-  .map(({ slug, e, audio }) => ({
+  .map(({ slug, thumb, e, audio }) => ({
     href: `/writing/${slug}/`,
+    thumb,
     title: e.title,
     date: e.date,
     kicker: e.kicker,
@@ -43,6 +46,7 @@ const posts = essays
 
 <Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/writing.png">
   <Masthead kicker={kicker} h1={title} standfirst={standfirst} h1Max="22ch" />
+  <ReadAlongDemo />
 
   <ul class="post-list">
     {
@@ -52,11 +56,14 @@ const posts = essays
             <div class="post-inner grid-margin">
               <p class="post-kicker margin-col">{p.kicker}</p>
               <div class="post-body body-col">
-                <h2 class="post-title" id={`post-${p.href.split('/').filter(Boolean).pop()}`}>{p.title}</h2>
-                <p class="post-dek">{p.dek}</p>
-                <p class="post-date tabular">
-                  <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read{p.audio ? ` · ${formatClock(p.audio)} audio` : ''}
-                </p>
+                <div class="post-text">
+                  <h2 class="post-title" id={`post-${p.href.split('/').filter(Boolean).pop()}`}>{p.title}</h2>
+                  <p class="post-dek">{p.dek}</p>
+                  <p class="post-date tabular">
+                    <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read{p.audio ? ` · ${formatClock(p.audio)} audio` : ''}
+                  </p>
+                </div>
+                <EssayThumb kind={p.thumb} />
               </div>
             </div>
           </a>
@@ -107,6 +114,10 @@ const posts = essays
   }
 
   .post-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: var(--s-8);
     padding: 0 var(--gutter) 0 var(--body-inset);
   }
 
@@ -155,6 +166,8 @@ const posts = essays
     }
 
     .post-body {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--s-5);
       padding: 0 var(--gutter);
     }
   }

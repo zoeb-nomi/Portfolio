@@ -1,0 +1,276 @@
+---
+// One sheet per engine, 63 squares per sheet (the search-mode probes). A dark square is a probe whose answer cited
+// the site or the repo in Wave 1, a red square is one Wave 2 added, a dashed square is one it lost. Each sheet is
+// named with a label that stays upright and readable as the stack tilts. Plays once as it scrolls into view: the
+// sheets slide apart, the Wave 1 squares fill, then the Wave 2 squares fill in red. The drawing is aria-hidden; the
+// list under it carries every number. Reduced motion lays the sheets flat in a grid.
+interface Engine {
+  label: string;
+  from: number;
+  to: number;
+}
+
+interface Props {
+  engines: Engine[];
+  of: number;
+  fromLabel: string;
+  toLabel: string;
+}
+
+const { engines, of, fromLabel, toLabel } = Astro.props;
+const COLS = 9;
+const kindAt = (e: Engine, k: number) => {
+  const base = Math.min(e.from, e.to);
+  if (k < base) return 'base';
+  if (k < e.to) return 'add';
+  if (k < e.from) return 'lost';
+  return 'none';
+};
+---
+
+<div class="es" data-fig="stack" style={`--cols:${COLS}`}>
+  <div class="es-stage" aria-hidden="true">
+    <div class="es-sheets">
+      {
+        engines.map((e, i) => (
+          <div class="es-sheet" style={`--i:${i}`}>
+            <div class="es-cells">
+              {Array.from({ length: of }, (_, k) => <span class={`es-cell is-${kindAt(e, k)}`} style={`--k:${k}`} />)}
+            </div>
+            <span class="es-tag"><b>{e.label}</b> {e.from} {'→'} {e.to}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <ul class="es-legend">
+    {engines.map((e) => <li><b>{e.label}</b><span class="tabular">{e.from} {'→'} {e.to} of {of}</span></li>)}
+  </ul>
+  <p class="es-key" aria-hidden="true">
+    <span><i class="es-cell is-base" /> cited in {fromLabel}</span>
+    <span><i class="es-cell is-add" /> added by {toLabel}</span>
+    <span><i class="es-cell is-none" /> no owned citation</span>
+  </p>
+</div>
+
+<script>
+  import { mountFigures, motionAllowed } from '../scripts/figure-motion';
+
+  mountFigures('[data-fig="stack"]');
+
+  // A little pointer tilt on devices that hover. The label counter-rotates by the same amount.
+  if (motionAllowed() && window.matchMedia('(hover: hover)').matches) {
+    document.querySelectorAll<HTMLElement>('[data-fig="stack"] .es-stage').forEach((stage) => {
+      const sheets = stage.querySelector<HTMLElement>('.es-sheets')!;
+      stage.addEventListener('pointermove', (ev) => {
+        const r = stage.getBoundingClientRect();
+        const x = (ev.clientX - r.left) / r.width - 0.5;
+        const y = (ev.clientY - r.top) / r.height - 0.5;
+        sheets.style.setProperty('--tz', `${x * 16}deg`);
+        sheets.style.setProperty('--tx', `${-y * 10}deg`);
+      });
+      stage.addEventListener('pointerleave', () => {
+        sheets.style.setProperty('--tz', '0deg');
+        sheets.style.setProperty('--tx', '0deg');
+      });
+    });
+  }
+</script>
+
+<style>
+  .es {
+    --w: min(15rem, 58vw);
+  }
+
+  .es-stage {
+    perspective: 1100px;
+    display: flex;
+    justify-content: flex-start;
+    min-block-size: calc(var(--w) * 1.62);
+    padding: var(--s-4) 0 0 calc(var(--w) * 0.62);
+    overflow: hidden;
+  }
+
+  .es-sheets {
+    --gap: 46px;
+    position: relative;
+    inline-size: var(--w);
+    aspect-ratio: 9 / 7;
+    margin-top: calc(var(--w) * 0.34);
+    transform-style: preserve-3d;
+    transform: rotateX(calc(58deg + var(--tx, 0deg))) rotateZ(calc(-34deg + var(--tz, 0deg)));
+    transition: transform var(--dur-base) ease-out;
+  }
+
+  .es-sheet {
+    position: absolute;
+    inset: 0;
+    padding: var(--s-2);
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    transform-style: preserve-3d;
+    transform: translateZ(calc(var(--i) * var(--gap)));
+    transition: transform 800ms var(--ease-draw);
+  }
+
+  .es-cells {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: 3px;
+    block-size: 100%;
+  }
+
+  .es-cell {
+    display: block;
+    border: 1px solid var(--rule);
+    transition: background var(--dur-base) ease;
+  }
+
+  .es-cell.is-base {
+    border: 0;
+    background: var(--ink);
+    transition-delay: calc(var(--k, 0) * 6ms + var(--i, 0) * 70ms);
+  }
+
+  .es-cell.is-add {
+    border: 0;
+    background: var(--red);
+    transition-delay: calc(900ms + var(--k, 0) * 14ms);
+  }
+
+  .es-cell.is-lost {
+    border: 2px dashed var(--red);
+  }
+
+  /* The label stands at the sheet's front-right corner and faces the reader whatever the tilt. */
+  .es-tag {
+    position: absolute;
+    inset-inline-start: 100%;
+    inset-block-start: 100%;
+    padding-inline-start: var(--s-3);
+    transform-origin: 0 0;
+    transform: rotateZ(calc(34deg - var(--tz, 0deg))) rotateX(calc(-58deg - var(--tx, 0deg)));
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .es-tag b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .es[data-state='pre'] .es-sheets {
+    --gap: 6px;
+  }
+
+  .es[data-state='pre'] .es-sheet {
+    transition: none;
+  }
+
+  .es[data-state='pre'] .es-cell.is-base,
+  .es[data-state='pre'] .es-cell.is-add {
+    background: transparent;
+    transition: none;
+  }
+
+  .es-legend {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: var(--s-2) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .es-legend li {
+    padding: var(--s-3) var(--s-2) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-note);
+    line-height: var(--lh-snug);
+  }
+
+  .es-legend b {
+    display: block;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .es-legend span {
+    color: var(--ink-muted);
+  }
+
+  .es-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+    margin-top: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .es-key span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .es-key .es-cell {
+    inline-size: var(--s-3);
+    block-size: var(--s-3);
+  }
+
+  @media (max-width: 599px) {
+    .es {
+      --w: 58vw;
+    }
+
+    .es-stage {
+      justify-content: center;
+      padding-left: 0;
+    }
+
+    .es-tag {
+      display: none;
+    }
+
+    .es-legend {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* No motion: the sheets lie flat, side by side, each with its name under it. */
+  @media (prefers-reduced-motion: reduce) {
+    .es-stage {
+      perspective: none;
+      min-block-size: 0;
+      padding-top: 0;
+    }
+
+    .es-sheets {
+      inline-size: 100%;
+      aspect-ratio: auto;
+      margin-top: 0;
+      transform: none;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s-6);
+    }
+
+    .es-sheet {
+      position: relative;
+      inset: auto;
+      aspect-ratio: 9 / 7;
+      transform: none;
+    }
+
+    .es-tag {
+      display: block;
+      position: static;
+      transform: none;
+      padding: var(--s-2) 0 0;
+    }
+  }
+</style>

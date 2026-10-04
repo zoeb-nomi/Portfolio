@@ -1,0 +1,162 @@
+---
+// A small picture of an essay's own figure for the writing index. Decorative (aria-hidden): the card's title and
+// dek carry the meaning. Every number comes from the same data the figures use.
+import { writingMisses } from '../data/copy';
+import { forestData, waveData, judgeData } from '../lib/figureData';
+import { n2 } from '../lib/pct';
+
+type Kind = 'misses' | 'bus' | 'levers' | 'waves' | 'judge';
+
+interface Props {
+  kind: Kind;
+}
+
+const { kind } = Astro.props;
+
+// Two-levers: the four lever means sit on the zero line; the screener gap is the long bar.
+const forest = kind === 'levers' ? forestData() : null;
+const fpos = (v: number) => (forest ? ((v - forest.min) / (forest.max - forest.min)) * 100 : 0);
+
+// Reflection: Perplexity moved from 13 to 63, Claude stayed at 0.
+const waves = kind === 'waves' ? waveData() : null;
+const wrows = waves ? waves.rows.filter((r) => r.label === 'Perplexity' || r.label === 'Claude') : [];
+
+// Judge essay: the 15 of 15 blind check.
+const judge = kind === 'judge' ? judgeData() : null;
+const blind = judge?.rows[2];
+
+// Misses essay: the first row of its judges figure (filled of 40).
+const misses = kind === 'misses' ? writingMisses.figures.judges.rows[0] : null;
+
+// Bus-stop essay: Vijayanand Travels revenue, Rs crore, FY23 to FY25 (the three bars in the essay's own chart).
+const bars = [75, 351, 504];
+---
+
+<div class="et" aria-hidden="true">
+  {
+    forest && (
+      <>
+        <div class="et-track">
+          {forest.groups.flatMap((g) => g.rows).map((r) => <i class="et-pt is-fill" style={`--x:${n2(fpos(r.mean))}`} />)}
+        </div>
+        <div class="et-track">
+          <i class="et-bar" style={`--l:${n2(fpos(0))};--w:${n2(fpos(forest.gap.mean) - fpos(0))}`} />
+          <i class="et-pt is-red" style={`--x:${n2(fpos(forest.gap.max))}`} />
+        </div>
+      </>
+    )
+  }
+  {
+    waves && wrows.map((r) => (
+      <div class="et-track">
+        <i class="et-link" style={`--l:${n2((Math.min(r.from, r.to) / waves.max) * 100)};--w:${n2((Math.abs(r.to - r.from) / waves.max) * 100)}`} />
+        <i class="et-pt" style={`--x:${n2((r.from / waves.max) * 100)}`} />
+        <i class="et-pt is-fill" style={`--x:${n2((r.to / waves.max) * 100)}`} />
+      </div>
+    ))
+  }
+  {blind && <div class="et-cells" style={`--cols:${blind.of}`}>{Array.from({ length: blind.of }, (_, i) => <i class={`et-cell${i < blind.filled ? ' on' : ''}`} />)}</div>}
+  {misses && <div class="et-cells" style="--cols:20">{Array.from({ length: misses.of }, (_, i) => <i class={`et-cell${i < misses.filled ? ' on' : ''}`} />)}</div>}
+  {kind === 'bus' && <div class="et-bars">{bars.map((b, i) => <i class={`et-col${i === 2 ? ' is-red' : ''}`} style={`--h:${n2((b / 504) * 100)}`} />)}</div>}
+</div>
+
+<style>
+  .et {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--s-3);
+    inline-size: 11rem;
+    block-size: 4.75rem;
+    padding: var(--s-3) var(--s-3);
+    border: 1px solid var(--ink);
+    background: var(--paper-raised);
+  }
+
+  .et-track {
+    position: relative;
+    block-size: var(--s-3);
+  }
+
+  .et-track::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    border-top: 1px solid var(--rule);
+  }
+
+  .et-pt {
+    left: calc(var(--x) * 1%);
+    position: absolute;
+    inset-block-start: 50%;
+    inline-size: var(--s-2);
+    block-size: var(--s-2);
+    margin: calc(var(--s-2) / -2) 0 0 calc(var(--s-2) / -2);
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .et-pt.is-fill {
+    background: var(--ink);
+  }
+
+  .et-pt.is-red {
+    border: 2px solid var(--red);
+  }
+
+  .et-bar,
+  .et-link {
+    left: calc(var(--l) * 1%);
+    width: calc(var(--w) * 1%);
+  }
+
+  .et-bar {
+    position: absolute;
+    inset-block-start: 50%;
+    block-size: var(--s-2);
+    margin-block-start: calc(var(--s-2) / -2);
+    background: var(--red);
+  }
+
+  .et-link {
+    position: absolute;
+    inset-block-start: 50%;
+    block-size: 2px;
+    margin-block-start: -1px;
+    background: var(--ink);
+  }
+
+  .et-cells {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: 2px;
+  }
+
+  .et-cell {
+    aspect-ratio: 1;
+    border: 1px solid var(--ink);
+  }
+
+  .et-cell.on {
+    background: var(--ink);
+  }
+
+  .et-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--s-2);
+    block-size: 100%;
+    border-block-end: 1px solid var(--ink);
+  }
+
+  .et-col {
+    flex: 1;
+    height: calc(var(--h) * 1%);
+    background: var(--ink);
+  }
+
+  .et-col.is-red {
+    background: var(--red);
+  }
+</style>
