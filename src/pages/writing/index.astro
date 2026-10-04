@@ -1,51 +1,44 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
-import { meta, writingMisses } from '../../data/copy';
-import { formatDate } from '../../lib/formatDate';
+import {
+  meta,
+  writingMisses,
+  writingBusStop,
+  writingTwoLevers,
+  writingReflection,
+  writingJudgeBug,
+  writingJudgeBugAudio,
+} from '../../data/copy';
+import { formatDate, formatClock } from '../../lib/formatDate';
 
 const kicker = 'Writing';
 const title = 'Writing';
 const standfirst =
   'Notes on eval methodology, LLM-as-judge reliability, and RAG output quality — drawn from CrossSource and production eval work. And, occasionally, an industry thesis written so it can be wrong.';
 
-const posts = [
-  {
-    href: '/writing/nobody-reports-the-misses/',
-    title: writingMisses.title,
-    date: writingMisses.date,
-    kicker: writingMisses.kicker,
-    dek: writingMisses.dek,
-  },
-  {
-    href: '/writing/the-bus-stop-nobody-notices/',
-    title: 'The bus stop nobody notices',
-    date: '2026-09-28',
-    kicker: 'Industry thesis · Mobility',
-    dek: 'A family business from Hubli built a fifty-year moat in Indian transport and just placed the largest private Volvo order in the country. What that says about premium intercity bus travel — and a ₹50,000 experiment to find out whether I actually understand it.',
-  },
-  {
-    href: '/writing/two-levers-that-did-not-move/',
-    title: '885 screenings, one résumé, and the two levers that did not move',
-    date: '2026-09-11',
-    kicker: 'Eval methodology · screener-eval',
-    dek: 'I ran my own résumé through two LLM screeners against 21 open AI PM roles, five times each, with the employers swapped for fictional ones and the links deleted. Neither mattered. Something else did.',
-  },
-  {
-    href: '/writing/eval-harness-at-my-own-reflection/',
-    title: 'I pointed an eval harness at my own reflection',
-    date: '2026-09-10',
-    kicker: 'Eval methodology · mirror-eval',
-    dek: 'What four AI search engines say about me, measured twice — and the three things that only showed up because the numbers were counted rather than scored.',
-  },
-  {
-    href: '/writing/the-judge-caught-a-bug/',
-    title: "The judge caught a bug I didn't",
-    date: '2026-08-20',
-    kicker: 'Eval methodology · CrossSource',
-    dek: 'On validating LLM-as-judge evals — why a 15/15 blind agreement and a broken instrument can live in the same pipeline.',
-  },
+// One source of truth: each essay's own data object in copy.ts (title, dek, kicker, date, reading
+// time, narration length). Newest first.
+const essays = [
+  { slug: 'nobody-reports-the-misses', e: writingMisses, audio: writingMisses.audio.duration },
+  { slug: 'the-bus-stop-nobody-notices', e: writingBusStop, audio: writingBusStop.audio?.duration },
+  { slug: 'two-levers-that-did-not-move', e: writingTwoLevers, audio: writingTwoLevers.audio?.duration },
+  { slug: 'eval-harness-at-my-own-reflection', e: writingReflection, audio: writingReflection.audio?.duration },
+  { slug: 'the-judge-caught-a-bug', e: writingJudgeBug, audio: writingJudgeBugAudio.duration },
 ];
+
+const posts = essays
+  .map(({ slug, e, audio }) => ({
+    href: `/writing/${slug}/`,
+    title: e.title,
+    date: e.date,
+    kicker: e.kicker,
+    dek: e.dek,
+    readingTime: e.readingTime,
+    audio,
+  }))
+  .sort((x, y) => y.date.localeCompare(x.date));
+
 ---
 
 <Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/writing.png">
@@ -62,7 +55,7 @@ const posts = [
                 <h2 class="post-title" id={`post-${p.href.split('/').filter(Boolean).pop()}`}>{p.title}</h2>
                 <p class="post-dek">{p.dek}</p>
                 <p class="post-date tabular">
-                  <time datetime={p.date}>{formatDate(p.date)}</time>
+                  <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read{p.audio ? ` · ${formatClock(p.audio)} audio` : ''}
                 </p>
               </div>
             </div>

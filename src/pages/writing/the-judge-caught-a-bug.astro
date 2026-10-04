@@ -6,19 +6,17 @@ import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
-import { meta, cta, home, writingJudgeBugAudio as audio } from '../../data/copy';
+import { formatDate } from '../../lib/formatDate';
+import { meta, cta, home, writingJudgeBug as wj, writingJudgeBugAudio as audio } from '../../data/copy';
 
-const kicker = 'Eval methodology · CrossSource';
-const title = "The judge caught a bug I didn't";
-const standfirst =
-  'On validating LLM-as-judge evals — and why a 15/15 blind agreement and a broken instrument can live in the same pipeline.';
+const { kicker, title, dek: standfirst } = wj;
 const repoHref = 'https://github.com/zoeb-nomi/crosssource';
 
 const articleLd = articleJsonLd({
   slug: 'the-judge-caught-a-bug',
   headline: title,
   description: meta.writingJudgeBug.description,
-  date: '2026-08-20',
+  date: wj.date,
   about: 'LLM-as-judge evaluation, RAG citation accuracy',
   audio: audio && { src: audio.src, duration: audio.duration },
 });
@@ -34,6 +32,7 @@ const articleLd = articleJsonLd({
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
 
   <Masthead kicker={kicker} h1={title} standfirst={standfirst} h1Max="22ch" narr>
+    <Fragment slot="byline"><time datetime={wj.date}>{formatDate(wj.date)}</time> · {wj.readingTime} read</Fragment>
     {audio && <AudioPlayer audio={audio} articleId="judge-bug" />}
   </Masthead>
 

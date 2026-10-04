@@ -1052,6 +1052,14 @@ export type Cue = [string, number, number];
 // "The judge caught a bug I didn't" keeps its title/standfirst/body as local
 // consts in the page itself (no writing* object above) — this is just the
 // audio player data for it.
+export const writingJudgeBug = {
+  kicker: 'Eval methodology · CrossSource',
+  title: "The judge caught a bug I didn't",
+  dek: 'On validating LLM-as-judge evals — and why a 15/15 blind agreement and a broken instrument can live in the same pipeline.',
+  date: '2026-08-20',
+  readingTime: '2 min',
+};
+
 export const writingJudgeBugAudio = {
   src: '/audio/the-judge-caught-a-bug.mp3',
   duration: 126,
@@ -1089,9 +1097,9 @@ export const writingReflection = {
     note: 'Read by a synthetic voice (Kokoro).',
     chapters: [
       { id: 's1', title: 'Why I ran this', start: 13.2 },
-      { id: 's2', title: "1. Engines don't abstain. They fill.", start: 69.8 },
-      { id: 's3', title: '2. "It\'s published by him, so it\'s his claim."', start: 143.1 },
-      { id: 's4', title: "3. The judge failed. The study didn't.", start: 210.8 },
+      { id: 's2', title: "Engines don't abstain. They fill.", start: 69.8 },
+      { id: 's3', title: '"It\'s published by him, so it\'s his claim."', start: 143.1 },
+      { id: 's4', title: "The judge failed. The study didn't.", start: 210.8 },
       { id: 's5', title: "What I'd tell someone running this on themselves", start: 311.4 },
     ],
     cues: [
@@ -1116,7 +1124,7 @@ export const writingReflection = {
 
   s2: {
     mark: '§2',
-    label: "1. Engines don't abstain. They fill.",
+    label: "Engines don't abstain. They fill.",
     paras: [
       "The headline split cleanly by engine. Perplexity went from citing my site on 13 of 63 search probes to 63 of 63. Claude went from 0 to 0. Same fixes, same month, opposite outcomes — and one variable explains it: index access. A Bing Webmaster submission reached the index Perplexity reads. There is no equivalent door into Anthropic's.",
       "But Claude's zero was not silence. The junk that used to feed its answers — name-etymology pages, a job-board scrape — dropped from 79 citations to 11. And a data broker rose from 0 to 74 to take their place. Claude's third most-cited source about me, after a month of cleanup, was a page I have never controlled and had asked to be removed.",
@@ -1126,7 +1134,7 @@ export const writingReflection = {
 
   s3: {
     mark: '§3',
-    label: '2. "It\'s published by him, so it\'s his claim."',
+    label: '"It\'s published by him, so it\'s his claim."',
     paras: [
       'While labelling answers by hand I kept meeting the same move. An engine would find my site, read a number on it — a metric from a project, a result from a harness — and then decline to stand behind it. Not because it was wrong, but because I was the one who had published it. The claim was treated as testimony rather than evidence.',
       'The engines are right to do this, which is what makes it uncomfortable. Self-attestation is weak evidence. A harness result on my own site is a claim; the same result in a repository with commits, or in a piece someone else wrote about the work, is corroboration. The lesson for anyone whose work is mostly self-published is not to publish more. It is to get the claim restated somewhere you do not own — and to make the thing you own as easy to verify as possible: public code, public data, dated releases, a predictions file scored in the open.',
@@ -1136,7 +1144,7 @@ export const writingReflection = {
 
   s4: {
     mark: '§4',
-    label: "3. The judge failed. The study didn't.",
+    label: "The judge failed. The study didn't.",
     paras: [
       'The harness uses two LLM judges from different model families to tag each answer with a failure category. Then it does the thing that makes a judge a judge: a blind, stratified sample of 40 answers, labelled by a human who cannot see the verdicts.',
       "The judges failed. The Claude judge matched the human's exact tag set on 3 of 40. The Gemini judge on 12. The two judges agreed with each other on 35% of answers. Ten repetitions of an identical prompt changed the tag set 86% of the time. It was the third blind check in a row to say so.",
