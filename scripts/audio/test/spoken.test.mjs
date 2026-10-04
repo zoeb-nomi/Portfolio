@@ -49,6 +49,11 @@ test('splitSentences', () => {
   assert.deepEqual(splitSentences('Compliance and KYB: the missed beneficial owner'), ['Compliance and KYB: the missed beneficial owner']);
 });
 
+test('splitSentences does not break after abbreviations', () => {
+  assert.deepEqual(splitSentences('In Mata v. Avianca, lawyers were sanctioned. They lost.'), ['In Mata v. Avianca, lawyers were sanctioned.', 'They lost.']);
+  assert.deepEqual(splitSentences('Ask Dr. Smith. She knows.'), ['Ask Dr. Smith.', 'She knows.']);
+});
+
 test('normalizeForCompare', () => {
   assert.deepEqual(normalizeForCompare("It wasn't; the 8% held."), ['it', 'wasnt', 'the', '8', 'held']);
 });

@@ -53,6 +53,8 @@ export function toSpoken(text, words = {}) {
   return t.trim();
 }
 
+const ABBREV = /(?:^|\s)(?:v|vs|Mr|Mrs|Ms|Dr|St|No|Inc|Co|Corp|Ltd|Jr|Sr|etc)\.$/;
+
 /** Split spoken text into sentences for synthesis (better prosody, exact sentence timings). */
 export function splitSentences(text) {
   const seg = new Intl.Segmenter('en', { granularity: 'sentence' });
@@ -60,8 +62,10 @@ export function splitSentences(text) {
   for (const { segment } of seg.segment(text)) {
     const s = segment.trim();
     if (!s) continue;
-    // Merge a trailing fragment with no letters (e.g. a lone quote) into the previous sentence.
-    if (out.length && !/[A-Za-z0-9]/.test(s)) out[out.length - 1] += ' ' + s;
+    // Merge a trailing fragment with no letters (e.g. a lone quote) into the previous sentence,
+    // and never break after an abbreviation ("Mata v. Avianca", "Dr. Smith", "No. 5").
+    const prev = out[out.length - 1];
+    if (prev && (!/[A-Za-z0-9]/.test(s) || ABBREV.test(prev))) out[out.length - 1] = prev + ' ' + s;
     else out.push(s);
   }
   return out;

@@ -14,6 +14,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { loadRegistry, outPaths, htmlPathFor } from './lib/config.mjs';
 import { extractSegments } from './lib/extract.mjs';
+import { applyOrder } from './lib/prepare.mjs';
 import { hashSegments } from './lib/hash.mjs';
 
 const only = process.argv[2];
@@ -34,7 +35,7 @@ for (const page of pages) {
   if (!existsSync(htmlPathFor(page))) {
     errors.push(`built page not found (${htmlPathFor(page)}); run "npm run build" first`);
   } else {
-    const segs = await extractSegments(htmlPathFor(page), page.overrides ?? {});
+    const segs = applyOrder(await extractSegments(htmlPathFor(page), page.overrides ?? {}), page.moveAfter);
     const now = hashSegments(segs);
     const was = m.meta?.segmentHashes ?? {};
     if (now.textHash !== m.meta?.textHash) {

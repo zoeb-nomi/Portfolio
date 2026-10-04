@@ -24,6 +24,31 @@
         "s9": "Compare notes"
       },
       "overrides": {}
+    },
+    {
+      "slug": "crosssource",
+      "path": "/crosssource/",
+      "title": "CrossSource: measuring whether a RAG system can be trusted to cite the law",
+      "chapterTitles": {
+        "s1": "Why this exists",
+        "s2": "Method",
+        "s3": "Findings",
+        "s4": "The judge caught a bug",
+        "s5": "What this demonstrates",
+        "s6": "Next (v0.2)",
+        "s7": "Related writing"
+      },
+      "overrides": {
+        "s0-stats": "Corpus: 22 opinions. Golden set: 25 questions. Retrieval: BM25, top 5. Judge validated: 15 out of 15.",
+        "s2-list": "Corpus: 22 public-domain U S court opinions, 16 Supreme Court, 2 federal circuit and 4 state, sourced from Harvard Law School's Caselaw Access Project and chunked to about 350 words. Retrieval: BM25, top 5. Generation: Claude, with mandatory inline citations in doc ID, colon, chunk ID format. Golden set: 25 human-authored questions with verified ground-truth supporting chunks. Two configurations: baseline, which is citation formatting only, versus strict, which adds explicit citation-discipline rules to the prompt. Scoring: claim-level citation precision and recall, faithfulness, and answer relevance, scored by an LLM judge and validated by hand.",
+        "s3-table1": "Table 1, baseline versus strict. Citation precision: 0.981 in baseline, 0.994 in strict. Citation recall: 0.760 in both. Faithfulness: 1.000 in both. Answer relevance: 0.980 in baseline, 0.960 in strict.",
+        "s3-table2": "Table 2, failure taxonomy by configuration. Right document, wrong passage: 3 in baseline, 1 in strict. Missing authority: 6 in both. Wrong document: 0 in both. Unsupported claim: 0 in both.",
+        "s5-list": "Instrument the pipeline. Build a failure taxonomy instead of a single score. Validate the judge externally. Separate precision from recall, so you know whether to fix prompting or retrieval.",
+        "s6-list": "Retrieval ablations. Cross-model judge comparison. Law-trained annotation review. Per-question difficulty stratification. An agent-eval module, in build."
+      },
+      "moveAfter": {
+        "s0-stats": "s0-dek"
+      }
     }
   ]
 }
