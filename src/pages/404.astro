@@ -31,7 +31,7 @@ import { notFound } from '../data/copy';
   .code {
     font-family: var(--font-display);
     font-size: var(--t-page);
-    line-height: 1.02;
+    line-height: var(--lh-display);
     letter-spacing: var(--track-tight);
     color: var(--ink);
     max-width: 20ch;
@@ -42,13 +42,13 @@ import { notFound } from '../data/copy';
     /* The only way out of a dead end: a full 44px target. */
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
+    min-height: var(--hit-touch);
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
     letter-spacing: var(--track-wide);
     text-transform: uppercase;
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
     color: var(--ink);
   }
 

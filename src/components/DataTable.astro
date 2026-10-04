@@ -13,9 +13,12 @@ interface Props {
   caption: string;
   columns: string[]; // first column header is the row-label header
   rows: Row[];
+  // Keep every data cell on one line (numbers, ids, ranges: "claude-haiku-4-5", "-3.05 to +2.76").
+  // Wide tables then scroll sideways instead of breaking a value mid-token. Leave off for prose cells.
+  nowrap?: boolean;
 }
 
-const { caption, columns, rows } = Astro.props;
+const { caption, columns, rows, nowrap = false } = Astro.props;
 const [labelHeader, ...dataHeaders] = columns;
 ---
 
@@ -24,8 +27,8 @@ const [labelHeader, ...dataHeaders] = columns;
     box (not the whole table) and can leave room for the "scroll" hint beside it.
     The <caption> inside the table stays, visually hidden, for assistive tech. */}
 <p class="dt-caption" aria-hidden="true">{caption}</p>
-<div class="data-table-wrap" tabindex="0" role="region" aria-label={caption}>
-<table class="data-table">
+<div class="data-table-wrap" tabindex="0" role="region" aria-label={caption} data-label={caption}>
+<table class:list={['data-table', { 'data-table--nowrap': nowrap }]}>
   <caption class="visually-hidden">{caption}</caption>
   <thead>
     <tr>
@@ -194,6 +197,26 @@ const [labelHeader, ...dataHeaders] = columns;
     color: var(--ink-muted);
   }
 
+  .data-table--nowrap td {
+    white-space: nowrap;
+  }
+
+  /* On narrow screens a scrolling table keeps its row label in view (the first column is a row
+     header, so the reader never loses which row a number belongs to). */
+  @media (max-width: 899px) {
+    .data-table th[scope='row'] {
+      position: sticky;
+      inset-inline-start: 0;
+      z-index: 1;
+      background: var(--paper);
+      padding-inline-end: var(--s-3);
+    }
+
+    .data-table tbody tr:hover th[scope='row'] {
+      background: var(--paper-raised);
+    }
+  }
+
   .data-table td.win {
     color: var(--red-ink);
     font-weight: 500;
@@ -208,3 +231,28 @@ const [labelHeader, ...dataHeaders] = columns;
     color: var(--red-ink);
   }
 </style>
+
+<script>
+  // A scroll region is a tab stop and a landmark only while it actually scrolls. Without
+  // overflow it is just a table: no extra Tab stop, no extra region to announce. (With
+  // JavaScript off the attributes stay, which is the safe default.)
+  const wraps = document.querySelectorAll<HTMLElement>('.data-table-wrap');
+  function sync(w: HTMLElement) {
+    if (w.scrollWidth > w.clientWidth + 1) {
+      w.setAttribute('tabindex', '0');
+      w.setAttribute('role', 'region');
+      w.setAttribute('aria-label', w.dataset.label ?? '');
+    } else {
+      w.removeAttribute('tabindex');
+      w.removeAttribute('role');
+      w.removeAttribute('aria-label');
+    }
+  }
+  const ro = new ResizeObserver((entries) => entries.forEach((e) => sync(e.target as HTMLElement)));
+  wraps.forEach((w) => {
+    sync(w);
+    ro.observe(w);
+    const t = w.querySelector('table');
+    if (t) ro.observe(t);
+  });
+</script>

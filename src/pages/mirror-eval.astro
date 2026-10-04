@@ -8,6 +8,7 @@ import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
 import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home } from '../data/copy';
+import { jsonLdString } from '../lib/jsonLdString';
 
 const table1Rows = me.s3.table1.rows.map((r) => ({
   label: r.engine,
@@ -30,7 +31,7 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
   path="/mirror-eval/"
   ogImage="/og/mirror-eval.png"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(mirrorEvalJsonLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(mirrorEvalJsonLd)} is:inline />
 
   <Masthead
     label="Case study specification"
@@ -73,11 +74,11 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
   <Section mark={me.s3.mark} label={me.s3.label} narrId="s3-cue">
     <p class="prose intro" data-narr="s3-p0">{me.s3.intro}</p>
     <div class="table-scroll" data-narr="s3-table1">
-      <DataTable caption={me.s3.table1.caption} columns={me.s3.table1.columns} rows={table1Rows} />
+      <DataTable nowrap caption={me.s3.table1.caption} columns={me.s3.table1.columns} rows={table1Rows} />
     </div>
     <p class="prose table-intro" data-narr="s3-p1">{me.s3.table2Intro}</p>
     <div class="table-scroll" data-narr="s3-table2">
-      <DataTable caption={me.s3.table2.caption} columns={me.s3.table2.columns} rows={table2Rows} />
+      <DataTable nowrap caption={me.s3.table2.caption} columns={me.s3.table2.columns} rows={table2Rows} />
     </div>
     <p class="prose finding" data-narr="s3-p2">
       <strong>{me.s3.findingLeadIn}</strong>{me.s3.findingBody}
@@ -86,7 +87,7 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 
   <Section mark={me.s4.mark} label={me.s4.label} narrId="s4-cue">
     <p class="prose" data-narr="s4-p0">{me.s4.para1}</p>
-    <p class="prose para2" data-narr="s4-p1">
+    <p class="prose" data-narr="s4-p1">
       {me.s4.para2Pre}<code>{me.s4.para2Code}</code>{me.s4.para2Post}
     </p>
     <div class="lesson" data-narr="s4-quote">

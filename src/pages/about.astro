@@ -4,6 +4,7 @@ import Masthead from '../components/Masthead.astro';
 import EmbedCard from '../components/EmbedCard.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, about, cta, home } from '../data/copy';
+import { isExternal } from '../lib/isExternal';
 
 // Order matches the footer's, so the two link rows read as one list.
 const links = [
@@ -13,7 +14,6 @@ const links = [
   { label: cta.github.label, href: cta.github.href },
 ];
 
-const isExternal = (href: string) => /^https?:\/\//.test(href);
 ---
 
 <Base title={meta.about.title} description={meta.about.description} path="/about/" ogImage="/og/about.png">
@@ -126,11 +126,6 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   }
 
   .prose {
-    font-family: var(--font-body);
-    font-size: var(--t-body);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 68ch;
     margin-bottom: var(--s-8);
   }
 
@@ -170,14 +165,14 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   .timeline-body {
     font-family: var(--font-body);
     font-size: var(--t-body);
-    line-height: 1.5;
+    line-height: var(--lh-snug);
     color: var(--ink-body);
   }
 
   .timeline-source {
     font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: var(--t-note);
+    line-height: var(--lh-snug);
     color: var(--ink-muted);
     text-align: right;
     /* The column is sized to hold the longest label; anywhere-wrapping is the
@@ -189,7 +184,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   .timeline-source a {
     color: var(--red-ink);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 
   .belief {
@@ -233,7 +228,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   .facts-row a {
     color: var(--red-ink);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 
   .links-list ul {
@@ -272,8 +267,8 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 
   .link-detail {
     font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: var(--t-note);
+    line-height: var(--lh-snug);
     color: var(--ink-muted);
     text-align: right;
   }

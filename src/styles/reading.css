@@ -1,0 +1,40 @@
+/* zoebnomi.com — reading text · The Red Pen v1.0
+   The paragraph and link-row styles every essay and case study shares. They used to be
+   re-declared in each page (eight copies of .prose); a change to reading type is now one edit.
+   Pages keep only what is genuinely theirs (e.g. /about/ adds a bottom margin). */
+
+/* :where() keeps the base at zero specificity, like layout.css: a page or component class
+   (.repo-cta, .table-intro, ...) overrides any single property regardless of which
+   stylesheet loads first. */
+:where(.prose) {
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-prose);
+  color: var(--ink-body);
+  max-width: var(--measure);
+}
+
+.prose + .prose {
+  margin-top: var(--s-6);
+}
+
+/* "Case study → · Repo →": the closing row of links under an essay. */
+.links-line {
+  margin-top: var(--s-6);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+}
+
+.links-line a {
+  /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit-min);
+  color: var(--red-ink);
+  text-decoration: underline;
+  text-underline-offset: var(--underline-offset);
+}
+
+.links-line .sep {
+  color: var(--ink-muted);
+}

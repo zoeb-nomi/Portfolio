@@ -4,31 +4,20 @@ import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
+import { isExternal } from '../../lib/isExternal';
 import { meta, cta, home, writingTwoLevers as wt } from '../../data/copy';
+import { jsonLdString } from '../../lib/jsonLdString';
 
-const articleLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+const articleLd = articleJsonLd({
+  slug: 'two-levers-that-did-not-move',
   headline: wt.title,
   description: meta.writingTwoLevers.description,
-  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  url: 'https://www.zoebnomi.com/writing/two-levers-that-did-not-move/',
-  mainEntityOfPage: 'https://www.zoebnomi.com/writing/two-levers-that-did-not-move/',
-  datePublished: wt.date,
-  dateModified: wt.date,
+  date: wt.date,
   about: 'LLM résumé screening, paired evaluation design, screener noise',
-  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  ...(wt.audio && {
-    audio: {
-      '@type': 'AudioObject',
-      contentUrl: 'https://www.zoebnomi.com/audio/two-levers-that-did-not-move.mp3',
-      encodingFormat: 'audio/mpeg',
-      duration: 'PT3M52S',
-      name: '885 screenings, one résumé, and the two levers that did not move — narration',
-    },
-  }),
-};
+  audio: wt.audio && { src: wt.audio.src, duration: wt.audio.duration },
+});
 ---
 
 <Base
@@ -38,7 +27,7 @@ const articleLd = {
   ogImage="/og/two-levers.png"
   ogType="article"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
   <Masthead
     kicker={wt.kicker}
@@ -73,7 +62,7 @@ const articleLd = {
       {wt.footer.map((link, i) => (
         <>
           {i > 0 && <span class="sep" aria-hidden="true"> · </span>}
-          <a href={link.href} target={link.href.startsWith('http') ? '_blank' : undefined} rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.label}</a>
+          <a href={link.href} target={isExternal(link.href) ? '_blank' : undefined} rel={isExternal(link.href) ? 'noopener noreferrer' : undefined}>{link.label}</a>
         </>
       ))}
     </p>
@@ -90,35 +79,4 @@ const articleLd = {
 </Base>
 
 <style>
-  .prose {
-    font-family: var(--font-body);
-    font-size: var(--t-body);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 68ch;
-  }
-
-  .prose + .prose {
-    margin-top: var(--s-6);
-  }
-
-  .links-line {
-    margin-top: var(--s-6);
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-  }
-
-  .links-line a {
-    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    color: var(--red-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .links-line .sep {
-    color: var(--ink-muted);
-  }
 </style>

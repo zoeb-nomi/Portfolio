@@ -61,10 +61,10 @@ const { current } = Astro.props;
     /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
     display: inline-flex;
     align-items: center;
-    min-height: 24px;
+    min-height: var(--hit-min);
     color: var(--ink-body);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 
   .switch-list a:hover {

@@ -76,10 +76,10 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   <Section mark={cs.s3.mark} label={cs.s3.label} narrId="s3-cue">
     <div data-narr="s3-table1">
-      <DataTable caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
+      <DataTable nowrap caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
     </div>
     <div class="table-gap" data-narr="s3-table2">
-      <DataTable caption={cs.s3.table2.caption} columns={cs.s3.table2.columns} rows={table2Rows} />
+      <DataTable nowrap caption={cs.s3.table2.caption} columns={cs.s3.table2.columns} rows={table2Rows} />
     </div>
     <p class="prose finding" data-narr="s3-p0">
       <strong>{cs.s3.findingLeadIn}</strong>{cs.s3.findingPre}<em>{cs.s3.findingItalic}</em>{cs.s3.findingPost}
@@ -132,14 +132,6 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 </Base>
 
 <style>
-  .prose {
-    font-family: var(--font-body);
-    font-size: var(--t-body);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 68ch;
-  }
-
   .prose em {
     font-family: var(--font-display);
     font-style: italic;
@@ -149,10 +141,10 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
     display: inline-flex;
     align-items: center;
-    min-height: 24px;
+    min-height: var(--hit-min);
     color: var(--red-ink);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 
   .related-writing + .related-writing {
@@ -191,7 +183,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   .method-row dd {
     font-family: var(--font-body);
     font-size: var(--t-body);
-    line-height: 1.6;
+    line-height: var(--lh-body);
     color: var(--ink-body);
     max-width: 60ch;
   }
@@ -203,7 +195,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   .method-row code {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--t-data);
     background: var(--paper-raised);
     padding: 2px 4px;
   }
@@ -219,7 +211,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   .stat-lead {
     font-family: var(--font-body);
     font-size: var(--t-body);
-    line-height: 1.62;
+    line-height: var(--lh-prose);
     color: var(--ink-body);
     max-width: 60ch;
     margin-bottom: var(--s-5);

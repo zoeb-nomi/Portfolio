@@ -8,3 +8,9 @@ export function formatDate(iso: string): string {
   if (!month) return iso;
   return `${Number(m[3])} ${month} ${m[1]}`;
 }
+
+/** 483 -> "8:03" (a narration length). */
+export function formatClock(totalSeconds: number): string {
+  const s = Math.max(0, Math.round(totalSeconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}

@@ -984,7 +984,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
+    min-height: var(--hit-touch);
     min-width: 24px; /* WCAG 2.5.8 minimum target width — was 18px wide */
     justify-content: center;
     font-family: var(--font-mono);
@@ -995,7 +995,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     border: 0;
     padding: 0 var(--s-2);
     text-decoration: none;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
     cursor: pointer;
   }
 
@@ -1078,7 +1078,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   .audio-chip {
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
+    min-height: var(--hit-touch);
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     color: var(--ink-muted);
@@ -1104,7 +1104,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     text-decoration: underline;
     text-decoration-color: var(--red);
     text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1211,7 +1211,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     display: none;
     flex: 0 0 auto;
     min-width: 44px;
-    min-height: 44px;
+    min-height: var(--hit-touch);
     align-items: center;
     justify-content: center;
     font-family: var(--font-mono);
@@ -1268,7 +1268,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   .audio-float-follow,
   .audio-float-up {
     flex: 0 0 auto;
-    min-height: 44px;
+    min-height: var(--hit-touch);
     min-width: 44px;
     justify-content: center;
     display: inline-flex;
@@ -1282,7 +1282,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     border: 0;
     padding: 0;
     text-decoration: none;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
     cursor: pointer;
   }
 

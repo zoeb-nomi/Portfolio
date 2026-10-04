@@ -7,31 +7,19 @@ import DataTable from '../../components/DataTable.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
 import { meta, cta, home, writingBusStop as wb } from '../../data/copy';
 import { formatDate } from '../../lib/formatDate';
+import { jsonLdString } from '../../lib/jsonLdString';
 
-const articleLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+const articleLd = articleJsonLd({
+  slug: 'the-bus-stop-nobody-notices',
   headline: wb.title,
   description: meta.writingBusStop.description,
-  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  url: 'https://www.zoebnomi.com/writing/the-bus-stop-nobody-notices/',
-  mainEntityOfPage: 'https://www.zoebnomi.com/writing/the-bus-stop-nobody-notices/',
-  datePublished: wb.date,
-  dateModified: wb.date,
+  date: wb.date,
   about: 'Indian intercity bus industry, Vijayanand Travels, premiumisation, hypothesis-driven investing, Vijayanand Travels video coverage',
-  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  ...(wb.audio && {
-    audio: {
-      '@type': 'AudioObject',
-      contentUrl: 'https://www.zoebnomi.com/audio/the-bus-stop-nobody-notices.mp3',
-      encodingFormat: 'audio/mpeg',
-      duration: 'PT15M46S',
-      name: 'The bus stop nobody notices — narration',
-    },
-  }),
-};
+  audio: wb.audio && { src: wb.audio.src, duration: wb.audio.duration },
+});
 ---
 
 <Base
@@ -41,7 +29,7 @@ const articleLd = {
   ogImage="/og/bus-stop.png"
   ogType="article"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
   <Masthead kicker={wb.kicker} h1={wb.title} standfirst={wb.dek} h1Max="24ch" narr>
     <Fragment slot="byline"><time datetime={wb.date}>{formatDate(wb.date)}</time> · {wb.readingTime} read</Fragment>
@@ -111,9 +99,6 @@ const articleLd = {
     <div
       class="textual table-wrap"
       data-narr="s5-table"
-      tabindex="0"
-      role="region"
-      aria-label="Operators table, scrollable"
     >
       <DataTable caption={wb.s5.table.caption} columns={wb.s5.table.columns} rows={wb.s5.table.rows} />
     </div>
@@ -193,9 +178,6 @@ const articleLd = {
     <div class="table-gap basket textual" data-narr="s7-table">
       <div
         class="table-wrap basket-table-wrap"
-        tabindex="0"
-        role="region"
-        aria-label="The basket as placed, table, scrollable"
       >
         <DataTable caption={wb.s7.table.caption} columns={wb.s7.table.columns} rows={wb.s7.table.rows} />
       </div>
@@ -334,14 +316,6 @@ const articleLd = {
 </Base>
 
 <style>
-  .prose {
-    font-family: var(--font-body);
-    font-size: var(--t-body);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 68ch;
-  }
-
   .prose + .prose,
   .stats + .prose,
   .table-gap + .prose,
@@ -364,26 +338,6 @@ const articleLd = {
     font-size: var(--t-micro);
     color: var(--ink-muted);
     margin-top: var(--s-7);
-  }
-
-  .links-line {
-    margin-top: var(--s-6);
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-  }
-
-  .links-line a {
-    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    color: var(--red-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .links-line .sep {
-    color: var(--ink-muted);
   }
 
   /* Inline-SVG data figures (§3, §6): thin marks, direct value labels, no
@@ -575,11 +529,11 @@ const articleLd = {
 
   /* Table wrapper: lets a wide table scroll within its own box instead of
      pushing the document wider than the viewport. */
+  /* DataTable scrolls itself; this wrapper must not add a second scroller. */
   .table-wrap {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    overflow-x: auto;
   }
 
   @media (max-width: 899px) {
@@ -807,7 +761,7 @@ const articleLd = {
   .watch-why {
     font-family: var(--font-body);
     font-size: var(--t-note); /* sans floor is 12px */
-    line-height: 1.5;
+    line-height: var(--lh-snug);
     color: var(--ink-body);
     margin: 0;
   }

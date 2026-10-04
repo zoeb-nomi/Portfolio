@@ -34,8 +34,7 @@ interface Props {
   narr?: boolean;
   spec?: SpecRow[];
   switcher?: 'CrossSource' | 'mirror-eval' | 'screener-eval';
-  /** `bare` keeps the pre-WCAG-2.5.8 link (no 24px hit area); see .repo-link--bare. */
-  repo?: { href: string; label: string; bare?: boolean };
+  repo?: { href: string; label: string };
 }
 
 const {
@@ -93,7 +92,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
           )}
           {switcher && <EvalsSwitcher current={switcher} />}
           {repo && (
-            <a class:list={['repo-link', { 'repo-link--bare': repo.bare }]} href={repo.href} target="_blank" rel="noopener noreferrer">
+            <a class="repo-link" href={repo.href} target="_blank" rel="noopener noreferrer">
               {repo.label}
             </a>
           )}
@@ -145,7 +144,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
   .page-h1 {
     font-family: var(--font-display);
     font-size: var(--t-page);
-    line-height: 1.02;
+    line-height: var(--lh-display);
     letter-spacing: var(--track-tight);
     color: var(--ink);
     margin-bottom: var(--s-6);
@@ -155,7 +154,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
   .standfirst {
     font-family: var(--font-body);
     font-size: var(--t-body);
-    line-height: 1.62;
+    line-height: var(--lh-prose);
     color: var(--ink-body);
     max-width: var(--standfirst-max, 62ch);
   }
@@ -197,27 +196,28 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     color: var(--ink);
   }
 
+  /* In the 200px margin column (900-1099px) label and value no longer fit on one line:
+     stack them instead of letting each wrap independently ("Probes 332 per / wave"). */
+  @media (min-width: 900px) and (max-width: 1099px) {
+    .spec-row {
+      flex-direction: column;
+      gap: var(--s-1);
+    }
+  }
+
   .repo-link {
     display: inline-block;
     /* Hit area >= 24px tall (WCAG 2.5.8): padding added, margin-top reduced by
        the same amount so the layout does not move. */
     padding-block: var(--s-1);
-    min-height: 24px;
+    min-height: var(--hit-min);
     margin-top: calc(var(--s-6) - var(--s-1));
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     color: var(--red-ink);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
     overflow-wrap: anywhere;
-  }
-
-  /* CrossSource's original link: no padded hit area. Kept so the refactor moves
-     no pixel; drop the flag (and this rule) to give it the 24px target. */
-  .repo-link--bare {
-    padding-block: 0;
-    min-height: 0;
-    margin-top: var(--s-6);
   }
 
   /* plain: the margin column is only the rule; it has no content to stack. */

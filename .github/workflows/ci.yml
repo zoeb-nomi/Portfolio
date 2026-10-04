@@ -26,6 +26,7 @@ jobs:
       - run: npm run build
       - run: npm run gate
       - run: npm run check
+      - run: npm run lint
       - run: npx playwright install --with-deps chromium
       - name: Preview + QA sweep
         run: |
@@ -33,6 +34,7 @@ jobs:
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:4321/ >/dev/null && break; sleep 1; done
           npm run qa
           npm run tokens
+      - run: npm run audio:check
       - uses: actions/upload-artifact@v4
         if: always()
         with:

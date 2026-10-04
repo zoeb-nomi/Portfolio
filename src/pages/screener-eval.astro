@@ -8,6 +8,7 @@ import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
 import { meta, screenerEval as se, screenerEvalJsonLd, cta, home } from '../data/copy';
+import { jsonLdString } from '../lib/jsonLdString';
 
 const table1Rows = se.s3.table1.rows.map((r) => ({
   label: r.lever,
@@ -31,7 +32,7 @@ const table3Rows = se.s5.table.rows.map((r) => ({
   path="/screener-eval/"
   ogImage="/og/screener-eval.png"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(screenerEvalJsonLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(screenerEvalJsonLd)} is:inline />
 
   <Masthead
     label="Case study specification"
@@ -71,11 +72,11 @@ const table3Rows = se.s5.table.rows.map((r) => ({
   <Section mark={se.s3.mark} label={se.s3.label} narrId="s3-cue">
     <p class="prose intro" data-narr="s3-p0">{se.s3.intro}</p>
     <div class="table-scroll" data-narr="s3-table1">
-      <DataTable caption={se.s3.table1.caption} columns={se.s3.table1.columns} rows={table1Rows} />
+      <DataTable nowrap caption={se.s3.table1.caption} columns={se.s3.table1.columns} rows={table1Rows} />
     </div>
     <p class="prose table-intro" data-narr="s3-p1">{se.s3.table2Intro}</p>
     <div class="table-scroll" data-narr="s3-table2">
-      <DataTable caption={se.s3.table2.caption} columns={se.s3.table2.columns} rows={table2Rows} />
+      <DataTable nowrap caption={se.s3.table2.caption} columns={se.s3.table2.columns} rows={table2Rows} />
     </div>
     <p class="prose between" data-narr="s3-p2">{se.s3.betweenScreeners}</p>
     <p class="prose finding" data-narr="s3-p3">
@@ -93,7 +94,7 @@ const table3Rows = se.s5.table.rows.map((r) => ({
   <Section mark={se.s5.mark} label={se.s5.label} narrId="s5-cue">
     <p class="prose intro" data-narr="s5-p0">{se.s5.intro}</p>
     <div class="table-scroll" data-narr="s5-table">
-      <DataTable caption={se.s5.table.caption} columns={se.s5.table.columns} rows={table3Rows} />
+      <DataTable nowrap caption={se.s5.table.caption} columns={se.s5.table.columns} rows={table3Rows} />
     </div>
     <p class="prose close" data-narr="s5-p1">{se.s5.close}</p>
   </Section>

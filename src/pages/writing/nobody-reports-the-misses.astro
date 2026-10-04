@@ -8,36 +8,22 @@ import OwnershipGap from '../../components/OwnershipGap.astro';
 import BarList from '../../components/BarList.astro';
 import UnitChart from '../../components/UnitChart.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
 import { meta, writingMisses as wm } from '../../data/copy';
+import { jsonLdString } from '../../lib/jsonLdString';
 
-const url = 'https://www.zoebnomi.com/writing/nobody-reports-the-misses/';
 const f = wm.figures;
-const mins = Math.floor(wm.audio.duration / 60);
-const secs = wm.audio.duration % 60;
 const summaryRows = f.summary.rows.map((r) => ({ label: r.label, cells: r.cells.map((text) => ({ text })) }));
 
-const articleLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+const articleLd = articleJsonLd({
+  slug: 'nobody-reports-the-misses',
   headline: wm.title,
   description: meta.writingMisses.description,
-  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  url,
-  mainEntityOfPage: url,
-  datePublished: wm.date,
-  dateModified: wm.date,
+  date: wm.date,
   about: 'Counting missed items (false passes) in AI systems used for regulated work',
-  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  audio: {
-    '@type': 'AudioObject',
-    contentUrl: `https://www.zoebnomi.com${wm.audio.src}`,
-    encodingFormat: 'audio/mpeg',
-    duration: `PT${mins}M${secs}S`,
-    name: `${wm.title} — narration`,
-    caption: `https://www.zoebnomi.com${wm.audio.captions}`,
-  },
-};
+  audio: { src: wm.audio.src, duration: wm.audio.duration, captions: wm.audio.captions },
+});
 ---
 
 <Base
@@ -47,7 +33,7 @@ const articleLd = {
   ogImage="/og/misses.png"
   ogType="article"
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
   <Masthead kicker={wm.kicker} h1={wm.title} standfirst={wm.dek} h1Max="24ch" narr>
     <Fragment slot="byline"><time datetime={wm.date}>{formatDate(wm.date)}</time> · {wm.readingTime} read</Fragment>
@@ -120,18 +106,6 @@ const articleLd = {
 </Base>
 
 <style>
-  .prose {
-    font-family: var(--font-body);
-    font-size: var(--t-body);
-    line-height: 1.62;
-    color: var(--ink-body);
-    max-width: 68ch;
-  }
-
-  .prose + .prose {
-    margin-top: var(--s-6);
-  }
-
   .intro {
     margin-top: var(--s-8);
   }
@@ -140,21 +114,21 @@ const articleLd = {
     margin-top: var(--s-3);
     font-family: var(--font-body);
     font-size: var(--t-note);
-    line-height: 1.5;
+    line-height: var(--lh-snug);
     color: var(--ink-muted);
   }
 
   .read-along a {
     color: var(--red-ink);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 
   /* A figure or table that follows a paragraph needs the same gap a paragraph
      would get. The figure supplies its own margin; the table wrapper does here. */
   .summary {
     margin-top: var(--s-8);
-    max-width: 68ch;
+    max-width: var(--measure);
   }
 
   /* Table 1 is text, not numbers: left-align it (DataTable defaults to the

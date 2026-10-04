@@ -99,7 +99,7 @@ const parts = site.footerLine.split(' · ').map((part) => part.replace(' — ', 
 
   .llms-link {
     /* WCAG 2.5.8: 24px minimum hit area. */
-    min-height: 24px;
+    min-height: var(--hit-min);
     padding-block: var(--s-1);
     color: var(--ink-muted);
     text-transform: none;
