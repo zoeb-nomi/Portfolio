@@ -5,6 +5,7 @@ import Section from '../components/Section.astro';
 import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
 import { meta, crosssource as cs, cta, home } from '../data/copy';
 
 const table1Rows = cs.s3.table1.rows.map((r) => ({
@@ -34,16 +35,19 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     spec={cs.specBlock}
     switcher="CrossSource"
     repo={{ href: cs.repoHref, label: cs.repoLabel }}
-  />
+    narr
+  >
+    <AudioPlayer audio={cs.audio} articleId="crosssource" />
+  </Masthead>
 
-  <Section mark={cs.s1.mark} label={cs.s1.label}>
-    <p class="prose">
+  <Section mark={cs.s1.mark} label={cs.s1.label} narrId="s1-cue">
+    <p class="prose" data-narr="s1-p0">
       {cs.s1.paraPre}<em>{cs.s1.caseName}</em>{cs.s1.paraMid}<span class="highlight">{cs.s1.highlight}</span>{cs.s1.paraPost}
     </p>
   </Section>
 
-  <Section mark={cs.s2.mark} label={cs.s2.label}>
-    <dl class="method-list">
+  <Section mark={cs.s2.mark} label={cs.s2.label} narrId="s2-cue">
+    <dl class="method-list" data-narr="s2-list">
       {cs.s2.rows.map((row) => (
         <div class="method-row">
           <dt>{row.term}</dt>
@@ -70,47 +74,49 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     </dl>
   </Section>
 
-  <Section mark={cs.s3.mark} label={cs.s3.label}>
-    <DataTable caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
-    <div class="table-gap">
+  <Section mark={cs.s3.mark} label={cs.s3.label} narrId="s3-cue">
+    <div data-narr="s3-table1">
+      <DataTable caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
+    </div>
+    <div class="table-gap" data-narr="s3-table2">
       <DataTable caption={cs.s3.table2.caption} columns={cs.s3.table2.columns} rows={table2Rows} />
     </div>
-    <p class="prose finding">
+    <p class="prose finding" data-narr="s3-p0">
       <strong>{cs.s3.findingLeadIn}</strong>{cs.s3.findingPre}<em>{cs.s3.findingItalic}</em>{cs.s3.findingPost}
     </p>
   </Section>
 
-  <Section mark={cs.s4.mark} label={cs.s4.label} note={cs.s4.marginNote}>
-    <p class="stat-lead">{cs.s4.statPre}</p>
-    <p class="stat-figure tabular">{cs.s4.statQuote}{cs.s4.statPost}</p>
-    <p class="prose">{cs.s4.bugPara}</p>
-    <div class="lesson">
+  <Section mark={cs.s4.mark} label={cs.s4.label} note={cs.s4.marginNote} narrId="s4-cue">
+    <p class="stat-lead" data-narr="s4-p0">{cs.s4.statPre}</p>
+    <p class="stat-figure tabular" data-narr="s4-p1">{cs.s4.statQuote}{cs.s4.statPost}</p>
+    <p class="prose" data-narr="s4-p2">{cs.s4.bugPara}</p>
+    <div class="lesson" data-narr="s4-quote">
       <PullQuote rule="red">{cs.s4.lessonQuote}</PullQuote>
     </div>
   </Section>
 
-  <Section mark={cs.s5.mark} label={cs.s5.label}>
-    <p class="prose intro">{cs.s5.intro}</p>
-    <ul class="rule-list">
+  <Section mark={cs.s5.mark} label={cs.s5.label} narrId="s5-cue">
+    <p class="prose intro" data-narr="s5-p0">{cs.s5.intro}</p>
+    <ul class="rule-list" data-narr="s5-list">
       {cs.s5.items.map((item) => <li>{item}</li>)}
     </ul>
   </Section>
 
-  <Section mark={cs.s6.mark} label={cs.s6.label}>
-    <p class="status-line">{cs.s6.status}</p>
-    <ul class="mono-list">
+  <Section mark={cs.s6.mark} label={cs.s6.label} narrId="s6-cue">
+    <p class="status-line" data-narr="s6-p0">{cs.s6.status}</p>
+    <ul class="mono-list" data-narr="s6-list">
       {cs.s6.items.map((item) => <li>{item}</li>)}
     </ul>
   </Section>
 
-  <Section mark="§7" label="Related writing">
-    <p class="prose related-writing">
+  <Section mark="§7" label="Related writing" narrId="s7-cue">
+    <p class="prose related-writing" data-narr="s7-p0">
       <a href="/writing/the-judge-caught-a-bug/">The judge caught a bug I didn't</a> — on validating the LLM judge behind these numbers.
     </p>
-    <p class="prose related-writing">
+    <p class="prose related-writing" data-narr="s7-p1">
       <a href="/mirror-eval/">mirror-eval</a> — the same method pointed at what AI search engines say about me.
     </p>
-    <p class="prose related-writing">
+    <p class="prose related-writing" data-narr="s7-p2">
       <a href="/screener-eval/">screener-eval</a> — the same counting discipline pointed at LLM résumé screeners, no judge at all.
     </p>
   </Section>
