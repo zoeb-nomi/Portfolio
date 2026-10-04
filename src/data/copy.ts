@@ -2069,7 +2069,7 @@ export const about = {
     {
       year: '2025–present',
       body: 'Product Manager, Instead · owning production LLM output quality',
-      source: { label: 'instead.com/research →', href: sources.insteadResearch.href } as TimelineSource | null,
+      source: null as TimelineSource | null,
     },
   ],
   // The Medium piece cannot be framed, so the About page draws the link card
