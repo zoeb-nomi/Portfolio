@@ -58,6 +58,13 @@ Essays are hand-built `.astro` pages in `src/pages/writing/`, not Markdown and n
 
 **Figures.** `EssayFigure` (a numbered, captioned frame with a source line) wraps `UnitChart` (one square per case), `BarList` (label / bar / value rows), `OwnershipGap` (a chain-of-ownership illustration), or the existing `DataTable`. They are built from HTML and hairlines, not SVG, so type stays on the token scale and above the 11px floor; the numbers in them come from the site's own harness pages and each figure links its source. For a wide text table on phones, render a stacked-card version below 900px (see Table 1 in `nobody-reports-the-misses.astro`).
 
+**Animated figures.** The data figures move: `ForestPlot` (confidence intervals around zero, with the screener gap on the same scale), `Dumbbell` (a hollow start marker and a filled end marker that slides out), `UnitChart` (squares fill in), `ParserCompare` (two résumé versions, tick boxes grey one out), `FailureOwners`, `EvidenceStack` (3D sheets on /mirror-eval/, flat with reduced motion), `PlayerStepper` (a media-player explainer; its transcript is the figure when JavaScript is off), `ProofStrip` (counts up on the home page and /evals/), and `CareerTimeline` on /about/. The rules:
+
+- The default CSS is the final state, so a figure is complete with no script and with reduced motion. `src/scripts/figure-motion.ts` puts a figure in its start frame (`data-state="pre"`) and plays it once when 35% of it is on screen; pass `replay` to `EssayFigure` to get the small Replay link.
+- Numbers are not typed twice. `src/lib/figureData.ts` reads them out of the case-study tables and paragraphs, and the build fails, naming the figure, if the wording changes so a number can no longer be read.
+- Chart positions are unitless CSS variables (`--x`, `--l`, `--w`), not inline percentages: the geo-gate bans the string `85%` anywhere in the HTML, and a chart can land on it by chance.
+- Lines are 1px ink, 1px rule or 2px red, filled squares carry no border, and everything stays on the type tokens; `npm run tokens` and `npm run lint` check it.
+
 ## Design system ("The Red Pen") and accessibility conventions
 
 `src/styles/tokens.css` is the single source for colour, type, space, lines and breakpoints; `scripts/tokens-audit.mjs` checks the rendered result.

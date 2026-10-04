@@ -8,13 +8,18 @@ interface Props {
   source?: string;
   href?: string;
   hrefLabel?: string;
+  /** The figure animates: show a small Replay link (shown by figure-motion.ts when motion is allowed). */
+  replay?: boolean;
 }
 
-const { n, title, source, href, hrefLabel } = Astro.props;
+const { n, title, source, href, hrefLabel, replay = false } = Astro.props;
 ---
 
 <figure class="ef">
-  <figcaption class="ef-title"><span class="ef-n">Fig. {n}</span> {title}</figcaption>
+  <figcaption class="ef-title">
+    <span><span class="ef-n">Fig. {n}</span> {title}</span>
+    {replay && <button type="button" class="ef-replay" hidden>Replay</button>}
+  </figcaption>
   <div class="ef-body"><slot /></div>
   {
     (source || href) && (
@@ -40,6 +45,11 @@ const { n, title, source, href, hrefLabel } = Astro.props;
   }
 
   .ef-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
     font-family: var(--font-mono);
     font-size: var(--t-label);
     letter-spacing: var(--track-caps);
@@ -47,6 +57,20 @@ const { n, title, source, href, hrefLabel } = Astro.props;
     color: var(--ink-muted);
     line-height: var(--lh-label);
     margin-bottom: var(--s-5);
+  }
+
+  .ef-replay {
+    min-block-size: var(--hit-min);
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+    cursor: pointer;
   }
 
   /* The figure number is a reviewer's proof mark: annotation, so red. */

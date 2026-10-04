@@ -1052,12 +1052,56 @@ export type Cue = [string, number, number];
 // "The judge caught a bug I didn't" keeps its title/standfirst/body as local
 // consts in the page itself (no writing* object above) — this is just the
 // audio player data for it.
+export interface PlayerStage {
+  title: string;
+  text: string;
+  tone?: 'bad';
+  chips: { text: string; kind?: 'hot' | 'fail' }[];
+}
+
 export const writingJudgeBug = {
   kicker: 'Eval methodology · CrossSource',
   title: "The judge caught a bug I didn't",
   dek: 'On validating LLM-as-judge evals — and why a 15/15 blind agreement and a broken instrument can live in the same pipeline.',
   date: '2026-08-20',
   readingTime: '2 min',
+
+  // The five stages of the step-through player (PlayerStepper), shared by this essay and /crosssource/ section 4.
+  // Every claim is in the essay or the case study: inline doc_id:chunk_id citations; consecutive citations giving
+  // punctuation-only claim spans such as "."; the judge scoring them as citation failures; the blind 15/15 check
+  // that surfaced the bug. The spans drawn are placeholders, not real answer text.
+  player: {
+    title: 'One answer through the harness',
+    stages: [
+      {
+        title: 'The answer',
+        text: 'The model answers a legal question and cites its sources inline.',
+        chips: [{ text: 'claim span' }, { text: 'claim span' }, { text: 'claim span' }],
+      },
+      {
+        title: 'Claim spans',
+        text: 'The harness cuts the answer into claim spans. The judge will check each one against the passage it cites.',
+        chips: [{ text: 'claim span' }, { text: 'claim span' }, { text: 'claim span' }, { text: 'claim span' }],
+      },
+      {
+        title: 'The bug',
+        tone: 'bad',
+        text: 'Where two citations sit side by side, a span is left holding nothing but punctuation, a fragment like "." that is not a claim.',
+        chips: [{ text: 'claim span' }, { text: 'claim span' }, { text: '.', kind: 'hot' }, { text: 'claim span' }],
+      },
+      {
+        title: 'The judge scores it',
+        tone: 'bad',
+        text: 'The judge dutifully scores that span as a citation failure. A harness bug now looks like a model failure.',
+        chips: [{ text: 'claim span' }, { text: 'claim span' }, { text: '. failed', kind: 'fail' }, { text: 'claim span' }],
+      },
+      {
+        title: 'The blind check',
+        text: "I hand-graded a blind, stratified sample of the judge's verdicts: 15 of 15 agreed. Checking the judge is what exposed the bug.",
+        chips: [{ text: '15 of 15 agree' }, { text: 'bug found anyway', kind: 'hot' }],
+      },
+    ] as PlayerStage[],
+  },
 };
 
 export const writingJudgeBugAudio = {
@@ -2066,6 +2110,13 @@ export const notFound = {
   message: '404 — no source found for that claim',
   linkLabel: 'Home',
   linkHref: '/',
+  /** The page it would have been: one square of twelve is missing. Illustration only, no data. */
+  caption: 'One of these is the page you asked for.',
+  links: [
+    { label: 'Home', href: '/' },
+    { label: 'Case studies', href: '/evals/' },
+    { label: 'Writing', href: '/writing/' },
+  ],
 };
 
 // ---------------------------------------------------------------------------

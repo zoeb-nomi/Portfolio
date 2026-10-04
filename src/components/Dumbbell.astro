@@ -1,0 +1,139 @@
+---
+// Dumbbell: one row per item, a hollow marker where it started and a filled marker where it ended, joined by a
+// line. It plays once as it scrolls into view: the filled marker slides from the start to the end. The values
+// are text first; the drawing is aria-hidden.
+interface Row {
+  label: string;
+  sub?: string;
+  from: number;
+  to: number;
+  note?: string;
+}
+
+interface Props {
+  rows: Row[];
+  max: number;
+  ticks: number[];
+  fromLabel: string;
+  toLabel: string;
+  /** Appended to each value, e.g. "of 63". */
+  unit?: string;
+  heading?: string;
+  /** Show the hollow / filled key (leave it off for later groups in the same figure). */
+  showKey?: boolean;
+}
+
+import { n2 } from '../lib/pct';
+
+const { rows, max, ticks, fromLabel, toLabel, unit, heading, showKey = true } = Astro.props;
+const pos = (v: number) => (v / max) * 100;
+---
+
+<div class="db" data-fig="dumbbell">
+  {heading && <p class="db-heading">{heading}</p>}
+  {
+    showKey && (
+      <p class="db-key" aria-hidden="true">
+        <span><i class="fg-pt" /> {fromLabel}</span>
+        <span><i class="fg-pt is-fill" /> {toLabel}</span>
+      </p>
+    )
+  }
+  {
+    rows.map((r, i) => (
+      <div class="fg-row" style={`--r:${i}`}>
+        <span class="fg-lab">{r.label}{r.sub && <small>{r.sub}</small>}</span>
+        <span class="fg-trk" aria-hidden="true">
+          <span class="fg-in">
+            <span
+              class="fg-line db-link"
+              style={`--l:${n2(pos(Math.min(r.from, r.to)))};--w:${n2(Math.abs(pos(r.to) - pos(r.from)))};transform-origin:${r.to >= r.from ? 'left' : 'right'}`}
+            />
+            <span class="fg-pt db-from" style={`--x:${n2(pos(r.from))}`} />
+            <span class="fg-pt is-fill db-to" style={`--from:${n2(pos(r.from))};--to:${n2(pos(r.to))}`} />
+          </span>
+        </span>
+        <span class="fg-val">{r.from} {'→'} {r.to}{unit ? ` ${unit}` : ''}</span>
+        {r.note && <span class="fg-note">{r.note}</span>}
+      </div>
+    ))
+  }
+  <div class="fg-axis" aria-hidden="true">
+    <div class="fg-axis-in">
+      {ticks.map((t) => <span style={`--x:${n2(pos(t))}`}>{t}</span>)}
+    </div>
+  </div>
+</div>
+
+<script>
+  import { mountFigures } from '../scripts/figure-motion';
+  mountFigures('[data-fig="dumbbell"]');
+</script>
+
+<style>
+  .db {
+    --fg-val: 7.5rem;
+  }
+
+  .db + .db {
+    margin-top: var(--s-6);
+  }
+
+  .db-heading {
+    margin-bottom: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    color: var(--ink-muted);
+  }
+
+  .db-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+    margin-bottom: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .db-key span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .db-key .fg-pt {
+    position: static;
+    margin: 0;
+    flex: none;
+  }
+
+  /* The filled marker starts on top of the hollow one and slides out; the joining line is drawn behind it. */
+  .db-to {
+    left: calc(var(--to) * 1%);
+    transition: left 900ms var(--ease-draw);
+    transition-delay: calc(var(--r) * 110ms + 150ms);
+  }
+
+  .db-from {
+    left: calc(var(--x) * 1%);
+  }
+
+  .db-link {
+    left: calc(var(--l) * 1%);
+    width: calc(var(--w) * 1%);
+    transition: transform 900ms var(--ease-draw);
+    transition-delay: calc(var(--r) * 110ms + 150ms);
+  }
+
+  .db[data-state='pre'] .db-to {
+    left: calc(var(--from) * 1%);
+    transition: none;
+  }
+
+  .db[data-state='pre'] .db-link {
+    transform: scaleX(0);
+    transition: none;
+  }
+</style>

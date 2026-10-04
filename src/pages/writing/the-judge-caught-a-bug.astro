@@ -4,6 +4,8 @@ import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
+import EssayFigure from '../../components/EssayFigure.astro';
+import PlayerStepper from '../../components/PlayerStepper.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
@@ -63,6 +65,9 @@ const articleLd = articleJsonLd({
       it changed the metrics: citation precision moved from 0.981 to 0.994 under strict citation
       discipline.
     </p>
+    <EssayFigure n={1} title={wj.player.title} source="Source: this essay and the CrossSource case study. The spans drawn are placeholders, not real answer text." href="/crosssource/" hrefLabel="Case study →">
+      <PlayerStepper stages={wj.player.stages} />
+    </EssayFigure>
   </Section>
 
   <Section mark="§3" label="Why this keeps happening" narrId="s3-cue">

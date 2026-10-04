@@ -1,0 +1,177 @@
+---
+// A silent preview of the read-along: the first lines of a real essay light up on the narration's own timing
+// (the cue times in copy.ts), looping. It has a Pause button and stops when it is off screen. With reduced
+// motion it is a still frame with the first line lit. No sound plays; the real thing is on every essay page.
+import { writingJudgeBug, writingJudgeBugAudio } from '../data/copy';
+
+const cue = (id: string) => writingJudgeBugAudio.cues.find((c) => c[0] === id) ?? (() => { throw new Error(`ReadAlongDemo: no cue ${id}`); })();
+const title = cue('s0-title');
+const dek = cue('s0-dek');
+const lines = [
+  { text: writingJudgeBug.title, start: title[1], end: title[2], kind: 'title' },
+  { text: writingJudgeBug.dek, start: dek[1], end: dek[2], kind: 'dek' },
+];
+const total = Math.ceil(dek[2] + 1.5);
+---
+
+<div class="ra" data-ra data-total={total} data-lines={JSON.stringify(lines.map((l) => [l.start, l.end]))}>
+  <p class="ra-label">Listen, and read along</p>
+  <div class="ra-box">
+    <p class="ra-line ra-line--title is-lit" data-i="0">{lines[0].text}</p>
+    <p class="ra-line ra-line--dek" data-i="1">{lines[1].text}</p>
+    <div class="ra-foot">
+      <span class="ra-bar" aria-hidden="true"><i data-bar></i></span>
+      <span class="ra-note">Silent preview. Every essay has the real narration and this highlighting.</span>
+      <button type="button" class="ra-pause" data-pause hidden>Pause</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { motionAllowed } from '../scripts/figure-motion';
+
+  if (motionAllowed()) {
+    document.querySelectorAll<HTMLElement>('[data-ra]').forEach((root) => {
+      const total = Number(root.dataset.total) * 1000;
+      const cues: [number, number][] = JSON.parse(root.dataset.lines ?? '[]');
+      const lit = Array.from(root.querySelectorAll<HTMLElement>('[data-i]'));
+      const bar = root.querySelector<HTMLElement>('[data-bar]')!;
+      const pause = root.querySelector<HTMLButtonElement>('[data-pause]')!;
+      pause.hidden = false;
+      let t = 0;
+      let last = 0;
+      let running = false;
+      let onScreen = false;
+      let userPaused = false;
+      let raf = 0;
+
+      const paint = () => {
+        lit.forEach((el, i) => el.classList.toggle('is-lit', t / 1000 >= cues[i][0] && t / 1000 < cues[i][1] + 0.4));
+        bar.style.inlineSize = `${(t / total) * 100}%`;
+      };
+      const tick = (now: number) => {
+        if (!running) return;
+        t = (t + (now - last)) % total;
+        last = now;
+        paint();
+        raf = requestAnimationFrame(tick);
+      };
+      const sync = () => {
+        const should = onScreen && !userPaused;
+        if (should && !running) {
+          running = true;
+          last = performance.now();
+          raf = requestAnimationFrame(tick);
+        } else if (!should && running) {
+          running = false;
+          cancelAnimationFrame(raf);
+        }
+      };
+
+      new IntersectionObserver((e) => { onScreen = e.some((x) => x.isIntersecting); sync(); }, { threshold: 0.3 }).observe(root);
+      pause.addEventListener('click', () => {
+        userPaused = !userPaused;
+        pause.textContent = userPaused ? 'Play' : 'Pause';
+        sync();
+      });
+      paint();
+    });
+  }
+</script>
+
+<style>
+  .ra {
+    padding: var(--s-6) var(--gutter);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .ra-label {
+    margin-bottom: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .ra-box {
+    max-inline-size: 44rem;
+    padding: var(--s-5) var(--s-6);
+    border: 1px solid var(--ink);
+    background: var(--paper-raised);
+  }
+
+  .ra-line {
+    padding: var(--s-1) var(--s-3);
+    border-inline-start: 2px solid transparent;
+    color: var(--ink-muted);
+    transition: color var(--dur-base) ease, border-color var(--dur-base) ease;
+  }
+
+  .ra-line--title {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    line-height: var(--lh-title);
+    letter-spacing: var(--track-tight);
+  }
+
+  .ra-line--dek {
+    margin-top: var(--s-2);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+  }
+
+  .ra-line.is-lit {
+    border-inline-start-color: var(--red);
+    color: var(--ink);
+  }
+
+  .ra-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-4);
+    margin-top: var(--s-4);
+  }
+
+  .ra-bar {
+    flex: 1 1 8rem;
+    block-size: var(--s-1);
+    background: var(--rule);
+  }
+
+  .ra-bar i {
+    display: block;
+    block-size: 100%;
+    inline-size: 0;
+    background: var(--ink);
+  }
+
+  .ra-note {
+    flex: 3 1 14rem;
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .ra-pause {
+    min-block-size: var(--hit-min);
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+    cursor: pointer;
+  }
+
+  @media (max-width: 599px) {
+    .ra-box {
+      padding: var(--s-4);
+    }
+  }
+</style>

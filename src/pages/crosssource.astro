@@ -6,7 +6,13 @@ import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
-import { meta, crosssource as cs, cta, home } from '../data/copy';
+import EssayFigure from '../components/EssayFigure.astro';
+import FailureOwners from '../components/FailureOwners.astro';
+import PlayerStepper from '../components/PlayerStepper.astro';
+import { meta, crosssource as cs, writingJudgeBug as wj, cta, home } from '../data/copy';
+import { failureData } from '../lib/figureData';
+
+const failures = failureData();
 
 const table1Rows = cs.s3.table1.rows.map((r) => ({
   label: r.dimension,
@@ -75,6 +81,9 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   </Section>
 
   <Section mark={cs.s3.mark} label={cs.s3.label} narrId="s3-cue">
+    <EssayFigure n={1} replay title="Which layer owns the failure" source="Source: Tables 1 and 2 below. Wrong-passage failures fell under the strict prompt; missing-authority failures trace to retrieval.">
+      <FailureOwners {...failures} />
+    </EssayFigure>
     <div data-narr="s3-table1">
       <DataTable nowrap caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
     </div>
@@ -90,6 +99,9 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     <p class="stat-lead" data-narr="s4-p0">{cs.s4.statPre}</p>
     <p class="stat-figure tabular" data-narr="s4-p1">{cs.s4.statQuote}{cs.s4.statPost}</p>
     <p class="prose" data-narr="s4-p2">{cs.s4.bugPara}</p>
+    <EssayFigure n={2} title={wj.player.title} source="Source: this section and the judge essay. The spans drawn are placeholders, not real answer text." href="/writing/the-judge-caught-a-bug/" hrefLabel="Read the essay →">
+      <PlayerStepper stages={wj.player.stages} />
+    </EssayFigure>
     <div class="lesson" data-narr="s4-quote">
       <PullQuote rule="red">{cs.s4.lessonQuote}</PullQuote>
     </div>

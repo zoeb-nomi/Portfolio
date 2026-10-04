@@ -1,0 +1,408 @@
+---
+// A step-through explainer built like a media player: a screen, five chapters, and a bar with Play/Pause, Back,
+// Next, a scrubber, the time, and a speed control. It never starts by itself. Without JavaScript the player is
+// hidden and the transcript below it (all five steps, in full) is the figure.
+interface Chip {
+  text: string;
+  kind?: 'hot' | 'fail';
+}
+
+interface Stage {
+  title: string;
+  text: string;
+  tone?: 'bad';
+  chips: Chip[];
+}
+
+interface Props {
+  stages: Stage[];
+  /** Seconds each step lasts at 1x. */
+  seconds?: number;
+}
+
+const { stages, seconds = 4 } = Astro.props;
+const deci = stages.length * seconds * 10;
+---
+
+<div class="ps" data-ps data-seconds={seconds} data-stages={JSON.stringify(stages)}>
+  <div class="ps-player" hidden>
+    <div class="ps-screen">
+      <div class="ps-strip" data-strip></div>
+      <p class="ps-cap" data-cap aria-live="polite"></p>
+    </div>
+    <ol class="ps-chapters">
+      {
+        stages.map((s, i) => (
+          <li>
+            <button type="button" class="ps-chap" data-chap={i} data-tone={s.tone} aria-label={`Go to step ${i + 1}: ${s.title}`}>
+              <span class="ps-chap-n" aria-hidden="true">{i + 1}</span><span class="ps-chap-t" aria-hidden="true">{s.title}</span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="ps-bar">
+      <button type="button" class="ps-play" data-play>Play</button>
+      <button type="button" class="ps-nav" data-back>Back</button>
+      <button type="button" class="ps-nav" data-next>Next</button>
+      <input class="ps-scrub" type="range" min="0" max={deci} step="1" value="0" data-scrub aria-label="Position in the walkthrough" />
+      <span class="ps-time tabular" data-time>0:00</span>
+      <label class="ps-speed"><span>Speed</span>
+        <select data-speed>
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.5">1.5×</option>
+          <option value="2">2×</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="ps-transcript">
+    <p class="ps-tlabel">Transcript</p>
+    <ol>
+      {stages.map((s, i) => <li data-t={i}><b>{s.title}.</b> {s.text}</li>)}
+    </ol>
+  </div>
+</div>
+
+<script>
+  type Chip = { text: string; kind?: string };
+  type Stage = { title: string; text: string; tone?: string; chips: Chip[] };
+
+  const clock = (ms: number): string => {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-ps]').forEach((root) => {
+    const stages: Stage[] = JSON.parse(root.dataset.stages ?? '[]');
+    const stepMs = Number(root.dataset.seconds ?? 4) * 1000;
+    const total = stages.length * stepMs;
+    const q = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+    const player = q('.ps-player');
+    const strip = q('[data-strip]');
+    const cap = q('[data-cap]');
+    const play = q<HTMLButtonElement>('[data-play]');
+    const back = q<HTMLButtonElement>('[data-back]');
+    const next = q<HTMLButtonElement>('[data-next]');
+    const scrub = q<HTMLInputElement>('[data-scrub]');
+    const time = q('[data-time]');
+    const speedSel = q<HTMLSelectElement>('[data-speed]');
+    const chapters = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-chap]'));
+    const lines = Array.from(root.querySelectorAll<HTMLElement>('[data-t]'));
+    player.hidden = false;
+
+    let t = 0;
+    let speed = 1;
+    let playing = false;
+    let last = 0;
+    let raf = 0;
+    let shown = -1;
+    const at = (ms: number) => Math.min(stages.length - 1, Math.floor(ms / stepMs));
+
+    function draw() {
+      const i = at(t);
+      if (i !== shown) {
+        shown = i;
+        strip.replaceChildren(
+          ...stages[i].chips.map((c) => {
+            const span = document.createElement('span');
+            span.className = `ps-chip${c.kind ? ` is-${c.kind}` : ''}${c.text.length <= 12 ? ' is-short' : ''}`;
+            span.textContent = c.text;
+            return span;
+          }),
+        );
+        cap.textContent = stages[i].text;
+        chapters.forEach((b, k) => {
+          b.classList.toggle('is-now', k === i);
+          b.classList.toggle('is-past', k < i);
+          if (k === i) b.setAttribute('aria-current', 'step');
+          else b.removeAttribute('aria-current');
+        });
+        lines.forEach((li, k) => li.classList.toggle('is-now', k === i));
+      }
+      scrub.value = String(Math.round(t / 100));
+      scrub.setAttribute('aria-valuetext', `Step ${i + 1} of ${stages.length}: ${stages[i].title}`);
+      time.textContent = `${clock(t)} / ${clock(total)}`;
+      play.textContent = playing ? 'Pause' : t >= total ? 'Replay' : 'Play';
+      back.disabled = t === 0;
+      next.disabled = i === stages.length - 1;
+    }
+
+    function tick(now: number) {
+      if (!playing) return;
+      t = Math.min(total, t + (now - last) * speed);
+      last = now;
+      if (t >= total) {
+        playing = false;
+        draw();
+        return;
+      }
+      draw();
+      raf = requestAnimationFrame(tick);
+    }
+
+    function start() {
+      if (t >= total) t = 0;
+      playing = true;
+      last = performance.now();
+      raf = requestAnimationFrame(tick);
+      draw();
+    }
+
+    function stop() {
+      playing = false;
+      cancelAnimationFrame(raf);
+      draw();
+    }
+
+    play.addEventListener('click', () => (playing ? stop() : start()));
+    back.addEventListener('click', () => {
+      const i = at(t);
+      t = t - i * stepMs > 600 ? i * stepMs : Math.max(0, (i - 1) * stepMs);
+      draw();
+    });
+    next.addEventListener('click', () => {
+      t = Math.min(total, (at(t) + 1) * stepMs);
+      draw();
+    });
+    scrub.addEventListener('input', () => {
+      t = Number(scrub.value) * 100;
+      draw();
+    });
+    speedSel.addEventListener('change', () => (speed = Number(speedSel.value)));
+    chapters.forEach((b, k) => b.addEventListener('click', () => { t = k * stepMs; draw(); }));
+    draw();
+  });
+</script>
+
+<style>
+  .ps-screen {
+    min-block-size: 11rem;
+    padding: var(--s-6);
+    border: 1px solid var(--ink);
+    background: var(--paper-raised);
+  }
+
+  .ps-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    min-block-size: var(--s-10);
+    align-items: center;
+  }
+
+  /* The chips are created by the script, so they are styled through :global. */
+  .ps :global(.ps-chip) {
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: var(--font-mono);
+    font-size: var(--t-note);
+    color: var(--ink);
+    animation: ps-in var(--dur-base) var(--ease-draw) both;
+  }
+
+  .ps :global(.ps-chip.is-short) {
+    min-inline-size: var(--s-10);
+    text-align: center;
+  }
+
+  .ps :global(.ps-chip.is-hot) {
+    border: 2px dashed var(--red);
+    color: var(--red-ink);
+  }
+
+  .ps :global(.ps-chip.is-fail) {
+    border-color: var(--red);
+    background: var(--red);
+    color: var(--on-red);
+  }
+
+  @keyframes ps-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--s-2));
+    }
+  }
+
+  .ps-cap {
+    margin-top: var(--s-5);
+    max-inline-size: 52ch;
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink);
+  }
+
+  .ps-chapters {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ps-chap {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-2);
+    inline-size: 100%;
+    block-size: 100%;
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--ink);
+    border-block-start: 0;
+    border-inline-start: 0;
+    background: var(--paper);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    line-height: var(--lh-snug);
+    text-align: start;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .ps-chapters li:first-child .ps-chap {
+    border-inline-start: 1px solid var(--ink);
+  }
+
+  .ps-chap.is-past {
+    background: var(--paper-raised);
+  }
+
+  .ps-chap.is-now {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .ps-chap.is-now[data-tone='bad'] {
+    border-color: var(--red);
+    background: var(--red);
+    color: var(--on-red);
+  }
+
+  .ps-chap-n {
+    color: inherit;
+    opacity: 0.7;
+  }
+
+  .ps-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .ps-play,
+  .ps-nav {
+    min-block-size: var(--s-9);
+    padding: 0 var(--s-4);
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .ps-play {
+    min-inline-size: 5.5rem;
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .ps-nav:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .ps-scrub {
+    background: transparent;
+    flex: 1 1 10rem;
+    min-inline-size: 0;
+    accent-color: var(--ink);
+  }
+
+  .ps-time {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .ps-speed {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .ps-speed select {
+    min-block-size: var(--s-8);
+    padding: 0 var(--s-2);
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: var(--paper);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink);
+  }
+
+  .ps-transcript {
+    margin-top: var(--s-5);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  .ps-tlabel {
+    margin-bottom: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .ps-transcript ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ps-transcript li {
+    padding: var(--s-2) var(--s-3);
+    border-inline-start: 2px solid transparent;
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+  }
+
+  .ps-transcript li b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .ps-transcript li.is-now {
+    border-inline-start-color: var(--red);
+    color: var(--ink);
+  }
+
+  @media (max-width: 599px) {
+    .ps-screen {
+      padding: var(--s-4);
+    }
+
+    .ps-chap-t {
+      display: none;
+    }
+
+    .ps-chap {
+      justify-content: center;
+    }
+  }
+</style>

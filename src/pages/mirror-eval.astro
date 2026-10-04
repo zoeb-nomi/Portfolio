@@ -7,8 +7,17 @@ import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
+import EssayFigure from '../components/EssayFigure.astro';
+import EvidenceStack from '../components/EvidenceStack.astro';
+import Dumbbell from '../components/Dumbbell.astro';
+import UnitChart from '../components/UnitChart.astro';
 import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home } from '../data/copy';
 import { jsonLdString } from '../lib/jsonLdString';
+import { waveData, vacuumData, judgeData } from '../lib/figureData';
+
+const waves = waveData();
+const vacuum = vacuumData();
+const judge = judgeData();
 
 const table1Rows = me.s3.table1.rows.map((r) => ({
   label: r.engine,
@@ -45,6 +54,9 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     narr
   >
     {me.audio && <AudioPlayer audio={me.audio} articleId="mirror-eval" />}
+    <EssayFigure n={1} replay title="Every engine, every search probe" source="Source: Table 1 below, the owned (site or repo) column. Squares are grouped by outcome, so a square's position is not a probe id.">
+      <EvidenceStack engines={waves.rows} of={waves.of} fromLabel={waves.fromLabel} toLabel={waves.toLabel} />
+    </EssayFigure>
   </Masthead>
 
   <Section mark={me.s1.mark} label={me.s1.label} narrId="s1-cue">
@@ -73,10 +85,18 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 
   <Section mark={me.s3.mark} label={me.s3.label} narrId="s3-cue">
     <p class="prose intro" data-narr="s3-p0">{me.s3.intro}</p>
+    <EssayFigure n={2} replay title="Probes citing my site or repo, by engine" source="Source: Table 1 below, the owned (site or repo) column.">
+      <Dumbbell rows={waves.rows} max={waves.max} ticks={waves.ticks} fromLabel={waves.fromLabel} toLabel={waves.toLabel} unit={`of ${waves.of}`} />
+    </EssayFigure>
     <div class="table-scroll" data-narr="s3-table1">
       <DataTable nowrap caption={me.s3.table1.caption} columns={me.s3.table1.columns} rows={table1Rows} />
     </div>
     <p class="prose table-intro" data-narr="s3-p1">{me.s3.table2Intro}</p>
+    <EssayFigure n={3} replay title="What filled the gap" source="Source: Table 2 below. Each group has its own scale.">
+      {vacuum.groups.map((g, gi) => (
+        <Dumbbell showKey={gi === 0} heading={g.heading} rows={g.rows} max={g.max} ticks={g.ticks} fromLabel={vacuum.fromLabel} toLabel={vacuum.toLabel} />
+      ))}
+    </EssayFigure>
     <div class="table-scroll" data-narr="s3-table2">
       <DataTable nowrap caption={me.s3.table2.caption} columns={me.s3.table2.columns} rows={table2Rows} />
     </div>
@@ -87,6 +107,9 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 
   <Section mark={me.s4.mark} label={me.s4.label} narrId="s4-cue">
     <p class="prose" data-narr="s4-p0">{me.s4.para1}</p>
+    <EssayFigure n={4} replay title="The judges against a blind human" source="Source: this section and the CrossSource blind check. A filled square is a judge output that agreed with the human label: the exact tag set in mirror-eval, the citation-precision verdict in CrossSource.">
+      <UnitChart rows={judge.rows} cols={judge.cols} filledMeans="matched the human" emptyMeans="did not match" />
+    </EssayFigure>
     <p class="prose" data-narr="s4-p1">
       {me.s4.para2Pre}<code>{me.s4.para2Code}</code>{me.s4.para2Post}
     </p>

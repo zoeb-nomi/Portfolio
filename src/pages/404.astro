@@ -12,7 +12,13 @@ import { notFound } from '../data/copy';
 >
   <section class="not-found">
     <h1 class="code">{notFound.message}</h1>
-    <a class="home-link" href={notFound.linkHref}>{notFound.linkLabel} <span aria-hidden="true">→</span></a>
+    <div class="miss" aria-hidden="true">
+      {Array.from({ length: 12 }, (_, i) => <span class={`miss-cell${i === 7 ? ' is-missing' : ''}`} />)}
+    </div>
+    <p class="miss-caption">{notFound.caption}</p>
+    <ul class="exits">
+      {notFound.links.map((l) => <li><a class="home-link" href={l.href}>{l.label} <span aria-hidden="true">→</span></a></li>)}
+    </ul>
   </section>
 </Base>
 
@@ -38,8 +44,42 @@ import { notFound } from '../data/copy';
     text-wrap: balance;
   }
 
+  .miss {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, var(--s-6)));
+    gap: var(--s-1);
+    inline-size: 100%;
+    max-inline-size: 24rem;
+  }
+
+  .miss-cell {
+    aspect-ratio: 1;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+  }
+
+  .miss-cell.is-missing {
+    border: 2px dashed var(--red);
+    background: transparent;
+  }
+
+  .miss-caption {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .exits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
   .home-link {
-    /* The only way out of a dead end: a full 44px target. */
+    /* Each way out of a dead end is a full 44px target. */
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);

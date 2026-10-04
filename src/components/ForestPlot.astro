@@ -1,0 +1,177 @@
+---
+// Forest plot: each lever as a mean marker with its 95% interval on one shared axis, then the screener gap
+// drawn on the same scale. The values are text first; the drawing is aria-hidden. It plays once as it scrolls
+// into view (zero line, the lever intervals, then the screener bar) and has no controls of its own.
+interface Row {
+  label: string;
+  sub?: string;
+  mean: number;
+  lo: number;
+  hi: number;
+}
+
+interface Group {
+  title: string;
+  rows: Row[];
+}
+
+interface Gap {
+  label: string;
+  sub: string;
+  mean: number;
+  max: number;
+  note: string;
+}
+
+interface Props {
+  groups: Group[];
+  gap: Gap;
+  min: number;
+  max: number;
+  ticks: number[];
+  axisLabel: string;
+}
+
+import { n2 } from '../lib/pct';
+
+const { groups, gap, min, max, ticks, axisLabel } = Astro.props;
+const pos = (v: number) => ((v - min) / (max - min)) * 100;
+const num = (v: number, sign = false) => `${v < 0 ? '−' : sign && v > 0 ? '+' : ''}${Math.abs(v).toFixed(2)}`;
+const crossesZero = (r: Row) => r.lo < 0 && r.hi > 0;
+const verdict = (g: Group) =>
+  g.rows.every(crossesZero) ? 'Both intervals include zero: no change this design could detect.' : 'At least one interval stays on one side of zero.';
+let order = 0;
+---
+
+<div class="fp" data-fig="forest">
+  {
+    groups.map((g) => (
+      <div class="fp-group">
+        <p class="fp-title">{g.title}</p>
+        {g.rows.map((r) => (
+          <div class="fg-row" style={`--r:${order++}`}>
+            <span class="fg-lab">{r.label}{r.sub && <small>{r.sub}</small>}</span>
+            <span class="fg-trk" aria-hidden="true">
+              <span class="fg-in">
+                <span class="fp-zero" style={`--x:${n2(pos(0))}`} />
+                <span class="fg-line fp-wh" style={`--l:${n2(pos(r.lo))};--w:${n2(pos(r.hi) - pos(r.lo))}`} />
+                <span class="fg-pt is-fill fp-mean" style={`--x:${n2(pos(r.mean))}`} />
+              </span>
+            </span>
+            <span class="fg-val">{num(r.mean, true)} <span class="fp-ci">({num(r.lo, true)} to {num(r.hi, true)})</span></span>
+          </div>
+        ))}
+        <p class="fp-verdict">{verdict(g)}</p>
+      </div>
+    ))
+  }
+  <div class="fp-group fp-gap">
+    <p class="fp-title">The screener that read the résumé</p>
+    <div class="fg-row" style={`--r:${order}`}>
+      <span class="fg-lab">{gap.label}<small>{gap.sub}</small></span>
+      <span class="fg-trk" aria-hidden="true">
+        <span class="fg-in">
+          <span class="fp-zero" style={`--x:${n2(pos(0))}`} />
+          <span class="fp-bar" style={`--l:${n2(pos(0))};--w:${n2(pos(gap.mean) - pos(0))}`} />
+          <span class="fg-pt fp-max" style={`--x:${n2(pos(gap.max))}`} />
+        </span>
+      </span>
+      <span class="fg-val">{gap.mean.toFixed(1)} <span class="fp-ci">(largest {gap.max.toFixed(1)})</span></span>
+      <span class="fg-note">{gap.note}</span>
+    </div>
+  </div>
+  <div class="fg-axis" aria-hidden="true">
+    <div class="fg-axis-in">
+      {ticks.map((t) => <span style={`--x:${n2(pos(t))}`}>{t < 0 ? '−' : ''}{Math.abs(t)}</span>)}
+    </div>
+    <p class="fg-axis-label">{axisLabel}</p>
+  </div>
+</div>
+
+<script>
+  import { mountFigures } from '../scripts/figure-motion';
+  mountFigures('[data-fig="forest"]');
+</script>
+
+<style>
+  .fp-group + .fp-group {
+    margin-top: var(--s-6);
+  }
+
+  .fp-title {
+    margin-bottom: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    color: var(--ink-muted);
+  }
+
+  .fp-ci {
+    color: var(--ink-muted);
+  }
+
+  .fp-verdict {
+    margin-top: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--red-ink);
+  }
+
+  .fp-zero,
+  .fp-mean,
+  .fp-max {
+    left: calc(var(--x) * 1%);
+  }
+
+  .fp-wh,
+  .fp-bar {
+    left: calc(var(--l) * 1%);
+    width: calc(var(--w) * 1%);
+  }
+
+  .fp-zero {
+    position: absolute;
+    inset-block: var(--s-1);
+    border-inline-start: 1px solid var(--ink);
+  }
+
+  /* Interval and mean: the whisker is drawn out from its centre, the marker pops in after it. */
+  .fp-wh {
+    transform-origin: center;
+    transition: transform var(--dur-slow) var(--ease-draw);
+    transition-delay: calc(var(--r) * 90ms);
+  }
+
+  .fp-mean,
+  .fp-max {
+    transition: opacity var(--dur-base) ease;
+    transition-delay: calc(var(--r) * 90ms + 300ms);
+  }
+
+  .fp-bar {
+    position: absolute;
+    inset-block-start: 50%;
+    block-size: var(--s-3);
+    margin-block-start: calc(var(--s-3) / -2);
+    background: var(--red);
+    transform-origin: left;
+    transition: transform 900ms var(--ease-draw);
+    transition-delay: calc(var(--r) * 90ms + 200ms);
+  }
+
+  .fp-max {
+    border: 2px solid var(--red);
+  }
+
+  .fp[data-state='pre'] .fp-wh,
+  .fp[data-state='pre'] .fp-bar {
+    transform: scaleX(0);
+    transition: none;
+  }
+
+  .fp[data-state='pre'] .fp-mean,
+  .fp[data-state='pre'] .fp-max {
+    opacity: 0;
+    transition: none;
+  }
+</style>

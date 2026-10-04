@@ -2,6 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
+import EssayFigure from '../../components/EssayFigure.astro';
+import Dumbbell from '../../components/Dumbbell.astro';
+import UnitChart from '../../components/UnitChart.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
@@ -10,6 +13,11 @@ import { formatDate } from '../../lib/formatDate';
 import { isExternal } from '../../lib/isExternal';
 import { meta, cta, home, writingReflection as wr } from '../../data/copy';
 import { jsonLdString } from '../../lib/jsonLdString';
+import { waveData, vacuumData, judgeData } from '../../lib/figureData';
+
+const waves = waveData();
+const vacuum = vacuumData();
+const judge = judgeData();
 
 const articleLd = articleJsonLd({
   slug: 'eval-harness-at-my-own-reflection',
@@ -46,7 +54,25 @@ const articleLd = articleJsonLd({
   </Section>
 
   <Section mark={wr.s2.mark} label={wr.s2.label} narrId="s2-cue">
-    {wr.s2.paras.map((p, i) => <p class="prose" data-narr={`s2-p${i}`}>{p}</p>)}
+    {
+      wr.s2.paras.map((p, i) => (
+        <>
+          <p class="prose" data-narr={`s2-p${i}`}>{p}</p>
+          {i === 0 && (
+            <EssayFigure n={1} replay title="Probes citing my site or repo, by engine" source="Source: mirror-eval Table 1, the owned (site or repo) column. 63 search-mode probes per engine." href="/mirror-eval/" hrefLabel="Case study →">
+              <Dumbbell rows={waves.rows} max={waves.max} ticks={waves.ticks} fromLabel={waves.fromLabel} toLabel={waves.toLabel} unit={`of ${waves.of}`} />
+            </EssayFigure>
+          )}
+          {i === 1 && (
+            <EssayFigure n={2} replay title="What filled the gap" source="Source: mirror-eval Table 2, citation counts. Each group has its own scale." href="/mirror-eval/" hrefLabel="Case study →">
+              {vacuum.groups.map((g, gi) => (
+                <Dumbbell showKey={gi === 0} heading={g.heading} rows={g.rows} max={g.max} ticks={g.ticks} fromLabel={vacuum.fromLabel} toLabel={vacuum.toLabel} />
+              ))}
+            </EssayFigure>
+          )}
+        </>
+      ))
+    }
   </Section>
 
   <Section mark={wr.s3.mark} label={wr.s3.label} narrId="s3-cue">
@@ -54,7 +80,18 @@ const articleLd = articleJsonLd({
   </Section>
 
   <Section mark={wr.s4.mark} label={wr.s4.label} narrId="s4-cue">
-    {wr.s4.paras.map((p, i) => <p class="prose" data-narr={`s4-p${i}`}>{p}</p>)}
+    {
+      wr.s4.paras.map((p, i) => (
+        <>
+          <p class="prose" data-narr={`s4-p${i}`}>{p}</p>
+          {i === 1 && (
+            <EssayFigure n={3} replay title="The judges against a blind human" source="Source: mirror-eval section 4 and the CrossSource blind check. A filled square is a judge output that agreed with the human label: the exact tag set in mirror-eval, the citation-precision verdict in CrossSource." href="/mirror-eval/" hrefLabel="Case study →">
+              <UnitChart rows={judge.rows} cols={judge.cols} filledMeans="matched the human" emptyMeans="did not match" />
+            </EssayFigure>
+          )}
+        </>
+      ))
+    }
     <div class="lesson" data-narr="s4-quote">
       <PullQuote rule="red">{wr.s4.lessonQuote}</PullQuote>
     </div>

@@ -23,17 +23,17 @@ interface Props {
 const { rows, cols, filledMeans, emptyMeans } = Astro.props;
 ---
 
-<div class="uc" style={`--cols:${cols}`}>
+<div class="uc" data-fig="units" style={`--cols:${cols}`}>
   {
-    rows.map((r) => (
-      <div class="uc-row">
+    rows.map((r, row) => (
+      <div class="uc-row" style={`--row:${row}`}>
         <p class="uc-head">
           <span class="uc-label">{r.label}</span>
           <span class="uc-value tabular">{r.text}</span>
         </p>
         <div class="uc-cells" aria-hidden="true">
           {Array.from({ length: r.of }, (_, i) => (
-            <span class:list={['uc-cell', { on: i < r.filled }]} />
+            <span class:list={['uc-cell', { on: i < r.filled }]} style={`--i:${i}`} />
           ))}
         </div>
       </div>
@@ -44,6 +44,11 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
     <span class="uc-key-item"><span class="uc-cell uc-key-cell" aria-hidden="true"></span>{emptyMeans}</span>
   </p>
 </div>
+
+<script>
+  import { mountFigures } from '../scripts/figure-motion';
+  mountFigures('[data-fig="units"]');
+</script>
 
 <style>
   .uc-row + .uc-row {
@@ -76,6 +81,14 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
 
   .uc-cell.on {
     background: var(--ink);
+    transition: background var(--dur-base) ease;
+    transition-delay: calc(var(--row, 0) * 160ms + var(--i, 0) * 14ms);
+  }
+
+  /* Start frame: the counted squares are empty, then fill in one by one. */
+  .uc[data-state='pre'] .uc-cells .uc-cell.on {
+    background: transparent;
+    transition: none;
   }
 
   .uc-key {
