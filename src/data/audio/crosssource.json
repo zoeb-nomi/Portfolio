@@ -1,0 +1,117 @@
+{
+  "src": "/audio/crosssource.mp3",
+  "captions": "/audio/crosssource.vtt",
+  "duration": 264,
+  "label": "Listen to this piece",
+  "note": "Read by a synthetic voice (Kokoro).",
+  "chapters": [
+    {
+      "id": "s1",
+      "title": "Why this exists",
+      "start": 28.2
+    },
+    {
+      "id": "s2",
+      "title": "Method",
+      "start": 56.8
+    },
+    {
+      "id": "s3",
+      "title": "Findings",
+      "start": 107.5
+    },
+    {
+      "id": "s4",
+      "title": "The judge caught a bug",
+      "start": 175.1
+    },
+    {
+      "id": "s5",
+      "title": "What this demonstrates",
+      "start": 212.8
+    },
+    {
+      "id": "s6",
+      "title": "Next (v0.2)",
+      "start": 229.7
+    },
+    {
+      "id": "s7",
+      "title": "Related writing",
+      "start": 244.5
+    }
+  ],
+  "cues": [
+    ["s0-title", 0.15, 4.02],
+    ["s0-dek", 4.62, 16.56],
+    ["s0-stats", 17.16, 26.96],
+    ["s1-cue", 28.16, 29.18],
+    ["s1-p0", 29.78, 55.56],
+    ["s2-cue", 56.76, 57.38],
+    ["s2-list", 57.98, 106.33],
+    ["s3-cue", 107.53, 108.28],
+    ["s3-table1", 108.88, 131.47],
+    ["s3-table2", 132.07, 146.34],
+    ["s3-p0", 146.94, 173.87],
+    ["s4-cue", 175.07, 177.67],
+    ["s4-p0", 178.27, 183.57],
+    ["s4-p1", 184.17, 187.08],
+    ["s4-p2", 187.68, 201.33],
+    ["s4-quote", 201.93, 211.61],
+    ["s5-cue", 212.81, 214.03],
+    ["s5-p0", 214.63, 216.75],
+    ["s5-list", 217.35, 228.47],
+    ["s6-cue", 229.67, 231.42],
+    ["s6-p0", 232.02, 232.69],
+    ["s6-list", 233.29, 243.31],
+    ["s7-cue", 244.51, 245.48],
+    ["s7-p0", 246.08, 251.44],
+    ["s7-p1", 252.04, 256.51],
+    ["s7-p2", 257.11, 263.67]
+  ],
+  "meta": {
+    "engine": "kokoro-82m-v1.0",
+    "voice": "af_heart",
+    "speed": 1,
+    "sampleRate": 24000,
+    "bitrateKbps": 64,
+    "lufs": -19,
+    "gaps": {
+      "lead": 0.15,
+      "sentence": 0.28,
+      "segment": 0.6,
+      "beforeCue": 1.2,
+      "tail": 0.5
+    },
+    "modelSha256": "8fbea51ea711f2af382e88c833d9e288c6dc82ce5e98421ea61c058ce21a34cb",
+    "segmentHashes": {
+      "s0-title": "d2303ec9ef70",
+      "s0-dek": "25f957e93bda",
+      "s0-stats": "4286b71efc94",
+      "s1-cue": "54e879ed145c",
+      "s1-p0": "424d81acf9b1",
+      "s2-cue": "52a0f9b65b27",
+      "s2-list": "bc4c4a86d83d",
+      "s3-cue": "e171c2ff25b5",
+      "s3-table1": "fb928cd81dfd",
+      "s3-table2": "334757d789ac",
+      "s3-p0": "2b295460e9d9",
+      "s4-cue": "e5296f4952e2",
+      "s4-p0": "9aaf56044d1f",
+      "s4-p1": "06651f447f97",
+      "s4-p2": "d2418aa2e6ee",
+      "s4-quote": "f3d35489ddad",
+      "s5-cue": "24e25af73edd",
+      "s5-p0": "416801ca069e",
+      "s5-list": "6f00645aaaaf",
+      "s6-cue": "39424406d950",
+      "s6-p0": "122efcba0f85",
+      "s6-list": "ad0423bb2088",
+      "s7-cue": "f0ebf421bec1",
+      "s7-p0": "8c7bd6a1c043",
+      "s7-p1": "763ab31221e9",
+      "s7-p2": "bfcfaea25f41"
+    },
+    "textHash": "da0375e43220bbbb"
+  }
+}

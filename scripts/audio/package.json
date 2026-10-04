@@ -1,0 +1,14 @@
+{
+  "name": "zoebnomi-audio-pipeline",
+  "private": true,
+  "type": "module",
+  "description": "Local narration pipeline for zoebnomi.com. Deliberately NOT part of the site's dependency tree: nothing here ships to the browser and CI does not install it. Install with: npm run audio:install (from the repo root).",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
+    "@huggingface/transformers": "^3.5.1",
+    "kokoro-js": "^1.2.1"
+  }
+}

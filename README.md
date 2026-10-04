@@ -53,6 +53,7 @@ Essays are hand-built `.astro` pages in `src/pages/writing/`, not Markdown and n
 5. **Sitemap** — add the URL to `src/data/lastmod.json` (and bump `/writing/`). A route with no entry gets no `lastmod`; the build date is never used.
 6. **OG card** — add an entry to `scripts/generate-og.mjs` and run `node scripts/generate-og.mjs`. It re-renders every card with tiny byte differences, so commit only the PNGs you meant to change (`git checkout -- public/og/<other>.png`).
 7. **Checks** — add the URL to `PAGES` in `scripts/qa-sweep.mjs` and `scripts/tokens-audit.mjs` (see above), then run build, gate, check, qa and tokens.
+8. **Audio (optional)** — see "Narration audio" below.
 
 **Figures.** `EssayFigure` (a numbered, captioned frame with a source line) wraps `UnitChart` (one square per case), `BarList` (label / bar / value rows), `OwnershipGap` (a chain-of-ownership illustration), or the existing `DataTable`. They are built from HTML and hairlines, not SVG, so type stays on the token scale and above the 11px floor; the numbers in them come from the site's own harness pages and each figure links its source. For a wide text table on phones, render a stacked-card version below 900px (see Table 1 in `nobody-reports-the-misses.astro`).
 
@@ -72,6 +73,28 @@ Accessibility conventions that came out of the 2026-10 UX audit (the written rep
 - Text drawn inside an SVG scales with the figure and can fall below the 11px floor on phones, and `qa-sweep` and `tokens-audit` skip SVG text. Prefer HTML for chart labels, or step the sizes up below 600px as the bus-stop chart does.
 - Colour alone never carries state: the current page keeps its underline, focus rings are drawn inside clipping frames (`outline-offset`), and a failed audio load says so.
 - The floating audio control parks below the heading it follows (never on top of it), and hides while the CTA slab or footer is on screen.
+
+## Narration audio
+
+An essay can have a narrated, read-along audio file. It is generated **locally** by `scripts/audio` (a Kokoro voice running on this machine; nothing is sent anywhere), not by the site build, and the result is committed: `public/audio/<slug>.mp3`, `public/audio/<slug>.vtt` (captions) and `src/data/audio/<slug>.json` (duration, chapters, per-paragraph read-along cues, and provenance: engine, voice, loudness, model hash, per-paragraph text hashes).
+
+```bash
+npm run audio:install                        # once: isolated deps in scripts/audio/node_modules (~400 MB; not part of the site's install or CI)
+npm run build                                # the narration is read from the built page
+npm run audio:build -- <slug> --dry-run      # read the spoken script first; no model needed
+npm run audio:build -- <slug>                # voice (first run downloads the ~330 MB model into .audio-cache/), mix, mp3
+npm run audio:verify -- <slug>               # optional: transcribe it back with Whisper and compare, sentence by sentence
+npm run audio:check                          # is the audio still true to the page? (after npm run build)
+npm run audio:test                           # unit tests; no model, no network
+```
+
+- **Anchors.** The page is the script: every element with `data-narr` is narrated, in document order. `Masthead narr` anchors the title and standfirst, `Section narrId="sN-cue"` the section headings, and `data-narr="sN-pK"` each paragraph. Tables, lists and figures cannot be read verbatim: extraction stops and names the anchors until `scripts/audio/pages.json` supplies a spoken version of each in `overrides` (`/crosssource/` has six; review them like copy). `moveAfter` changes the spoken order when the markup order is wrong for the ear (the margin spec block comes after the standfirst).
+- **Register the page** in `scripts/audio/pages.json` (slug, path, title, optional `chapterTitles`), then wire the generated data in like `nobody-reports-the-misses` does: an `audio` object in `src/data/copy.ts`, `<AudioPlayer />` in the Masthead slot, and the `AudioObject` in the page's JSON-LD.
+- **Pronunciation** lives in `scripts/audio/lexicon.json`. Add a line when `audio:verify` (or your ears) catches a mispronounced word; only the sentences that change are re-synthesised.
+- **Keeping it honest.** `audio:check` fails when the page text changes after the audio was built and names the anchors that changed. It is not wired into CI (it needs the generated files and a build), so run it after editing any essay that has audio.
+- **What it can't tell you** is whether it sounds good: `audio:verify` measures intelligibility and cue alignment, not taste. Listen before merging.
+
+How the pipeline works, and its quality gates, are in [`scripts/audio/README.md`](scripts/audio/README.md).
 
 ## Contributions graph
 

@@ -1,0 +1,133 @@
+{
+  "src": "/audio/nobody-reports-the-misses.mp3",
+  "captions": "/audio/nobody-reports-the-misses.vtt",
+  "duration": 483,
+  "label": "Listen to this piece",
+  "note": "Read by a synthetic voice (Kokoro).",
+  "chapters": [
+    {
+      "id": "s1",
+      "title": "What I measured",
+      "start": 54.9
+    },
+    {
+      "id": "s2",
+      "title": "KYB",
+      "start": 159.6
+    },
+    {
+      "id": "s3",
+      "title": "Audit and controls",
+      "start": 202
+    },
+    {
+      "id": "s4",
+      "title": "Insurance",
+      "start": 241.6
+    },
+    {
+      "id": "s5",
+      "title": "Legal",
+      "start": 283.5
+    },
+    {
+      "id": "s6",
+      "title": "Patents",
+      "start": 323.8
+    },
+    {
+      "id": "s7",
+      "title": "Voice agents",
+      "start": 364.2
+    },
+    {
+      "id": "s8",
+      "title": "Setting the bar",
+      "start": 406.5
+    },
+    {
+      "id": "s9",
+      "title": "Compare notes",
+      "start": 466.3
+    }
+  ],
+  "cues": [
+    ["s0-title", 0.15, 5.26],
+    ["s0-dek", 5.86, 12.81],
+    ["s0-p0", 13.41, 23.71],
+    ["s0-p1", 24.31, 44.46],
+    ["s0-p2", 45.06, 53.66],
+    ["s1-cue", 54.86, 55.68],
+    ["s1-p0", 56.28, 95.34],
+    ["s1-p1", 95.94, 128.76],
+    ["s1-p2", 129.36, 148.68],
+    ["s1-p3", 149.28, 158.45],
+    ["s2-cue", 159.65, 162.85],
+    ["s2-p0", 163.45, 200.8],
+    ["s3-cue", 202, 204.85],
+    ["s3-p0", 205.45, 240.42],
+    ["s4-cue", 241.62, 244.9],
+    ["s4-p0", 245.5, 282.32],
+    ["s5-cue", 283.52, 285.86],
+    ["s5-p0", 286.46, 322.6],
+    ["s6-cue", 323.8, 326.21],
+    ["s6-p0", 326.81, 363.04],
+    ["s7-cue", 364.24, 367.64],
+    ["s7-p0", 368.24, 405.33],
+    ["s8-cue", 406.53, 407.69],
+    ["s8-p0", 408.29, 420.93],
+    ["s8-p1", 421.53, 438.6],
+    ["s8-p2", 439.2, 447.2],
+    ["s8-p3", 447.8, 465.09],
+    ["s9-cue", 466.29, 467.19],
+    ["s9-p0", 467.79, 482.15]
+  ],
+  "meta": {
+    "engine": "kokoro-82m-v1.0",
+    "voice": "af_heart",
+    "speed": 1,
+    "sampleRate": 24000,
+    "bitrateKbps": 64,
+    "lufs": -19,
+    "gaps": {
+      "lead": 0.15,
+      "sentence": 0.28,
+      "segment": 0.6,
+      "beforeCue": 1.2,
+      "tail": 0.5
+    },
+    "modelSha256": "8fbea51ea711f2af382e88c833d9e288c6dc82ce5e98421ea61c058ce21a34cb",
+    "segmentHashes": {
+      "s0-title": "0989976d482d",
+      "s0-dek": "26e5e4be95a5",
+      "s0-p0": "71feeb8329ec",
+      "s0-p1": "54b59e5e10fc",
+      "s0-p2": "815bfbbbd8c9",
+      "s1-cue": "75d6259a1143",
+      "s1-p0": "c907e5632254",
+      "s1-p1": "c88ef71dcd87",
+      "s1-p2": "7989b9b91081",
+      "s1-p3": "fb14d913eab0",
+      "s2-cue": "9d02eaaa224d",
+      "s2-p0": "8099e1b49c18",
+      "s3-cue": "5339724529a5",
+      "s3-p0": "4e231dd3a5e6",
+      "s4-cue": "5dce17ee2145",
+      "s4-p0": "34696b70c4f0",
+      "s5-cue": "aabdfbb3432f",
+      "s5-p0": "fe262c7c4e1c",
+      "s6-cue": "278623db71b9",
+      "s6-p0": "17a77a9b553e",
+      "s7-cue": "bd5d43097563",
+      "s7-p0": "b61520f0d613",
+      "s8-cue": "b651096a2145",
+      "s8-p0": "92430f01ac1c",
+      "s8-p1": "9ba72b2dc88b",
+      "s8-p2": "279e6118cc00",
+      "s8-p3": "db116ca171ef",
+      "s9-cue": "47373670f192",
+      "s9-p0": "9193b8624813"
+    },
+    "textHash": "503e87f6881fdee2"
+  }
+}

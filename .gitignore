@@ -3,3 +3,4 @@ dist/
 .astro/
 screenshots/
 audit-report.json
+.audio-cache/
