@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Masthead from '../components/Masthead.astro';
 import EmbedCard from '../components/EmbedCard.astro';
 import CTASlab from '../components/CTASlab.astro';
+import CareerTimeline from '../components/CareerTimeline.astro';
 import { meta, about, cta, home } from '../data/copy';
 import { isExternal } from '../lib/isExternal';
 
@@ -43,21 +44,7 @@ const links = [
           logo={{ src: '/img/logos/keka.png', width: 66, height: 24, alt: 'Keka' }}
         />
 
-        <ul class="timeline">
-          {about.timeline.map((t) => (
-            <li class="timeline-row">
-              <p class="timeline-year">{t.year}</p>
-              <p class="timeline-body">{t.body}</p>
-              <p class="timeline-source">
-                {t.source && (
-                  <a href={t.source.href} target="_blank" rel="noopener noreferrer">
-                    {t.source.label}
-                  </a>
-                )}
-              </p>
-            </li>
-          ))}
-        </ul>
+        <CareerTimeline items={about.timeline} />
 
         <blockquote class="belief">
           <p>
@@ -127,64 +114,6 @@ const links = [
 
   .prose {
     margin-bottom: var(--s-8);
-  }
-
-  /* Timeline — mono year (kicker), a one-line body, and, where a public
-     artefact exists, a source. A row with no source is a claim on trust. */
-  .timeline {
-    list-style: none;
-    /* The embed card's bottom strong rule is the only rule above the
-       timeline — no second strong line here. */
-    margin-top: var(--s-9);
-    margin-bottom: var(--s-9);
-  }
-
-  .timeline-row {
-    display: grid;
-    grid-template-columns: 132px minmax(0, 1fr) minmax(0, 220px);
-    gap: var(--s-5);
-    align-items: baseline;
-    padding-block: var(--s-4);
-    border-bottom: 1px solid var(--rule);
-  }
-
-  /* The belief block's own strong rule closes the timeline — a line here
-     would double it. */
-  .timeline-row:last-child {
-    border-bottom: 0;
-  }
-
-  .timeline-year {
-    font-family: var(--font-mono);
-    font-size: var(--t-label);
-    letter-spacing: var(--track-wide);
-    color: var(--ink-muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .timeline-body {
-    font-family: var(--font-body);
-    font-size: var(--t-body);
-    line-height: var(--lh-snug);
-    color: var(--ink-body);
-  }
-
-  .timeline-source {
-    font-family: var(--font-mono);
-    font-size: var(--t-note);
-    line-height: var(--lh-snug);
-    color: var(--ink-muted);
-    text-align: right;
-    /* The column is sized to hold the longest label; anywhere-wrapping is the
-       fallback if a future label outgrows it, rather than nowrap overflowing
-       silently. */
-    overflow-wrap: anywhere;
-  }
-
-  .timeline-source a {
-    color: var(--red-ink);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
   }
 
   .belief {
@@ -295,15 +224,6 @@ const links = [
 
     .facts-row li:first-child {
       border-top: 0;
-    }
-
-    .timeline-row {
-      grid-template-columns: 1fr;
-      gap: var(--s-1);
-    }
-
-    .timeline-source {
-      text-align: left;
     }
 
     /* Only the row that carries a detail line stacks; the arrow rows keep the
