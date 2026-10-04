@@ -34,7 +34,7 @@ export interface CtaLink {
 export const site = {
   name: 'Zoeb Nomi',
     footerLine:
-      'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to US relocation',
+      'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to AI PM roles · Open to US relocation',
 };
 
 export const nav: NavItem[] = [
