@@ -109,7 +109,7 @@ body {
   color: var(--ink-body);
   font-family: var(--font-body);
   font-size: var(--t-body);
-  line-height: 1.55;
+  line-height: var(--lh-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

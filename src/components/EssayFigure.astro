@@ -45,7 +45,7 @@ const { n, title, source, href, hrefLabel } = Astro.props;
     letter-spacing: var(--track-caps);
     text-transform: uppercase;
     color: var(--ink-muted);
-    line-height: 1.7;
+    line-height: var(--lh-label);
     margin-bottom: var(--s-5);
   }
 
@@ -59,13 +59,13 @@ const { n, title, source, href, hrefLabel } = Astro.props;
     margin-top: var(--s-5);
     font-family: var(--font-body);
     font-size: var(--t-note);
-    line-height: 1.5;
+    line-height: var(--lh-snug);
     color: var(--ink-muted);
   }
 
   .ef-source a {
     color: var(--red-ink);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 </style>

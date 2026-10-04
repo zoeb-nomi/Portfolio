@@ -26,6 +26,7 @@ jobs:
       - run: npm run build
       - run: npm run gate
       - run: npm run check
+      - run: npm run lint
       - run: npx playwright install --with-deps chromium
       - name: Preview + QA sweep
         run: |

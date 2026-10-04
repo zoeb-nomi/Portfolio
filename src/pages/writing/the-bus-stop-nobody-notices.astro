@@ -337,7 +337,7 @@ const articleLd = {
   .prose {
     font-family: var(--font-body);
     font-size: var(--t-body);
-    line-height: 1.62;
+    line-height: var(--lh-prose);
     color: var(--ink-body);
     max-width: 68ch;
   }
@@ -376,10 +376,10 @@ const articleLd = {
     /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
     display: inline-flex;
     align-items: center;
-    min-height: 24px;
+    min-height: var(--hit-min);
     color: var(--red-ink);
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: var(--underline-offset);
   }
 
   .links-line .sep {
@@ -807,7 +807,7 @@ const articleLd = {
   .watch-why {
     font-family: var(--font-body);
     font-size: var(--t-note); /* sans floor is 12px */
-    line-height: 1.5;
+    line-height: var(--lh-snug);
     color: var(--ink-body);
     margin: 0;
   }

@@ -8,21 +8,15 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { sitemapPages } from './lib/pages.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = (process.env.BASE_URL || 'http://127.0.0.1:4321').replace(/\/$/, '');
-const PAGES = [
-  '/', '/about/', '/work/', '/evals/', '/crosssource/', '/mirror-eval/', '/screener-eval/',
-  '/writing/',
-  '/writing/eval-harness-at-my-own-reflection/',
-  '/writing/nobody-reports-the-misses/',
-  '/writing/the-bus-stop-nobody-notices/',
-  '/writing/the-judge-caught-a-bug/',
-  '/writing/two-levers-that-did-not-move/',
-  '/404.html',
-];
-const WIDTHS = [360, 390, 412, 768, 1024, 1280, 1440, 1920];
-const AXE_WIDTHS = [390, 1440];
+// Every page in the built sitemap, plus /404.html (see scripts/lib/pages.mjs). Nothing to add by hand.
+const PAGES = sitemapPages(ROOT);
+// 360-1920 plus both sides of every breakpoint (599/600, 899/900, 1099/1100): layout bugs live at the boundaries.
+const WIDTHS = [360, 390, 412, 599, 600, 768, 899, 900, 1024, 1099, 1100, 1280, 1440, 1920];
+const AXE_WIDTHS = [390, 768, 1024, 1440];
 const IGNORE = /umami|cloudflareinsights|\/api\/contributions/;
 
 // --- allowed font sizes from tokens.css -----------------------------------

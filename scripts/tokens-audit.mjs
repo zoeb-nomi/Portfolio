@@ -1,4 +1,5 @@
 // Tokens audit — does the rendered site stay inside The Red Pen's token set?
+// (Pages come from the built sitemap; widths are 1440 / 1024 / 390.)
 // Run against a live site:  npx astro preview --host 127.0.0.1 --port 4321 &  npm run tokens
 // Env: BASE_URL (default http://127.0.0.1:4321). Report: .astro/tokens-report.json
 //
@@ -15,21 +16,16 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { sitemapPages } from './lib/pages.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = (process.env.BASE_URL || 'http://127.0.0.1:4321').replace(/\/$/, '');
-const PAGES = [
-  '/', '/about/', '/work/', '/evals/', '/crosssource/', '/mirror-eval/', '/screener-eval/',
-  '/writing/',
-  '/writing/eval-harness-at-my-own-reflection/',
-  '/writing/nobody-reports-the-misses/',
-  '/writing/the-bus-stop-nobody-notices/',
-  '/writing/the-judge-caught-a-bug/',
-  '/writing/two-levers-that-did-not-move/',
-  '/404.html',
-];
+// Every page in the built sitemap, plus /404.html (see scripts/lib/pages.mjs). Nothing to add by hand.
+const PAGES = sitemapPages(ROOT);
+// 1024 is the 900-1099px band (narrow margin column) that 1440/390 never render.
 const VIEWPORTS = [
   { width: 1440, height: 900 },
+  { width: 1024, height: 768 },
   { width: 390, height: 844 },
 ];
 
