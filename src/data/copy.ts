@@ -103,7 +103,7 @@ export const meta = {
   screenerEval: {
     title: 'screener-eval: what LLM résumé screeners reward — Zoeb Nomi',
     description:
-      'One résumé, 21 open AI PM roles, two LLM screeners, 885 calls. Fictional employers and deleted links moved scores under a point; the screener moved them 22.',
+      'One résumé, 21 open AI PM roles, two LLM screeners, 885 calls. Employer swaps and deleted links moved scores about a point or less; the screener moved them 22.',
   },
   writingTwoLevers: {
     title: '885 screenings, two levers that did not move — Zoeb Nomi',
@@ -706,7 +706,7 @@ export const screenerEval = {
   kicker: 'Case study · Open evaluation harness · Python',
   title: 'screener-eval: I ran my résumé through an LLM screener 885 times',
   standfirst:
-    'Same résumé, same 21 job descriptions, two LLM screeners, five repeats each. Swapping every employer on the résumé for a fictional one moved the fit score by less than a point. Deleting every link moved it by less than a point. Which screener read it moved it by 22.',
+    'Same résumé, same 21 job descriptions, two LLM screeners, five repeats each. Swapping every employer on the résumé for a fictional one moved the fit score by about a point at most. Deleting every link moved it by less than a point. Which screener read it moved it by 22.',
   specBlock: [
     { label: 'Postings', value: '21' },
     { label: 'Screeners', value: '2' },
@@ -882,7 +882,7 @@ export const screenerEval = {
       'Between the two screeners, on the same résumé and the same posting: mean gap 22.3 points, largest 51.3; gpt-5-mini scored higher on 19 of 21 postings; the two agreed on the majority verdict for 6 of 21 postings; correlation between their per-posting scores 0.46.',
     findingLeadIn: 'The finding that matters:',
     findingBody:
-      " the two levers résumé advice is built on did nothing measurable. Replacing every employer with a company that does not exist, and deleting every link to proof, each moved the score by less than a point, with confidence intervals that straddle zero on both screeners. The choice of screener moved it by 22 points on average and flipped the verdict on 15 of 21 postings. And the screener's own noise — a 3-to-5-point wobble on identical input, a verdict that flips against itself on a third to a half of postings — is larger than either lever. A single-shot \"ATS score\" from any tool is a sample from that wobble.",
+      " the two levers résumé advice is built on did nothing measurable. Replacing every employer with a company that does not exist, and deleting every link to proof, each moved the score by about a point or less, with confidence intervals that straddle zero on both screeners. The choice of screener moved it by 22 points on average and flipped the verdict on 15 of 21 postings. And the screener's own noise — a 3-to-5-point wobble on identical input, a verdict that flips against itself on a third to a half of postings — is larger than either lever. A single-shot \"ATS score\" from any tool is a sample from that wobble.",
     lessonQuote: 'The screener you get is the variable.',
   },
 
@@ -958,7 +958,7 @@ export const screenerEval = {
 //   mirror-eval   13 → 63, 0 → 0 — mirrorEval.s3.table1 (Perplexity / Claude, of 63 search-mode probes)
 //                 4 engines, 63 probes, 3/40, 12/40 — mirrorEval.specBlock, s2.rows, s4.para1
 //                 2026-08-06, 2026-09-04 — mirrorEval.s2.rows ('Two waves')
-//   screener-eval < 1 pt, 21, 2, 885, 5 reps, CIs straddle zero, 22 — screenerEval.standfirst, specBlock, s3.findingBody
+//   screener-eval ~1 pt, 21, 2, 885, 5 reps, CIs straddle zero, 22 — screenerEval.standfirst, specBlock, s3.findingBody
 // ---------------------------------------------------------------------------
 
 export interface HarnessEntry {
@@ -1023,15 +1023,15 @@ export const evalsLedger: HarnessEntry[] = [
     id: 'screener-eval',
     name: 'screener-eval',
     question: 'Do employer names and evidence links change what an LLM résumé screener scores?',
-    numeral: '< 1 pt',
-    caption: 'score shift when every employer is swapped · 885 calls · 21 postings',
+    numeral: '~1 pt',
+    caption: 'largest score shift when every employer is swapped · 885 calls · 21 postings',
     status: '[null]',
     rail: ['21 postings · 2 screeners · 5 reps', 'no judge in the loop', '95% CIs straddle zero'],
     table: {
       judge: 'None — nothing is judged by a model',
       metric: 'Paired delta in fit score (B − A), 10,000-resample bootstrap 95% CI',
       sample: '1 résumé · 21 postings · 2 screeners · 885 calls',
-      verdict: 'Employer swap and link deletion each moved the score under a point; which screener read it moved it 22',
+      verdict: 'Employer swap and link deletion each moved the score by about a point or less; which screener read it moved it 22',
     },
     caseHref: '/screener-eval/',
     repoHref: screenerEval.repoHref,
