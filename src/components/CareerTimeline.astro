@@ -1,12 +1,10 @@
 ---
-// The About record as a vertical timeline, newest first. A spine runs down the left and fills as you read. Each
-// row has a marker (hollow until you pass it, red while it is the row you are reading) and a bar drawn to the year
-// scale, so you can see how long each role or course ran and where they overlap. All of the text is always on
-// the page; the motion only adds the reading progress and the bars drawing in. A row with a source link shows it,
-// and a row without one shows nothing: a row with no link is a claim taken on trust, and the page does not
-// imply otherwise.
-import { n2 } from '../lib/pct';
-
+// The About record as a vertical timeline, newest first, current role on top. The dates sit on the left, a spine
+// runs down the middle, and each entry reads: organisation (the headline), then role and detail, then a source
+// link if one exists. As you read down, the spine fills red, each marker fills as you pass it, and the entries
+// you have not reached yet are set in the muted ink. Everything is always on the page; reduced motion and no
+// script show it fully lit and still. A row with no link shows none: it is a claim taken on trust, and the page
+// does not imply otherwise.
 interface Item {
   year: string;
   body: string;
@@ -19,45 +17,42 @@ interface Props {
 
 const { items } = Astro.props;
 
-// "2019" is the year 2019; "2021–2022" runs to the end of 2022; "2025–present" runs to today.
-const today = new Date();
-const now = today.getUTCFullYear() + today.getUTCMonth() / 12;
-const span = (year: string): [number, number] => {
+// "2019" is the year 2019; "2021–2022" runs to the end of 2022; "2025–present" has no end.
+const bounds = (year: string): { start: number; end: number } => {
   const m = /^(\d{4})(?:\s*[–-]\s*(\d{4}|present))?$/.exec(year.trim());
   if (!m) throw new Error(`CareerTimeline: could not read the years in "${year}"`);
-  const a = Number(m[1]);
-  return [a, m[2] === 'present' ? now : m[2] ? Number(m[2]) + 1 : a + 1];
+  const start = Number(m[1]);
+  return { start, end: m[2] === 'present' ? Infinity : m[2] ? Number(m[2]) + 1 : start + 1 };
 };
 
-const spans = items.map((i) => span(i.year));
-const first = Math.min(...spans.map((s) => s[0]));
-const last = Math.ceil(Math.max(...spans.map((s) => s[1])));
-const pct = (y: number) => n2(((y - first) / (last - first)) * 100);
-// A year tick that would sit under the "now" label is left out.
-const ticks = Array.from({ length: Math.floor((last - first) / 2) + 1 }, (_, i) => first + i * 2).filter(
-  (y) => y < last && pct(now) - pct(y) > 24,
-);
+// "Product Manager, Instead · owning production LLM output quality" -> org "Instead", role "Product Manager",
+// detail "owning production LLM output quality". The copy stays one string in copy.ts.
+const parse = (body: string) => {
+  const [head, ...rest] = body.split(' · ');
+  const comma = head.indexOf(', ');
+  return {
+    org: comma === -1 ? head : head.slice(comma + 2),
+    role: comma === -1 ? '' : head.slice(0, comma),
+    detail: rest.join(' · '),
+  };
+};
+
+// Newest first: whatever is still running, then by when it ended, then by when it began.
 const rows = items
-  .map((item, i) => ({ item, left: pct(spans[i][0]), width: n2(pct(spans[i][1]) - pct(spans[i][0])), start: spans[i][0] }))
-  .sort((a, b) => b.start - a.start);
+  .map((item) => ({ item, ...bounds(item.year), ...parse(item.body) }))
+  .sort((a, b) => (b.end === a.end ? b.start - a.start : b.end - a.end));
 ---
 
 <div class="tl" data-tl>
-  <div class="tl-axis" aria-hidden="true">
-    <p class="tl-key">Bars show when, to the year.</p>
-    <div class="tl-ticks">
-      {ticks.map((y) => <span style={`--x:${pct(y)}`}>{y}</span>)}
-      <span class="tl-now" style={`--x:${pct(now)}`}>now</span>
-    </div>
-  </div>
   <ol class="tl-list">
     {
-      rows.map(({ item, left, width }) => (
+      rows.map(({ item, org, role, detail }) => (
         <li class="tl-item">
+          <p class="tl-when">{item.year}</p>
           <span class="tl-mark" aria-hidden="true"></span>
-          <p class="tl-year">{item.year}</p>
-          <div class="tl-body">
-            <p class="tl-text">{item.body}</p>
+          <div class="tl-what">
+            <h3 class="tl-org">{org}</h3>
+            {(role || detail) && <p class="tl-role">{[role, detail].filter(Boolean).join(' · ')}</p>}
             {
               item.source && (
                 <p class="tl-source">
@@ -66,7 +61,6 @@ const rows = items
               )
             }
           </div>
-          <span class="tl-span" aria-hidden="true"><i style={`--l:${left};--w:${width}`}></i></span>
         </li>
       ))
     }
@@ -85,14 +79,17 @@ const rows = items
 
       const update = () => {
         queued = false;
-        const mid = window.innerHeight * 0.5;
+        const line = window.innerHeight * 0.6;
         const box = list.getBoundingClientRect();
-        list.style.setProperty('--p', String(Math.min(1, Math.max(0, (mid - box.top) / box.height))));
+        list.style.setProperty('--p', String(Math.min(1, Math.max(0, (line - box.top) / box.height))));
+        let now: HTMLElement | null = null;
         items.forEach((li) => {
           const r = li.getBoundingClientRect();
-          li.classList.toggle('is-passed', r.top + 20 < mid);
-          li.classList.toggle('is-now', r.top <= mid && r.bottom > mid);
+          const reached = r.top + 24 < line;
+          li.classList.toggle('is-reached', reached);
+          if (reached) now = li;
         });
+        items.forEach((li) => li.classList.toggle('is-now', li === now));
       };
       const queue = () => {
         if (!queued) {
@@ -102,20 +99,6 @@ const rows = items
       };
       window.addEventListener('scroll', queue, { passive: true });
       window.addEventListener('resize', queue);
-
-      // Each row's bar draws in the first time the row is on screen.
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) {
-              (e.target as HTMLElement).classList.add('is-drawn');
-              io.unobserve(e.target);
-            }
-          });
-        },
-        { threshold: 0.4 },
-      );
-      items.forEach((li) => io.observe(li));
       update();
     });
   }
@@ -123,49 +106,9 @@ const rows = items
 
 <style>
   .tl {
+    --tl-when: 9rem;
     --tl-mark: var(--s-5);
     margin-block: var(--s-9);
-  }
-
-  .tl-axis,
-  .tl-item {
-    display: grid;
-    grid-template-columns: var(--tl-mark) 8.5rem minmax(0, 1fr) 11rem;
-    column-gap: var(--s-5);
-  }
-
-  .tl-axis {
-    align-items: end;
-    padding-bottom: var(--s-3);
-  }
-
-  .tl-key {
-    grid-column: 2 / 4;
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-    color: var(--ink-muted);
-  }
-
-  .tl-ticks {
-    position: relative;
-    grid-column: 4;
-    block-size: var(--s-5);
-    margin-inline: 0;
-  }
-
-  .tl-ticks span {
-    position: absolute;
-    inset-inline-start: calc(var(--x) * 1%);
-    inset-block-start: 0;
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-    font-variant-numeric: tabular-nums;
-    color: var(--ink-muted);
-  }
-
-  .tl-ticks .tl-now {
-    transform: translateX(-100%);
-    color: var(--red-ink);
   }
 
   .tl-list {
@@ -181,8 +124,8 @@ const rows = items
   .tl-list::after {
     content: '';
     position: absolute;
-    inset-block: 0;
-    inset-inline-start: calc(var(--tl-mark) / 2);
+    inset-block: var(--s-3);
+    inset-inline-start: calc(var(--tl-when) + var(--s-5) + var(--tl-mark) / 2);
     border-inline-start: 1px solid var(--rule);
   }
 
@@ -194,29 +137,16 @@ const rows = items
   }
 
   .tl-item {
-    position: relative;
-    align-items: baseline;
-    padding-block: var(--s-5);
-    border-block-start: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: var(--tl-when) var(--tl-mark) minmax(0, 1fr);
+    column-gap: var(--s-5);
+    align-items: start;
+    padding-block: var(--s-6);
   }
 
-  .tl-item:first-child {
-    border-block-start: 0;
-  }
-
-  .tl-mark {
-    position: relative;
-    z-index: 1;
-    inline-size: var(--s-3);
-    block-size: var(--s-3);
-    margin-inline-start: calc((var(--tl-mark) - var(--s-3)) / 2);
-    border: 1px solid var(--ink);
-    background: var(--ink);
-    transform: translateY(var(--s-1));
-    transition: background var(--dur-base) ease;
-  }
-
-  .tl-year {
+  .tl-when {
+    padding-top: var(--s-2);
+    text-align: end;
     font-family: var(--font-mono);
     font-size: var(--t-label);
     letter-spacing: var(--track-wide);
@@ -224,15 +154,39 @@ const rows = items
     font-variant-numeric: tabular-nums;
   }
 
-  .tl-text {
+  .tl-mark {
+    position: relative;
+    z-index: 1;
+    inline-size: var(--s-3);
+    block-size: var(--s-3);
+    margin: var(--s-2) 0 0 calc((var(--tl-mark) - var(--s-3)) / 2);
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    transition: background var(--dur-base) ease;
+  }
+
+  .tl-org {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    font-weight: 400;
+    line-height: var(--lh-title);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    transition: color var(--dur-base) ease;
+  }
+
+  .tl-role {
+    margin-top: var(--s-2);
+    max-inline-size: var(--measure);
     font-family: var(--font-body);
     font-size: var(--t-body);
     line-height: var(--lh-snug);
     color: var(--ink-body);
+    transition: color var(--dur-base) ease;
   }
 
   .tl-source {
-    margin-top: var(--s-1);
+    margin-top: var(--s-2);
     font-family: var(--font-mono);
     font-size: var(--t-note);
     line-height: var(--lh-snug);
@@ -245,30 +199,13 @@ const rows = items
     text-underline-offset: var(--underline-offset);
   }
 
-  /* The year bar: a hairline track with the span drawn on it, to the same scale as the axis above. */
-  .tl-span {
-    position: relative;
-    block-size: var(--s-2);
-    border-block-end: 1px solid var(--rule);
-    align-self: center;
-  }
-
-  .tl-span i {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: calc(var(--l) * 1%);
-    inline-size: calc(var(--w) * 1%);
-    background: var(--ink);
-    transform-origin: left;
-    transition: transform 700ms var(--ease-draw), background var(--dur-base) ease;
-  }
-
-  /* While the page is live, a marker is hollow until you pass it, and red while you are reading its row. */
+  /* While live: a marker is hollow until you reach it, red while it is the entry you are on, and the entries
+     below the reading line are in the muted ink until you get to them. */
   .tl[data-live] .tl-mark {
     background: var(--paper);
   }
 
-  .tl[data-live] .tl-item.is-passed .tl-mark {
+  .tl[data-live] .tl-item.is-reached .tl-mark {
     background: var(--ink);
   }
 
@@ -277,53 +214,44 @@ const rows = items
     background: var(--red);
   }
 
-  .tl[data-live] .tl-item.is-now .tl-text {
-    color: var(--ink);
-  }
-
-  .tl[data-live] .tl-item.is-now .tl-span i {
-    background: var(--red);
-  }
-
-  .tl[data-live] .tl-item:not(.is-drawn) .tl-span i {
-    transform: scaleX(0);
+  .tl[data-live] .tl-item:not(.is-reached) .tl-org,
+  .tl[data-live] .tl-item:not(.is-reached) .tl-role {
+    color: var(--ink-muted);
   }
 
   @media (max-width: 899px) {
-    .tl-axis,
+    .tl {
+      --tl-when: 0rem;
+    }
+
+    .tl-list::before,
+    .tl-list::after {
+      inset-inline-start: calc(var(--tl-mark) / 2);
+    }
+
     .tl-item {
       grid-template-columns: var(--tl-mark) minmax(0, 1fr);
       column-gap: var(--s-4);
+      padding-block: var(--s-5);
     }
 
-    .tl-key {
+    .tl-when {
       grid-column: 2;
-    }
-
-    .tl-ticks {
-      grid-column: 2;
-    }
-
-    .tl-axis {
-      row-gap: var(--s-2);
-    }
-
-    .tl-year {
-      grid-column: 2;
+      grid-row: 1;
+      padding-top: 0;
+      text-align: start;
     }
 
     .tl-mark {
-      grid-row: 1 / span 3;
-      align-self: start;
+      grid-column: 1;
+      grid-row: 1;
+      margin-top: var(--s-1);
     }
 
-    .tl-body,
-    .tl-span {
+    .tl-what {
       grid-column: 2;
-    }
-
-    .tl-span {
-      margin-top: var(--s-3);
+      grid-row: 2;
+      margin-top: var(--s-1);
     }
   }
 </style>
