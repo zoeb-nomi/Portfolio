@@ -1,7 +1,8 @@
 ---
 // Lite-embed facade. Nothing third-party loads until someone asks to watch:
-// the poster is self-hosted, and the YouTube iframe is created on click. On
-// first paint the page makes zero requests off this origin.
+// the poster is self-hosted, and the YouTube iframe is created on click. This
+// component makes no third-party request on first paint (the page-level analytics
+// scripts in Base.astro are separate).
 //
 // Progressive enhancement: the markup ships an <a> to the watch page, so the
 // poster is a working link with JavaScript off. The inline script upgrades that

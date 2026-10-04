@@ -34,8 +34,7 @@ interface Props {
   narr?: boolean;
   spec?: SpecRow[];
   switcher?: 'CrossSource' | 'mirror-eval' | 'screener-eval';
-  /** `bare` keeps the pre-WCAG-2.5.8 link (no 24px hit area); see .repo-link--bare. */
-  repo?: { href: string; label: string; bare?: boolean };
+  repo?: { href: string; label: string };
 }
 
 const {
@@ -93,7 +92,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
           )}
           {switcher && <EvalsSwitcher current={switcher} />}
           {repo && (
-            <a class:list={['repo-link', { 'repo-link--bare': repo.bare }]} href={repo.href} target="_blank" rel="noopener noreferrer">
+            <a class="repo-link" href={repo.href} target="_blank" rel="noopener noreferrer">
               {repo.label}
             </a>
           )}
@@ -210,14 +209,6 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
     overflow-wrap: anywhere;
-  }
-
-  /* CrossSource's original link: no padded hit area. Kept so the refactor moves
-     no pixel; drop the flag (and this rule) to give it the 24px target. */
-  .repo-link--bare {
-    padding-block: 0;
-    min-height: 0;
-    margin-top: var(--s-6);
   }
 
   /* plain: the margin column is only the rule; it has no content to stack. */

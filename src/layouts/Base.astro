@@ -4,6 +4,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/layout.css';
+import '../styles/reading.css';
 import {
   site,
   personJsonLd,
@@ -66,7 +67,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
 
     <meta name="google-site-verification" content={googleSiteVerification} />
 
-    <!-- Fonts: self-hosted, preload the two above-the-fold files only -->
+    <!-- Fonts: self-hosted, preload the three above-the-fold files only (display, body, mono) -->
     <link
       rel="preload"
       href="/fonts/instrument-serif-latin-400-normal.woff2"

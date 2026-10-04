@@ -66,6 +66,9 @@
   --t-note: 12px;                           /* MarginNote, bylines, RecordList .where */
   --t-micro: 11px;                          /* hard floor for mono captions/labels */
 
+  /* Reading measure: the max line width of running text (.prose). */
+  --measure: 68ch;
+
   /* §5 — Space scale (4px base) */
   --s-1: 4px;
   --s-2: 8px;
