@@ -10,19 +10,51 @@ Keystone project: [CrossSource](https://github.com/zoeb-nomi/crosssource) — ev
 
 Hosted on Cloudflare Pages. Build command `npm run build`, output directory `dist/`. Node version is pinned in `.nvmrc` (22; `engines` allows >= 20).
 
-**Publish rule** — `main` is live. Zoeb commits via the GitHub web UI; Claude never pushes. Every change goes through a branch and PR, and CI (`.github/workflows/ci.yml`) must be green first.
+- **Production** — every commit to `main` builds and auto-deploys. There is no staging environment.
+- **Previews** — commits on any other branch get their own preview deployment at a generated URL. Previews send `X-Robots-Tag: noindex`.
+- **Rollback** — Cloudflare Pages → the project → **Deployments** → find the last good build → **Rollback to this deployment**. This repoints production immediately without a rebuild. Alternatively revert the offending commit on `main` and let the normal build redeploy.
+- **Which project?** At the time of writing two Cloudflare Pages projects (`zoebnomi` and `portfolio`) are connected to this repo and both post a preview on every PR. Check in the dashboard which one owns the `zoebnomi.com` domain before following the rollback steps.
 
-**Checks** (all run in CI):
+**Publish rule** — `main` is live and only Zoeb merges to it. Zoeb commits via the GitHub web UI; Claude does not push to `main` or merge, and does not push at all unless Zoeb explicitly asks in that session, in which case it pushes a feature branch and opens a **draft** PR for him to review. Every change goes through a branch and PR, and CI (`.github/workflows/ci.yml`) must be green first.
+
+Run `node scripts/geo-gate.mjs` against `dist/` before deploying — it is the last gate between an edit and production.
+
+## Checks
+
+All of these run in CI, in this order (`.github/workflows/ci.yml`): `npm ci`, `npm run build`, `npm run gate`, `npm run check`, then `npm run qa` and `npm run tokens` against a running preview.
 
 - `npm run check` — `astro check` (types).
 - `npm run gate` — `scripts/geo-gate.mjs` against `dist/` (run `npm run build` first).
-- `npm run qa` — `scripts/qa-sweep.mjs`: Playwright sweep of every page for horizontal overflow (360–1920px), axe violations, font-weight > 500, off-scale font sizes (warn only), console errors and 4xx/5xx requests. Needs a running site (`npx astro preview --host 127.0.0.1 --port 4321`, or set `BASE_URL`); report written to `.astro/qa-report.json`.
+- `npm run qa` — `scripts/qa-sweep.mjs`: Playwright sweep of every page for horizontal overflow (360–1920px), axe violations (at 390 and 1440), font-weight > 500, off-scale font sizes (warn only), console errors and 4xx/5xx requests. Needs a running site (`npx astro preview --host 127.0.0.1 --port 4321`, or set `BASE_URL`); report written to `.astro/qa-report.json`.
+- `npm run tokens` — `scripts/tokens-audit.mjs`: the rendered site against the design tokens, at 1440 and 390. **Fails** on font-weight > 500 and on any text or background colour outside the palette; **warns** on font sizes outside the type tokens, line styles other than {1px ink, 1px rule, 2px red}, and border-radius other than 0. Same running-site requirement; report in `.astro/tokens-report.json`.
 
-- **Production** — every commit to `main` builds and auto-deploys. There is no staging environment.
-- **Previews** — commits on any other branch get their own preview deployment at a generated URL.
-- **Rollback** — Cloudflare Pages → the project → **Deployments** → find the last good build → **Rollback to this deployment**. This repoints production immediately without a rebuild. Alternatively revert the offending commit on `main` and let the normal build redeploy.
+**Both sweeps use a hard-coded list of pages** (`PAGES` at the top of `scripts/qa-sweep.mjs` and `scripts/tokens-audit.mjs`). A new page is not checked until it is added to both.
 
-Run `node scripts/geo-gate.mjs` against `dist/` before deploying — it is the last gate between an edit and production.
+## Local setup
+
+```bash
+nvm use                            # Node 22, from .nvmrc
+npm ci
+npx playwright install chromium    # once: qa, tokens and generate-og drive a real browser
+npm run build
+npx astro preview --host 127.0.0.1 --port 4321    # then: npm run qa, npm run tokens
+```
+
+`npm run build` runs `prebuild` first, which fetches live GitHub data and rewrites the tracked `src/data/contributions.json`. Unless you meant to refresh the heatmap, run `git checkout -- src/data/contributions.json` before committing.
+
+## Writing (essays)
+
+Essays are hand-built `.astro` pages in `src/pages/writing/`, not Markdown and not a content collection. The newer ones keep their copy in `src/data/copy.ts` and render through `Base` → `Masthead` → `Section`. To add one:
+
+1. **Copy** — add a `meta.<key>` entry (`title`, `description`) and an essay object (`kicker`, `title`, `dek`, `date` as ISO `YYYY-MM-DD`, `readingTime`, sections) to `src/data/copy.ts`. `Base` uses one `title` for both `<title>` and `og:title`, so keep it at 60 characters or fewer; keep the description at 155 or fewer. Use straight quotes and apostrophes.
+2. **Page** — `src/pages/writing/<slug>.astro`. Give each `Section` an `anchorId` to make its heading a stable, human deep link (`#kyb`); a `Section` without one renders no id. Each section heading is an `h2`, so the page has one `h1` (the masthead) and no skipped levels.
+3. **Index** — add the entry to `posts` in `src/pages/writing/index.astro`, newest first.
+4. **llms.txt** — add the essay to the list in `src/pages/llms.txt.ts`.
+5. **Sitemap** — add the URL to `src/data/lastmod.json` (and bump `/writing/`). A route with no entry gets no `lastmod`; the build date is never used.
+6. **OG card** — add an entry to `scripts/generate-og.mjs` and run `node scripts/generate-og.mjs`. It re-renders every card with tiny byte differences, so commit only the PNGs you meant to change (`git checkout -- public/og/<other>.png`).
+7. **Checks** — add the URL to `PAGES` in `scripts/qa-sweep.mjs` and `scripts/tokens-audit.mjs` (see above), then run build, gate, check, qa and tokens.
+
+**Figures.** `EssayFigure` (a numbered, captioned frame with a source line) wraps `UnitChart` (one square per case), `BarList` (label / bar / value rows), `OwnershipGap` (a chain-of-ownership illustration), or the existing `DataTable`. They are built from HTML and hairlines, not SVG, so type stays on the token scale and above the 11px floor; the numbers in them come from the site's own harness pages and each figure links its source. For a wide text table on phones, render a stacked-card version below 900px (see Table 1 in `nobody-reports-the-misses.astro`).
 
 ## Contributions graph
 
