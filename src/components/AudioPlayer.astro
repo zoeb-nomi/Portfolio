@@ -562,7 +562,8 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         // (for this cue only — re-decided every time the highlight moves)
         // if neither clear spot fits in the viewport.
         if (marginCol) {
-          const noteEls = Array.from(marginCol.querySelectorAll('.margin-note, figcaption'));
+          // The section heading lives in this column too: "above the note" must not mean "on the heading".
+          const noteEls = Array.from(marginCol.querySelectorAll('.margin-note, figcaption, .mark-label'));
           const floatLeft = window.innerWidth - right - floatW;
           const rectAt = (t) => ({ top: t, bottom: t + floatH, left: floatLeft, right: floatLeft + floatW });
           const collidesAt = (t) => noteEls.some((n) => rectsIntersect(rectAt(t), n.getBoundingClientRect()));
