@@ -4,6 +4,7 @@ import Masthead from '../components/Masthead.astro';
 import EmbedCard from '../components/EmbedCard.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, about, cta, home } from '../data/copy';
+import { isExternal } from '../lib/isExternal';
 
 // Order matches the footer's, so the two link rows read as one list.
 const links = [
@@ -13,7 +14,6 @@ const links = [
   { label: cta.github.label, href: cta.github.href },
 ];
 
-const isExternal = (href: string) => /^https?:\/\//.test(href);
 ---
 
 <Base title={meta.about.title} description={meta.about.description} path="/about/" ogImage="/og/about.png">

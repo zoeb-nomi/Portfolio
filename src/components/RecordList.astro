@@ -5,6 +5,7 @@
 // link is still a placeholder (href starting `TODO_`) are not rendered: an
 // unlinked "public record" row is a claim pretending to be evidence.
 import type { RecordItem } from '../data/copy';
+import { isExternal } from '../lib/isExternal';
 
 interface Props {
   kicker: string;
@@ -26,7 +27,6 @@ const isReady = (item: RecordItem) =>
   item.links.length > 0 && item.links.every((l) => !l.href.startsWith('TODO_'));
 
 const rows = items.filter(isReady);
-const isExternal = (href: string) => /^https?:\/\//.test(href);
 ---
 
 {

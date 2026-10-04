@@ -7,31 +7,18 @@ import DataTable from '../../components/DataTable.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
 import { meta, cta, home, writingBusStop as wb } from '../../data/copy';
 import { formatDate } from '../../lib/formatDate';
 
-const articleLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+const articleLd = articleJsonLd({
+  slug: 'the-bus-stop-nobody-notices',
   headline: wb.title,
   description: meta.writingBusStop.description,
-  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  url: 'https://www.zoebnomi.com/writing/the-bus-stop-nobody-notices/',
-  mainEntityOfPage: 'https://www.zoebnomi.com/writing/the-bus-stop-nobody-notices/',
-  datePublished: wb.date,
-  dateModified: wb.date,
+  date: wb.date,
   about: 'Indian intercity bus industry, Vijayanand Travels, premiumisation, hypothesis-driven investing, Vijayanand Travels video coverage',
-  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  ...(wb.audio && {
-    audio: {
-      '@type': 'AudioObject',
-      contentUrl: 'https://www.zoebnomi.com/audio/the-bus-stop-nobody-notices.mp3',
-      encodingFormat: 'audio/mpeg',
-      duration: 'PT15M46S',
-      name: 'The bus stop nobody notices — narration',
-    },
-  }),
-};
+  audio: wb.audio && { src: wb.audio.src, duration: wb.audio.duration },
+});
 ---
 
 <Base

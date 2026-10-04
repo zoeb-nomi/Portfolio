@@ -5,6 +5,7 @@ import Section from '../../components/Section.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
 import { meta, cta, home, writingJudgeBugAudio as audio } from '../../data/copy';
 
 const kicker = 'Eval methodology · CrossSource';
@@ -13,28 +14,14 @@ const standfirst =
   'On validating LLM-as-judge evals — and why a 15/15 blind agreement and a broken instrument can live in the same pipeline.';
 const repoHref = 'https://github.com/zoeb-nomi/crosssource';
 
-const articleLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
-  headline: "The judge caught a bug I didn't",
+const articleLd = articleJsonLd({
+  slug: 'the-judge-caught-a-bug',
+  headline: title,
   description: meta.writingJudgeBug.description,
-  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  url: 'https://www.zoebnomi.com/writing/the-judge-caught-a-bug/',
-  mainEntityOfPage: 'https://www.zoebnomi.com/writing/the-judge-caught-a-bug/',
-  datePublished: '2026-08-20',
-  dateModified: '2026-08-20',
+  date: '2026-08-20',
   about: 'LLM-as-judge evaluation, RAG citation accuracy',
-  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  ...(audio && {
-    audio: {
-      '@type': 'AudioObject',
-      contentUrl: 'https://www.zoebnomi.com/audio/the-judge-caught-a-bug.mp3',
-      encodingFormat: 'audio/mpeg',
-      duration: 'PT2M6S',
-      name: "The judge caught a bug I didn't — narration",
-    },
-  }),
-};
+  audio: audio && { src: audio.src, duration: audio.duration },
+});
 ---
 
 <Base

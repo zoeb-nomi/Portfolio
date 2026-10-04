@@ -8,36 +8,21 @@ import OwnershipGap from '../../components/OwnershipGap.astro';
 import BarList from '../../components/BarList.astro';
 import UnitChart from '../../components/UnitChart.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
 import { meta, writingMisses as wm } from '../../data/copy';
 
-const url = 'https://www.zoebnomi.com/writing/nobody-reports-the-misses/';
 const f = wm.figures;
-const mins = Math.floor(wm.audio.duration / 60);
-const secs = wm.audio.duration % 60;
 const summaryRows = f.summary.rows.map((r) => ({ label: r.label, cells: r.cells.map((text) => ({ text })) }));
 
-const articleLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+const articleLd = articleJsonLd({
+  slug: 'nobody-reports-the-misses',
   headline: wm.title,
   description: meta.writingMisses.description,
-  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  url,
-  mainEntityOfPage: url,
-  datePublished: wm.date,
-  dateModified: wm.date,
+  date: wm.date,
   about: 'Counting missed items (false passes) in AI systems used for regulated work',
-  isPartOf: { '@type': 'WebSite', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
-  audio: {
-    '@type': 'AudioObject',
-    contentUrl: `https://www.zoebnomi.com${wm.audio.src}`,
-    encodingFormat: 'audio/mpeg',
-    duration: `PT${mins}M${secs}S`,
-    name: `${wm.title} — narration`,
-    caption: `https://www.zoebnomi.com${wm.audio.captions}`,
-  },
-};
+  audio: { src: wm.audio.src, duration: wm.audio.duration, captions: wm.audio.captions },
+});
 ---
 
 <Base
