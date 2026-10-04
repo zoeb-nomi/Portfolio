@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
-import { meta } from '../../data/copy';
+import { meta, writingMisses } from '../../data/copy';
 import { formatDate } from '../../lib/formatDate';
 
 const kicker = 'Writing';
@@ -10,6 +10,13 @@ const standfirst =
   'Notes on eval methodology, LLM-as-judge reliability, and RAG output quality — drawn from CrossSource and production eval work. And, occasionally, an industry thesis written so it can be wrong.';
 
 const posts = [
+  {
+    href: '/writing/nobody-reports-the-misses/',
+    title: writingMisses.title,
+    date: writingMisses.date,
+    kicker: writingMisses.kicker,
+    dek: writingMisses.dek,
+  },
   {
     href: '/writing/the-bus-stop-nobody-notices/',
     title: 'The bus stop nobody notices',

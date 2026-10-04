@@ -15,6 +15,7 @@ const PAGES = [
   '/', '/about/', '/work/', '/evals/', '/crosssource/', '/mirror-eval/', '/screener-eval/',
   '/writing/',
   '/writing/eval-harness-at-my-own-reflection/',
+  '/writing/nobody-reports-the-misses/',
   '/writing/the-bus-stop-nobody-notices/',
   '/writing/the-judge-caught-a-bug/',
   '/writing/two-levers-that-did-not-move/',

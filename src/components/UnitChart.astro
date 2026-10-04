@@ -1,0 +1,108 @@
+---
+// Unit chart: one square per case, filled when the thing being counted
+// happened. "3 of 40" is easier to feel as 3 filled squares in a field of 40
+// than as a percentage. The squares are decoration (aria-hidden); the row's
+// visible text carries the numbers, so screen readers get them too.
+interface Row {
+  label: string;
+  filled: number;
+  of: number;
+  /** Visible value, e.g. "3 of 40 · 8%". */
+  text: string;
+}
+
+interface Props {
+  rows: Row[];
+  /** Squares per line. */
+  cols: number;
+  /** What a filled square means, shown as the key. */
+  filledMeans: string;
+  emptyMeans: string;
+}
+
+const { rows, cols, filledMeans, emptyMeans } = Astro.props;
+---
+
+<div class="uc" style={`--cols:${cols}`}>
+  {
+    rows.map((r) => (
+      <div class="uc-row">
+        <p class="uc-head">
+          <span class="uc-label">{r.label}</span>
+          <span class="uc-value tabular">{r.text}</span>
+        </p>
+        <div class="uc-cells" aria-hidden="true">
+          {Array.from({ length: r.of }, (_, i) => (
+            <span class:list={['uc-cell', { on: i < r.filled }]} />
+          ))}
+        </div>
+      </div>
+    ))
+  }
+  <p class="uc-key">
+    <span class="uc-key-item"><span class="uc-cell on uc-key-cell" aria-hidden="true"></span>{filledMeans}</span>
+    <span class="uc-key-item"><span class="uc-cell uc-key-cell" aria-hidden="true"></span>{emptyMeans}</span>
+  </p>
+</div>
+
+<style>
+  .uc-row + .uc-row {
+    margin-top: var(--s-5);
+  }
+
+  .uc-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+    margin-bottom: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink);
+  }
+
+  /* Columns shrink with the container, so the field never overflows on a phone. */
+  .uc-cells {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, var(--s-4)));
+    gap: var(--s-1);
+  }
+
+  .uc-cell {
+    aspect-ratio: 1;
+    border: 1px solid var(--ink);
+    background: transparent;
+  }
+
+  .uc-cell.on {
+    background: var(--ink);
+  }
+
+  .uc-key {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-2);
+    margin-top: var(--s-5);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--ink-muted);
+  }
+
+  .uc-key {
+    column-gap: var(--s-5);
+  }
+
+  .uc-key-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .uc-key-cell {
+    flex: none;
+    inline-size: var(--s-3);
+    block-size: var(--s-3);
+    aspect-ratio: auto;
+  }
+</style>
