@@ -246,8 +246,31 @@ import { meta, home, cta, contributions } from '../data/copy';
   }
 
   @media (max-width: 1099px) {
+    /* Below 1100px the subhead and the reviewer's note stack, which pushed the
+       CTAs under both (below the fold on 900-1099px). CTAs go before the note so
+       "Book a call" lands in the first viewport; DOM order (and wide desktop)
+       unchanged. */
+    .body-col {
+      display: flex;
+      flex-direction: column;
+    }
+
     .hero-lower {
-      grid-template-columns: 1fr;
+      display: contents;
+    }
+
+    .subhead {
+      order: 1;
+      margin-bottom: var(--s-6);
+    }
+
+    .hero-ctas {
+      order: 2;
+    }
+
+    .hero-lower > :global(.margin-note) {
+      order: 3;
+      margin-top: var(--s-7);
     }
   }
 
@@ -266,31 +289,6 @@ import { meta, home, cta, contributions } from '../data/copy';
       grid-column: 1;
       grid-row: 1;
       margin-bottom: 0;
-    }
-
-    .body-col {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* CTAs before the reviewer's note so "Book a call" lands in the first
-       viewport; DOM order (and desktop) unchanged. */
-    .hero-lower {
-      display: contents;
-    }
-
-    .subhead {
-      order: 1;
-      margin-bottom: var(--s-6);
-    }
-
-    .hero-ctas {
-      order: 2;
-    }
-
-    .hero-lower > :global(.margin-note) {
-      order: 3;
-      margin-top: var(--s-7);
     }
 
     .method-row {

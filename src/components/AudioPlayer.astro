@@ -51,9 +51,12 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   data-duration={audio.duration}
   data-cues={cuesJson}
 >
-  <audio class="audio-el" data-audio-el preload="metadata" controls>
+  <audio class="audio-el" data-audio-el preload="metadata" controls aria-label={audio.label}>
     <source src={audio.src} type="audio/mpeg" />
   </audio>
+
+  {/* No-JS readers get the native player; keep the synthetic-voice disclosure for them too. */}
+  <noscript><p class="audio-note">{audio.note}</p></noscript>
 
   <div class="audio-enhanced" data-audio-enhanced hidden>
     <p class="audio-caption">{captionText}</p>
@@ -93,6 +96,8 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       <button type="button" class="audio-speed" data-audio-speed aria-label="Playback speed: 1×. Tap to change.">1×</button>
     </div>
 
+    <p class="audio-status" data-audio-status role="status" aria-live="polite"></p>
+
     <p class="audio-note">{audio.note}</p>
 
     {audio.chapters && audio.chapters.length > 0 && (
@@ -130,6 +135,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         <span class="audio-float-dot" aria-hidden="true"></span>Follow
       </button>
       <button type="button" class="audio-float-up" data-audio-float-up aria-label="Back to player" title="Back to player">↑<span class="audio-float-up-label"> Player</span></button>
+      <button type="button" class="audio-float-close" data-audio-float-close aria-label="Hide these controls until I press play again" title="Hide">×</button>
     </div>
   </div>
 </div>
@@ -162,6 +168,22 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       const resumeTag = root.querySelector('[data-audio-resume-tag]');
       const speedButton = root.querySelector('[data-audio-speed]');
       const chapterButtons = Array.from(root.querySelectorAll('[data-audio-chapter]'));
+
+      const statusEl = root.querySelector('[data-audio-status]');
+      function setStatus(msg) {
+        if (statusEl) statusEl.textContent = msg;
+      }
+
+      // One name for the play button in every state: "Play: <title>" / "Pause: <title>".
+      const baseName = (playButton.getAttribute('aria-label') || 'Play').replace(/^Play:?\s*/, '');
+      const labelFor = (verb) => (baseName ? `${verb}: ${baseName}` : verb);
+
+      function tryPlay() {
+        audioEl.play().catch((e) => {
+          // AbortError (a new load interrupted it) and NotAllowedError (no user gesture) are not failures.
+          if (e && e.name !== 'AbortError' && e.name !== 'NotAllowedError') setStatus('This audio could not be played.');
+        });
+      }
 
       // Swap native controls for the custom row now that JS is running.
       audioEl.removeAttribute('controls');
@@ -231,7 +253,14 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
           lastActiveChapterId = activeId;
           const activeBtn = chapterButtons.find((b) => b.dataset.chapterId === activeId);
           const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          activeBtn?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', inline: 'center', block: 'nearest' });
+          // Centre the chip inside its own scrolling rail. scrollIntoView would also scroll the
+          // PAGE back up to the rail whenever the chapter changed while the reader was elsewhere.
+          const rail = activeBtn ? activeBtn.closest('[data-audio-chapters]') : null;
+          if (rail && activeBtn) {
+            const rr = rail.getBoundingClientRect();
+            const br = activeBtn.getBoundingClientRect();
+            rail.scrollTo({ left: rail.scrollLeft + (br.left - rr.left) - (rr.width - br.width) / 2, behavior: reduced ? 'auto' : 'smooth' });
+          }
         }
       }
 
@@ -272,16 +301,26 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
 
       playButton.addEventListener('click', () => {
         if (audioEl.paused) {
-          audioEl.play().catch(() => {});
+          tryPlay();
         } else {
           audioEl.pause();
         }
       });
 
+      // A missing or blocked file must not look like a dead button.
+      audioEl.addEventListener('waiting', () => setStatus('Loading audio…'));
+      audioEl.addEventListener('playing', () => setStatus(''));
+      audioEl.addEventListener('canplay', () => setStatus(''));
+      audioEl.addEventListener('error', () => {
+        setStatus('This audio could not be loaded. Please try again later.');
+        playButton.disabled = true;
+        root.dataset.state = 'error';
+      });
+
       audioEl.addEventListener('play', () => {
         setHidden(iconPlay, true);
         setHidden(iconPause, false);
-        playButton.setAttribute('aria-label', 'Pause');
+        playButton.setAttribute('aria-label', labelFor('Pause'));
         if (resumeTag) resumeTag.hidden = true;
         if (!firedPlay) {
           firedPlay = true;
@@ -292,7 +331,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       audioEl.addEventListener('pause', () => {
         setHidden(iconPlay, false);
         setHidden(iconPause, true);
-        playButton.setAttribute('aria-label', 'Play');
+        playButton.setAttribute('aria-label', labelFor('Play'));
       });
 
       audioEl.addEventListener('timeupdate', () => {
@@ -441,6 +480,8 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       let highlightStarted = false; // resume never highlights until real playback starts
       let followMode = true;
       let playerInView = true;
+      let floatDismissed = false; // the reader closed the controls; they return on the next play
+      let nearEnd = false; // the CTA slab or footer is on screen: nothing should cover it
       let lastCueCheck = 0;
       let lastSeekAt = 0;
       let programmaticScrollUntil = 0;
@@ -499,7 +540,10 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         const minTop = headerBottom + 12;
         const maxTop = window.innerHeight - floatH - 12;
 
-        let top = elRect.top;
+        // Section headings live in the margin column, the same column the float sits in.
+        // Park the float just below the heading it is following instead of on top of it.
+        const inMarginCol = !!(activeEl && activeEl.closest('.margin-col'));
+        let top = inMarginCol ? elRect.bottom + 12 : elRect.top;
         top = Math.max(top, minTop);
         top = Math.min(top, maxTop);
 
@@ -518,7 +562,8 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         // (for this cue only — re-decided every time the highlight moves)
         // if neither clear spot fits in the viewport.
         if (marginCol) {
-          const noteEls = Array.from(marginCol.querySelectorAll('.margin-note, figcaption'));
+          // The section heading lives in this column too: "above the note" must not mean "on the heading".
+          const noteEls = Array.from(marginCol.querySelectorAll('.margin-note, figcaption, .mark-label'));
           const floatLeft = window.innerWidth - right - floatW;
           const rectAt = (t) => ({ top: t, bottom: t + floatH, left: floatLeft, right: floatLeft + floatW });
           const collidesAt = (t) => noteEls.some((n) => rectsIntersect(rectAt(t), n.getBoundingClientRect()));
@@ -537,6 +582,18 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
               floatEl.style.right = '';
               return;
             }
+          }
+        }
+
+        if (inMarginCol) {
+          // Near the bottom of the viewport there may be no room below the heading: use the bar.
+          const floatLeft = window.innerWidth - right - floatW;
+          const r = { top, bottom: top + floatH, left: floatLeft, right: floatLeft + floatW };
+          if (rectsIntersect(r, elRect)) {
+            floatEl.classList.add('audio-float--bar-fallback');
+            floatEl.style.top = '';
+            floatEl.style.right = '';
+            return;
           }
         }
 
@@ -566,7 +623,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         // scrolled into view — otherwise it can disappear out from under
         // focus mid-Tab and flicker back.
         const focusInFloat = document.activeElement instanceof Node && floatEl.contains(document.activeElement);
-        const shouldShow = focusInFloat || (active && !playerInView);
+        const shouldShow = !floatDismissed && !nearEnd && (focusInFloat || (active && !playerInView));
         if (shouldShow === !floatEl.hidden) {
           if (shouldShow) positionFloat();
           return;
@@ -603,11 +660,30 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         // Tab landing on/leaving a float control changes whether it
         // should stay visible; re-check immediately rather than waiting
         // for the next scroll/timeupdate tick.
+        const endEls = Array.from(document.querySelectorAll('.cta-slab, .site-footer'));
+        if (endEls.length) {
+          const seen = new Map();
+          const eio = new IntersectionObserver((entries) => {
+            for (const en of entries) seen.set(en.target, en.isIntersecting);
+            nearEnd = Array.from(seen.values()).some(Boolean);
+            updateFloatVisibility();
+          });
+          endEls.forEach((el) => eio.observe(el));
+        }
+        root.querySelector('[data-audio-float-close]')?.addEventListener('click', () => {
+          floatDismissed = true;
+          updateFloatVisibility();
+        });
+        audioEl.addEventListener('play', () => {
+          floatDismissed = false;
+          updateFloatVisibility();
+        });
+
         floatEl.addEventListener('focusin', updateFloatVisibility);
         floatEl.addEventListener('focusout', updateFloatVisibility);
 
         floatPlayButton?.addEventListener('click', () => {
-          if (audioEl.paused) audioEl.play().catch(() => {});
+          if (audioEl.paused) tryPlay();
           else audioEl.pause();
         });
 
@@ -714,7 +790,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
             if (!cue) return;
             const wasActive = el === activeEl;
             seekTo(cue[1]);
-            if (audioEl.paused) audioEl.play().catch(() => {});
+            if (audioEl.paused) tryPlay();
             if (wasActive) {
               followMode = true;
               updateFollowButton();
@@ -935,6 +1011,23 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     text-decoration-color: var(--red);
   }
 
+  .audio-status {
+    margin-top: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    color: var(--ink-body);
+  }
+
+  .audio-status:empty {
+    display: none;
+  }
+
+  .audio-play:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
   .audio-note {
     margin-top: var(--s-3);
     font-family: var(--font-mono);
@@ -1113,6 +1206,23 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     display: none;
   }
 
+  /* Only the bar layouts (phones, and the desktop fallback) can be dismissed. */
+  .audio-float-close {
+    display: none;
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: var(--t-small);
+    color: var(--ink-muted);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
   /* Same visual proportions as the main player's play button: 44px hit
      area, 34px ink square (inset: 5px). */
   .audio-float-play {
@@ -1159,6 +1269,8 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   .audio-float-up {
     flex: 0 0 auto;
     min-height: 44px;
+    min-width: 44px;
+    justify-content: center;
     display: inline-flex;
     align-items: center;
     font-family: var(--font-mono);
@@ -1216,13 +1328,17 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
      aware. JS never sets inline top/right at this breakpoint. */
   @media (max-width: 899px) {
     .audio-float {
-      left: 16px;
-      right: 16px;
-      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      left: 0;
+      right: 0;
+      bottom: 0;
       gap: var(--s-3);
-      padding: var(--s-2) 0 0;
+      padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
       background: var(--paper);
       border-top: 1px solid var(--rule);
+    }
+
+    .audio-float-close {
+      display: inline-flex;
     }
 
     .audio-float-time {
@@ -1280,15 +1396,19 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     .audio-float.audio-float--bar-fallback {
       position: fixed;
       top: auto !important;
-      left: 16px !important;
-      right: 16px !important;
-      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0;
       flex-direction: row;
       align-items: center;
       gap: var(--s-3);
-      padding: var(--s-2) 0 0;
+      padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
       background: var(--paper);
       border-top: 1px solid var(--rule);
+    }
+
+    .audio-float.audio-float--bar-fallback .audio-float-close {
+      display: inline-flex;
     }
 
     .audio-float.audio-float--bar-fallback .audio-float-time {

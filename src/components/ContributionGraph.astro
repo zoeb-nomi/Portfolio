@@ -187,6 +187,12 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
         if (captionEl && typeof data.total_last_year === 'number') {
           captionEl.textContent = `${data.total_last_year} contributions in the last year · live from GitHub`;
+          // Keep the accessible name in step with the visible caption (it said the snapshot's
+          // total while the caption showed the live one).
+          root.querySelector('.cg-grid')?.setAttribute(
+            'aria-label',
+            `GitHub contribution calendar for zoeb-nomi: ${data.total_last_year} contributions in the last year`,
+          );
         }
       })
       .catch(() => {
@@ -233,6 +239,11 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
     grid-template-rows: 14px repeat(7, var(--cg-cell));
     gap: 3px;
     flex: 0 0 auto;
+    /* Stay in view while the scroller is parked at the recent weeks. */
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--paper);
   }
 
   .cg-weekday-label {

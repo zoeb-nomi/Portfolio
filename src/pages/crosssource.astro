@@ -33,7 +33,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     h1Max="22ch"
     spec={cs.specBlock}
     switcher="CrossSource"
-    repo={{ href: cs.repoHref, label: cs.repoLabel, bare: true }}
+    repo={{ href: cs.repoHref, label: cs.repoLabel }}
   />
 
   <Section mark={cs.s1.mark} label={cs.s1.label}>
@@ -140,6 +140,10 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   }
 
   .related-writing a {
+    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: 3px;

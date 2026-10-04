@@ -166,8 +166,12 @@ const { currentPath } = Astro.props;
     text-decoration: none;
   }
 
+  /* Colour alone is not enough to say "you are here": add an underline. */
   .sheet-links a[aria-current='page'] {
     color: var(--red-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
   }
 
   .sheet-ctas {
@@ -211,9 +215,12 @@ const { currentPath } = Astro.props;
   const wordmark = document.querySelector('.wordmark');
   let lastFocused: HTMLElement | null = null;
 
+  // The toggle is the visible close button, so it is part of the Tab loop: header
+  // button first, then the sheet's links.
   function focusable(): HTMLElement[] {
     if (!sheet) return [];
-    return Array.from(sheet.querySelectorAll('a, button'));
+    const items = Array.from(sheet.querySelectorAll<HTMLElement>('a, button'));
+    return toggle ? [toggle, ...items] : items;
   }
 
   function onKeydown(e: KeyboardEvent) {
@@ -239,20 +246,18 @@ const { currentPath } = Astro.props;
     if (!toggle || !sheet) return;
     lastFocused = document.activeElement as HTMLElement;
     toggle.setAttribute('aria-expanded', 'true');
-    toggle.setAttribute('aria-label', 'Close menu');
     sheet.hidden = false;
     document.body.style.overflow = 'hidden';
     main?.setAttribute('inert', '');
     footer?.setAttribute('inert', '');
     wordmark?.setAttribute('inert', '');
     document.addEventListener('keydown', onKeydown);
-    focusable()[0]?.focus();
+    sheet.querySelector<HTMLElement>('a')?.focus();
   }
 
   function close() {
     if (!toggle || !sheet) return;
     toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Menu');
     sheet.hidden = true;
     document.body.style.overflow = '';
     main?.removeAttribute('inert');
@@ -268,4 +273,10 @@ const { currentPath } = Astro.props;
   });
 
   sheet?.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+
+  // Rotating a tablet (or resizing a window) past the desktop breakpoint must not leave a
+  // full-screen sheet open with its toggle hidden, the page inert and scrolling locked.
+  window.matchMedia('(min-width: 900px)').addEventListener('change', (e) => {
+    if (e.matches && toggle?.getAttribute('aria-expanded') === 'true') close();
+  });
 </script>

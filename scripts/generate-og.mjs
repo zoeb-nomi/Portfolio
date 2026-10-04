@@ -26,7 +26,7 @@ const pages = [
     title: 'About', sub: 'Mechanical engineer turned AI product manager. Open to US relocation.' },
   { id: 'work', // meta.work
     title: 'Work', sub: 'Zero-to-one BGV at Keka, LLM output quality at Instead.',
-    num: { value: '3', caption: 'roles → AI PM' } },
+    num: { value: '4', caption: 'companies · 2 promotions' } },
   { id: 'evals', // meta.evals
     title: 'Evals', sub: 'One method: CrossSource, mirror-eval, screener-eval.',
     num: { value: '3', caption: 'harnesses' } },
@@ -140,6 +140,7 @@ function templateHTML({ title, sub, num }) {
     letter-spacing: 0;
     color: #3b362e;
     margin-top: 22px;
+    text-wrap: balance;
   }
   .num {
     flex: 0 0 auto;
@@ -153,7 +154,7 @@ function templateHTML({ title, sub, num }) {
     font-size: 190px;
     line-height: 0.9;
     letter-spacing: -0.02em;
-    color: #be241f;
+    color: #191713;
     white-space: nowrap;
   }
   .arr, .kicker .arr {

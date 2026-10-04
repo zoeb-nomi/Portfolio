@@ -209,18 +209,4 @@ const articleLd = {
     font-size: var(--t-data);
     color: var(--ink);
   }
-
-  /* Deep links (#kyb, #sox, ...): below 900px the header scrolls away, so keep
-     the section band's own top padding in view; from 900px it is sticky, so
-     leave room for it plus the section's top rule. Scoped to this page;
-     headings without an id are untouched. */
-  :global(.mark-label[id]) {
-    scroll-margin-top: var(--s-6);
-  }
-
-  @media (min-width: 900px) {
-    :global(.mark-label[id]) {
-      scroll-margin-top: calc(var(--s-9) + var(--s-11));
-    }
-  }
 </style>

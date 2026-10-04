@@ -47,7 +47,7 @@ npx astro preview --host 127.0.0.1 --port 4321    # then: npm run qa, npm run to
 Essays are hand-built `.astro` pages in `src/pages/writing/`, not Markdown and not a content collection. The newer ones keep their copy in `src/data/copy.ts` and render through `Base` → `Masthead` → `Section`. To add one:
 
 1. **Copy** — add a `meta.<key>` entry (`title`, `description`) and an essay object (`kicker`, `title`, `dek`, `date` as ISO `YYYY-MM-DD`, `readingTime`, sections) to `src/data/copy.ts`. `Base` uses one `title` for both `<title>` and `og:title`, so keep it at 60 characters or fewer; keep the description at 155 or fewer. Use straight quotes and apostrophes.
-2. **Page** — `src/pages/writing/<slug>.astro`. Give each `Section` an `anchorId` to make its heading a stable, human deep link (`#kyb`); a `Section` without one renders no id. Each section heading is an `h2`, so the page has one `h1` (the masthead) and no skipped levels.
+2. **Page** — `src/pages/writing/<slug>.astro`. Give each `Section` an `anchorId` for a stable, human deep link (`#kyb`); without one its heading gets `sec-<label>`. Each section heading is an `h2`, so the page has one `h1` (the masthead) and no skipped levels.
 3. **Index** — add the entry to `posts` in `src/pages/writing/index.astro`, newest first.
 4. **llms.txt** — add the essay to the list in `src/pages/llms.txt.ts`.
 5. **Sitemap** — add the URL to `src/data/lastmod.json` (and bump `/writing/`). A route with no entry gets no `lastmod`; the build date is never used.
@@ -55,6 +55,23 @@ Essays are hand-built `.astro` pages in `src/pages/writing/`, not Markdown and n
 7. **Checks** — add the URL to `PAGES` in `scripts/qa-sweep.mjs` and `scripts/tokens-audit.mjs` (see above), then run build, gate, check, qa and tokens.
 
 **Figures.** `EssayFigure` (a numbered, captioned frame with a source line) wraps `UnitChart` (one square per case), `BarList` (label / bar / value rows), `OwnershipGap` (a chain-of-ownership illustration), or the existing `DataTable`. They are built from HTML and hairlines, not SVG, so type stays on the token scale and above the 11px floor; the numbers in them come from the site's own harness pages and each figure links its source. For a wide text table on phones, render a stacked-card version below 900px (see Table 1 in `nobody-reports-the-misses.astro`).
+
+## Design system ("The Red Pen") and accessibility conventions
+
+`src/styles/tokens.css` is the single source for colour, type, space, lines and breakpoints; `scripts/tokens-audit.mjs` checks the rendered result.
+
+- **Colour** — red (`--red`, `--red-ink`) is for annotation and action only: text links, CTAs, reviewer marks, focus. Never headings or body text, and never a proof numeral (OG cards included).
+- **Shape and type** — radius 0 everywhere; font weights of 500 or less; type only from the `--t-*` tokens (floors: mono 11px, sans 12px, serif 20px); spacing from the 4px `--s-*` scale.
+- **Lines** — three tiers only: 1px `--rule-strong` (ink) for structural boundaries, 1px `--rule` for secondary dividers, 2px red for annotation. At most one strong rule between two adjacent blocks.
+- **Breakpoints** — 599px, 899px and 1099px only (the header is sticky from 900px). Light theme only.
+
+Accessibility conventions that came out of the 2026-10 UX audit (the written report is in the HQ docs folder; each finding is a row in the Notion Findings Ledger):
+
+- Standalone links and controls have a 24px minimum hit area (44px for a primary action). Inline links in running text are exempt.
+- One `h1` per page and no skipped heading levels. `Section` renders its margin column as a plain `div`: use `aside` only for a real note (`MarginNote`) or a spec block, never to lay out a column. `html` has `scroll-padding-top` from 900px, and `Section` headings have `scroll-margin-top`, so anchors land below the sticky header.
+- Text drawn inside an SVG scales with the figure and can fall below the 11px floor on phones, and `qa-sweep` and `tokens-audit` skip SVG text. Prefer HTML for chart labels, or step the sizes up below 600px as the bus-stop chart does.
+- Colour alone never carries state: the current page keeps its underline, focus rings are drawn inside clipping frames (`outline-offset`), and a failed audio load says so.
+- The floating audio control parks below the heading it follows (never on top of it), and hides while the CTA slab or footer is on screen.
 
 ## Contributions graph
 

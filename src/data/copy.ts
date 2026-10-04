@@ -480,7 +480,7 @@ export const crosssource = {
     ],
   },
 
-  ctaSlabBody: 'Read the code, run the harness →',
+  ctaSlabBody: 'Read the code, run the harness',
 };
 
 // ---------------------------------------------------------------------------
@@ -503,7 +503,7 @@ export const mirrorEval = {
     { label: 'Engines', value: '4' },
     { label: 'Probes', value: '332 per wave' },
     { label: 'Waves', value: '2' },
-    { label: 'Judge validated', value: '3/40 · 12/40' },
+    { label: 'Judge failed', value: '3/40 · 12/40' },
   ],
   repoHref: 'https://github.com/zoeb-nomi/mirror-eval',
   repoLabel: 'github.com/zoeb-nomi/mirror-eval',
@@ -663,7 +663,7 @@ export const mirrorEval = {
   },
 
   repoCta: [
-    { label: 'Read the code, run it on yourself →', href: 'https://github.com/zoeb-nomi/mirror-eval' },
+    { label: 'View the repo →', href: 'https://github.com/zoeb-nomi/mirror-eval' },
     { label: 'Release v1.0 →', href: 'https://github.com/zoeb-nomi/mirror-eval/releases/tag/v1.0' },
     { label: 'Predictions →', href: 'https://github.com/zoeb-nomi/mirror-eval/blob/main/PREDICTIONS.md' },
   ],
@@ -680,7 +680,7 @@ export const mirrorEval = {
     href: '/screener-eval/',
   },
 
-  ctaSlabBody: 'Read the code, run it on yourself →',
+  ctaSlabBody: 'Read the code, run it on yourself',
 };
 
 // ---------------------------------------------------------------------------
@@ -938,7 +938,7 @@ export const screenerEval = {
     href: '/writing/two-levers-that-did-not-move/',
   },
 
-  ctaSlabBody: 'Read the code, run it on your own résumé →',
+  ctaSlabBody: 'Read the code, run it on your own résumé',
 };
 
 // ---------------------------------------------------------------------------
