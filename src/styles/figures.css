@@ -1,0 +1,139 @@
+/* Shared pieces of the animated figures (ForestPlot, Dumbbell, ...).
+   The default style IS the final state, so a figure is complete with no script and with reduced motion.
+   figure-motion.ts sets data-state="pre" for the start frame and "run" to release it. Lines are 1px ink or
+   rule, or a 2px block of ink (a background, not a border). Marks are square. */
+
+.fg-row {
+  display: grid;
+  grid-template-columns: minmax(0, var(--fg-lab, 10rem)) minmax(0, 1fr) minmax(0, var(--fg-val, 11.5rem));
+  column-gap: var(--s-4);
+  row-gap: var(--s-1);
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--t-data);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+
+.fg-row + .fg-row {
+  margin-top: var(--s-3);
+}
+
+.fg-lab small {
+  display: block;
+  font-size: var(--t-micro);
+  color: var(--ink-muted);
+}
+
+.fg-val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.fg-note {
+  grid-column: 2 / -1;
+  font-size: var(--t-micro);
+  color: var(--red-ink);
+}
+
+/* The track: a hairline with an inset, so a mark at 0% or 100% stays inside it. */
+.fg-trk {
+  position: relative;
+  block-size: var(--s-6);
+}
+
+.fg-trk::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  border-top: 1px solid var(--rule);
+}
+
+.fg-in {
+  position: absolute;
+  inset-block: 0;
+  inset-inline: var(--s-2);
+}
+
+.fg-axis {
+  display: grid;
+  grid-template-columns: minmax(0, var(--fg-lab, 10rem)) minmax(0, 1fr) minmax(0, var(--fg-val, 11.5rem));
+  column-gap: var(--s-4);
+  margin-top: var(--s-1);
+}
+
+.fg-axis-in {
+  position: relative;
+  grid-column: 2;
+  block-size: var(--s-5);
+  margin-inline: var(--s-2);
+}
+
+.fg-axis-in span {
+  position: absolute;
+  inset-inline-start: calc(var(--x) * 1%);
+  inset-block-start: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.fg-axis-label {
+  grid-column: 2;
+  margin-top: var(--s-1);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--ink-muted);
+}
+
+/* Square marks centred on their left offset. */
+.fg-pt {
+  position: absolute;
+  inset-block-start: 50%;
+  inline-size: var(--s-3);
+  block-size: var(--s-3);
+  margin: calc(var(--s-3) / -2) 0 0 calc(var(--s-3) / -2);
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+
+.fg-pt.is-fill {
+  background: var(--ink);
+}
+
+/* A horizontal run of ink, 2px tall, positioned by left and width. */
+.fg-line {
+  position: absolute;
+  inset-block-start: 50%;
+  block-size: 2px;
+  margin-block-start: -1px;
+  background: var(--ink);
+}
+
+@media (max-width: 599px) {
+  .fg-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .fg-row .fg-trk {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .fg-note {
+    grid-column: 1 / -1;
+  }
+
+  .fg-axis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fg-axis-in,
+  .fg-axis-label {
+    grid-column: 1;
+  }
+}
