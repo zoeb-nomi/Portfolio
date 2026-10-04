@@ -39,9 +39,10 @@
    container rather than let the page grow wider on narrow viewports. The
    Section body-col already has min-width: 0 (layout.css), so the track can
    shrink and overflow-x: auto does its job. */
+/* An anchor for the read-along only. DataTable owns the sideways scrolling; a second scroller
+   around it gave two nested scroll regions (and two Tab stops) per table. */
 .table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
+  min-width: 0;
 }
 
 .related-writing a {

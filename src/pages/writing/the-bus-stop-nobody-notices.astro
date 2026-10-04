@@ -98,9 +98,6 @@ const articleLd = articleJsonLd({
     <div
       class="textual table-wrap"
       data-narr="s5-table"
-      tabindex="0"
-      role="region"
-      aria-label="Operators table, scrollable"
     >
       <DataTable caption={wb.s5.table.caption} columns={wb.s5.table.columns} rows={wb.s5.table.rows} />
     </div>
@@ -180,9 +177,6 @@ const articleLd = articleJsonLd({
     <div class="table-gap basket textual" data-narr="s7-table">
       <div
         class="table-wrap basket-table-wrap"
-        tabindex="0"
-        role="region"
-        aria-label="The basket as placed, table, scrollable"
       >
         <DataTable caption={wb.s7.table.caption} columns={wb.s7.table.columns} rows={wb.s7.table.rows} />
       </div>
@@ -534,11 +528,11 @@ const articleLd = articleJsonLd({
 
   /* Table wrapper: lets a wide table scroll within its own box instead of
      pushing the document wider than the viewport. */
+  /* DataTable scrolls itself; this wrapper must not add a second scroller. */
   .table-wrap {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    overflow-x: auto;
   }
 
   @media (max-width: 899px) {

@@ -76,10 +76,10 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   <Section mark={cs.s3.mark} label={cs.s3.label} narrId="s3-cue">
     <div data-narr="s3-table1">
-      <DataTable caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
+      <DataTable nowrap caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
     </div>
     <div class="table-gap" data-narr="s3-table2">
-      <DataTable caption={cs.s3.table2.caption} columns={cs.s3.table2.columns} rows={table2Rows} />
+      <DataTable nowrap caption={cs.s3.table2.caption} columns={cs.s3.table2.columns} rows={table2Rows} />
     </div>
     <p class="prose finding" data-narr="s3-p0">
       <strong>{cs.s3.findingLeadIn}</strong>{cs.s3.findingPre}<em>{cs.s3.findingItalic}</em>{cs.s3.findingPost}

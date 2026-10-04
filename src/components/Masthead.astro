@@ -196,6 +196,15 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     color: var(--ink);
   }
 
+  /* In the 200px margin column (900-1099px) label and value no longer fit on one line:
+     stack them instead of letting each wrap independently ("Probes 332 per / wave"). */
+  @media (min-width: 900px) and (max-width: 1099px) {
+    .spec-row {
+      flex-direction: column;
+      gap: var(--s-1);
+    }
+  }
+
   .repo-link {
     display: inline-block;
     /* Hit area >= 24px tall (WCAG 2.5.8): padding added, margin-top reduced by
