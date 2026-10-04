@@ -1,7 +1,8 @@
 ---
-// Who can fix each failure. Every failure is a square: ink if a prompt can fix it, red if only retrieval can.
-// The strict prompt row shows the same squares with the ones it fixed left as dashed outlines. It plays once as
-// it scrolls into view: the strict row starts identical to the baseline row, then the fixed squares empty out.
+// Which layer owns each failure. Every failure is a square: ink for a wrong-passage failure (tied to the prompt), red
+// for a missing-authority failure (traces to retrieval). The strict prompt row shows the same squares with the ones
+// that are gone left as dashed outlines. It plays once as it scrolls into view: the strict row starts identical to the
+// baseline row, then those squares empty out.
 interface Count {
   prompt: number;
   retrieval: number;
@@ -36,16 +37,16 @@ const total = (c: Count) => c.prompt + c.retrieval;
     <div class="fo-cells" aria-hidden="true">{strictCells.map((k, i) => <span class={`fo-cell is-${k}`} style={`--i:${i}`} />)}</div>
   </div>
   <p class="fo-key" aria-hidden="true">
-    <span><i class="fo-cell is-prompt" /> a prompt can fix it</span>
-    <span><i class="fo-cell is-retrieval" /> only retrieval can fix it</span>
-    <span><i class="fo-cell is-fixed" /> fixed by the strict prompt</span>
+    <span><i class="fo-cell is-prompt" /> wrong passage, tied to the prompt</span>
+    <span><i class="fo-cell is-retrieval" /> missing authority, traces to retrieval</span>
+    <span><i class="fo-cell is-fixed" /> absent under the strict prompt</span>
   </p>
   <dl class="fo-stats">
     <div><dt>Citation precision</dt><dd class="tabular">{precision.from} {'→'} {precision.to}</dd></div>
     <div><dt>Citation recall</dt><dd class="tabular">{recall.from} {'→'} {recall.to}</dd></div>
   </dl>
   <p class="fo-anno">
-    The strict prompt fixed {fixed} of the {baseline.prompt} failures a prompt can reach. The {strict.retrieval} that remain are retrieval's, and no prompt touches them.
+    The strict prompt had {fixed} fewer wrong-passage failures than baseline ({baseline.prompt} {'\u2192'} {strict.prompt}). The {strict.retrieval} missing-authority failures were the same in both configurations and trace to retrieval.
   </p>
 </div>
 

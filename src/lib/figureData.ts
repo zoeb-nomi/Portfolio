@@ -108,8 +108,8 @@ export function waveData() {
   const short = (iso: string) => formatDate(iso).split(' ').slice(0, 2).join(' ');
   // The one-line reasons are the essay's own sentences about the two engines that moved or did not.
   const notes: Record<string, string> = {
-    Claude: 'No equivalent door into the index Claude reads: a true null at four weeks.',
-    Perplexity: 'A Bing Webmaster submission reached the index Perplexity reads.',
+    Claude: 'No owned citation in either wave.',
+    Perplexity: 'The fixes included a Bing Webmaster submission, which reaches the index Perplexity reads.',
   };
   return {
     of,
@@ -156,7 +156,7 @@ export function judgeData() {
     rows: [
       { label: 'Claude judge', filled: Number(m[2]), of: n, text: `${m[2]} of ${n} · ${m[3]}%` },
       { label: 'Gemini judge', filled: Number(m[4]), of: n, text: `${m[4]} of ${n} · ${m[5]}%` },
-      { label: 'CrossSource judge', filled: Number(c[1]), of: Number(c[2]), text: `${c[1]} of ${c[2]} · 100%` },
+      { label: 'CrossSource judge (a different test)', filled: Number(c[1]), of: Number(c[2]), text: `${c[1]} of ${c[2]} · 100%` },
     ],
     agree: { claude: Number(m[2]), gemini: Number(m[4]), n },
   };
@@ -191,6 +191,6 @@ export function proofData() {
     { value: calls, suffix: '', label: 'scored calls in screener-eval', href: '/screener-eval/' },
     { value: probes, suffix: '', label: 'probes per wave in mirror-eval, over two waves', href: '/mirror-eval/' },
     { value: Number(csJudge[1]), suffix: ` of ${csJudge[2]}`, label: 'judge verdicts matched a blind human in CrossSource', href: '/crosssource/' },
-    { value: Number(meJudge[1]), suffix: ` of ${meJudge[2]}`, label: 'the Claude judge matched a blind human in mirror-eval', href: '/mirror-eval/' },
+    { value: Number(meJudge[1]), suffix: ` of ${meJudge[2]}`, label: "the Claude judge matched a blind human's exact tag set in mirror-eval", href: '/mirror-eval/' },
   ];
 }

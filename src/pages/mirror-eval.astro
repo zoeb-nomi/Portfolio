@@ -107,7 +107,7 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
 
   <Section mark={me.s4.mark} label={me.s4.label} narrId="s4-cue">
     <p class="prose" data-narr="s4-p0">{me.s4.para1}</p>
-    <EssayFigure n={4} replay title="The judges against a blind human" source="Source: this section and the CrossSource blind check. A filled square is a verdict that matched the human's exact tag set.">
+    <EssayFigure n={4} replay title="The judges against a blind human" source="Source: this section and the CrossSource blind check. A filled square is a judge output that agreed with the human label: the exact tag set in mirror-eval, the citation-precision verdict in CrossSource.">
       <UnitChart rows={judge.rows} cols={judge.cols} filledMeans="matched the human" emptyMeans="did not match" />
     </EssayFigure>
     <p class="prose" data-narr="s4-p1">

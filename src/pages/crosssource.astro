@@ -81,7 +81,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   </Section>
 
   <Section mark={cs.s3.mark} label={cs.s3.label} narrId="s3-cue">
-    <EssayFigure n={1} replay title="Who can fix each failure" source="Source: Tables 1 and 2 below. Wrong-passage citations are the failures a prompt can reach; missing-authority failures trace to retrieval." >
+    <EssayFigure n={1} replay title="Which layer owns the failure" source="Source: Tables 1 and 2 below. Wrong-passage failures fell under the strict prompt; missing-authority failures trace to retrieval.">
       <FailureOwners {...failures} />
     </EssayFigure>
     <div data-narr="s3-table1">

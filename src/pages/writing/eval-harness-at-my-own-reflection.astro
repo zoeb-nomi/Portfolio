@@ -85,7 +85,7 @@ const articleLd = articleJsonLd({
         <>
           <p class="prose" data-narr={`s4-p${i}`}>{p}</p>
           {i === 1 && (
-            <EssayFigure n={3} replay title="The judges against a blind human" source="Source: mirror-eval section 4 and the CrossSource blind check. A filled square is a verdict that matched the human's exact tag set." href="/mirror-eval/" hrefLabel="Case study →">
+            <EssayFigure n={3} replay title="The judges against a blind human" source="Source: mirror-eval section 4 and the CrossSource blind check. A filled square is a judge output that agreed with the human label: the exact tag set in mirror-eval, the citation-precision verdict in CrossSource." href="/mirror-eval/" hrefLabel="Case study →">
               <UnitChart rows={judge.rows} cols={judge.cols} filledMeans="matched the human" emptyMeans="did not match" />
             </EssayFigure>
           )}
