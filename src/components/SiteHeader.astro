@@ -124,6 +124,8 @@ const { currentPath } = Astro.props;
   .primary-nav a:hover::after { transform: scaleX(1); }
   .primary-nav a:active { opacity: .7; }
   .primary-nav a.current { color: var(--red-ink); }
+  /* "You are here" must not rest on hue alone (current vs other is 1.34:1): keep the underline drawn. */
+  .primary-nav a.current::after { transform: scaleX(1); }
 
   @media (max-width: 899px) {
     .primary-nav { display: none; }

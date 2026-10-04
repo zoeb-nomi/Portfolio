@@ -16,7 +16,12 @@
     "check": "astro check",
     "gate": "node scripts/geo-gate.mjs",
     "qa": "node scripts/qa-sweep.mjs",
-    "tokens": "node scripts/tokens-audit.mjs"
+    "tokens": "node scripts/tokens-audit.mjs",
+    "audio:install": "npm --prefix scripts/audio install --no-audit --no-fund",
+    "audio:test": "npm --prefix scripts/audio test",
+    "audio:build": "node scripts/audio/build.mjs",
+    "audio:check": "node scripts/audio/check.mjs",
+    "audio:verify": "node scripts/audio/verify.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

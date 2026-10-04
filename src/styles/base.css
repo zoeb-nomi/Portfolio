@@ -154,6 +154,19 @@ main a:hover:not(.rp-button):not(.facade):not(.watch-facade):not(.skip-link):not
   text-decoration-thickness: 2px;
 }
 
+/* The skip link moves focus to <main tabindex="-1">; a programmatic landing is not a control,
+   so it gets no page-sized ring. */
+main:focus-visible {
+  outline: none;
+}
+
+/* The header is sticky from 900px: anchor jumps and the skip link must land below it. */
+@media (min-width: 900px) {
+  html {
+    scroll-padding-top: var(--s-12);
+  }
+}
+
 /* Scrollable regions made keyboard-reachable (tabindex="0" role="region"):
    the global :focus-visible ring above applies; keep it inside the box so
    overflow clipping never hides it. */

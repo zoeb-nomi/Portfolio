@@ -1,10 +1,22 @@
 ---
 import { site, cta } from '../data/copy';
+
+// The footer line is one string in copy.ts. Split at its separators so a wrapped
+// line never starts with a stray "·" or "—": each separator is glued (with a
+// non-breaking space) to the word before it.
+const parts = site.footerLine.split(' · ').map((part) => part.replace(' — ', '\u00a0— '));
 ---
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <p class="footer-line">{site.footerLine}</p>
+    <p class="footer-line">
+      {parts.map((part, i) => (
+        <>
+          <span class="footer-part">{part}</span>
+          {i < parts.length - 1 && ' '}
+        </>
+      ))}
+    </p>
     <div class="footer-links">
       <ul class="footer-ctas">
         <li><a href={cta.bookACall.href}>{cta.bookACall.label}</a></li>
@@ -37,6 +49,10 @@ import { site, cta } from '../data/copy';
     color: var(--ink-muted);
     max-width: 34ch;
     order: 2;
+  }
+
+  .footer-part:not(:last-child)::after {
+    content: '\00a0·';
   }
 
   /* llms.txt sits left-aligned under the CTA row, not hanging off its right

@@ -68,7 +68,11 @@ const isExternal = /^https?:\/\//.test(href);
     border-color: var(--paper);
   }
 
+  /* paper -> paper-raised was 1.06:1, i.e. no visible hover on the red slab.
+     Same ink fill as the secondary variant. */
   .rp-button--inverse:hover {
-    background: var(--paper-raised);
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
   }
 </style>

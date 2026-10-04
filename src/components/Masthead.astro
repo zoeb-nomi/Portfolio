@@ -23,7 +23,7 @@ interface Props {
   h1: string;
   kicker?: string;
   standfirst?: string;
-  /** Accessible name for the margin-column aside. */
+  /** Accessible name for the margin-column aside (used only when it carries a spec, switcher or repo link). */
   label?: string;
   variant?: 'default' | 'plain';
   thumbnail?: { alt: string };
@@ -42,7 +42,7 @@ const {
   h1,
   kicker,
   standfirst,
-  label = 'Article kicker',
+  label = 'Case study details',
   variant = 'default',
   thumbnail,
   h1Max,
@@ -57,6 +57,9 @@ const photo = Boolean(thumbnail);
 const plain = variant === 'plain';
 const hasByline = Astro.slots.has('byline');
 const hasMarginExtras = Boolean(spec || switcher || repo);
+// A kicker alone is just text. Only a margin column that carries a spec block, the evals
+// switcher or a repo link is a real complementary region and gets a name.
+const Margin = hasMarginExtras ? 'aside' : 'div';
 
 const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:${standfirstMax}`]
   .filter(Boolean)
@@ -76,7 +79,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
       ) : plain ? (
         <div class="margin-col" aria-hidden="true" />
       ) : (
-        <aside class="margin-col" aria-label={label}>
+        <Margin class="margin-col" aria-label={hasMarginExtras ? label : undefined}>
           <p class:list={['kicker', { 'kicker--stacked': hasMarginExtras }]}>{kicker}</p>
           {spec && (
             <dl class="spec-block" data-narr={narr ? 's0-stats' : undefined}>
@@ -94,7 +97,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
               {repo.label}
             </a>
           )}
-        </aside>
+        </Margin>
       )
     }
     <div class="body-col">
