@@ -142,6 +142,12 @@ const playLabel = `Play: ${title}`;
     background: var(--red-ink);
   }
 
+  /* .frame clips its children, so the global ring (offset +3px) was drawn outside the box
+     and cut off: keyboard focus showed only the glyph changing colour. Draw it inside. */
+  .facade:focus-visible {
+    outline-offset: calc(-1 * var(--s-2));
+  }
+
   /* The plate sits on whatever the poster happens to show, so it carries its
      own ink ground rather than trusting the frame behind it. */
   .plate {

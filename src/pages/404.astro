@@ -39,6 +39,10 @@ import { notFound } from '../data/copy';
   }
 
   .home-link {
+    /* The only way out of a dead end: a full 44px target. */
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
     letter-spacing: var(--track-wide);

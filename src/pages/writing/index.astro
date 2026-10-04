@@ -55,11 +55,11 @@ const posts = [
     {
       posts.map((p) => (
         <li>
-          <a href={p.href}>
+          <a href={p.href} aria-labelledby={`post-${p.href.split('/').filter(Boolean).pop()}`}>
             <div class="post-inner grid-margin">
               <p class="post-kicker margin-col">{p.kicker}</p>
               <div class="post-body body-col">
-                <h2 class="post-title">{p.title}</h2>
+                <h2 class="post-title" id={`post-${p.href.split('/').filter(Boolean).pop()}`}>{p.title}</h2>
                 <p class="post-dek">{p.dek}</p>
                 <p class="post-date tabular">
                   <time datetime={p.date}>{formatDate(p.date)}</time>

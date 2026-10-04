@@ -58,6 +58,10 @@ const { current } = Astro.props;
   }
 
   .switch-list a {
+    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
     color: var(--ink-body);
     text-decoration: underline;
     text-underline-offset: 3px;
