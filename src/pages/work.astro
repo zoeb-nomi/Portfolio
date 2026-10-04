@@ -15,12 +15,12 @@ import { meta, work, cta, home } from '../data/copy';
     <div class="open-work-inner grid-margin">
       <div class="margin-col" aria-hidden="true"></div>
       <div class="body-col">
-        <h2 class="visually-hidden">{work.openWork.kicker}</h2>
         <RecordList
           kicker={work.openWork.kicker}
           items={work.openWork.items}
           note={work.openWork.note}
           flush
+          headingLevel="h2"
         />
       </div>
     </div>
@@ -111,10 +111,10 @@ import { meta, work, cta, home } from '../data/copy';
 
 <style>
   /* Open work — same margin-col | body-col grid as the masthead, its own
-     closing rule (RecordList supplies the visible content and its own top
-     rule). The margin column is only the rule, so it is hidden when stacked.
-     The h2 inside is `.visually-hidden` (layout.css): it keeps h1 -> h2 -> h3
-     order intact, since RecordList's own kicker renders as an h3. */
+     closing rule (RecordList supplies the visible content; flush, because the
+     masthead above already closes with the strong rule). The margin column is
+     only the rule, so it is hidden when stacked. RecordList's kicker is the
+     block's h2 (h1 -> h2 -> the entries' h2s). */
   .open-work-inner {
     border-bottom: 1px solid var(--rule-strong);
     --body-pad-end: var(--s-11);

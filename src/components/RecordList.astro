@@ -15,9 +15,11 @@ interface Props {
   // Drop the block's own top rule and spacing when it directly follows another
   // strong rule (e.g. a masthead): at most ONE strong rule between blocks.
   flush?: boolean;
+  // The kicker is the block's heading. h3 inside a work entry; h2 when the list stands alone.
+  headingLevel?: 'h2' | 'h3';
 }
 
-const { kicker, items, note, context, flush = false } = Astro.props;
+const { kicker, items, note, context, flush = false, headingLevel: Heading = 'h3' } = Astro.props;
 const regionLabel = context ? `Public record — ${context}` : 'Public record';
 
 const isReady = (item: RecordItem) =>
@@ -31,7 +33,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
   rows.length > 0 && (
     <section class:list={['record', { 'record--flush': flush }]} aria-label={regionLabel}>
       <div class="record-head">
-        <h3 class="record-kicker">{kicker}</h3>
+        <Heading class="record-kicker">{kicker}</Heading>
         {note && <p class="record-note">{note}</p>}
       </div>
       <ul class="record-rows">

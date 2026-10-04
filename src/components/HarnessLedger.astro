@@ -31,7 +31,9 @@ const { linkCase, linkRepo } = home.evals;
 ---
 
 <div class:list={['ledger-block', `is-${variant}`]}>
-  {h2 && <h2 class="ledger-h2">{h2}</h2>}
+  {/* Inside a Section (home) the section's own <h2> already heads this block, so this is a
+      styled line, not a second consecutive h2. */}
+  {h2 && <p class="ledger-h2">{h2}</p>}
   {methodLine && <p class="ledger-method">{methodLine}</p>}
   <ul class="ledger" role="list">
     {
@@ -66,6 +68,7 @@ const { linkCase, linkRepo } = home.evals;
 
 <style>
   .ledger-h2 {
+    text-wrap: balance;
     font-family: var(--font-display);
     font-size: var(--t-h2);
     line-height: var(--lh-tight);

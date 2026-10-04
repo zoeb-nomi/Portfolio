@@ -10,23 +10,32 @@ interface Props {
   // narration for a section's spoken cue line. Omitted on pages/sections with
   // no narration.
   narrId?: string;
-  // Deep-link anchor: becomes the id of the section's <h2>. Omitted (no id
-  // attribute at all) on sections that are not meant to be linked to.
+  // Deep-link anchor: the id of the section's <h2>. Defaults to a slug of the
+  // label ("sec-method"); pass one to choose a stable, human URL (#kyb).
   anchorId?: string;
 }
 
 const { mark, label, note, as: Tag = 'section', narrId, anchorId } = Astro.props;
+const slug = label
+  .toLowerCase()
+  .replace(/['\u2019]/g, '')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '');
+const headingId = anchorId ?? `sec-${slug}`;
 ---
 
 <Tag class="rp-section">
   <div class="section-inner grid-margin grid-margin--compact">
-    <aside class="margin-col" aria-label={label}>
-      <h2 class="mark-label" id={anchorId} data-narr={narrId}>
+    {/* A <div>, not <aside aria-label>: the margin column is layout. Labelling every section's
+        margin as a complementary landmark gave 7-11 landmarks per page and put each heading
+        inside one. Only a real margin note below is an <aside>. */}
+    <div class="margin-col">
+      <h2 class="mark-label" id={headingId} data-narr={narrId}>
         <span class="mark" aria-hidden="true">{mark}</span> <span class="label">{label}</span>
       </h2>
       <slot name="margin" />
-      {note && <MarginNote as="div" label={`Note — ${label}`}>{note}</MarginNote>}
-    </aside>
+      {note && <MarginNote label={`Note — ${label}`}>{note}</MarginNote>}
+    </div>
     <div class="body-col">
       <slot />
     </div>
@@ -36,6 +45,18 @@ const { mark, label, note, as: Tag = 'section', narrId, anchorId } = Astro.props
 <style>
   .rp-section {
     border-bottom: 1px solid var(--rule-strong);
+  }
+
+  /* Deep links must land below the sticky header (html scroll-padding-top covers the
+     header from 900px) and keep the section's own top padding in view. */
+  .mark-label[id] {
+    scroll-margin-top: var(--s-6);
+  }
+
+  @media (min-width: 900px) {
+    .mark-label[id] {
+      scroll-margin-top: var(--s-9);
+    }
   }
 
   .mark-label {
