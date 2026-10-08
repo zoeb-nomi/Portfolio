@@ -4,6 +4,7 @@ import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import DataTable from '../../components/DataTable.astro';
 import EssayFigure from '../../components/EssayFigure.astro';
+import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
 import { meta, writingDecisions as wd } from '../../data/copy';
@@ -19,6 +20,7 @@ const articleLd = articleJsonLd({
   description: meta.writingDecisions.description,
   date: wd.date,
   about: wd.about,
+  audio: { src: wd.audio.src, duration: wd.audio.duration, captions: wd.audio.captions },
 });
 ---
 
@@ -33,6 +35,10 @@ const articleLd = articleJsonLd({
 
   <Masthead kicker={wd.kicker} h1={wd.title} standfirst={wd.dek} h1Max="24ch" narr>
     <Fragment slot="byline"><time datetime={wd.date}>{formatDate(wd.date)}</time> · {wd.readingTime} read</Fragment>
+    <AudioPlayer audio={wd.audio} articleId="decisions" />
+    <p class="read-along">
+      The text below follows the audio as it plays. <a href={wd.audio.captions} download>Captions (WebVTT)</a>
+    </p>
     <div class="intro">
       {wd.intro.map((p, i) => <p class="prose" data-narr={`s0-p${i}`}>{p}</p>)}
     </div>
@@ -123,6 +129,20 @@ const articleLd = articleJsonLd({
 
   .fig-caption {
     margin-top: var(--s-3);
+  }
+
+  .read-along {
+    margin-top: var(--s-3);
+    font-family: var(--font-body);
+    font-size: var(--t-note);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+  }
+
+  .read-along a {
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
   }
 
   /* A figure or table that follows a paragraph needs the same gap a paragraph
