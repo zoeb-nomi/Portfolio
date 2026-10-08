@@ -1,0 +1,213 @@
+---
+import Base from '../../layouts/Base.astro';
+import Masthead from '../../components/Masthead.astro';
+import Section from '../../components/Section.astro';
+import DataTable from '../../components/DataTable.astro';
+import EssayFigure from '../../components/EssayFigure.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
+import { formatDate } from '../../lib/formatDate';
+import { meta, writingDecisions as wd } from '../../data/copy';
+import { jsonLdString } from '../../lib/jsonLdString';
+
+const f = wd.figures;
+const glance = f.glance;
+const glanceRows = glance.rows.map((r) => ({ label: r.label, cells: r.cells.map((text) => ({ text })) }));
+
+const articleLd = articleJsonLd({
+  slug: 'decisions-api-legal-quiz',
+  headline: wd.title,
+  description: meta.writingDecisions.description,
+  date: wd.date,
+  about: wd.about,
+});
+---
+
+<Base
+  title={meta.writingDecisions.title}
+  description={meta.writingDecisions.description}
+  path="/writing/decisions-api-legal-quiz/"
+  ogImage="/og/decisions-api-legal-quiz.png"
+  ogType="article"
+>
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
+
+  <Masthead kicker={wd.kicker} h1={wd.title} standfirst={wd.dek} h1Max="24ch" narr>
+    <Fragment slot="byline"><time datetime={wd.date}>{formatDate(wd.date)}</time> · {wd.readingTime} read</Fragment>
+    <div class="intro">
+      {wd.intro.map((p, i) => <p class="prose" data-narr={`s0-p${i}`}>{p}</p>)}
+    </div>
+  </Masthead>
+
+  {
+    wd.sections.map((s, i) => (
+      <Section mark={s.mark} label={s.label} anchorId={s.id} narrId={`s${i + 1}-cue`}>
+        {s.paras.map((p, j) => (
+          <>
+            <p class="prose" data-narr={`s${i + 1}-p${j}`}>
+              {p}
+            </p>
+            {s.after?.[j] === 'glance' && (
+              <div class="summary">
+                <div class="summary-table">
+                  <DataTable caption={glance.caption} columns={glance.columns} rows={glanceRows} nowrap />
+                </div>
+                <div class="summary-cards">
+                  <p class="summary-cap">{glance.caption}</p>
+                  <ul class="summary-list">
+                    {glance.rows.map((r) => (
+                      <li class="summary-card">
+                        <p class="summary-kind">{r.label}</p>
+                        <dl class="summary-fields">
+                          {r.cells.map((c, k) => (
+                            <div class="summary-field">
+                              <dt>{glance.columns[k + 1]}</dt>
+                              <dd>{c}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p class="summary-source">
+                  {glance.source}{' '}
+                  <a href={glance.href}>{glance.hrefLabel}</a>
+                </p>
+              </div>
+            )}
+            {s.after?.[j] === 'trust' && (
+              <EssayFigure n={f.trust.n} title={f.trust.title} source={f.trust.source} href={f.trust.href} hrefLabel={f.trust.hrefLabel}>
+                <video
+                  controls
+                  preload="none"
+                  playsinline
+                  poster={f.trust.video.poster}
+                  width={f.trust.video.width}
+                  height={f.trust.video.height}
+                  aria-label={f.trust.video.label}
+                >
+                  <source src={f.trust.video.src} type="video/mp4" />
+                </video>
+                <p class="prose fig-caption" data-narr={`s${i + 1}-fig1`}>{f.trust.caption}</p>
+              </EssayFigure>
+            )}
+          </>
+        ))}
+      </Section>
+    ))
+  }
+</Base>
+
+<style>
+  .intro {
+    margin-top: var(--s-8);
+  }
+
+  /* The trust-curve video fills its figure. */
+  video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .fig-caption {
+    margin-top: var(--s-3);
+  }
+
+  /* A figure or table that follows a paragraph needs the same gap a paragraph
+     would get. The figure supplies its own margin; the table wrapper does here. */
+  .summary {
+    margin-top: var(--s-8);
+    max-width: var(--measure);
+  }
+
+  /* Wide screens: the table. Below 900px: one labelled card per row, so no
+     sideways scrolling for six numeric columns. */
+  .summary-cards {
+    display: none;
+  }
+
+  @media (max-width: 899px) {
+    .summary-table {
+      display: none;
+    }
+
+    .summary-cards {
+      display: block;
+    }
+  }
+
+  .summary-cap {
+    padding-bottom: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .summary-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .summary-card {
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .summary-card:first-child {
+    border-top: 1px solid var(--rule);
+  }
+
+  .summary-kind {
+    margin-bottom: var(--s-3);
+    font-family: var(--font-body);
+    font-size: var(--t-small);
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .summary-fields {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .summary-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    font-family: var(--font-mono);
+  }
+
+  .summary-field dt {
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-wide);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .summary-field dd {
+    margin: 0;
+    font-size: var(--t-data);
+    color: var(--ink);
+  }
+
+  /* Source line under the table, set like EssayFigure's. */
+  .summary-source {
+    margin-top: var(--s-5);
+    font-family: var(--font-body);
+    font-size: var(--t-note);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+  }
+
+  .summary-source a {
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+</style>

@@ -9,6 +9,23 @@
   },
   "pages": [
     {
+      "slug": "decisions-api-legal-quiz",
+      "path": "/writing/decisions-api-legal-quiz/",
+      "title": "I gave OpenAI's Decisions API a quiz written by lawyers",
+      "chapterTitles": {
+        "s1": "The quiz",
+        "s2": "What came back",
+        "s3": "The misses have a shape",
+        "s4": "The same number, three meanings",
+        "s5": "The refusals",
+        "s6": "The prompt is part of the test",
+        "s7": "What I would do with it",
+        "s8": "What this does not show",
+        "s9": "Data and code"
+      },
+      "overrides": {}
+    },
+    {
       "slug": "nobody-reports-the-misses",
       "path": "/writing/nobody-reports-the-misses/",
       "title": "Nobody Reports the Misses: Counting False Passes in AI for Regulated Work",

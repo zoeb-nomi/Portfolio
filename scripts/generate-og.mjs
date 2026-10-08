@@ -57,6 +57,9 @@ const pages = [
   { id: 'misses', // meta.writingMisses
     title: 'Nobody Reports the Misses: Counting False Passes in AI',
     sub: 'Wrong AI answers get caught. Missed items don’t.' },
+  { id: 'decisions-api-legal-quiz', // meta.writingDecisions
+    title: 'I gave OpenAI’s Decisions API a quiz written by lawyers',
+    sub: '544 legal questions · one probability each · no safe threshold' },
   { id: '404', // notFound.message
     title: '404', sub: 'No source found for that claim.' },
 ];

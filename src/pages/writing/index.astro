@@ -5,6 +5,7 @@ import EssayThumb from '../../components/EssayThumb.astro';
 import ReadAlongDemo from '../../components/ReadAlongDemo.astro';
 import {
   meta,
+  writingDecisions,
   writingMisses,
   writingBusStop,
   writingTwoLevers,
@@ -22,6 +23,7 @@ const standfirst =
 // One source of truth: each essay's own data object in copy.ts (title, dek, kicker, date, reading
 // time, narration length). Newest first.
 const essays = [
+  { slug: 'decisions-api-legal-quiz', thumb: 'decisions', e: writingDecisions, audio: undefined },
   { slug: 'nobody-reports-the-misses', thumb: 'misses', e: writingMisses, audio: writingMisses.audio.duration },
   { slug: 'the-bus-stop-nobody-notices', thumb: 'bus', e: writingBusStop, audio: writingBusStop.audio?.duration },
   { slug: 'two-levers-that-did-not-move', thumb: 'levers', e: writingTwoLevers, audio: writingTwoLevers.audio?.duration },

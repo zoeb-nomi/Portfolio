@@ -120,6 +120,11 @@ export const meta = {
     description:
       "Wrong AI answers get caught. Missed items don't. How to count false passes in KYB, audit, insurance, contracts, patents and voice agents.",
   },
+  writingDecisions: {
+    title: "OpenAI's Decisions API, quizzed by lawyers",
+    description:
+      "544 LegalBench questions through OpenAI's Decisions API. At 90% confidence it was 88% right. Counted, not scored, with the curve and the code.",
+  },
   work: {
     title: 'Work — Zoeb Nomi',
     description:
@@ -1730,6 +1735,167 @@ export const writingMisses = {
 };
 
 // ---------------------------------------------------------------------------
+// Writing: I gave OpenAI's Decisions API a quiz written by lawyers (2026-10-08). No audio yet.
+// ---------------------------------------------------------------------------
+
+type DecisionsFigure = 'glance' | 'trust';
+
+interface DecisionsSection {
+  id: string;
+  mark: string;
+  label: string;
+  paras: string[];
+  /** Figure to place after the paragraph at this index. */
+  after?: Record<number, DecisionsFigure>;
+}
+
+export const writingDecisions = {
+  kicker: 'Writing · Eval',
+  title: `I gave OpenAI's Decisions API a quiz written by lawyers`,
+  dek: `544 yes/no legal questions, one API call each, and the question that matters to anyone routing work on a confidence score: is there a number above which you can stop checking? Not in this data.`,
+  date: '2026-10-08',
+  readingTime: '7 min',
+  about: `Whether a probability from OpenAI's Decisions API can be trusted as a routing threshold on legal yes/no questions`,
+
+  // Unlabelled opening: three paragraphs before the first section.
+  intro: [
+    `OpenAI's Decisions API is a model endpoint that does not write anything. You send it a piece of text and a question, and it sends back a probability. No prose, no output tokens, ten cents per million input tokens, and the docs say about ten times faster than the Responses API. It is built for routing, filtering and triage.`,
+    `The pitch is the number. A probability invites a threshold: above it the system handles the item, below it a person does. So the test I cared about was not "is it accurate". It was "when it says it is sure, is it right". Those are different questions, and only the second one decides whether the thing can take work off a reviewer's desk.`,
+    `So I gave it a quiz lawyers wrote, and watched what happened to the confident answers.`,
+  ],
+
+  // Nine sections. `id` is the deep-link anchor on the section's <h2>.
+  sections: [
+    {
+      id: 'quiz',
+      mark: '§1',
+      label: `The quiz`,
+      paras: [
+        `LegalBench is a public benchmark from 2023, 162 tasks contributed by lawyers and legal academics, released under CC BY. I took six of its yes/no tasks. Three are contract clause classification from CUAD: does this clause restrict assignment, does it restrict competing, does it give one party rights if the other changes control. Two are short fact patterns that test legal reasoning: is there hearsay, is there personal jurisdiction. One is consumer contract Q&A: read an excerpt from a terms of service and answer a question about it.`,
+        `That gave 544 items. 100 per task, half yes and half no, where the task had enough rows. Every test item for the two reasoning tasks, which are small: 94 for hearsay and 50 for personal jurisdiction.`,
+        `One call per item. The clause or fact pattern as the input, the task's own instruction line as the question, one predicate question. No examples, no system prompt, no second attempt. The whole run was 192 thousand input tokens, which cost two cents and took four minutes.`,
+        `Scoring is the simplest thing that could work. The model's answer is yes if the probability is at least one half. Its confidence is the distance from that fence: the probability for a yes, one minus it for a no. The trust curve then asks, for every threshold from 0.5 up to 0.99, what share of items clear it and how accurate the model is inside that share.`,
+      ],
+    },
+    {
+      id: 'results',
+      mark: '§2',
+      label: `What came back`,
+      paras: [
+        `523 items got an answer and 21 came back as refusals, all of them hearsay fact patterns. Overall accuracy was 83.2%. The ranking was good: an AUROC of 0.894, and above 0.95 on three of the six tasks. The calibration was middling: an expected calibration error of 0.103 over ten bins and a Brier score of 0.140.`,
+        `Then the curve, which is the point of the exercise.`,
+        `It is flat. Keep only the answers the model was at least 90% sure about and accuracy rises from 83% to 88%, in exchange for dropping 28% of the items. Push the bar to 99%, which still clears half the items, and it reaches 90%. There is no knee in the curve, no point where the confident set suddenly gets clean. 47 wrong answers sit inside the set the model was 90% sure about.`,
+      ],
+      after: { 0: 'glance', 1: 'trust' },
+    },
+    {
+      id: 'misses',
+      mark: '§3',
+      label: `The misses have a shape`,
+      paras: [
+        `The reliability diagram says where they live. 242 of the 523 items got a probability close to zero, a confident no. Lawyers had marked 17% of those as yes.`,
+        `On the three contract tasks the model's average probability on clauses that really were absent was between 0.01 and 0.08. On clauses that really were present it was between 0.46 and 0.78. It is far more willing to say a clause is not there than to say it is. On change of control it missed about half the clauses that were there, most of them with a probability under 0.1.`,
+        `In a review workflow that is the expensive direction. A false yes costs a reviewer a minute. A confident false no never reaches the reviewer at all.`,
+      ],
+    },
+    {
+      id: 'meanings',
+      mark: '§4',
+      label: `The same number, three meanings`,
+      paras: [
+        `Confidence meant different things depending on what I asked. On personal jurisdiction, the model cleared the 90% bar on only 8 of 50 items, and all 8 were right. On the contract tasks it cleared the bar on about four items in five, and between one in ten and one in four of those were wrong. On consumer contracts it cleared the bar on 87 of 100 and was right on 98% of them.`,
+        `So a single global threshold is the wrong tool. 0.9 is a conservative reviewer on one task and a careless one on the next. The number only means something once you have measured it against your own labelled set, task by task.`,
+      ],
+    },
+    {
+      id: 'refusals',
+      mark: '§5',
+      label: `The refusals`,
+      paras: [
+        `21 of the 94 hearsay fact patterns, 22%, came back as a refusal instead of a probability. Hearsay hypotheticals in a law exam describe assaults, thefts and threats, which is what trips a content filter. 18 of the 21 refused items were ones the lawyers had marked no.`,
+        `That matters for the pipeline more than the model. If a refusal is routed to a person, fine. If it is treated as a no, or silently dropped, the error rate on that task roughly doubles. It also means the hearsay accuracy above is measured on the 73 items the model was willing to read, not all 94.`,
+      ],
+    },
+    {
+      id: 'prompt',
+      mark: '§6',
+      label: `The prompt is part of the test`,
+      paras: [
+        `One change from the plan. LegalBench's own instruction for hearsay is a single line: "Hearsay is an out-of-court statement introduced to prove the truth of the matter asserted. Is there hearsay?" In a ten-item pilot the model answered yes on all seven items marked no, and got one of nine right. It seemed to be answering "is there an out-of-court statement", which almost every fact pattern has.`,
+        `For the full run I gave it a four-sentence statement of the rule instead: in-court statements are not hearsay, conduct is only a statement if intended as one, a statement offered for something other than its truth is not hearsay. On the same ten items that went from one right to three. On the full 73 it reached 74%. The API answers the question you wrote, not the one you meant, and the difference showed up as 30 points.`,
+      ],
+    },
+    {
+      id: 'routing',
+      mark: '§7',
+      label: `What I would do with it`,
+      paras: [
+        `As a first pass that ranks a review queue, it is useful and nearly free. An AUROC of 0.89 across six legal tasks for two cents is a real result, and on the contract tasks the ordering is good enough that a reviewer starting from the top would find most of what matters early.`,
+        `As a thing that decides on its own above some threshold, it is not ready for questions like these. 12% wrong on the confident 72% is not a number a legal review lead would sign, and the errors skew toward missing things.`,
+        `The usable pattern is asymmetric. Trust a confident yes, since the model rarely invents a clause. Treat a confident no as unverified rather than clear. Set the threshold per task, from your own labelled sample, and count refusals as review items with a cost of their own.`,
+        `The question it leaves open is the one I started with. If the probability is not the trust signal, what is? A second model that disagrees? A per-task calibration table maintained by hand? Or just the old answer, a person, with a better-sorted queue.`,
+      ],
+    },
+    {
+      id: 'limits',
+      mark: '§8',
+      label: `What this does not show`,
+      paras: [
+        `One model, one call per item, zero-shot, with the benchmark's own question as the only instruction. A tuned prompt or a few examples would move these numbers, probably a lot. The hearsay rewrite shows how far.`,
+        `50 to 100 items per task. A per-task accuracy here carries a margin of roughly seven to ten points either way. The overall numbers are steadier than the task ones.`,
+        `LegalBench items are short and self-contained. Real contract review means long documents, defined terms and cross-references. This says nothing about that.`,
+        `The labels are the benchmark's. Lawyers disagree with each other too, and I did not audit the items the model got wrong.`,
+        `Nothing here compares the Decisions API to the Responses API or to any other model. It measures one thing: whether the probability this endpoint returns can be trusted on its own.`,
+      ],
+    },
+    {
+      id: 'code',
+      mark: '§9',
+      label: `Data and code`,
+      paras: [
+        `The scripts, the prompts, the per-item scores and the curve as a table are in the repository: https://github.com/zoeb-nomi/openai_decisions. Five commands reproduce the run for about two cents. LegalBench is by Guha and others, 2023, released under CC BY 4.0.`,
+      ],
+    },
+  ] as DecisionsSection[],
+
+  // Table 1 and Fig. 1. Every number is from results/metrics.json and results/trust_curve.csv in the repository.
+  figures: {
+    glance: {
+      caption: 'Table 1 — Six tasks at a glance',
+      columns: ['Task', 'n', 'Accuracy', 'AUROC', 'Items at or above 0.9 confidence', 'Accuracy within those'],
+      rows: [
+        { label: 'consumer_contracts_qa', cells: ['100', '93.0%', '0.976', '87 of 100', '97.7%'] },
+        { label: 'cuad_non-compete', cells: ['100', '88.0%', '0.949', '83 of 100', '90.4%'] },
+        { label: 'personal_jurisdiction', cells: ['50', '84.0%', '0.913', '8 of 50', '100%'] },
+        { label: 'cuad_anti-assignment', cells: ['100', '83.0%', '0.952', '85 of 100', '87.1%'] },
+        { label: 'cuad_change_of_control', cells: ['100', '75.0%', '0.863', '79 of 100', '75.9%'] },
+        { label: 'hearsay', cells: ['73', '74.0%', '0.786', '35 of 73', '80.0%'] },
+        { label: 'overall', cells: ['523', '83.2%', '0.894', '377 of 523', '87.5%'] },
+      ],
+      source: 'OpenAI Decisions API, gpt-6-luna, 2026-10-08. LegalBench test splits, seed 42. Refusals excluded from n.',
+      href: 'https://github.com/zoeb-nomi/openai_decisions/blob/main/results/metrics.json',
+      hrefLabel: 'Metrics and raw scores →',
+    },
+    trust: {
+      n: 1,
+      title: 'The trust curve',
+      source: '523 answered items, six LegalBench tasks. Coverage and accuracy at each threshold are in trust_curve.csv.',
+      href: 'https://github.com/zoeb-nomi/openai_decisions/blob/main/results/trust_curve.csv',
+      hrefLabel: 'The curve as a table →',
+      video: {
+        src: '/media/decisions-trust-curve.mp4',
+        poster: '/img/writing/decisions-trust-curve.png',
+        width: 1080,
+        height: 1080,
+        label:
+          'Animated trust curve. Each of the 523 answered questions is a dot placed at the model\'s confidence, red where the model was wrong. A line sweeps the threshold upward while two counters show how much of the work clears the bar and how often the model is right on the items that do.',
+      },
+      caption: `Each dot is one question placed at the model's confidence, red if the model was wrong.`,
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
 // 4 · WORK — pack §4
 // ---------------------------------------------------------------------------
 
@@ -2159,4 +2325,5 @@ export const llmsTxt = `# Zoeb Nomi
 - Writing: https://www.zoebnomi.com/writing/eval-harness-at-my-own-reflection/
 - Writing: https://www.zoebnomi.com/writing/two-levers-that-did-not-move/
 - Writing — "The bus stop nobody notices" (industry thesis on premium intercity bus travel in India, with a pre-registered ₹50,000 experiment): https://www.zoebnomi.com/writing/the-bus-stop-nobody-notices/
+- Writing: https://www.zoebnomi.com/writing/decisions-api-legal-quiz/
 `;

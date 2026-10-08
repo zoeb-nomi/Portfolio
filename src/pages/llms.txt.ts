@@ -6,6 +6,7 @@ import {
   writingTwoLevers,
   writingBusStop,
   writingMisses,
+  writingDecisions,
 } from '../data/copy';
 
 export const prerender = true;
@@ -21,6 +22,7 @@ const essays = [
   { slug: 'two-levers-that-did-not-move', title: writingTwoLevers.title, blurb: writingTwoLevers.dek },
   { slug: 'the-bus-stop-nobody-notices', title: writingBusStop.title, blurb: writingBusStop.dek },
   { slug: 'nobody-reports-the-misses', title: writingMisses.title, blurb: writingMisses.dek },
+  { slug: 'decisions-api-legal-quiz', title: writingDecisions.title, blurb: writingDecisions.dek },
 ];
 
 const essayLines = essays.map(
