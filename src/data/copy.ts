@@ -1890,7 +1890,7 @@ export const writingDecisions = {
         label:
           'Animated trust curve. Each of the 523 answered questions is a dot placed at the model\'s confidence, red where the model was wrong. A line sweeps the threshold upward while two counters show how much of the work clears the bar and how often the model is right on the items that do.',
       },
-      caption: `Each dot is one question placed at the model's confidence, red if the model was wrong.`,
+      caption: `Each small page is one question. The model sorts them into two trays by its own confidence, and the red marks are the wrong answers in the tray a lawyer never sees.`,
     },
   },
 };

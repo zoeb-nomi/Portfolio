@@ -23,7 +23,9 @@
         "s8": "What this does not show",
         "s9": "Data and code"
       },
-      "overrides": {}
+      "overrides": {
+        "s9-p0": "The scripts, the prompts, the per-item scores and the curve as a table are in the repository on GitHub, linked here. Five commands reproduce the run for about two cents. Legal Bench is by Guha and others, 2023, released under a Creative Commons attribution licence."
+      }
     },
     {
       "slug": "nobody-reports-the-misses",
