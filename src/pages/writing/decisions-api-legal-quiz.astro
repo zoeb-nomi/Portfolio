@@ -78,9 +78,12 @@ const articleLd = articleJsonLd({
             {s.after?.[j] === 'trust' && (
               <EssayFigure n={f.trust.n} title={f.trust.title} source={f.trust.source} href={f.trust.href} hrefLabel={f.trust.hrefLabel}>
                 <video
-                  controls
-                  preload="none"
+                  autoplay
+                  muted
+                  loop
                   playsinline
+                  preload="auto"
+                  data-trust-curve
                   poster={f.trust.video.poster}
                   width={f.trust.video.width}
                   height={f.trust.video.height}
@@ -97,6 +100,14 @@ const articleLd = articleJsonLd({
     ))
   }
 </Base>
+
+<script is:inline>
+  // The trust-curve figure plays on a loop, muted. Viewers who ask for
+  // reduced motion get the poster frame instead.
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    for (const v of document.querySelectorAll('video[data-trust-curve]')) { v.removeAttribute('autoplay'); v.pause(); }
+  }
+</script>
 
 <style>
   .intro {
