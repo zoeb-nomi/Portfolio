@@ -8,6 +8,7 @@ import {
   writingMisses,
   writingDecisions,
 } from '../data/copy';
+import { notes } from '../data/notes';
 
 export const prerender = true;
 
@@ -29,6 +30,11 @@ const essayLines = essays.map(
   (e) => `- Writing — "${e.title}" (${e.blurb}): ${ORIGIN}/writing/${e.slug}/`,
 );
 
+// Notes are listed the same way, newest first, from src/data/notes.ts.
+const noteLines = [...notes]
+  .sort((a, b) => b.date.localeCompare(a.date))
+  .map((n) => `- Notes — "${n.title}" (${n.dek}): ${ORIGIN}/notes/${n.slug}/`);
+
 // Drop the hand-written per-essay lines; keep the "Writing (essays index)" line.
 const base = llmsTxt
   .split('\n')
@@ -37,7 +43,7 @@ const base = llmsTxt
   .replace(/\n+$/, '\n');
 
 export const GET: APIRoute = () => {
-  return new Response(base + essayLines.join('\n') + '\n', {
+  return new Response(base + [...essayLines, ...noteLines].join('\n') + '\n', {
     status: 200,
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
