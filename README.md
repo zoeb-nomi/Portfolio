@@ -13,7 +13,7 @@ Hosted on Cloudflare Pages. Build command `npm run build`, output directory `dis
 - **Production** — every commit to `main` builds and auto-deploys. There is no staging environment.
 - **Previews** — commits on any other branch get their own preview deployment at a generated URL. Previews send `X-Robots-Tag: noindex`.
 - **Rollback** — Cloudflare Pages → the project → **Deployments** → find the last good build → **Rollback to this deployment**. This repoints production immediately without a rebuild. Alternatively revert on `main` and let the normal build redeploy. PRs land as merge commits, so use the **Revert** button on the merged PR, or `git revert -m 1 <merge commit>`; each PR reverts on its own.
-- **Which project?** At the time of writing two Cloudflare Pages projects (`zoebnomi` and `portfolio`) are connected to this repo and both post a preview on every PR. Check in the dashboard which one owns the `zoebnomi.com` domain before following the rollback steps.
+- **Which project?** At the time of writing two Cloudflare Pages projects (`zoebnomi` and `portfolio`) are connected to this repo and both post a preview on every PR (`zoebnomi` at `*.zoebnomi.pages.dev`, `portfolio` at `*.portfolio-a5z.pages.dev`). Roll back `zoebnomi` first (verify once in the Cloudflare dashboard; the `portfolio` project is the second connected project).
 
 **Publish rule** — `main` is live and only Zoeb merges to it. Zoeb commits via the GitHub web UI; Claude does not push to `main` or merge, and does not push at all unless Zoeb explicitly asks in that session, in which case it pushes a feature branch and opens a **draft** PR for him to review. Every change goes through a branch and PR, and CI (`.github/workflows/ci.yml`) must be green first.
 

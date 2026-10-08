@@ -1736,7 +1736,7 @@ export const writingMisses = {
 };
 
 // ---------------------------------------------------------------------------
-// Writing: I gave OpenAI's Decisions API a quiz written by lawyers (2026-10-08). No audio yet.
+// Writing: I gave OpenAI's Decisions API a quiz written by lawyers (2026-10-08).
 // ---------------------------------------------------------------------------
 
 type DecisionsFigure = 'glance' | 'trust';
@@ -1775,7 +1775,7 @@ export const writingDecisions = {
       paras: [
         `LegalBench is a public benchmark from 2023, 162 tasks contributed by lawyers and legal academics, released under CC BY. I took six of its yes/no tasks. Three are contract clause classification from CUAD: does this clause restrict assignment, does it restrict competing, does it give one party rights if the other changes control. Two are short fact patterns that test legal reasoning: is there hearsay, is there personal jurisdiction. One is consumer contract Q&A: read an excerpt from a terms of service and answer a question about it.`,
         `That gave 544 items. 100 per task, half yes and half no, where the task had enough rows. Every test item for the two reasoning tasks, which are small: 94 for hearsay and 50 for personal jurisdiction.`,
-        `One call per item. The clause or fact pattern as the input, the task's own instruction line as the question, one predicate question. No examples, no system prompt, no second attempt. The whole run was 192 thousand input tokens, which cost two cents and took four minutes.`,
+        `One call per item. The clause or fact pattern as the input, the task's own instruction line as the question, one predicate question. No examples, no system prompt, no second attempt. The whole run was 192 thousand input tokens, pilot included, which cost two cents and took four minutes.`,
         `Scoring is the simplest thing that could work. The model's answer is yes if the probability is at least one half. Its confidence is the distance from that fence: the probability for a yes, one minus it for a no. The trust curve then asks, for every threshold from 0.5 up to 0.99, what share of items clear it and how accurate the model is inside that share.`,
       ],
     },
@@ -1784,9 +1784,9 @@ export const writingDecisions = {
       mark: '§2',
       label: `What came back`,
       paras: [
-        `523 items got an answer and 21 came back as refusals, all of them hearsay fact patterns. Overall accuracy was 83.2%. The ranking was good: an AUROC of 0.894, and above 0.95 on three of the six tasks. The calibration was middling: an expected calibration error of 0.103 over ten bins and a Brier score of 0.140.`,
-        `Then the curve, which is the point of the exercise.`,
-        `It is flat. Keep only the answers the model was at least 90% sure about and accuracy rises from 83% to 88%, in exchange for dropping 28% of the items. Push the bar to 99%, which still clears half the items, and it reaches 90%. There is no knee in the curve, no point where the confident set suddenly gets clean. 47 wrong answers sit inside the set the model was 90% sure about.`,
+        `523 items got an answer and 21 came back as refusals, all of them hearsay fact patterns. Overall accuracy was 83.2%. The ranking was good: an AUROC of 0.894, and above 0.95 on two of the six tasks. The calibration was middling: an expected calibration error of 0.103 over ten bins and a Brier score of 0.140.`,
+        `Then the answer sheet, which is the point of the exercise.`,
+        `The curve behind it is flat. Keep only the answers the model was at least 90% sure about and accuracy rises from 83% to 88%, in exchange for dropping 28% of the items. Push the bar to 99%, which still clears half the items, and it reaches 90%. There is no knee in the curve, no point where the confident set suddenly gets clean. 47 wrong answers sit inside the set the model was 90% sure about.`,
       ],
       after: { 0: 'glance', 1: 'trust' },
     },
@@ -1855,7 +1855,7 @@ export const writingDecisions = {
       mark: '§9',
       label: `Data and code`,
       paras: [
-        `The scripts, the prompts, the per-item scores and the curve as a table are in the repository: https://github.com/zoeb-nomi/openai_decisions. Five commands reproduce the run for about two cents. LegalBench is by Guha and others, 2023, released under CC BY 4.0.`,
+        `The scripts, the prompts, the per-item scores and the curve as a table are in the repository: https://github.com/zoeb-nomi/decisions-api-legal-quiz. Five commands reproduce the run for about two cents. LegalBench is by Guha and others, 2023, released under CC BY 4.0.`,
       ],
     },
   ] as DecisionsSection[],
@@ -1866,31 +1866,33 @@ export const writingDecisions = {
       caption: 'Table 1 — Six tasks at a glance',
       columns: ['Task', 'n', 'Accuracy', 'AUROC', 'Items at or above 0.9 confidence', 'Accuracy within those'],
       rows: [
-        { label: 'consumer_contracts_qa', cells: ['100', '93.0%', '0.976', '87 of 100', '97.7%'] },
-        { label: 'cuad_non-compete', cells: ['100', '88.0%', '0.949', '83 of 100', '90.4%'] },
-        { label: 'personal_jurisdiction', cells: ['50', '84.0%', '0.913', '8 of 50', '100%'] },
-        { label: 'cuad_anti-assignment', cells: ['100', '83.0%', '0.952', '85 of 100', '87.1%'] },
-        { label: 'cuad_change_of_control', cells: ['100', '75.0%', '0.863', '79 of 100', '75.9%'] },
-        { label: 'hearsay', cells: ['73', '74.0%', '0.786', '35 of 73', '80.0%'] },
-        { label: 'overall', cells: ['523', '83.2%', '0.894', '377 of 523', '87.5%'] },
+        { label: 'Consumer contracts · consumer_contracts_qa', cells: ['100', '93.0%', '0.976', '87 of 100', '97.7%'] },
+        { label: 'Non-compete · cuad_non-compete', cells: ['100', '88.0%', '0.949', '83 of 100', '90.4%'] },
+        { label: 'Personal jurisdiction', cells: ['50', '84.0%', '0.913', '8 of 50', '100%'] },
+        { label: 'Anti-assignment · cuad_anti-assignment', cells: ['100', '83.0%', '0.952', '85 of 100', '87.1%'] },
+        { label: 'Change of control · cuad_change_of_control', cells: ['100', '75.0%', '0.863', '79 of 100', '75.9%'] },
+        { label: 'Hearsay', cells: ['73', '74.0%', '0.786', '35 of 73', '80.0%'] },
+        { label: 'Overall', cells: ['523', '83.2%', '0.894', '377 of 523', '87.5%'] },
       ],
       source: 'OpenAI Decisions API, gpt-6-luna, 2026-10-08. LegalBench test splits, seed 42. Refusals excluded from n.',
-      href: 'https://github.com/zoeb-nomi/openai_decisions/blob/main/results/metrics.json',
+      href: 'https://github.com/zoeb-nomi/decisions-api-legal-quiz/blob/main/results/metrics.json',
       hrefLabel: 'Metrics and raw scores →',
+      href2: 'https://github.com/zoeb-nomi/decisions-api-legal-quiz/blob/main/results/trust_curve.csv',
+      hrefLabel2: 'The curve as a table →',
     },
     trust: {
       n: 1,
-      title: 'The trust curve',
+      title: "The model's answer sheet",
       source: '523 answered items, six LegalBench tasks. Coverage and accuracy at each threshold are in trust_curve.csv.',
-      href: 'https://github.com/zoeb-nomi/openai_decisions/blob/main/results/trust_curve.csv',
-      hrefLabel: 'The curve as a table →',
+      href: 'https://github.com/zoeb-nomi/decisions-api-legal-quiz',
+      hrefLabel: 'Code and data →',
       video: {
         src: '/media/decisions-trust-curve.mp4',
         poster: '/img/writing/decisions-trust-curve.png',
         width: 1080,
         height: 1080,
         label:
-          'Animated trust curve. Each of the 523 answered questions is a dot placed at the model\'s confidence, red where the model was wrong. A line sweeps the threshold upward while two counters show how much of the work clears the bar and how often the model is right on the items that do.',
+          "Animated answer sheet. Rows of quiz questions, each with the model's answer and how sure it was. An examiner marks a tick or a red cross on every row. Then only the rows the model was 90% or more sure about are kept, and the red crosses remain: 47 of the 377 kept rows.",
       },
       caption: `Each row is one question from the quiz, with the model's answer and how sure it was. The red crosses are the answers the lawyers marked wrong, and they are still there once only the answers it was 90% or more sure about are kept.`,
     },
@@ -2327,5 +2329,4 @@ export const llmsTxt = `# Zoeb Nomi
 - Writing: https://www.zoebnomi.com/writing/eval-harness-at-my-own-reflection/
 - Writing: https://www.zoebnomi.com/writing/two-levers-that-did-not-move/
 - Writing — "The bus stop nobody notices" (industry thesis on premium intercity bus travel in India, with a pre-registered ₹50,000 experiment): https://www.zoebnomi.com/writing/the-bus-stop-nobody-notices/
-- Writing: https://www.zoebnomi.com/writing/decisions-api-legal-quiz/
 `;

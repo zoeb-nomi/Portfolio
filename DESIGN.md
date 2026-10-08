@@ -71,7 +71,9 @@ action. Inline links in running text are exempt.
 
 - First person, plain, specific. Counted, not scored. Findings stated with
   their limits in the same breath.
-- Straight quotes and apostrophes. No em dashes. No exclamation marks.
+- Straight quotes and apostrophes. No em dashes in running text; the one
+  exception is the table caption convention "Table 1 — Title". No exclamation
+  marks.
 - Red is never a heading, body text or a proof numeral, OG cards included.
 - One h1 per page, no skipped heading levels.
 - Every number on the site traces to its source. Figure source lines are
@@ -106,8 +108,15 @@ body), `UnitChart`, `BarList`, `Dumbbell`, `ForestPlot`, `ParserCompare`,
 Media: `AudioPlayer` (audio json, articleId), `ReadAlongDemo`,
 `PlayerStepper`, `VideoEmbed` (YouTube only, lite facade, extensionless poster
 with .webp and .jpg). A self-hosted mp4 goes inside `EssayFigure` as a plain
-`<video controls preload="none" playsinline poster=...>`, width 100%, with a
-one-sentence caption that is also narrated.
+`<video autoplay muted loop playsinline preload="none" poster=...>`, width
+100%, no `controls` attribute, with a one-sentence caption that is also
+narrated. An inline script plays it through an IntersectionObserver when at
+least 35% of the figure is on screen and pauses it when it leaves. Under
+`prefers-reduced-motion` the script removes `autoplay` and the `<source>`, so
+the poster is all that shows and nothing downloads. A plain Pause / Play
+`<button type="button">` sits right-aligned above the caption (mono, `--t-note`,
+ink, 1px `--rule` border, `--hit-min` high) and holds the video paused until
+pressed again.
 
 Figures are HTML and hairlines, not SVG, and chart labels are HTML so they
 never fall under the 11px floor. Chart positions are unitless CSS variables
@@ -123,14 +132,24 @@ read), optional AudioPlayer and read-along line, intro paragraphs
 `data-narr="sN-pK"`), figures injected after chosen paragraphs, optional
 CTASlab or related writing.
 
-Registering an essay (README "Writing" steps): copy.ts object and meta;
-the page; the `essays` array in `src/pages/writing/index.astro` (with an
-`EssayThumb` kind); `src/pages/llms.txt.ts` and the `- Writing:` line in the
-llmsTxt template; `src/data/lastmod.json` (add the path, bump /writing/);
-the OG card in `scripts/generate-og.mjs` (paper, 10px red top border,
-Instrument Serif title at 116px, Plex Mono sub at 28px; run it, then
-`git checkout -- public/og/` for the cards you did not mean to touch);
-optional narration via `scripts/audio/pages.json`.
+Registering an essay (README "Writing" steps; eight places):
+
+1. Copy: the `writing<Name>` object and `meta.writing<Name>` in
+   `src/data/copy.ts`.
+2. Page: `src/pages/writing/<slug>.astro`.
+3. Index: the `essays` array in `src/pages/writing/index.astro`, with an
+   `EssayThumb` kind.
+4. llms.txt: the `essays` array in `src/pages/llms.txt.ts`. It is the source;
+   the hand-written `- Writing:` lines in the llmsTxt template are stripped,
+   so do not add one.
+5. Sitemap: `src/data/lastmod.json` (add the path, bump /writing/).
+6. OG card: `scripts/generate-og.mjs` (paper, 10px red top border,
+   Instrument Serif title at 116px, Plex Mono sub at 28px, `\n` in the sub
+   breaks the line); run it, then `git checkout -- public/og/` for the cards
+   you did not mean to touch.
+7. Checks: nothing to register, `qa` and `tokens` read the sitemap. Run build,
+   gate, check, lint, qa and tokens.
+8. Audio (optional): narration via `scripts/audio/pages.json`.
 
 Case study (`/crosssource/`, `/mirror-eval/`, `/screener-eval/`): Masthead
 with switcher and spec, `case-study.css`, a repo link, and a row in
@@ -154,7 +173,7 @@ Use the same tokens and faces for anything that will be seen next to the site.
 - Phone legibility at 1080px: counters 44pt or larger, headline 26pt or
   larger, axis labels 16pt or larger.
 - Reference implementation: `animate.py` and `plot.py` in the
-  openai_decisions repo (fonts in media/fonts).
+  decisions-api-legal-quiz repo (fonts in media/fonts).
 
 ## 7. Checks that enforce this
 

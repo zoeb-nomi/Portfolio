@@ -14,6 +14,14 @@ const f = wd.figures;
 const glance = f.glance;
 const glanceRows = glance.rows.map((r) => ({ label: r.label, cells: r.cells.map((text) => ({ text })) }));
 
+// A bare URL in a paragraph (the repo link in section 9) renders as a link whose text is the URL.
+function withLinks(text: string): { text: string; href?: string }[] {
+  return text
+    .split(/(https?:\/\/\S*[^\s.,;:)])/)
+    .filter(Boolean)
+    .map((part) => (/^https?:\/\//.test(part) ? { text: part, href: part } : { text: part }));
+}
+
 const articleLd = articleJsonLd({
   slug: 'decisions-api-legal-quiz',
   headline: wd.title,
@@ -37,7 +45,7 @@ const articleLd = articleJsonLd({
     <Fragment slot="byline"><time datetime={wd.date}>{formatDate(wd.date)}</time> · {wd.readingTime} read</Fragment>
     <AudioPlayer audio={wd.audio} articleId="decisions" />
     <p class="read-along">
-      The text below follows the audio as it plays. <a href={wd.audio.captions} download>Captions (WebVTT)</a>
+      The text below follows the audio as it plays. <a href={wd.audio.captions} download>Download captions (.vtt)</a>
     </p>
     <div class="intro">
       {wd.intro.map((p, i) => <p class="prose" data-narr={`s0-p${i}`}>{p}</p>)}
@@ -50,7 +58,7 @@ const articleLd = articleJsonLd({
         {s.paras.map((p, j) => (
           <>
             <p class="prose" data-narr={`s${i + 1}-p${j}`}>
-              {p}
+              {withLinks(p).map((part) => (part.href ? <a class="prose-link" href={part.href}>{part.text}</a> : part.text))}
             </p>
             {s.after?.[j] === 'glance' && (
               <div class="summary">
@@ -77,18 +85,18 @@ const articleLd = articleJsonLd({
                 </div>
                 <p class="summary-source">
                   {glance.source}{' '}
-                  <a href={glance.href}>{glance.hrefLabel}</a>
+                  <a href={glance.href}>{glance.hrefLabel}</a>{' '}
+                  <a href={glance.href2}>{glance.hrefLabel2}</a>
                 </p>
               </div>
             )}
             {s.after?.[j] === 'trust' && (
               <EssayFigure n={f.trust.n} title={f.trust.title} source={f.trust.source} href={f.trust.href} hrefLabel={f.trust.hrefLabel}>
                 <video
-                  autoplay
                   muted
                   loop
                   playsinline
-                  preload="auto"
+                  preload="none"
                   data-trust-curve
                   poster={f.trust.video.poster}
                   width={f.trust.video.width}
@@ -97,6 +105,9 @@ const articleLd = articleJsonLd({
                 >
                   <source src={f.trust.video.src} type="video/mp4" />
                 </video>
+                <div class="fig-controls">
+                  <button type="button" class="fig-toggle" data-trust-toggle hidden>Pause</button>
+                </div>
                 <p class="prose fig-caption" data-narr={`s${i + 1}-fig1`}>{f.trust.caption}</p>
               </EssayFigure>
             )}
@@ -108,10 +119,14 @@ const articleLd = articleJsonLd({
 </Base>
 
 <script is:inline>
-  // The trust-curve figure plays on a loop, muted. Viewers who ask for
-  // reduced motion get the poster frame instead.
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    for (const v of document.querySelectorAll('video[data-trust-curve]')) { v.removeAttribute('autoplay'); v.pause(); }
+  // Fig. 1 plays muted on a loop while at least 35% of it is on screen. Reduced motion: the poster
+  // only, and nothing downloads. The button holds the video paused until it is pressed again.
+  for (const v of document.querySelectorAll('video[data-trust-curve]')) {
+    const b = v.closest('figure').querySelector('[data-trust-toggle]'); let held = false;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.querySelector('source')?.remove(); v.load(); continue; }
+    new IntersectionObserver(([e]) => { if (e.intersectionRatio >= 0.35 && !held) v.play().catch(() => {}); else v.pause(); }, { threshold: [0, 0.35] }).observe(v.closest('figure'));
+    v.onplay = v.onpause = () => { b.textContent = v.paused ? 'Play' : 'Pause'; };
+    b.hidden = false; b.onclick = () => { held = !v.paused; if (held) v.pause(); else v.play().catch(() => {}); };
   }
 </script>
 
@@ -129,6 +144,46 @@ const articleLd = articleJsonLd({
 
   .fig-caption {
     margin-top: var(--s-3);
+  }
+
+  /* Pause / Play for Fig. 1, right-aligned above the caption. Shown by the script only. */
+  .fig-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--s-3);
+  }
+
+  .fig-toggle {
+    min-block-size: var(--hit-min);
+    padding: var(--s-1) var(--s-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: none;
+    font-family: var(--font-mono);
+    font-size: var(--t-note);
+    line-height: var(--lh-label);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .fig-toggle[hidden] {
+    display: none;
+  }
+
+  .prose-link {
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+    overflow-wrap: anywhere;
+  }
+
+  /* Standalone links in this page's source lines meet the 24px hit area. */
+  .read-along a,
+  .summary-source a,
+  :global(.ef-source a) {
+    display: inline-block;
+    min-block-size: var(--hit-min);
+    line-height: var(--lh-label);
   }
 
   .read-along {
@@ -149,7 +204,14 @@ const articleLd = articleJsonLd({
      would get. The figure supplies its own margin; the table wrapper does here. */
   .summary {
     margin-top: var(--s-8);
+    margin-bottom: var(--s-8);
     max-width: var(--measure);
+  }
+
+  /* The Overall row closes the table: a 1px ink rule above it. Cell borders win over the
+     row borders in the collapsed table, so the rule shows against Hearsay's hairline. */
+  .summary-table :global(.data-table tbody tr:last-child > *) {
+    border-top: 1px solid var(--rule-strong);
   }
 
   /* Wide screens: the table. Below 900px: one labelled card per row, so no
@@ -192,6 +254,15 @@ const articleLd = articleJsonLd({
     border-top: 1px solid var(--rule);
   }
 
+  /* Overall: the same ink rule above it as in the table. */
+  .summary-card:last-child {
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .summary-card:nth-last-child(2) {
+    border-bottom: 0;
+  }
+
   .summary-kind {
     margin-bottom: var(--s-3);
     font-family: var(--font-body);
@@ -207,10 +278,13 @@ const articleLd = articleJsonLd({
     gap: var(--s-2);
   }
 
+  /* One row per field: label left, value right. */
   .summary-field {
     display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-4);
     font-family: var(--font-mono);
   }
 
@@ -223,6 +297,9 @@ const articleLd = articleJsonLd({
 
   .summary-field dd {
     margin: 0;
+    flex: none;
+    text-align: right;
+    white-space: nowrap;
     font-size: var(--t-data);
     color: var(--ink);
   }

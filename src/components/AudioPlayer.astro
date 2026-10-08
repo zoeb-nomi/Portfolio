@@ -562,8 +562,10 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         // (for this cue only — re-decided every time the highlight moves)
         // if neither clear spot fits in the viewport.
         if (marginCol) {
-          // The section heading lives in this column too: "above the note" must not mean "on the heading".
-          const noteEls = Array.from(marginCol.querySelectorAll('.margin-note, figcaption, .mark-label'));
+          // Every section's margin column sits at the same x, so a heading or note from a neighbouring
+          // section can be under the float too (the reader scrolled away from the active paragraph).
+          // Check them all, not just the active section's.
+          const noteEls = Array.from(document.querySelectorAll('.margin-col .margin-note, .margin-col figcaption, .margin-col .mark-label'));
           const floatLeft = window.innerWidth - right - floatW;
           const rectAt = (t) => ({ top: t, bottom: t + floatH, left: floatLeft, right: floatLeft + floatW });
           const collidesAt = (t) => noteEls.some((n) => rectsIntersect(rectAt(t), n.getBoundingClientRect()));
@@ -572,10 +574,11 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
             const noteRect = collided.getBoundingClientRect();
             const above = noteRect.top - floatH - 12;
             const below = noteRect.bottom + 12;
-            if (above >= minTop && !collidesAt(above)) {
-              top = above;
-            } else if (below <= maxTop && !collidesAt(below)) {
-              top = below;
+            // A heading is followed, so park below it first; a note is parked above first.
+            const spots = collided.matches('.mark-label') ? [below, above] : [above, below];
+            const spot = spots.find((t) => t >= minTop && t <= maxTop && !collidesAt(t));
+            if (spot !== undefined) {
+              top = spot;
             } else {
               floatEl.classList.add('audio-float--bar-fallback');
               floatEl.style.top = '';
