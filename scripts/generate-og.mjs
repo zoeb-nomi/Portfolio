@@ -57,6 +57,9 @@ const pages = [
   { id: 'misses', // meta.writingMisses
     title: 'Nobody Reports the Misses: Counting False Passes in AI',
     sub: 'Wrong AI answers get caught. Missed items don’t.' },
+  { id: 'decisions-api-legal-quiz', // meta.writingDecisions
+    title: "I gave OpenAI's Decisions API a quiz written by lawyers",
+    sub: '544 legal questions\none probability each · no safe threshold' },
   { id: '404', // notFound.message
     title: '404', sub: 'No source found for that claim.' },
 ];
@@ -195,7 +198,7 @@ function templateHTML({ title, sub, num }) {
     <div class="main">
       <div class="text">
         <p class="title" id="title">${esc(title)}</p>
-        <p class="kicker">${withArrows(sub)}</p>
+        <p class="kicker">${withArrows(sub).replace(/\n/g, '<br>')}</p>
       </div>
       ${num ? `<div class="num"><p class="num-value" id="num">${withArrows(num.value)}</p><p class="num-caption">${withArrows(num.caption)}</p></div>` : ''}
     </div>

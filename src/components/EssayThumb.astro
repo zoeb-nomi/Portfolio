@@ -5,7 +5,7 @@ import { writingMisses } from '../data/copy';
 import { forestData, waveData, judgeData } from '../lib/figureData';
 import { n2 } from '../lib/pct';
 
-type Kind = 'misses' | 'bus' | 'levers' | 'waves' | 'judge';
+type Kind = 'misses' | 'bus' | 'levers' | 'waves' | 'judge' | 'decisions';
 
 interface Props {
   kind: Kind;
@@ -57,6 +57,13 @@ const bars = [75, 351, 504];
   }
   {blind && <div class="et-cells" style={`--cols:${blind.of}`}>{Array.from({ length: blind.of }, (_, i) => <i class={`et-cell${i < blind.filled ? ' on' : ''}`} />)}</div>}
   {misses && <div class="et-cells" style="--cols:20">{Array.from({ length: misses.of }, (_, i) => <i class={`et-cell${i < misses.filled ? ' on' : ''}`} />)}</div>}
+  {
+    kind === 'decisions' && (
+      <div class="et-track">
+        <i class="et-pt is-red" style={`--x:${n2(90)}`} />
+      </div>
+    )
+  }
   {kind === 'bus' && <div class="et-bars">{bars.map((b, i) => <i class={`et-col${i === 2 ? ' is-red' : ''}`} style={`--h:${n2((b / 504) * 100)}`} />)}</div>}
 </div>
 

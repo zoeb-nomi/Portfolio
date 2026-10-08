@@ -19,6 +19,13 @@
     "LLM-as-judge": "L L M as judge",
     "n=25": "n equals 25",
     "Mata v. Avianca": "Mata versus Avianca",
-    "v0.2": "version 0.2"
+    "v0.2": "version 0.2",
+    "decisions-api-legal-quiz": "decisions A P I legal quiz",
+    "gpt-6-luna": "G P T six luna",
+    "AUROC": "A U R O C",
+    "CUAD": "C U A D",
+    "LegalBench": "Legal Bench",
+    "API": "A P I",
+    "OpenAI": "Open A I"
   }
 }

@@ -1,0 +1,157 @@
+{
+  "src": "/audio/decisions-api-legal-quiz.mp3",
+  "captions": "/audio/decisions-api-legal-quiz.vtt",
+  "duration": 586,
+  "label": "Listen to this piece",
+  "note": "Read by a synthetic voice (Kokoro).",
+  "chapters": [
+    {
+      "id": "s1",
+      "title": "The quiz",
+      "start": 66.8
+    },
+    {
+      "id": "s2",
+      "title": "What came back",
+      "start": 166.3
+    },
+    {
+      "id": "s3",
+      "title": "The misses have a shape",
+      "start": 246.6
+    },
+    {
+      "id": "s4",
+      "title": "The same number, three meanings",
+      "start": 299.3
+    },
+    {
+      "id": "s5",
+      "title": "The refusals",
+      "start": 343.2
+    },
+    {
+      "id": "s6",
+      "title": "The prompt is part of the test",
+      "start": 385.1
+    },
+    {
+      "id": "s7",
+      "title": "What I would do with it",
+      "start": 439.8
+    },
+    {
+      "id": "s8",
+      "title": "What this does not show",
+      "start": 509.4
+    },
+    {
+      "id": "s9",
+      "title": "Data and code",
+      "start": 566.2
+    }
+  ],
+  "cues": [
+    ["s0-title", 0.15, 4.23],
+    ["s0-dek", 4.83, 18.32],
+    ["s0-p0", 18.92, 40.11],
+    ["s0-p1", 40.71, 60.41],
+    ["s0-p2", 61.01, 65.59],
+    ["s1-cue", 66.79, 67.43],
+    ["s1-p0", 68.03, 105.2],
+    ["s1-p1", 105.8, 120.49],
+    ["s1-p2", 121.09, 140.76],
+    ["s1-p3", 141.36, 165.08],
+    ["s2-cue", 166.28, 167.12],
+    ["s2-p0", 167.72, 196.85],
+    ["s2-p1", 197.45, 200.7],
+    ["s2-fig1", 201.3, 214.6],
+    ["s2-p2", 215.2, 245.41],
+    ["s3-cue", 246.61, 247.69],
+    ["s3-p0", 248.29, 261.03],
+    ["s3-p1", 261.63, 288.73],
+    ["s3-p2", 289.33, 298.1],
+    ["s4-cue", 299.3, 300.9],
+    ["s4-p0", 301.5, 327.07],
+    ["s4-p1", 327.67, 341.98],
+    ["s5-cue", 343.18, 344.08],
+    ["s5-p0", 344.68, 364.3],
+    ["s5-p1", 364.9, 383.94],
+    ["s6-cue", 385.14, 386.65],
+    ["s6-p0", 387.25, 411.78],
+    ["s6-p1", 412.38, 438.65],
+    ["s7-cue", 439.85, 440.87],
+    ["s7-p0", 441.47, 459.81],
+    ["s7-p1", 460.41, 475.07],
+    ["s7-p2", 475.67, 492.6],
+    ["s7-p3", 493.2, 508.17],
+    ["s8-cue", 509.37, 510.6],
+    ["s8-p0", 511.2, 524.28],
+    ["s8-p1", 524.88, 535.35],
+    ["s8-p2", 535.95, 545.67],
+    ["s8-p3", 546.27, 552.94],
+    ["s8-p4", 553.54, 564.99],
+    ["s9-cue", 566.19, 567.21],
+    ["s9-p0", 567.81, 585.14]
+  ],
+  "meta": {
+    "engine": "kokoro-82m-v1.0",
+    "voice": "af_heart",
+    "speed": 1,
+    "sampleRate": 24000,
+    "bitrateKbps": 64,
+    "lufs": -19,
+    "gaps": {
+      "lead": 0.15,
+      "sentence": 0.28,
+      "segment": 0.6,
+      "beforeCue": 1.2,
+      "tail": 0.5
+    },
+    "modelSha256": "8fbea51ea711f2af382e88c833d9e288c6dc82ce5e98421ea61c058ce21a34cb",
+    "segmentHashes": {
+      "s0-title": "e845d9f018c0",
+      "s0-dek": "cbcca5c948f7",
+      "s0-p0": "2eca6d0d5fd8",
+      "s0-p1": "752a78db2eca",
+      "s0-p2": "13e15e70ebc5",
+      "s1-cue": "66b04573a993",
+      "s1-p0": "6ab1b97a537a",
+      "s1-p1": "e69c68565f1b",
+      "s1-p2": "416fb73cd294",
+      "s1-p3": "82f184a762e7",
+      "s2-cue": "79665b6d0c73",
+      "s2-p0": "c34af611866e",
+      "s2-p1": "680cec80dd60",
+      "s2-fig1": "7bff886b73cc",
+      "s2-p2": "5d3b56952757",
+      "s3-cue": "4e7966246b6f",
+      "s3-p0": "7e0aa354319b",
+      "s3-p1": "55fd7bc69ae9",
+      "s3-p2": "f1f934d4c31f",
+      "s4-cue": "ad1c9fa3c744",
+      "s4-p0": "4ecb1764f69d",
+      "s4-p1": "d5be51682387",
+      "s5-cue": "761c7f277527",
+      "s5-p0": "c2e45ab3911b",
+      "s5-p1": "e643dc657404",
+      "s6-cue": "7e1c43a54b36",
+      "s6-p0": "344df1d33fae",
+      "s6-p1": "42ae37a17e9e",
+      "s7-cue": "3997e8abd7fe",
+      "s7-p0": "eeb373140e83",
+      "s7-p1": "164b670e1b7f",
+      "s7-p2": "e2cb389e20c8",
+      "s7-p3": "892204c1250b",
+      "s8-cue": "822ef1a4b067",
+      "s8-p0": "f6e5484e6d68",
+      "s8-p1": "d11c358bb844",
+      "s8-p2": "25a2b9e8045f",
+      "s8-p3": "1db514134c28",
+      "s8-p4": "8eb6d008567b",
+      "s9-cue": "1b0d2659b9d1",
+      "s9-p0": "f5cc8cf17319"
+    },
+    "textHash": "4ebb74ff69fb86b9"
+  }
+}

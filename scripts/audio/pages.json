@@ -9,6 +9,25 @@
   },
   "pages": [
     {
+      "slug": "decisions-api-legal-quiz",
+      "path": "/writing/decisions-api-legal-quiz/",
+      "title": "I gave OpenAI's Decisions API a quiz written by lawyers",
+      "chapterTitles": {
+        "s1": "The quiz",
+        "s2": "What came back",
+        "s3": "The misses have a shape",
+        "s4": "The same number, three meanings",
+        "s5": "The refusals",
+        "s6": "The prompt is part of the test",
+        "s7": "What I would do with it",
+        "s8": "What this does not show",
+        "s9": "Data and code"
+      },
+      "overrides": {
+        "s9-p0": "The scripts, the prompts, the per-item scores and the curve as a table are in the repository on GitHub, linked here. Five commands reproduce the run for about two cents. Legal Bench is by Guha and others, 2023, released under a Creative Commons attribution licence."
+      }
+    },
+    {
       "slug": "nobody-reports-the-misses",
       "path": "/writing/nobody-reports-the-misses/",
       "title": "Nobody Reports the Misses: Counting False Passes in AI for Regulated Work",
