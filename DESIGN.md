@@ -158,22 +158,105 @@ one method"; adding a harness means updating both.
 
 ## 6. Off-site: applying the system outside the browser
 
-Use the same tokens and faces for anything that will be seen next to the site.
+Anything seen next to the site uses the same tokens and faces, and the social
+kit in the content-engine repo is the reference implementation. It turns one
+`figure.json` into a still, a video, a GIF and a PDF carousel. The canvas is
+built for a phone feed: one counted finding, one figure, one red group. The
+kit's `kit/social.css` holds the values; this section holds the rules. Colour,
+faces, square corners and no shadows are as in section 2.
 
-- Video and stills (1080x1080 social, 1200x630 OG): background `--paper`,
-  text `--ink`, secondary `--ink-muted`, grid and faded marks `--rule`, the
-  one accent `--red`. Wrong/miss/annotation = red; correct/neutral = ink-muted.
-  No green, ever. Headline and large numerals in Instrument Serif; labels,
-  axis ticks and footers in IBM Plex Mono uppercase; any running sentence in
-  IBM Plex Sans. Square corners, no drop shadows, no logos.
-- matplotlib: convert public/fonts/*.woff2 to .ttf with fonttools, register
-  them with `font_manager.fontManager.addfont`, and set the figure facecolor
-  to paper. The site's woff2 files are Latin subsets, so avoid "≥" and other
-  symbols that would fall back to another face; write "0.9 or more".
-- Phone legibility at 1080px: counters 44pt or larger, headline 26pt or
-  larger, axis labels 16pt or larger.
-- Reference implementation: `animate.py` and `plot.py` in the
-  decisions-api-legal-quiz repo (fonts in media/fonts).
+Formats:
+
+| output | spec |
+|---|---|
+| still | PNG, 1080x1350, under 5 MB |
+| video | MP4, H.264, 30 fps, 15 to 45 s |
+| GIF | 15 fps, under 5 MB, one cycle |
+| carousel | PDF, 5 to 8 pages at 1080x1350; the cover equals the still |
+| OG card | 1200x630, unchanged (section 5, step 6) |
+
+Scale rule. A phone shows the 1080px canvas at 360 CSS px, about 3 device px
+per CSS px, so every site floor is multiplied by three: mono 11 becomes 33,
+sans 12 becomes 36, serif 20 becomes 60, a 1px hairline becomes 3px, an 8px
+mark becomes 24px. A figure that does not fit its zone gets a different
+primitive, never a smaller font.
+
+Anatomy, top to bottom, all left-aligned, each zone a fixed height:
+
+1. Kicker: mono caps, ink-muted, one line.
+2. Title: Instrument Serif, the hook, two lines at most.
+3. Figure: one primitive, 498px tall.
+4. Finding line: Instrument Serif, one line, ink.
+5. Method: IBM Plex Sans, ink-body, two lines at most.
+6. Footer: IBM Plex Sans, ink-muted, states the limit, two lines at most.
+
+Margins are 72px left and right, 72px top and 96px bottom (the bottom clears
+platform video controls). Red is reserved for the one finding. There is no
+URL, logo, handle or other chrome on the canvas; the link goes in the post.
+
+Floors and marks, in px at 1080 wide:
+
+| item | floor |
+|---|---|
+| kicker | 33 |
+| title | 100 |
+| finding line | 64 |
+| method | 36 |
+| footer | 36 |
+| labels and values inside a figure | 33 (values 40) |
+| the one big numeral (stat tile only) | 200 |
+| mark | 24, or 32 in grids, with an 8 gap |
+| hairline | 3 |
+| marks in a figure | 100 at most |
+
+Weight stays at 500 or below and the radius stays 0. A mark never overlaps
+another mark.
+
+Mark states:
+
+| state | look |
+|---|---|
+| the finding | `--red`, only inside `[data-finding]` |
+| counted | `--ink`, filled |
+| excluded | outline in `--rule` |
+| text, secondary | `--ink-muted` |
+
+There is one `[data-finding]` group per canvas. The big numeral is never red;
+a stat tile marks its finding with a 6px red rule above the numeral.
+
+Primitives (`kit/primitives`; the build throws when a cap is broken):
+
+| primitive | cap |
+|---|---|
+| unit strip | at most 100 squares in one block |
+| dumbbell | 1 to 5 rows, from and to on one axis |
+| bar list | 1 to 6 rows on one scale; row notes need 5 or fewer |
+| waterfall | 3 to 5 steps, start then drops then end, end equals start minus drops |
+| stat tile | one numeral, with an optional second smaller one |
+| compare table | at most 5 rows and 3 columns, row pitch 84 or more |
+| answer sheet | binned to at most 100 squares, the red group last |
+
+Copy budgets live in the content-engine CLAUDE.md. Row labels in bar lists
+and dumbbells are 10 characters or fewer.
+
+Motion. Frame 0 equals the still. Then hold 1 s, cut to the pre state in
+120 ms, hold the pre state briefly, and build: each mark or bar draws over
+600 ms, staggered. Red enters last, the finding line fades in over 200 ms,
+and the final hold is at least 1.5 s so the last frame equals frame 0. The
+MP4 plays two cycles; the GIF plays one.
+
+Carousel. 5 to 8 pages, each a full canvas with its own kicker ("1 of 3"),
+title, figure, finding, method and footer. Page 1 is the still. One idea per
+page, one red group per page, and every page passes the same lint.
+
+Alt text. One factual sentence with the numbers and the limit. Never "image
+of" or "picture of", no URL, 20 to 1000 characters.
+
+Renderer. HTML plus Playwright at deviceScaleFactor 1; frames go through
+ffmpeg and the PDF through Playwright. The woff2 files are Latin subsets, so
+write "0.9 or more", not a symbol. `design-lint` in the content-engine repo
+enforces all of this: zones, floors, margins, palette, red scope, marks,
+text, line counts, PNG size and alt text. A render that fails it is not done.
 
 ## 7. Checks that enforce this
 
@@ -182,5 +265,6 @@ tokens.css), `npm run gate` (required and banned strings in dist),
 `npm run check` (astro check), `npm run tokens` (colours, sizes, lines,
 radius on the rendered site), `npm run qa` (overflow at 14 widths, axe,
 weights above 500, console errors, 4xx/5xx), `npm run audio:check` (narration
-still matches the page). CI runs all of them; main is live and only Zoeb
+still matches the page). For social output the check is `design-lint` in the
+content-engine repo (section 6). CI runs all of them; main is live and only Zoeb
 merges.
