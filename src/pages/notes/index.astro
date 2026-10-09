@@ -3,10 +3,10 @@ import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
 import { formatDate } from '../../lib/formatDate';
 import { meta, notesPage as np } from '../../data/copy';
-import { notes } from '../../data/notes';
+import { notes, isLive } from '../../data/notes';
 
-// Newest first.
-const posts = [...notes].sort((x, y) => y.date.localeCompare(x.date));
+// Newest first; only pieces already posted (date at or before the build date).
+const posts = notes.filter((n) => isLive(n)).sort((x, y) => y.date.localeCompare(x.date));
 ---
 
 <Base title={meta.notesIndex.title} description={meta.notesIndex.description} path="/notes/" ogImage="/og/notes.png">

@@ -19,7 +19,8 @@ const { note } = Astro.props;
 const { figure: fig } = note;
 
 // Meta limits from DESIGN.md section 3: title 60 characters or fewer, description 155 or fewer.
-const metaTitle = `${note.title} — Zoeb Nomi`;
+// The author suffix is dropped when the title alone would push the tag past the limit.
+const metaTitle = note.title.length + 12 <= 60 ? `${note.title} — Zoeb Nomi` : note.title;
 if (metaTitle.length > 60) throw new Error(`notes/${note.slug}: meta title is ${metaTitle.length} characters (max 60)`);
 if (note.dek.length > 155) throw new Error(`notes/${note.slug}: dek is ${note.dek.length} characters (max 155)`);
 
