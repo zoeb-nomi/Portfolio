@@ -712,7 +712,7 @@ export const screenerEval = {
   kicker: 'Case study · Open evaluation harness · Python',
   title: 'screener-eval: I ran my résumé through an LLM screener 885 times',
   standfirst:
-    'Same résumé, same 21 job descriptions, two LLM screeners, five repeats each. Swapping every employer on the résumé for a fictional one moved the fit score by about a point at most. Deleting every link moved it by less than a point. Which screener read it moved it by 22.',
+    'Same résumé, same 21 job descriptions, two LLM screeners, five repeats each. Swapping every employer on the résumé for a fictional one moved the fit score by about a point at most. Deleting every link moved it by 0.90 points down on one screener and 0.41 up on the other. Which screener read it moved it by 22.',
   specBlock: [
     { label: 'Postings', value: '21' },
     { label: 'Screeners', value: '2' },
