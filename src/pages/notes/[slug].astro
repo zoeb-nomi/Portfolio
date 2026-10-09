@@ -1,0 +1,198 @@
+---
+import Base from '../../layouts/Base.astro';
+import Masthead from '../../components/Masthead.astro';
+import Section from '../../components/Section.astro';
+import EssayFigure from '../../components/EssayFigure.astro';
+import Button from '../../components/Button.astro';
+import { articleJsonLd } from '../../lib/articleJsonLd';
+import { formatDate } from '../../lib/formatDate';
+import { jsonLdString } from '../../lib/jsonLdString';
+import { isExternal } from '../../lib/isExternal';
+import { notes } from '../../data/notes';
+import { notesPage as np } from '../../data/copy';
+
+export function getStaticPaths() {
+  return notes.map((note) => ({ params: { slug: note.slug }, props: { note } }));
+}
+
+const { note } = Astro.props;
+const { figure: fig } = note;
+
+// Meta limits from DESIGN.md section 3: title 60 characters or fewer, description 155 or fewer.
+// The author suffix is dropped when the title alone would push the tag past the limit.
+const metaTitle = note.title.length + 12 <= 60 ? `${note.title} — Zoeb Nomi` : note.title;
+if (metaTitle.length > 60) throw new Error(`notes/${note.slug}: meta title is ${metaTitle.length} characters (max 60)`);
+if (note.dek.length > 155) throw new Error(`notes/${note.slug}: dek is ${note.dek.length} characters (max 155)`);
+
+const path = `/notes/${note.slug}/`;
+const articleLd = articleJsonLd({
+  slug: note.slug,
+  headline: note.title,
+  description: note.dek,
+  date: note.date,
+  about: note.kicker,
+  path,
+});
+
+// The same play / pause pattern as the essays' mp4 figures (DESIGN.md section 4).
+const videoScript = `// The figure plays muted on a loop while at least 35% of it is on screen. Reduced motion: the poster
+// only, and nothing downloads. The button holds the video paused until it is pressed again.
+for (const v of document.querySelectorAll('video[data-note-video]')) {
+  const b = v.closest('figure').querySelector('[data-note-toggle]'); let held = false;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.querySelector('source')?.remove(); v.load(); continue; }
+  new IntersectionObserver(([e]) => { if (e.intersectionRatio >= 0.35 && !held) v.play().catch(() => {}); else v.pause(); }, { threshold: [0, 0.35] }).observe(v.closest('figure'));
+  v.onplay = v.onpause = () => { b.textContent = v.paused ? 'Play' : 'Pause'; };
+  b.hidden = false; b.onclick = () => { held = !v.paused; if (held) v.pause(); else v.play().catch(() => {}); };
+}`;
+---
+
+<Base title={metaTitle} description={note.dek} path={path} ogImage="/og/notes.png" ogType="article">
+  <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
+
+  <Masthead kicker={note.kicker} h1={note.title} standfirst={note.dek} h1Max="24ch">
+    <Fragment slot="byline"><time datetime={note.date}>{formatDate(note.date)}</time></Fragment>
+  </Masthead>
+
+  <Section mark={np.section.mark} label={np.section.label} anchorId={np.section.anchorId}>
+    <EssayFigure n={1} title={fig.caption}>
+      {
+        fig.video ? (
+          <>
+            <video
+              muted
+              loop
+              playsinline
+              preload="none"
+              data-note-video
+              poster={fig.video.poster}
+              width={fig.width}
+              height={fig.height}
+              aria-label={fig.video.label}
+            >
+              <source src={fig.video.src} type="video/mp4" />
+            </video>
+            <div class="fig-controls">
+              <button type="button" class="fig-toggle" data-note-toggle hidden>{np.videoPause}</button>
+            </div>
+          </>
+        ) : (
+          <img src={fig.src} alt={fig.alt} width={fig.width} height={fig.height} loading="eager" decoding="async" />
+        )
+      }
+    </EssayFigure>
+
+    {note.body.map((p) => <p class="prose">{p}</p>)}
+
+    <h3 class="where-h">{np.pointersLabel}</h3>
+    <ul class="where">
+      {
+        note.pointers.map((p) => (
+          <li>
+            <a href={p.href} target={isExternal(p.href) ? '_blank' : undefined} rel={isExternal(p.href) ? 'noopener noreferrer' : undefined}>
+              {p.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      note.deep && (
+        <p class="deep">
+          <Button href={note.deep.href} variant="secondary">{note.deep.label}</Button>
+        </p>
+      )
+    }
+
+    <p class="limit">{note.limit}</p>
+  </Section>
+</Base>
+
+{fig.video && <script is:inline set:html={videoScript} />}
+
+<style>
+  /* The note's figure fills its frame; width and height attributes reserve the 4:5 box. */
+  img,
+  video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .fig-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--s-3);
+  }
+
+  .fig-toggle {
+    min-block-size: var(--hit-min);
+    padding: var(--s-1) var(--s-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: none;
+    font-family: var(--font-mono);
+    font-size: var(--t-note);
+    line-height: var(--lh-label);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .fig-toggle[hidden] {
+    display: none;
+  }
+
+  .where-h {
+    margin-top: var(--s-8);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    font-weight: 400;
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    line-height: var(--lh-label);
+  }
+
+  .where {
+    list-style: none;
+    margin: var(--s-3) 0 0;
+    padding: 0;
+    max-width: var(--measure);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    line-height: var(--lh-snug);
+  }
+
+  .where li {
+    padding-block: var(--s-2);
+    border-top: 1px solid var(--rule);
+  }
+
+  .where li:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .where a {
+    display: inline-block;
+    min-block-size: var(--hit-min);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+    overflow-wrap: anywhere;
+  }
+
+  .deep {
+    margin-top: var(--s-7);
+  }
+
+  /* The limit line is set like EssayFigure's source line. */
+  .limit {
+    margin-top: var(--s-7);
+    max-width: var(--measure);
+    padding-bottom: var(--s-4);
+    font-family: var(--font-body);
+    font-size: var(--t-note);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+  }
+</style>

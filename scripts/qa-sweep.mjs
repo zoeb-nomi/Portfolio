@@ -59,7 +59,10 @@ const browser = await chromium.launch();
 const results = [];
 let fail = false;
 
-for (const p of PAGES) {
+// One page per task; a small pool keeps the sweep under CI's time cap now that the notes section adds
+// twenty-odd pages whose looping video holds the network-idle wait open.
+const POOL = Number(process.env.QA_POOL || 4);
+async function sweep(p) {
   const r = { page: p, overflow: [], axe: [], heavy: [], sizes: [], console: [], failed: [], http: [] };
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
@@ -103,8 +106,19 @@ for (const p of PAGES) {
   }
   await ctx.close();
   if (r.overflow.length || r.axe.length || r.heavy.length || r.http.length) fail = true;
-  results.push(r);
+  return r;
 }
+
+let next = 0;
+await Promise.all(Array.from({ length: Math.min(POOL, PAGES.length) }, async () => {
+  while (next < PAGES.length) {
+    const p = PAGES[next++];
+    const r = await sweep(p);
+    if (r.overflow.length || r.axe.length || r.heavy.length || r.http.length) fail = true;
+    results.push(r);
+  }
+}));
+results.sort((a, b) => PAGES.indexOf(a.page) - PAGES.indexOf(b.page));
 await browser.close();
 
 // --- output -------------------------------------------------------------------
