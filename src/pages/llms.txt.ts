@@ -8,7 +8,7 @@ import {
   writingMisses,
   writingDecisions,
 } from '../data/copy';
-import { notes, isLive } from '../data/notes';
+import { notes } from '../data/notes';
 
 export const prerender = true;
 
@@ -31,8 +31,7 @@ const essayLines = essays.map(
 );
 
 // Notes are listed the same way, newest first, from src/data/notes.ts.
-const noteLines = notes
-  .filter((n) => isLive(n))
+const noteLines = [...notes]
   .sort((a, b) => b.date.localeCompare(a.date))
   .map((n) => `- Notes — "${n.title}" (${n.dek}): ${ORIGIN}/notes/${n.slug}/`);
 

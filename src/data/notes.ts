@@ -3,9 +3,6 @@
 // Newest first is the index's job (it sorts by date); order here does not matter.
 // Page chrome (labels, index masthead) lives in copy.ts `notesPage`.
 
-/** A note is listed (index, llms.txt) only once its piece's posting date has passed at build time; its page always exists. */
-export const isLive = (n: Note, today: string = new Date().toISOString().slice(0, 10)): boolean => n.date <= today;
-
 export type Note = {
   /** Piece id, e.g. 'p03'. */
   id: string;
@@ -81,7 +78,7 @@ export const notes: Note[] = [
   {
     id: 'p04',
     slug: 'the-0-9-threshold',
-    date: '2026-10-14',
+    date: '2026-10-13',
     kicker: 'decisions api · 544 questions · one run',
     title: 'At 0.9 confidence, 47 of 377 were wrong.',
     dek: '47 of 377 wrong. No threshold hit 95%.',
@@ -123,7 +120,7 @@ export const notes: Note[] = [
   {
     id: 'p05',
     slug: 'two-screeners-22-point-gap',
-    date: '2026-10-16',
+    date: '2026-10-15',
     kicker: 'screener-eval · one resume · two models',
     title: 'One resume, one posting: 28 and reject, 79 and advance.',
     dek: 'Mean gap 22.3 points over 21 postings.',
@@ -164,7 +161,7 @@ export const notes: Note[] = [
   {
     id: 'p06',
     slug: 'six-of-25-never-retrieved',
-    date: '2026-10-19',
+    date: '2026-10-17',
     kicker: 'crosssource · 25 questions · retrieval',
     title: 'Six of 25 answers never came back from search.',
     dek: '6 of 25 never retrieved. Recall 0.760.',
@@ -206,7 +203,7 @@ export const notes: Note[] = [
   {
     id: 'p07',
     slug: 'hearsay-refusals',
-    date: '2026-10-21',
+    date: '2026-10-19',
     kicker: 'decisions api · hearsay · 94 items',
     title: '21 of 94 hearsay items came back refused.',
     dek: '21 refused. 18 of them were a no.',
@@ -248,7 +245,7 @@ export const notes: Note[] = [
   {
     id: 'p08',
     slug: 'judges-vs-blind-labels',
-    date: '2026-10-24',
+    date: '2026-10-21',
     kicker: 'mirror-eval · judge check · 40 labels',
     title: 'Two judges, 40 blind labels. Matches: 3 and 12.',
     dek: '3 of 40 and 12 of 40 matched.',
@@ -285,7 +282,7 @@ export const notes: Note[] = [
   {
     id: 'p09',
     slug: '444-to-239',
-    date: '2026-10-26',
+    date: '2026-10-23',
     kicker: 'recruiter-prompt-bank · 28 sep 2026',
     title: '444 collected, 239 kept. The 205 rejects are public.',
     dek: '20 of 444: the page did not hold the text.',
@@ -323,7 +320,7 @@ export const notes: Note[] = [
   {
     id: 'p10',
     slug: 'two-levers-that-did-not-move',
-    date: '2026-10-29',
+    date: '2026-10-25',
     kicker: 'screener-eval · four edits · n = 21',
     title: 'Two levers that did not move. One that did.',
     dek: 'Largest edit effect 1.14. Screener swap: 22.3.',
@@ -364,7 +361,7 @@ export const notes: Note[] = [
   {
     id: 'p11',
     slug: 'eleven-predictions',
-    date: '2026-10-31',
+    date: '2026-10-27',
     kicker: 'mirror-eval · 11 predictions',
     title: 'I wrote 11 predictions before the run. Three missed.',
     dek: '3 of 11 missed. 4 held.',
@@ -395,7 +392,7 @@ export const notes: Note[] = [
   {
     id: 'p12',
     slug: 'confident-no',
-    date: '2026-11-03',
+    date: '2026-10-29',
     kicker: 'decisions api · the near-certain noes',
     title: '242 answers at 0.1 or less. The lawyers said yes to 41.',
     dek: '41 of 242 near-certain noes were a yes.',
@@ -436,7 +433,7 @@ export const notes: Note[] = [
   {
     id: 'p13',
     slug: 'five-parsers',
-    date: '2026-11-05',
+    date: '2026-10-31',
     kicker: 'screener-eval · one pdf · five parsers',
     title: 'Three parsers lost the same three fields. The links.',
     dek: '26 of 29, three times. Then 29 of 29.',
@@ -478,7 +475,7 @@ export const notes: Note[] = [
   {
     id: 'p14',
     slug: 'same-model-generates-and-judges',
-    date: '2026-11-08',
+    date: '2026-11-02',
     kicker: 'crosssource · judge check · 15 labels',
     title: 'Same default model writes and judges. 15 labels.',
     dek: '15 of 15 agreed. Interval floor 0.78.',
@@ -511,12 +508,16 @@ export const notes: Note[] = [
       { label: 'judge_agreement.md', href: 'https://github.com/zoeb-nomi/crosssource/blob/main/judge_agreement.md' },
       { label: 'results/judge_agreement.md', href: 'https://github.com/zoeb-nomi/crosssource/blob/main/results/judge_agreement.md' },
     ],
+    deep: {
+      label: 'The eval, with the judge check script and the limitations section',
+      href: '/writing/the-judge-caught-a-bug/',
+    },
     limit: 'One non-lawyer rater. Three of the six unsupported were the comma bug. No second judge family.',
   },
   {
     id: 'p15',
     slug: 'zoominfo-0-to-74',
-    date: '2026-11-10',
+    date: '2026-11-04',
     kicker: 'mirror-eval · claude · two waves',
     title: 'Poisoned sources: 79 to 11. A data broker: 0 to 74.',
     dek: 'ZoomInfo: 0 to 74 citations.',
@@ -552,7 +553,7 @@ export const notes: Note[] = [
   {
     id: 'p16',
     slug: 'six-cases',
-    date: '2026-11-13',
+    date: '2026-11-06',
     kicker: 'nobody reports the misses · six cases',
     title: 'Wrong answers get caught. Missed items do not.',
     dek: 'Six kinds of work. Six ways to count a miss.',
@@ -578,12 +579,16 @@ export const notes: Note[] = [
       { label: 'raw_results.jsonl', href: 'https://github.com/zoeb-nomi/nobody/blob/main/raw_results.jsonl' },
       { label: 'summary.json', href: 'https://github.com/zoeb-nomi/nobody/blob/main/summary.json' },
     ],
+    deep: {
+      label: 'The essay, with the six cases and the table',
+      href: '/writing/nobody-reports-the-misses/',
+    },
     limit: 'Six hypothetical cases, no incident or cost figure. Behind it: one model, 25 questions on public-domain case law.',
   },
   {
     id: 'p17',
     slug: 'what-changed-aug-to-sep',
-    date: '2026-11-15',
+    date: '2026-11-08',
     kicker: 'mirror-eval · perplexity · 29 days',
     title: '13 of 63, then 63 of 63. A cluster of changes.',
     dek: '13 to 63 of 63 in 29 days.',
@@ -616,12 +621,16 @@ export const notes: Note[] = [
       { label: 'PREDICTIONS.md', href: 'https://github.com/zoeb-nomi/mirror-eval/blob/main/PREDICTIONS.md' },
       { label: 'analyze.py', href: 'https://github.com/zoeb-nomi/mirror-eval/blob/main/analyze.py' },
     ],
+    deep: {
+      label: 'The case study, with the five listed changes and both waves',
+      href: '/mirror-eval/',
+    },
     limit: 'One subject. Changes went out as a cluster. No test exists for the count. Versions not verifiably frozen.',
   },
   {
     id: 'p18',
     slug: 'verdict-modes',
-    date: '2026-11-18',
+    date: '2026-11-10',
     kicker: 'screener-eval · verdicts · two models',
     title: 'One screener\'s default was reject. The other\'s was hold.',
     dek: 'Reject 136 of 233. Hold 157 of 232.',
@@ -661,7 +670,7 @@ export const notes: Note[] = [
   {
     id: 'p19',
     slug: 'baseline-vs-strict',
-    date: '2026-11-20',
+    date: '2026-11-12',
     kicker: 'crosssource · two prompts · n = 25',
     title: 'Two prompts, 25 questions: two fewer wrong passages.',
     dek: 'Wrong passage: 3 of 143, then 1 of 142.',
@@ -703,7 +712,7 @@ export const notes: Note[] = [
   {
     id: 'p20',
     slug: 'vendor-criteria',
-    date: '2026-11-23',
+    date: '2026-11-14',
     kicker: 'recruiter-prompt-bank · 20 vendors',
     title: 'What AI screeners say they check: 14, 9, 7, 4, nothing.',
     dek: '4 of 20: no criteria, or not disclosed.',
@@ -740,7 +749,7 @@ export const notes: Note[] = [
   {
     id: 'p21',
     slug: 'silence-is-information',
-    date: '2026-11-25',
+    date: '2026-11-16',
     kicker: 'tradeframe · 438 runs · all green',
     title: 'One run took 59 ms. The log said success.',
     dek: '9 silent failures behind 438 green runs.',
@@ -772,7 +781,7 @@ export const notes: Note[] = [
   {
     id: 'p22',
     slug: 'taxonomy-miss',
-    date: '2026-11-28',
+    date: '2026-11-18',
     kicker: 'mirror-eval · prediction 9 · agreement',
     title: 'I set the floor at 60%. Agreement came in at 35.',
     dek: '117 of 332 answers agreed. 35%.',
@@ -809,7 +818,7 @@ export const notes: Note[] = [
   {
     id: 'p23',
     slug: 'what-five-reps-can-say',
-    date: '2026-11-30',
+    date: '2026-11-20',
     kicker: 'screener-eval · five reps · the noise',
     title: 'Same cell, two runs: 62.0 and 47.2. Five calls each.',
     dek: 'Noise 3.0 and 4.8 points. Five reps run.',
@@ -845,7 +854,7 @@ export const notes: Note[] = [
   {
     id: 'p25',
     slug: 'exactly-zero-or-one',
-    date: '2026-12-05',
+    date: '2026-11-22',
     kicker: 'decisions api · 224 answers · certain',
     title: '224 answers at exactly 0 or 1. Eighteen were wrong.',
     dek: '18 of 224 wrong at a probability of 0 or 1.',
@@ -886,7 +895,7 @@ export const notes: Note[] = [
   {
     id: 'p27',
     slug: 'vendor-voice',
-    date: '2026-12-10',
+    date: '2026-11-24',
     kicker: 'recruiter-prompt-bank · 239 records',
     title: 'Labels: hiring manager 3 of 239, vendor 173.',
     dek: '173 of 239 in the vendor\'s voice.',
@@ -923,7 +932,7 @@ export const notes: Note[] = [
   {
     id: 'p29',
     slug: 'my-own-counter-was-wrong',
-    date: '2026-12-15',
+    date: '2026-12-02',
     kicker: 'recruiter-prompt-bank · one counter',
     title: 'My own counter was wrong. Link is inside LinkedIn.',
     dek: '34 of 239 by substring. 17 by word.',
@@ -962,7 +971,7 @@ export const notes: Note[] = [
   {
     id: 'p30',
     slug: 'two-cents',
-    date: '2026-12-18',
+    date: '2026-11-26',
     kicker: 'decisions api · 544 calls · cost',
     title: 'The eval cost two cents. The day was the budget.',
     dek: '190,399 input tokens. $0.019.',
@@ -1003,7 +1012,7 @@ export const notes: Note[] = [
   {
     id: 'p31',
     slug: 'seventy-four-strings',
-    date: '2026-12-20',
+    date: '2026-11-28',
     kicker: 'portfolio · the build gate',
     title: 'My site fails CI unless it still says 74 things.',
     dek: '74 required. 11 banned. Exit 1 otherwise.',
@@ -1038,7 +1047,7 @@ export const notes: Note[] = [
   {
     id: 'p32',
     slug: 'hearsay-prompt',
-    date: '2026-12-23',
+    date: '2026-11-30',
     kicker: 'decisions api · hearsay · two prompts',
     title: 'The benchmark\'s one-liner: 1 of 9. Four sentences: 3 of 8.',
     dek: 'Same ten items. 1 of 9, then 3 of 8.',
