@@ -39,3 +39,8 @@
 - TradeFrame film reuses only the workflow names, schedules and counts from Zoeb's system guide; no tickers, positions, amounts, brokers, bots or hosts.
 - Posts: openings rotated across four types tied to each film's first moment; facts frozen to the existing fact-check rows; alt text rewritten per new still.
 - Six draft PRs opened on the portfolio (#20 to #25), all green; Zoeb merges in the web UI.
+
+## 9 October, evening: lineup simplified
+- Cadence is one post every alternate day from 11 October (11, 13, 15 ... 2 December), per Zoeb; the Decisions API post of 9 October is already live. The three holds that waited on portfolio fixes (#20, #21, #23) became a merge step in the hand-over; p29 is last and still waits on the recruiter-prompt-bank fix.
+- Every note is listed on /notes/ from the start; the date gate was removed at Zoeb's request.
+- Hand-over pack: one zip with a folder per post (POST.txt with LinkedIn body, first comment, X posts, alt text; the still, mp4, gif or carousel pdf and page pngs), plus SCHEDULE.md and the phone page.
