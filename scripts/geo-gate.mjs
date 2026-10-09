@@ -75,7 +75,7 @@ const POSITIVES = [
   '86%',
   '63 search-mode probes',
   '332 per wave',
-  'two of nine',
+  'four hit (one tied)',
   'PM who ships code',
 
   // screener-eval — copy-pack-s17.md §19, added 2026-09-11.
