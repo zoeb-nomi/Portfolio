@@ -30,3 +30,12 @@
 ## Site
 - A /notes/ section gives every piece a portfolio home; copy stays in src/data as the repo requires.
 - Four fix branches and the notes branch wait behind one pre-upgrade-review gate; Zoeb ticks findings and merges draft PRs in the GitHub web UI.
+
+## 9 October, afternoon: films rebuilt
+- The first films (scene crossfades, twelve seconds each, text swapping every two to three seconds) were rejected as slide decks. Replaced by a timeline runtime with a 3D stage (content-engine kit/film.mjs, kit/stage.css, scripts/film.mjs) and one bespoke film.mjs per piece: one object from the work, a different move per film, length from the content (13 to 21 s including the still as opener and closer), nothing to read mid-film but numbers, one red group entering last. The red pen as a motif is limited to the eval and judge pieces; the rest use stamps, stacks, tapes, receipts, rings and cards. The briefs are in content-engine/FILMS.md.
+- The still of each film piece is now frame 0 of the film, so the stills carry the topic object too.
+- screener-eval films were corrected to the project's shape: the parser test (one PDF through five parsers, 26 of 29 then 29 of 29) is a separate, deterministic test; the screener run is a paired, interleaved run of two cheap models over 21 postings with scripted edits. Verdict words (advance, hold, reject) are the prompt's own schema and appear only in the verdict piece.
+- mirror-eval films show the probe to answer to citations flow as the harness ran it (provider APIs with web search, not a chat product); the "sources cleaning" is the August cluster of surface fixes, not a pipeline stage.
+- TradeFrame film reuses only the workflow names, schedules and counts from Zoeb's system guide; no tickers, positions, amounts, brokers, bots or hosts.
+- Posts: openings rotated across four types tied to each film's first moment; facts frozen to the existing fact-check rows; alt text rewritten per new still.
+- Six draft PRs opened on the portfolio (#20 to #25), all green; Zoeb merges in the web UI.
