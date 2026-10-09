@@ -62,8 +62,10 @@ const articleLd = articleJsonLd({
       But the validation pass itself surfaced something the judge and I had both been getting wrong:
       consecutive citations were producing punctuation-only claim spans — fragments like "." — which
       the judge was dutifully scoring as citation failures. A harness bug, not a model failure. Fixing
-      it changed the metrics: citation precision moved from 0.981 to 0.994 under strict citation
-      discipline.
+      it changed the failure counts: unsupported_claim went from 3 to 0, because all three were this
+      artifact, and the affected items were re-scored. The citation precision move from 0.981 to
+      0.994 is a different comparison, the baseline prompt against the strict citation-discipline
+      prompt.
     </p>
     <EssayFigure n={1} title={wj.player.title} source="Source: this essay and the CrossSource case study. The spans drawn are placeholders, not real answer text." href="/crosssource/" hrefLabel="Case study →">
       <PlayerStepper stages={wj.player.stages} />
