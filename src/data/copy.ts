@@ -42,6 +42,7 @@ export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Evals', href: '/evals/', activePrefixes: ['/crosssource/', '/mirror-eval/', '/screener-eval/'] },
   { label: 'Writing', href: '/writing/' },
+  { label: 'Notes', href: '/notes/' },
   { label: 'Work', href: '/work/' },
   { label: 'About', href: '/about/' },
 ];
@@ -2303,7 +2304,7 @@ export const notesPage = {
   title: 'Notes',
   standfirst:
     'One counted finding per note, with its denominator, its figure and the file the numbers come from. The short version of what I post on LinkedIn and X.',
-  /** Line on the Writing index that points here (Notes is not in the header nav). */
+  /** Line on the Writing index that also points here; Notes is in the header nav since 11 Oct 2026. */
   writingLink: { text: 'Shorter and more often:', label: 'Notes', href: '/notes/' },
   section: { mark: '§1', label: 'The note', anchorId: 'note' },
   pointersLabel: 'Where the numbers live',
