@@ -126,6 +126,11 @@ export const meta = {
     description:
       "544 LegalBench questions through OpenAI's Decisions API. At 90% confidence it was 88% right. Counted, not scored, with the curve and the code.",
   },
+  notesIndex: {
+    title: 'Notes — Zoeb Nomi',
+    description:
+      'One counted finding per note, with its denominator, its figure and the file the numbers come from. The short version of what I post on LinkedIn and X.',
+  },
   work: {
     title: 'Work — Zoeb Nomi',
     description:
@@ -2290,6 +2295,23 @@ export const notFound = {
 };
 
 // ---------------------------------------------------------------------------
+// Notes: page chrome for /notes/ and /notes/<slug>/. The notes themselves are in notes.ts.
+// ---------------------------------------------------------------------------
+
+export const notesPage = {
+  kicker: 'Notes',
+  title: 'Notes',
+  standfirst:
+    'One counted finding per note, with its denominator, its figure and the file the numbers come from. The short version of what I post on LinkedIn and X.',
+  /** Line on the Writing index that points here (Notes is not in the header nav). */
+  writingLink: { text: 'Shorter and more often:', label: 'Notes', href: '/notes/' },
+  section: { mark: '§1', label: 'The note', anchorId: 'note' },
+  pointersLabel: 'Where the numbers live',
+  videoPause: 'Pause',
+  indexAriaLabel: 'Notes, newest first',
+};
+
+// ---------------------------------------------------------------------------
 // llms.txt — pack §6, verbatim
 // ---------------------------------------------------------------------------
 
@@ -2325,6 +2347,7 @@ export const llmsTxt = `# Zoeb Nomi
 - Work: https://www.zoebnomi.com/work/
 - About: https://www.zoebnomi.com/about/
 - Writing (essays index): https://www.zoebnomi.com/writing/
+- Notes (one counted finding per note): https://www.zoebnomi.com/notes/
 - Writing — "The judge caught a bug I didn't" (validating LLM-as-judge evals): https://www.zoebnomi.com/writing/the-judge-caught-a-bug/
 - Writing: https://www.zoebnomi.com/writing/eval-harness-at-my-own-reflection/
 - Writing: https://www.zoebnomi.com/writing/two-levers-that-did-not-move/

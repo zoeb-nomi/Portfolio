@@ -41,6 +41,8 @@ const pages = [
     num: { value: '885', caption: 'screener calls' } },
   { id: 'writing', // meta.writingIndex
     title: 'Writing', sub: 'Notes on LLM evaluation, judge reliability and RAG quality.' },
+  { id: 'notes', // meta.notesIndex
+    title: 'Notes', sub: 'One counted finding per note.' },
   { id: 'eval-harness', // meta.writingReflection
     title: 'I pointed an eval harness at my own reflection',
     sub: 'Engines fill rather than abstain. The LLM judge failed blind validation.' },

@@ -11,12 +11,14 @@ interface Options {
   /** ISO date, YYYY-MM-DD. */
   date: string;
   about: string;
+  /** Site path of the page; defaults to the essay path /writing/<slug>/. */
+  path?: string;
   /** Narration, if the essay has one: path under the site root, length in seconds, optional captions path. */
   audio?: { src: string; duration: number; captions?: string };
 }
 
-export function articleJsonLd({ slug, headline, description, date, about, audio }: Options) {
-  const url = `${ORIGIN}/writing/${slug}/`;
+export function articleJsonLd({ slug, headline, description, date, about, audio, path }: Options) {
+  const url = `${ORIGIN}${path ?? `/writing/${slug}/`}`;
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',

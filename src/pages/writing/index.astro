@@ -5,6 +5,7 @@ import EssayThumb from '../../components/EssayThumb.astro';
 import ReadAlongDemo from '../../components/ReadAlongDemo.astro';
 import {
   meta,
+  notesPage,
   writingDecisions,
   writingMisses,
   writingBusStop,
@@ -48,6 +49,9 @@ const posts = essays
 
 <Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/writing.png">
   <Masthead kicker={kicker} h1={title} standfirst={standfirst} h1Max="22ch" />
+  <p class="notes-link">
+    {notesPage.writingLink.text} <a href={notesPage.writingLink.href}>{notesPage.writingLink.label}</a>
+  </p>
   <ReadAlongDemo />
 
   <ul class="post-list">
@@ -76,6 +80,23 @@ const posts = essays
 </Base>
 
 <style>
+  /* One line under the masthead pointing at /notes/ (Notes is not in the header nav). */
+  .notes-link {
+    padding: var(--s-4) var(--gutter);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .notes-link a {
+    display: inline-block;
+    min-block-size: var(--hit-min);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
   /* Post list — uses the same two-column masthead grid (margin-col / body-col
      widths) so rows align with the post page above. */
   .post-list {
