@@ -26,6 +26,9 @@
     "CUAD": "C U A D",
     "LegalBench": "Legal Bench",
     "API": "A P I",
-    "OpenAI": "Open A I"
+    "OpenAI": "Open A I",
+    "claude-opus-4-8": "Claude Opus 4.8",
+    "claude-haiku-4-5": "Claude Haiku 4.5",
+    "gpt-5-mini": "G P T 5 mini"
   }
 }
