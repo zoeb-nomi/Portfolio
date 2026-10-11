@@ -665,7 +665,7 @@ export const mirrorEval = {
     mark: '§7',
     label: 'Predictions, scored',
     body:
-      'PREDICTIONS.md was committed before Wave 1 ran and scored publicly, misses first: two of nine held. The misses changed the roadmap more than the hits did.',
+      'PREDICTIONS.md was committed before Wave 1 ran and scored publicly, misses first. Of 11 predictions, four hit (one tied), one partly held, one was inconclusive, three missed and two could not be tested. The misses changed the roadmap more than the hits did.',
   },
 
   s8: {
