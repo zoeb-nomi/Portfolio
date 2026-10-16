@@ -5,8 +5,15 @@ import { formatDate } from '../../lib/formatDate';
 import { meta, notesPage as np } from '../../data/copy';
 import { notes } from '../../data/notes';
 
-// Newest first. Every note is listed from the start; the run's dates are in the content engine's schedule.
-const posts = [...notes].sort((x, y) => y.date.localeCompare(x.date));
+// Every note is listed from the start; the run's dates are in the content engine's schedule.
+// Order: notes dated up to today, newest first; then the scheduled ones, soonest first, so a
+// piece posted today sits at the top instead of under the December dates.
+const today = new Date().toISOString().slice(0, 10);
+const posts = [...notes].sort((x, y) => {
+  const px = x.date <= today, py = y.date <= today;
+  if (px !== py) return px ? -1 : 1;
+  return px ? y.date.localeCompare(x.date) : x.date.localeCompare(y.date);
+});
 ---
 
 <Base title={meta.notesIndex.title} description={meta.notesIndex.description} path="/notes/" ogImage="/og/notes.png">
