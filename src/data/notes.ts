@@ -1113,6 +1113,11 @@ Before you blame the model, count how often your own experts agree.`,
       width: 1080,
       height: 1350,
       caption: 'Haiku 5.5, GPT-6 Luna, Gemini 3.1 Flash-Lite, Gemma 4 on a laptop, against Opus 5.5.',
+      video: {
+        src: '/content/p33/cheap-tier-workflows.mp4',
+        poster: '/content/p33/cheap-tier-workflows.png',
+        label: 'Animated version of the figure. Three workflow diagrams for tax, legal and HR consulting, each showing where a cheap model sits between the case coming in and Opus 5.5 or a person, drawn from 1,414 expert-labelled cases across 10 tasks on which Claude Haiku 5.5, GPT-6 Luna, Gemini 3.1 Flash-Lite and Gemma 4 26B were compared with Opus 5.5 run on every item; only Haiku can be trusted to say when it is unsure; short benchmark texts rather than whole files, advice labels on which the labellers disagree about 1 time in 6, list prices on 15 Oct 2026.',
+      },
     },
     pointers: [
       { label: 'Code, prompts and summaries', href: 'https://github.com/zoeb-nomi/cheap-tier-legal-tax-hr' },
