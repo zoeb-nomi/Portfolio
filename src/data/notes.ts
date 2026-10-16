@@ -1087,7 +1087,7 @@ export const notes: Note[] = [
   {
     id: 'p33',
     slug: 'cheap-tier-workflows',
-    date: '2026-10-17',
+    date: '2026-10-16',
     kicker: 'cheap-tier-legal-tax-hr · 1,414 cases',
     title: 'Where a 10-cent model goes in tax, legal, HR',
     dek: 'One of four can say when it is unsure.',
