@@ -1084,4 +1084,44 @@ export const notes: Note[] = [
     },
     limit: 'Ten rows is a reason to look, not a rate. One run, gpt-6-luna, 8 Oct 2026. Labels are LegalBench\'s.',
   },
+  {
+    id: 'p33',
+    slug: 'cheap-tier-workflows',
+    date: '2026-10-17',
+    kicker: 'cheap-tier-legal-tax-hr · 1,414 cases',
+    title: 'Where a 10-cent model goes in tax, legal, HR',
+    dek: 'One of four can say when it is unsure.',
+    body: [
+      `Which decisions in your workflow would you let a cheap model make alone?`,
+      `You run a tax, legal or HR consulting practice and you are wiring AI into the work. Haiku 5.5 came out last week at 10 cents per million input tokens, and everyone asks if a model that cheap is good enough.`,
+      `The better question is where it sits, what it may decide alone, and what that saves. I tested that.`,
+      `Five models, same prompt, 1,414 cases labelled by legal experts across 10 tasks. Opus 5.5 ran on every item as the reference. The whole study cost $7.27.`,
+      `HR. Haiku alone matched Opus on employment issue spotting, 0.96 each, at 3 cents on the dollar. Helpdesk triage is the easy one.`,
+      `Tax. Two cheap readers, one free on my laptop, and Opus decides only the 18 in 100 where they disagree. 0.945 against 0.957, and 71 cents in the dollar saved.`,
+      `Legal. Here the ceiling is the data. On legal-advice screening, the experts who wrote the labels agreed with each other 86 times in 100, and every model landed near 0.70. Use the cheap model to sort the clause queue, not to decide it.`,
+      `The finding that changes the build is what "sure" means. Haiku called itself 90 or more sure on 28 of 100 answers and was right on 99 of 100 of those. The other three cheap models said it on 92 of 100 and were wrong about 1 time in 6. When one of them was sure and Haiku disagreed, the sure one was wrong about half the time.`,
+      `Monday rules:
+Route on confidence only for the model whose confidence means something.
+Set the threshold per task, from your own labelled sample.
+Pay Opus 5.5 to referee disagreements, not to read everything.
+Before you blame the model, count how often your own experts agree.`,
+      `Which model in your stack says it is sure, and have you counted how often it is right when it does?`,
+    ],
+    figure: {
+      src: '/content/p33/cheap-tier-workflows.png',
+      alt: 'Three workflow diagrams for tax, legal and HR consulting, each showing where a cheap model sits between the case coming in and Opus 5.5 or a person, drawn from 1,414 expert-labelled cases across 10 tasks on which Claude Haiku 5.5, GPT-6 Luna, Gemini 3.1 Flash-Lite and Gemma 4 26B were compared with Opus 5.5 run on every item; only Haiku can be trusted to say when it is unsure; short benchmark texts rather than whole files, advice labels on which the labellers disagree about 1 time in 6, list prices on 15 Oct 2026.',
+      width: 1080,
+      height: 1350,
+      caption: 'Haiku 5.5, GPT-6 Luna, Gemini 3.1 Flash-Lite, Gemma 4 on a laptop, against Opus 5.5.',
+    },
+    pointers: [
+      { label: 'Code, prompts and summaries', href: 'https://github.com/zoeb-nomi/cheap-tier-legal-tax-hr' },
+      { label: 'results/multi/cascade.json', href: 'https://github.com/zoeb-nomi/cheap-tier-legal-tax-hr/blob/main/results/multi/cascade.json' },
+      { label: 'results/multi/summary.csv', href: 'https://github.com/zoeb-nomi/cheap-tier-legal-tax-hr/blob/main/results/multi/summary.csv' },
+      { label: 'results/multi/agreement.json', href: 'https://github.com/zoeb-nomi/cheap-tier-legal-tax-hr/blob/main/results/multi/agreement.json' },
+      { label: 'Alinia regulated-advice-bench', href: 'https://huggingface.co/datasets/alinia/regulated-advice-bench' },
+      { label: 'LegalBench', href: 'https://huggingface.co/datasets/nguha/legalbench' },
+    ],
+    limit: 'Short benchmark texts, not whole files. Experts labelling advice items disagreed about 1 time in 6.',
+  },
 ];
