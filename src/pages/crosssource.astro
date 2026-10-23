@@ -14,6 +14,11 @@ import { failureData } from '../lib/figureData';
 
 const failures = failureData();
 
+const sanityRows = cs.s3.sanity.rows.map((r) => ({
+  label: r.model,
+  cells: [{ text: r.precision }, { text: r.recall }, { text: r.accuracy }],
+}));
+
 const table1Rows = cs.s3.table1.rows.map((r) => ({
   label: r.dimension,
   cells: [{ text: r.baseline }, { text: r.strict, win: r.strictWins }],
@@ -81,7 +86,10 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   </Section>
 
   <Section mark={cs.s3.mark} label={cs.s3.label} narrId="s3-cue">
-    <EssayFigure n={1} replay title="Which layer owns the failure" source="Source: Tables 1 and 2 below. Wrong-passage failures fell under the strict prompt; missing-authority failures trace to retrieval.">
+    <div data-narr="s3-sanity">
+      <DataTable nowrap caption={cs.s3.sanity.caption} columns={cs.s3.sanity.columns} rows={sanityRows} />
+    </div>
+    <EssayFigure n={1} replay title="Which layer owns the failure" source="Source: Tables 2 and 3 below (v0.1, n = 25). Wrong-passage failures fell under the strict prompt; missing-authority failures trace to retrieval.">
       <FailureOwners {...failures} />
     </EssayFigure>
     <div data-narr="s3-table1">
@@ -117,7 +125,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   <Section mark={cs.s6.mark} label={cs.s6.label} narrId="s6-cue">
     <p class="status-line" data-narr="s6-p0">{cs.s6.status}</p>
     <ul class="mono-list" data-narr="s6-list">
-      {cs.s6.items.map((item) => <li>{item}</li>)}
+      {cs.s6.items.map((item) => <li><a href={item.href} target="_blank" rel="noopener noreferrer">{item.text}</a></li>)}
     </ul>
   </Section>
 
@@ -283,6 +291,16 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     color: var(--ink-muted);
     padding-block: var(--s-3);
     border-top: 1px solid var(--rule);
+  }
+
+  .mono-list a {
+    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-min);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
   }
 
   .mono-list li:first-child {

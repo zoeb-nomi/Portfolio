@@ -75,7 +75,7 @@ export const meta = {
   crosssource: {
     title: 'CrossSource: RAG citation evaluation — Zoeb Nomi',
     description:
-      'Open harness for legal-RAG citation accuracy: precision 0.981→0.994, a blind-validated LLM judge (15/15), and a taxonomy splitting prompting from retrieval.',
+      'Open legal-RAG citation benchmark. v0.3: 150 items over 45 public US court opinions, full provenance, two blind model raters. v0.1 (n = 25): precision 0.981→0.994.',
   },
   writingJudgeBug: {
     title: "The judge caught a bug I didn't — Zoeb Nomi",
@@ -226,8 +226,12 @@ export const softwareSourceCodeJsonLd = {
   '@type': 'SoftwareSourceCode',
   name: 'CrossSource',
   description:
-    'Open evaluation harness measuring citation accuracy in retrieval-augmented generation over public court opinions. Citation precision 0.981–0.994; 100% (15/15) blind human–judge agreement.',
+    "Open benchmark and evaluation harness for citation accuracy in retrieval-augmented generation over public US court opinions. v0.3: 150 items (75 qa_citation, 75 citation_check) over 45 CourtListener opinions, 15 legal topics, full provenance per item; two blind, independent model raters, Cohen's kappa 0.98 (citation_check) and 0.84 (qa_citation). Items are model-drafted and model-checked; no human labelled every item. v0.1 (n = 25): citation precision 0.981 → 0.994 under citation-discipline prompting.",
   codeRepository: 'https://github.com/zoeb-nomi/crosssource',
+  version: '0.3',
+  // Version DOI for v0.3; the concept DOI (all versions) is 10.5281/zenodo.21969577.
+  identifier: 'https://doi.org/10.5281/zenodo.23493797',
+  datePublished: '2026-10-20',
   programmingLanguage: 'Python',
   author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
 };
@@ -301,7 +305,7 @@ export const home = {
       verdict: null as string | null,
       sub: '(15/15)',
       label: 'blind human–judge agreement validating the LLM judge',
-      provenance: null as string | null,
+      provenance: '(CrossSource v0.1)' as string | null,
     },
     {
       value: '~95%',
@@ -363,15 +367,15 @@ export const home = {
 // ---------------------------------------------------------------------------
 
 export const crosssource = {
-  kicker: 'Case study · Open evaluation harness · v0.1 · Python',
+  kicker: 'Case study · Open evaluation harness · v0.3 · Python',
   title: 'CrossSource: measuring whether a RAG system can be trusted to cite the law',
   standfirst:
     'An open evaluation harness for citation accuracy in legal RAG — built to answer one question with rigor: when the system cites a court opinion, is the claim actually supported by that source?',
   specBlock: [
-    { label: 'Corpus', value: '22' },
-    { label: 'Golden set', value: '25' },
-    { label: 'Retrieval', value: 'BM25 top-5' },
-    { label: 'Judge validated', value: '15/15' },
+    { label: 'Items', value: '150' },
+    { label: 'Opinions', value: '45' },
+    { label: 'Topics', value: '15' },
+    { label: 'Rater kappa', value: '0.98 / 0.84' },
   ],
   repoHref: 'https://github.com/zoeb-nomi/crosssource',
   repoLabel: 'github.com/zoeb-nomi/crosssource',
@@ -389,7 +393,7 @@ export const crosssource = {
     highlight:
       'Citation hallucination is the canonical trust failure of legal AI — and it is exactly the class of failure my day job revolves around.',
     paraPost:
-      ' CrossSource is the public, reproducible version of that work: a fixed corpus, a golden question set, and an evaluation pipeline anyone can run.',
+      ' CrossSource is the public, reproducible version of that work: a dataset where every item traces to an exact passage in a public opinion, a written labelling protocol, and an evaluation pipeline anyone can run.',
   },
 
   s2: {
@@ -397,26 +401,55 @@ export const crosssource = {
     label: 'Method',
     rows: [
       {
-        term: 'Corpus',
+        term: 'v0.3 dataset',
+        kind: 'code' as const,
+        bodyPre: '150 items — 75 ',
+        code: 'qa_citation',
+        bodyPost: ', 75 citation_check — over 45 public US opinions from CourtListener (27 federal circuit, 18 state supreme court, 2018 or later), across 15 legal topics.',
+      },
+      {
+        term: 'Provenance',
+        kind: 'plain' as const,
+        body: 'Every item carries its opinion ID, URL, the exact passage and the cited authority.',
+      },
+      {
+        term: 'Labelling',
+        kind: 'code' as const,
+        bodyPre: 'A written protocol, ',
+        code: 'LABELING_PROTOCOL.md',
+        bodyPost: ' v1.1. Items are model-drafted and model-checked; no human labelled every item.',
+      },
+      {
+        term: 'Agreement',
+        kind: 'plain' as const,
+        body: "Two blind, independent model raters: Cohen's kappa 0.98 on citation_check, 0.84 on qa_citation.",
+      },
+      {
+        term: 'Adjudication',
+        kind: 'plain' as const,
+        body: 'Every disagreement plus a 10% audit sample, 30 items in all, adjudicated by me with a third independent model rater. 27 of 30 matched the recommended label.',
+      },
+      {
+        term: 'v0.1 corpus',
         kind: 'plain' as const,
         body:
           "22 public-domain US court opinions (16 Supreme Court, 2 federal circuit, 4 state), sourced from Harvard Law School's Caselaw Access Project, chunked to ~350 words.",
       },
-      { term: 'Retrieval', kind: 'plain' as const, body: 'BM25, top-5.' },
+      { term: 'v0.1 retrieval', kind: 'plain' as const, body: 'BM25, top-5.' },
       {
-        term: 'Generation',
+        term: 'v0.1 generation',
         kind: 'code' as const,
         bodyPre: 'Claude with mandatory inline citations in ',
         code: 'doc_id:chunk_id',
         bodyPost: ' format.',
       },
       {
-        term: 'Golden set',
+        term: 'v0.1 golden set',
         kind: 'plain' as const,
         body: '25 human-authored questions with verified ground-truth supporting chunks.',
       },
       {
-        term: 'Two configurations',
+        term: 'v0.1 configurations',
         kind: 'configs' as const,
         italic1: 'baseline',
         mid: ' (citation formatting only) vs ',
@@ -424,7 +457,7 @@ export const crosssource = {
         bodyPost: ' (explicit citation-discipline rules in the prompt).',
       },
       {
-        term: 'Scoring',
+        term: 'v0.1 scoring',
         kind: 'plain' as const,
         body: 'claim-level citation precision and recall, faithfulness, and answer relevance — scored by an LLM judge, validated by hand (below).',
       },
@@ -434,8 +467,16 @@ export const crosssource = {
   s3: {
     mark: '§3',
     label: 'Findings',
+    sanity: {
+      caption: 'Table 1 — v0.3 sanity run on a 30-item sample (not a full run)',
+      columns: ['Model', 'Citation precision', 'Citation recall', 'citation_check accuracy'],
+      rows: [
+        { model: 'claude-sonnet-5-5', precision: '0.919', recall: '0.718', accuracy: '1.00' },
+        { model: 'gpt-5-mini', precision: '0.763', recall: '0.718', accuracy: '0.93' },
+      ],
+    },
     table1: {
-      caption: 'Table 1 — baseline vs. strict',
+      caption: 'Table 2 — v0.1 (n = 25): baseline vs. strict',
       columns: ['Dimension', 'Baseline', 'Strict'],
       rows: [
         { dimension: 'Citation precision', baseline: '0.981', strict: '0.994', strictWins: true },
@@ -445,7 +486,7 @@ export const crosssource = {
       ],
     },
     table2: {
-      caption: 'Table 2 — failure taxonomy by configuration',
+      caption: 'Table 3 — v0.1 (n = 25): failure taxonomy by configuration',
       columns: ['Error type', 'Baseline', 'Strict'],
       rows: [
         { type: 'Right document, wrong passage', baseline: '3', strict: '1', strictWins: true },
@@ -454,9 +495,9 @@ export const crosssource = {
         { type: 'Unsupported claim', baseline: '0', strict: '0', strictWins: false },
       ],
     },
-    findingLeadIn: 'The finding that matters:',
+    findingLeadIn: 'The v0.1 finding that still stands (n = 25):',
     findingPre:
-      ' prompting discipline buys precision — wrong-passage citations drop 3 → 1, precision rises 0.981 → 0.994. It cannot buy recall: 0.760 in both configurations, because every missing-authority failure traces to retrieval, not generation. Knowing ',
+      ' citation-discipline prompting buys precision — wrong-passage citations drop 3 → 1, precision rises 0.981 → 0.994. It cannot buy recall: 0.760 in both configurations, capped by retrieval, because every missing-authority failure traces to retrieval, not generation. Knowing ',
     findingItalic: 'which layer owns the failure',
     findingPost: ' is the entire point of separating the metrics.',
   },
@@ -465,13 +506,13 @@ export const crosssource = {
     mark: '§4',
     label: 'The judge caught a bug — because I checked the judge',
     statQuote: '100% agreement (15/15)',
-    statPre: "I hand-graded a blind, stratified sample of the judge's citation-precision verdicts: ",
+    statPre: "In v0.1, I hand-graded a blind, stratified sample of the judge's citation-precision verdicts: ",
     statPost: '.',
     bugPara:
       'That validation pass also surfaced a genuine harness defect — consecutive citations produced punctuation-only claim spans that the judge initially mislabeled as failures. Fixing it changed the metrics.',
     lessonQuote:
       'That is the lesson worth paying for: an unvalidated eval reports wrong numbers with full confidence — precisely the failure mode the eval exists to catch.',
-    marginNote: 'Validation pass — stratified blind sample, hand-graded.',
+    marginNote: 'v0.1 validation pass — stratified blind sample, hand-graded.',
   },
 
   s5: {
@@ -488,14 +529,12 @@ export const crosssource = {
 
   s6: {
     mark: '§6',
-    label: 'Next (v0.2)',
-    status: 'In build',
+    label: 'Release (v0.3)',
+    status: 'Released 20 Oct 2026',
     items: [
-      'Retrieval ablations',
-      'Cross-model judge comparison',
-      'Law-trained annotation review',
-      'Per-question difficulty stratification',
-      'An agent-eval module — in build',
+      { text: 'v0.3 release notes', href: 'https://github.com/zoeb-nomi/crosssource/releases/tag/v0.3' },
+      { text: 'DOI 10.5281/zenodo.23493797 (v0.3)', href: 'https://doi.org/10.5281/zenodo.23493797' },
+      { text: 'DOI 10.5281/zenodo.21969577 (all versions)', href: 'https://doi.org/10.5281/zenodo.21969577' },
     ],
   },
 
@@ -965,8 +1004,9 @@ export const screenerEval = {
 // §2 compact, /evals/ full ledger) and by the /evals/ comparison table. Adding
 // a fourth harness is one more object here. Every number below is lifted from
 // the `crosssource`, `mirrorEval` and `screenerEval` case-study objects above:
-//   CrossSource   0.994 / 0.981 — crosssource.s3.table1 (precision, strict / baseline)
-//                 22, 25, BM25 top-5, 15/15 — crosssource.specBlock, s2.rows, s4.statQuote
+//   CrossSource   150, 45, 15, 0.98 / 0.84 — crosssource.specBlock, s2.rows (v0.3)
+//                 0.994 / 0.981, 0.760 — crosssource.s3.table1 (v0.1 precision strict / baseline, recall)
+//                 22, 25, 15/15 — crosssource.s2.rows, s4.statQuote (v0.1)
 //   mirror-eval   13 → 63, 0 → 0 — mirrorEval.s3.table1 (Perplexity / Claude, of 63 search-mode probes)
 //                 4 engines, 63 probes, 3/40, 12/40 — mirrorEval.specBlock, s2.rows, s4.para1
 //                 2026-08-06, 2026-09-04 — mirrorEval.s2.rows ('Two waves')
@@ -997,15 +1037,15 @@ export const evalsLedger: HarnessEntry[] = [
     id: 'crosssource',
     name: 'CrossSource',
     question: 'When the RAG cites a court opinion, does that opinion support the claim?',
-    numeral: '0.994',
-    caption: 'citation precision, strict prompt (baseline 0.981) · n=25 · judge 15/15 vs human',
+    numeral: '150',
+    caption: 'v0.3 items over 45 public US opinions · two blind model raters, kappa 0.98 / 0.84',
     status: '[judged]',
-    rail: ['22 opinions · 25 questions', 'LLM judge, blind-validated 15/15', 'BM25 top-5 · baseline vs strict'],
+    rail: ['v0.3 · 150 items · 45 opinions · 15 topics', 'model-labelled to a written protocol', 'v0.1 (n = 25) · precision 0.981 → 0.994'],
     table: {
-      judge: 'LLM judge, blind-validated against a human: 100% (15/15)',
-      metric: 'Claim-level citation precision, 0.981 → 0.994; recall 0.760 in both configurations',
-      sample: '22 opinions · 25 questions',
-      verdict: 'Judge passed and caught a harness bug; prompting buys precision, retrieval owns recall',
+      judge: 'v0.3: two blind, independent model raters (kappa 0.98 citation_check, 0.84 qa_citation), disagreements plus a 10% audit sample (30 items in all) adjudicated by me. v0.1: LLM judge blind-validated against a human, 100% (15/15)',
+      metric: 'v0.1 (n = 25): claim-level citation precision 0.981 → 0.994; recall 0.760, capped by retrieval',
+      sample: 'v0.3: 150 items · 45 opinions. v0.1: 22 opinions · 25 questions',
+      verdict: 'v0.1: judge passed and caught a harness bug; prompting buys precision, retrieval owns recall',
     },
     caseHref: '/crosssource/',
     repoHref: crosssource.repoHref,
@@ -1942,6 +1982,8 @@ export const work = {
         links: [
           { label: 'Case study', href: '/crosssource/' },
           { label: 'Repo', href: 'https://github.com/zoeb-nomi/crosssource' },
+          { label: 'v0.3', href: 'https://github.com/zoeb-nomi/crosssource/releases/tag/v0.3' },
+          { label: 'DOI', href: 'https://doi.org/10.5281/zenodo.23493797' },
         ],
         where: '',
       },
@@ -1959,6 +2001,28 @@ export const work = {
         links: [
           { label: 'Case study', href: '/screener-eval/' },
           { label: 'Repo', href: 'https://github.com/zoeb-nomi/screener-eval' },
+        ],
+        where: '',
+      },
+    ],
+  },
+
+  // Upstream contributions — added 2026-10-23. Same RecordList as openWork,
+  // rendered directly under it. Both are open pull requests, not merged.
+  contributions: {
+    kicker: 'Contributions',
+    note: 'Open pull requests to other people’s eval and citation tooling. Not merged.',
+    items: [
+      {
+        what: 'TaxCalcBench (Column Tax) — audited all 101 test cases against the official instructions: 2 answer-key errors and 5 input conflicts found, an opt-in --accept-alternatives scoring flag, AUDIT.md in the fork',
+        links: [{ label: 'PR #157 (open)', href: 'https://github.com/column-tax/tax-calc-bench/pull/157' }],
+        where: '',
+      },
+      {
+        what: 'eyecite (Free Law Project) — fix for Id. resolution past explanatory parentheticals (issue #348); three review findings fixed with regression tests; extraction benchmark 0 gains / 0 losses on 15,988 citations',
+        links: [
+          { label: 'PR #360 (open)', href: 'https://github.com/freelawproject/eyecite/pull/360' },
+          { label: 'issue #361', href: 'https://github.com/freelawproject/eyecite/issues/361' },
         ],
         where: '',
       },
@@ -2323,7 +2387,9 @@ export const llmsTxt = `# Zoeb Nomi
 ## Key facts
 
 - Role: Product Manager, Instead (Sep 2025–present). Owns citation-accuracy evaluation, model benchmarking, and regression-catching eval loops for a production tax-research LLM. ~95% citation accuracy on the eval set.
-- Flagship public project: CrossSource (https://github.com/zoeb-nomi/crosssource) — open evaluation harness for citation accuracy in legal RAG. Citation precision 0.981 (baseline) → 0.994 (strict); recall 0.760; faithfulness 1.000; 100% (15/15) blind human–judge agreement. Corpus: 22 public-domain US court opinions; 25-question golden set; BM25 top-5 retrieval.
+- Flagship public project: CrossSource (https://github.com/zoeb-nomi/crosssource) — open benchmark and evaluation harness for citation accuracy in legal RAG. v0.3 (released 20 Oct 2026, https://github.com/zoeb-nomi/crosssource/releases/tag/v0.3): 150 items (75 qa_citation, 75 citation_check) over 45 public US opinions from CourtListener (27 federal circuit, 18 state supreme court, 2018 or later), 15 legal topics, full provenance per item (opinion ID, URL, exact passage, cited authority). Written labelling protocol (LABELING_PROTOCOL.md v1.1); two blind, independent model raters, Cohen's kappa 0.98 on citation_check and 0.84 on qa_citation; every disagreement plus a 10% audit sample (30 items in all) adjudicated by the maintainer with a third independent model rater, 27 of 30 matched the recommended label. Items are model-drafted and model-checked; no human labelled every item. Sanity run on a 30-item sample, not a full run: claude-sonnet-5-5 citation precision 0.919 / recall 0.718, citation_check accuracy 1.00; gpt-5-mini 0.763 / 0.718, 0.93. DOI (v0.3): https://doi.org/10.5281/zenodo.23493797; DOI (all versions): https://doi.org/10.5281/zenodo.21969577.
+- CrossSource v0.1 result (n = 25): citation-discipline prompting lifted citation precision 0.981 (baseline) → 0.994 (strict); recall 0.760, capped by retrieval; faithfulness 1.000; 100% (15/15) blind human–judge agreement. Corpus: 22 public-domain US court opinions; 25-question golden set; BM25 top-5 retrieval.
+- Open-source contributions (open pull requests, not merged): TaxCalcBench (Column Tax) PR #157 — audit of all 101 test cases against official instructions, 2 answer-key errors and 5 input conflicts found, opt-in --accept-alternatives scoring flag, AUDIT.md in the fork (https://github.com/column-tax/tax-calc-bench/pull/157). eyecite (Free Law Project) PR #360 — fix for Id. resolution past explanatory parentheticals (issue #348), three review findings fixed with regression tests, extraction benchmark 0 gains / 0 losses on 15,988 citations (https://github.com/freelawproject/eyecite/pull/360); plus issue #361 (https://github.com/freelawproject/eyecite/issues/361).
 - Second public project: mirror-eval (https://github.com/zoeb-nomi/mirror-eval) — open evaluation harness for what AI search engines say about a person; built to the CrossSource method. Two waves (2026-08-06, 2026-09-04), 332 probes each across ChatGPT, Claude, Perplexity, Gemini. Judge-free citation trail: Perplexity 13-of-63 → 63-of-63 search probes citing zoebnomi.com; Claude 0-of-63 → 0-of-63; CrossSource repo cited by ChatGPT 0 → 25-of-63 and Gemini 0 → 32-of-63. Blind human validation of the LLM judges: 3/40 and 12/40 — taxonomy reported as bands only. Release v1.0.
 - Third public project: screener-eval (https://github.com/zoeb-nomi/screener-eval) — paired, repeated evaluation of LLM résumé screeners. One résumé, 21 open US AI PM postings, two cheap-tier screeners, 5 reps, 885 calls. Employer-name swap: +0.07 / −1.14 points (95% CIs straddle zero). Link deletion: −0.90 / +0.41. Cross-screener gap on the same input: 22.3 points mean, verdicts agree on 6 of 21 postings. Parser test: plain extractors 26/29 → 29/29 after printing URLs as text.
 - At Instead: fixed the "knowledge–citation gap" failure mode (plausible-but-wrong citations); cut workflow latency ~90% (10–15 min → under a minute); architected a 270K+-record RAG corpus across 100+ legal source types; fetchability harness across 378 sources; remediation of ~139K documents; Legal Support Matrix across 160+ tax strategies; shipped Source Explorer.

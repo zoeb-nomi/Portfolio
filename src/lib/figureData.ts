@@ -185,12 +185,12 @@ export function proofData() {
   const spec = (block: { label: string; value: string }[], label: string) => find(block, (b) => b.label === label, `a "${label}" spec value`).value;
   const calls = Number(spec(se.specBlock, 'Calls'));
   const probes = Number((/(\d+)/.exec(spec(me.specBlock, 'Probes')) ?? fail('the probes-per-wave value'))[1]);
-  const csJudge = /(\d+)\/(\d+)/.exec(spec(cs.specBlock, 'Judge validated')) ?? fail('the CrossSource judge value');
+  const csJudge = /\((\d+)\/(\d+)\)/.exec(cs.s4.statQuote) ?? fail('the CrossSource v0.1 blind-check count');
   const meJudge = /(\d+)\/(\d+)/.exec(spec(me.specBlock, 'Judge failed')) ?? fail('the mirror-eval judge value');
   return [
     { value: calls, suffix: '', label: 'scored calls in screener-eval', href: '/screener-eval/' },
     { value: probes, suffix: '', label: 'probes per wave in mirror-eval, over two waves', href: '/mirror-eval/' },
-    { value: Number(csJudge[1]), suffix: ` of ${csJudge[2]}`, label: 'judge verdicts matched a blind human in CrossSource', href: '/crosssource/' },
+    { value: Number(csJudge[1]), suffix: ` of ${csJudge[2]}`, label: 'judge verdicts matched a blind human in CrossSource v0.1', href: '/crosssource/' },
     { value: Number(meJudge[1]), suffix: ` of ${meJudge[2]}`, label: "the Claude judge matched a blind human's exact tag set in mirror-eval", href: '/mirror-eval/' },
   ];
 }

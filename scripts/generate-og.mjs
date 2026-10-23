@@ -31,8 +31,8 @@ const pages = [
     title: 'Evals', sub: 'One method: CrossSource, mirror-eval, screener-eval.',
     num: { value: '3', caption: 'harnesses' } },
   { id: 'crosssource', // meta.crosssource
-    title: 'CrossSource', sub: 'Open harness for legal-RAG citation accuracy.',
-    num: { value: '0.994', caption: 'citation precision, up from 0.981' } },
+    title: 'CrossSource', sub: 'Open benchmark for legal-RAG citation accuracy.',
+    num: { value: '150', caption: 'v0.3 items · 45 opinions' } },
   { id: 'mirror-eval', // meta.mirrorEval
     title: 'mirror-eval', sub: 'What AI search says about a person, measured twice.',
     num: { value: '13 → 63', caption: 'Perplexity · Claude 0 → 0' } },

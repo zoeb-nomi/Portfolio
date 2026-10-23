@@ -1,73 +1,74 @@
 {
   "src": "/audio/crosssource.mp3",
   "captions": "/audio/crosssource.vtt",
-  "duration": 264,
+  "duration": 382,
   "label": "Listen to this piece",
   "note": "Read by a synthetic voice (Kokoro).",
   "chapters": [
     {
       "id": "s1",
       "title": "Why this exists",
-      "start": 28.2
+      "start": 27.2
     },
     {
       "id": "s2",
       "title": "Method",
-      "start": 56.8
+      "start": 59.8
     },
     {
       "id": "s3",
       "title": "Findings",
-      "start": 107.5
+      "start": 180.9
     },
     {
       "id": "s4",
       "title": "The judge caught a bug",
-      "start": 175.1
+      "start": 290.8
     },
     {
       "id": "s5",
       "title": "What this demonstrates",
-      "start": 212.8
+      "start": 330.4
     },
     {
       "id": "s6",
-      "title": "Next (v0.2)",
-      "start": 229.7
+      "title": "Release (v0.3)",
+      "start": 347.3
     },
     {
       "id": "s7",
       "title": "Related writing",
-      "start": 244.5
+      "start": 362.7
     }
   ],
   "cues": [
     ["s0-title", 0.15, 4.02],
     ["s0-dek", 4.62, 16.56],
-    ["s0-stats", 17.16, 26.96],
-    ["s1-cue", 28.16, 29.18],
-    ["s1-p0", 29.78, 55.56],
-    ["s2-cue", 56.76, 57.38],
-    ["s2-list", 57.98, 106.33],
-    ["s3-cue", 107.53, 108.28],
-    ["s3-table1", 108.88, 131.47],
-    ["s3-table2", 132.07, 146.34],
-    ["s3-p0", 146.94, 173.87],
-    ["s4-cue", 175.07, 177.67],
-    ["s4-p0", 178.27, 183.57],
-    ["s4-p1", 184.17, 187.08],
-    ["s4-p2", 187.68, 201.33],
-    ["s4-quote", 201.93, 211.61],
-    ["s5-cue", 212.81, 214.03],
-    ["s5-p0", 214.63, 216.75],
-    ["s5-list", 217.35, 228.47],
-    ["s6-cue", 229.67, 231.42],
-    ["s6-p0", 232.02, 232.69],
-    ["s6-list", 233.29, 243.31],
-    ["s7-cue", 244.51, 245.48],
-    ["s7-p0", 246.08, 251.44],
-    ["s7-p1", 252.04, 256.51],
-    ["s7-p2", 257.11, 263.67]
+    ["s0-stats", 17.16, 25.97],
+    ["s1-cue", 27.17, 28.2],
+    ["s1-p0", 28.8, 58.57],
+    ["s2-cue", 59.77, 60.39],
+    ["s2-list", 60.99, 179.66],
+    ["s3-cue", 180.86, 181.6],
+    ["s3-sanity", 182.2, 211.87],
+    ["s3-table1", 212.47, 238.41],
+    ["s3-table2", 239.01, 256.68],
+    ["s3-p0", 257.28, 289.65],
+    ["s4-cue", 290.85, 293.45],
+    ["s4-p0", 294.05, 301.19],
+    ["s4-p1", 301.79, 304.7],
+    ["s4-p2", 305.3, 318.95],
+    ["s4-quote", 319.55, 329.23],
+    ["s5-cue", 330.43, 331.65],
+    ["s5-p0", 332.25, 334.37],
+    ["s5-list", 334.97, 346.09],
+    ["s6-cue", 347.29, 348.87],
+    ["s6-p0", 349.47, 351.54],
+    ["s6-list", 352.14, 361.5],
+    ["s7-cue", 362.7, 363.66],
+    ["s7-p0", 364.26, 369.63],
+    ["s7-p1", 370.23, 374.7],
+    ["s7-p2", 375.3, 381.86]
   ],
   "meta": {
     "engine": "kokoro-82m-v1.0",
@@ -87,31 +88,32 @@
     "segmentHashes": {
       "s0-title": "d2303ec9ef70",
       "s0-dek": "25f957e93bda",
-      "s0-stats": "4286b71efc94",
+      "s0-stats": "c140d3ba0453",
       "s1-cue": "54e879ed145c",
-      "s1-p0": "424d81acf9b1",
+      "s1-p0": "fb0b197ad919",
       "s2-cue": "52a0f9b65b27",
-      "s2-list": "bc4c4a86d83d",
+      "s2-list": "1da219cb3376",
       "s3-cue": "e171c2ff25b5",
-      "s3-table1": "fb928cd81dfd",
-      "s3-table2": "334757d789ac",
-      "s3-p0": "2b295460e9d9",
+      "s3-sanity": "61ca12444226",
+      "s3-table1": "5af2b1ce1844",
+      "s3-table2": "cd28f98473de",
+      "s3-p0": "197aac561892",
       "s4-cue": "e5296f4952e2",
-      "s4-p0": "9aaf56044d1f",
+      "s4-p0": "044b48ba88dc",
       "s4-p1": "06651f447f97",
       "s4-p2": "d2418aa2e6ee",
       "s4-quote": "f3d35489ddad",
       "s5-cue": "24e25af73edd",
       "s5-p0": "416801ca069e",
       "s5-list": "6f00645aaaaf",
-      "s6-cue": "39424406d950",
-      "s6-p0": "122efcba0f85",
-      "s6-list": "ad0423bb2088",
+      "s6-cue": "58802176112a",
+      "s6-p0": "ea8fe8d4ae35",
+      "s6-list": "bd9b9aeb469c",
       "s7-cue": "f0ebf421bec1",
       "s7-p0": "8c7bd6a1c043",
       "s7-p1": "763ab31221e9",
       "s7-p2": "bfcfaea25f41"
     },
-    "textHash": "da0375e43220bbbb"
+    "textHash": "572f4d95c6e91f06"
   }
 }
