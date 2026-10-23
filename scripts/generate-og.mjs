@@ -23,7 +23,7 @@ const pages = [
     title: 'Zoeb Nomi', sub: 'AI Product Manager · LLM Evaluation & RAG Quality',
     num: { value: '0.994', caption: 'citation precision · n=25' } },
   { id: 'about', // meta.about
-    title: 'About', sub: 'Mechanical engineer turned AI product manager. Open to US relocation.' },
+    title: 'About', sub: 'Mechanical engineer turned AI product manager, in Bengaluru.' },
   { id: 'work', // meta.work
     title: 'Work', sub: 'Zero-to-one BGV at Keka, LLM output quality at Instead.',
     num: { value: '4', caption: 'companies · 2 promotions' } },

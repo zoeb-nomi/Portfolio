@@ -56,7 +56,6 @@ const POSITIVES = [
   'linkedin.com/in/zoebnomi',
   'calendar.app.google/56javKNeXqw7X8oq6',
   'zoeb.nomi@gmail.com',
-  'Open to US relocation',
 
   // mirror-eval — copy-pack-additions.md §16, added 2026-09-10.
   'mirror-eval',
@@ -141,6 +140,9 @@ const NEGATIVE_LITERALS = [
   // screener-eval — copy-pack-s17.md §19 negative checks, added 2026-09-11.
   // "Two harnesses, one method" is retired now that a third harness exists.
   'Two harnesses, one method',
+
+  // Relocation language removed sitewide 2026-10-23; keep it out.
+  'relocation',
 ];
 
 // "Filed" as a standalone product name — must not match the common word

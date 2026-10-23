@@ -35,7 +35,7 @@ export interface CtaLink {
 export const site = {
   name: 'Zoeb Nomi',
     footerLine:
-      'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to AI PM roles · Open to US relocation',
+      'Zoeb Nomi · AI Product Manager — LLM Evaluation & RAG Quality · Bengaluru (IST) · Open to AI PM roles',
 };
 
 export const nav: NavItem[] = [
@@ -140,7 +140,7 @@ export const meta = {
   about: {
     title: 'About Zoeb Nomi — AI Product Manager at Instead, Bengaluru',
     description:
-      'Mechanical engineer turned AI product manager. Bengaluru, open to US relocation. Evals are a product surface, not a QA afterthought.',
+      'Mechanical engineer turned AI product manager, in Bengaluru. Evals are a product surface, not a QA afterthought.',
   },
 };
 
@@ -2334,7 +2334,6 @@ export const about = {
     ` The interesting product work in AI is deciding what "good output" means, making that measurable, and wiring the measurement into how the team ships. That's what my flagship project, CrossSource, demonstrates in public.`,
   factsRow: [
     'Bengaluru, India (IST)',
-    'Open to US relocation',
     'I keep US-morning slots open — book one',
   ],
   photoAlt: 'Zoeb Nomi',
@@ -2382,7 +2381,7 @@ export const notesPage = {
 
 export const llmsTxt = `# Zoeb Nomi
 
-> Zoeb Nomi is an AI Product Manager at Instead (AI-native tax research & planning platform; first new entrant to clear IRS e-filing approval alongside incumbents), specializing in LLM evaluation and RAG output quality. He owns end-to-end output quality for the production tax-research LLM. Based in Bengaluru, India; open to US relocation.
+> Zoeb Nomi is an AI Product Manager at Instead (AI-native tax research & planning platform; first new entrant to clear IRS e-filing approval alongside incumbents), specializing in LLM evaluation and RAG output quality. He owns end-to-end output quality for the production tax-research LLM. Based in Bengaluru, India.
 
 ## Key facts
 
