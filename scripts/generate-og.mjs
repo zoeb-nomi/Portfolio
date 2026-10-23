@@ -23,7 +23,7 @@ const pages = [
     title: 'Zoeb Nomi', sub: 'AI Product Manager · LLM Evaluation & RAG Quality',
     num: { value: '0.994', caption: 'citation precision · n=25' } },
   { id: 'about', // meta.about
-    title: 'About', sub: 'Mechanical engineer turned AI product manager. Open to US relocation.' },
+    title: 'About', sub: 'Mechanical engineer turned AI product manager, in Bengaluru.' },
   { id: 'work', // meta.work
     title: 'Work', sub: 'Zero-to-one BGV at Keka, LLM output quality at Instead.',
     num: { value: '4', caption: 'companies · 2 promotions' } },
@@ -31,8 +31,8 @@ const pages = [
     title: 'Evals', sub: 'One method: CrossSource, mirror-eval, screener-eval.',
     num: { value: '3', caption: 'harnesses' } },
   { id: 'crosssource', // meta.crosssource
-    title: 'CrossSource', sub: 'Open harness for legal-RAG citation accuracy.',
-    num: { value: '0.994', caption: 'citation precision, up from 0.981' } },
+    title: 'CrossSource', sub: 'Open benchmark for legal-RAG citation accuracy.',
+    num: { value: '150', caption: 'v0.3 items · 45 opinions' } },
   { id: 'mirror-eval', // meta.mirrorEval
     title: 'mirror-eval', sub: 'What AI search says about a person, measured twice.',
     num: { value: '13 → 63', caption: 'Perplexity · Claude 0 → 0' } },

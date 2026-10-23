@@ -58,13 +58,13 @@ const CANON = {
               id: '~95% golden-set citation accuracy',
               strings: ['~95%'],
               requiredIn: [],
-              recommendedIn: ['zoeb-nomi', 'portfolio'],
+              recommendedIn: ['zoeb-nomi'], // Instead numbers: never attached to CrossSource in the portfolio README
       },
       {
               id: '270K-record corpus',
               strings: ['270K'],
               requiredIn: [],
-              recommendedIn: ['zoeb-nomi', 'portfolio'],
+              recommendedIn: ['zoeb-nomi'], // Instead numbers: never attached to CrossSource in the portfolio README
       },
         ],
   

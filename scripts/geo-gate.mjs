@@ -56,7 +56,6 @@ const POSITIVES = [
   'linkedin.com/in/zoebnomi',
   'calendar.app.google/56javKNeXqw7X8oq6',
   'zoeb.nomi@gmail.com',
-  'Open to US relocation',
 
   // mirror-eval — copy-pack-additions.md §16, added 2026-09-10.
   'mirror-eval',
@@ -92,7 +91,37 @@ const POSITIVES = [
   '19 of 21',
   '29 / 0 / 0 / 0',
   'Three harnesses, one method',
+
+  // CrossSource v0.3 — released 2026-10-20, added 2026-10-23. The v0.1 strings
+  // above (0.981, 0.994, 0.760, 22 opinions, 25 questions) stay: labelled v0.1.
+  'CrossSource v0.1',
+  '150 items',
+  '45 public US opinions',
+  '75 qa_citation, 75 citation_check',
+  'LABELING_PROTOCOL.md v1.1',
+  'kappa 0.98',
+  '27 of 30',
+  'no human labelled every item',
+  'not a full run',
+  '0.919',
+  '0.718',
+  'github.com/zoeb-nomi/crosssource/releases/tag/v0.3',
+  '10.5281/zenodo.23493797',
+  '10.5281/zenodo.21969577',
+
+  // Upstream contributions — added 2026-10-23. Both open, not merged.
+  'github.com/column-tax/tax-calc-bench/pull/157',
+  'github.com/freelawproject/eyecite/pull/360',
+  'github.com/freelawproject/eyecite/issues/361',
+  '15,988 citations',
 ];
+
+// Instead's production numbers must never be attached to CrossSource. They are
+// legitimate on the Instead work entry (~95%, 270K+ above) and "95%" is a
+// common statistic ("95% CI"), so these are banned only where CrossSource is
+// described: its case-study page, its SoftwareSourceCode JSON-LD on any page,
+// and every llms.txt line that names CrossSource.
+const CROSSSOURCE_BANNED = ['270K', '95%'];
 
 // Simple literal-string negatives.
 const NEGATIVE_LITERALS = [
@@ -111,6 +140,9 @@ const NEGATIVE_LITERALS = [
   // screener-eval — copy-pack-s17.md §19 negative checks, added 2026-09-11.
   // "Two harnesses, one method" is retired now that a third harness exists.
   'Two harnesses, one method',
+
+  // Relocation language removed sitewide 2026-10-23; keep it out.
+  'relocation',
 ];
 
 // "Filed" as a standalone product name — must not match the common word
@@ -168,6 +200,23 @@ function main() {
   const filedPresent = filedHits.length > 0;
   if (filedPresent) negativesClean = false;
   negativeResults.push({ string: 'Filed (standalone product name)', present: filedPresent, files: filedHits.map((h) => h.file) });
+
+  // CrossSource-scoped negatives.
+  const csScopes = [];
+  for (const c of contents) {
+    if (c.file === path.join('crosssource', 'index.html')) csScopes.push({ where: c.file, text: c.text });
+    if (c.file.endsWith('llms.txt')) {
+      c.text.split('\n').filter((l) => l.includes('CrossSource')).forEach((l) => csScopes.push({ where: 'llms.txt', text: l }));
+    }
+    for (const m of c.text.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+      if (m[1].includes('"SoftwareSourceCode"') && m[1].includes('"CrossSource"')) csScopes.push({ where: `${c.file} (JSON-LD)`, text: m[1] });
+    }
+  }
+  for (const banned of CROSSSOURCE_BANNED) {
+    const hits = [...new Set(csScopes.filter((s) => s.text.includes(banned)).map((s) => s.where))];
+    if (hits.length) negativesClean = false;
+    negativeResults.push({ string: `${banned} (in any CrossSource description)`, present: hits.length > 0, files: hits });
+  }
 
   // ---- report ----
   console.log('\nGEO ACCEPTANCE GATE — positive strings (copy-pack §9)');
