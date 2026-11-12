@@ -24,6 +24,8 @@ interface Props {
   primary?: boolean;
   logo?: Logo | null;
   note?: string | null;
+  /** h2 when the entries stand alone; h3 inside About's §2 The record. */
+  headingLevel?: 'h2' | 'h3';
 }
 
 const {
@@ -36,6 +38,7 @@ const {
   primary = false,
   logo = null,
   note = null,
+  headingLevel: Heading = 'h2',
 } = Astro.props;
 ---
 
@@ -55,10 +58,11 @@ const {
     )}
     <p class="date-range">{dateRange}</p>
     <p class="role">{role}</p>
-    {note && <MarginNote label={`Note — ${company}`}>{note}</MarginNote>}
+    {note && <MarginNote label={`Note: ${company}`}>{note}</MarginNote>}
+    <slot name="margin" />
   </div>
   <div class="body-col">
-    <h2 class="company">{company}</h2>
+    <Heading class="company">{company}</Heading>
     {descriptor && <p class="descriptor">{descriptor}</p>}
     {standfirst && <p class="standfirst">{standfirst}</p>}
     <slot name="video" />
@@ -78,7 +82,7 @@ const {
 
 <style>
   .entry {
-    border-bottom: 1px solid var(--rule-strong);
+    border-bottom: var(--line-ink);
   }
 
   .company-logo {
@@ -144,7 +148,7 @@ const {
 
   .achievements li {
     padding-block: var(--s-5);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .achievements li:first-child {

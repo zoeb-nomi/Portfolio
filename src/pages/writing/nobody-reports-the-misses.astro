@@ -10,7 +10,9 @@ import UnitChart from '../../components/UnitChart.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
-import { meta, writingMisses as wm } from '../../data/copy';
+import PullQuote from '../../components/PullQuote.astro';
+import CTASlab from '../../components/CTASlab.astro';
+import { meta, writingMisses as wm, home, cta } from '../../data/copy';
 import { jsonLdString } from '../../lib/jsonLdString';
 
 const f = wm.figures;
@@ -54,9 +56,15 @@ const articleLd = articleJsonLd({
       <Section mark={s.mark} label={s.label} anchorId={s.id} narrId={`s${i + 1}-cue`}>
         {s.paras.map((p, j) => (
           <>
-            <p class="prose" data-narr={`s${i + 1}-p${j}`}>
-              {p}
-            </p>
+            {p.startsWith('A rule for autonomy.') ? (
+              <div class="autonomy" data-narr={`s${i + 1}-p${j}`}>
+                <PullQuote rule="red">{p}</PullQuote>
+              </div>
+            ) : (
+              <p class="prose" data-narr={`s${i + 1}-p${j}`}>
+                {p}
+              </p>
+            )}
             {s.after?.[j] === 'crosssource' && (
               <EssayFigure n={f.crosssource.n} title={f.crosssource.title} source={f.crosssource.source} href={f.crosssource.href} hrefLabel={f.crosssource.hrefLabel}>
                 <BarList heading={f.crosssource.scores.heading} max={f.crosssource.scores.max} rows={f.crosssource.scores.rows} />
@@ -103,9 +111,20 @@ const articleLd = articleJsonLd({
       </Section>
     ))
   }
+
+  <CTASlab
+    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
+    body={home.ctaSlabBody}
+    buttonLabel={cta.bookACall.label}
+    buttonHref={cta.bookACall.href}
+  />
 </Base>
 
 <style>
+  .autonomy {
+    margin-block: var(--s-8);
+  }
+
   .intro {
     margin-top: var(--s-8);
   }
@@ -171,11 +190,11 @@ const articleLd = articleJsonLd({
 
   .summary-card {
     padding-block: var(--s-4);
-    border-bottom: 1px solid var(--rule);
+    border-bottom: var(--line-hair);
   }
 
   .summary-card:first-child {
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .summary-kind {

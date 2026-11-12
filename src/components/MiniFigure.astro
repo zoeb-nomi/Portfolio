@@ -1,0 +1,247 @@
+---
+// Mini figure: the small before -> after mark on tiles, ledger rows and case-
+// study Fig. 1s (DESIGN v3 D-07, D-16). HTML and hairlines, not SVG, so every
+// label stays at or above the 12px floor.
+//   dumbbell  hollow square = before, filled square = after, joined by a 2px ink
+//             line; a zoomed axis says so.
+//   ratio     n of N as a filled share of one track.
+//   bars      a few ink bars on one scale; `mark` puts the red verdict tick on one.
+// The final state is in the HTML. The motion layer draws the joining line and
+// the bars from zero (`data-draw`), once, when the figure enters view.
+import type { BuildFigure } from '../data/copy';
+
+type Fig = Exclude<BuildFigure, { kind: 'flow' }>;
+type Row = { label?: string; fig: Fig };
+
+interface Props {
+  /** One figure, or several labelled dumbbells sharing a frame (case-study Fig. 1). */
+  fig?: Fig;
+  rows?: Row[];
+  size?: 'mini' | 'wide';
+  /** Accessible summary; the figure itself is aria-hidden. */
+  label: string;
+}
+
+const { fig, rows, size = 'mini', label } = Astro.props;
+const list: Row[] = rows ?? (fig ? [{ fig }] : []);
+const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v - min) / (max - min))).toFixed(4);
+---
+
+<div class:list={['mf', `mf--${size}`]} role="img" aria-label={label} data-mini-figure>
+  {
+    list.map(({ label: rowLabel, fig: f }) => (
+      <div class:list={['mf-row', { 'has-label': Boolean(rowLabel) }]}>
+        {rowLabel && <span class="mf-rowlabel" aria-hidden="true">{rowLabel}</span>}
+        {f.kind === 'dumbbell' && (
+          <div class="mf-plot" aria-hidden="true">
+            <div class="mf-track">
+              <span
+                class="mf-join"
+                data-draw
+                style={`--a:${pos(Math.min(f.from, f.to), f.min, f.max)};--b:${pos(Math.max(f.from, f.to), f.min, f.max)};--origin:${f.to >= f.from ? 'left' : 'right'}`}
+              />
+              <span class="mf-mark mf-before" style={`--x:${pos(f.from, f.min, f.max)}`} />
+              <span class="mf-mark mf-after" data-pop style={`--x:${pos(f.to, f.min, f.max)}`} />
+            </div>
+            <div class="mf-scale">
+              <span>{f.minLabel}</span>
+              {f.zoomed && <span class="mf-zoom">axis zoomed</span>}
+              <span>{f.maxLabel}</span>
+            </div>
+            <div class="mf-ends">
+              <span>{f.fromLabel}</span>
+              <span class="mf-arrow">→</span>
+              <span class="mf-to">{f.toLabel}</span>
+            </div>
+          </div>
+        )}
+        {f.kind === 'ratio' && (
+          <div class="mf-plot" aria-hidden="true">
+            <div class="mf-track mf-track--bar">
+              <span class="mf-fill" data-draw style={`--b:${(f.n / f.of).toFixed(4)}`} />
+            </div>
+            <div class="mf-scale">
+              <span>0</span>
+              <span>{f.of}</span>
+            </div>
+            <div class="mf-ends">
+              <span class="mf-to">{f.n} of {f.of}</span>
+            </div>
+          </div>
+        )}
+        {f.kind === 'bars' && (
+          <div class="mf-plot mf-bars" aria-hidden="true">
+            {f.bars.map((b) => (
+              <div class:list={['mf-bar', { 'is-mark': b.mark }]}>
+                <span class="mf-barlabel">{b.label}</span>
+                <span class="mf-bartrack">
+                  <span class="mf-fill" data-draw style={`--b:${(b.value / f.max).toFixed(4)}`} />
+                </span>
+                <span class="mf-barval">{b.display}</span>
+              </div>
+            ))}
+            <div class="mf-scale mf-scale--bars">
+              <span>0</span>
+              <span>{f.max} {f.unit}</span>
+            </div>
+          </div>
+        )}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .mf {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mf-row + .mf-row {
+    margin-top: var(--s-4);
+  }
+
+  .mf-row.has-label {
+    display: grid;
+    grid-template-columns: 11em minmax(0, 1fr);
+    column-gap: var(--s-4);
+    align-items: start;
+  }
+
+  .mf-rowlabel {
+    color: var(--ink);
+    padding-top: 2px;
+  }
+
+  .mf-track {
+    position: relative;
+    height: 14px;
+    margin-inline: 6px;
+    border-bottom: var(--line-hair);
+  }
+
+  .mf-join {
+    position: absolute;
+    left: calc(var(--a) * 100%);
+    width: calc((var(--b) - var(--a)) * 100%);
+    bottom: 5px;
+    border-top: var(--line-heavy);
+    transform-origin: var(--origin, left);
+  }
+
+  .mf-mark {
+    position: absolute;
+    bottom: 1px;
+    left: calc(var(--x) * 100%);
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border: var(--line-object);
+    background: var(--paper);
+  }
+
+  .mf-after {
+    background: var(--ink);
+  }
+
+  .mf-scale {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-2);
+    margin-top: var(--s-1);
+  }
+
+  .mf-zoom {
+    color: var(--ink-muted);
+    font-style: italic;
+  }
+
+  .mf-ends {
+    display: flex;
+    gap: var(--s-2);
+    margin-top: var(--s-1);
+    color: var(--ink);
+  }
+
+  .mf-arrow {
+    color: var(--ink-muted);
+  }
+
+  .mf-to {
+    font-weight: 500;
+  }
+
+  .mf-track--bar {
+    height: 10px;
+    border-bottom: 0;
+    background: var(--heat-0);
+    margin-inline: 0;
+  }
+
+  .mf-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(var(--b) * 100%);
+    background: var(--ink);
+    transform-origin: left;
+  }
+
+  .mf-bars {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .mf-bar {
+    display: grid;
+    grid-template-columns: 9.5em minmax(0, 1fr) 3.5em;
+    column-gap: var(--s-3);
+    align-items: center;
+  }
+
+  .mf-barlabel {
+    color: var(--ink-body);
+  }
+
+  .mf-bartrack {
+    position: relative;
+    height: 10px;
+    background: var(--heat-0);
+  }
+
+  .mf-barval {
+    text-align: right;
+    color: var(--ink);
+  }
+
+  .mf-bar.is-mark .mf-barval {
+    color: var(--red-ink);
+    font-weight: 500;
+  }
+
+  .mf-scale--bars {
+    padding-left: calc(9.5em + var(--s-3));
+    padding-right: calc(3.5em + var(--s-3));
+  }
+
+  .mf--wide .mf-track {
+    height: 16px;
+  }
+
+  @media (max-width: 599px) {
+    .mf-row.has-label {
+      grid-template-columns: 1fr;
+      row-gap: var(--s-1);
+    }
+
+    .mf-bar {
+      grid-template-columns: 7.5em minmax(0, 1fr) 3em;
+    }
+
+    .mf-scale--bars {
+      padding-left: calc(7.5em + var(--s-3));
+      padding-right: calc(3em + var(--s-3));
+    }
+  }
+</style>

@@ -4,7 +4,7 @@
 // and never disappears; a small inline script then tries /api/contributions
 // and re-renders with live data on success, updating the caption to match.
 //
-// Monochrome by design (§6 tokens in tokens.css) — never GitHub green.
+// Monochrome by design (§6 tokens in tokens.css): never GitHub green.
 import snapshot from '../data/contributions.json';
 import { contributions as copy } from '../data/copy';
 
@@ -150,7 +150,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 </div>
 
 <script>
-  // Progressive enhancement only — the server-rendered snapshot above is a
+  // Progressive enhancement only, the server-rendered snapshot above is a
   // complete, correct graph on its own. This script:
   //   1. scrolls the grid so the most recent ~26 weeks are in view by default
   //      on narrow viewports (fixed 11px cells never shrink below legible size,

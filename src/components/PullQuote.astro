@@ -14,18 +14,17 @@ const { kicker, rule = 'ink' } = Astro.props;
 
 <style>
   /* With a kicker the quote sits on the site grid (layout.css): kicker in the
-     margin column, quote in the body column. The columns are bare — no rule,
-     no padding — because the quote is already inside a body column. */
+     margin column, quote in the body column. The columns are bare, no rule,
+     no padding, because the quote is already inside a body column. */
   .pull-quote {
     gap: var(--s-6);
-    border-top: 1px solid var(--rule-strong);
+    border-top: var(--line-ink);
     padding-top: var(--s-7);
     margin: 0;
   }
 
   .pull-quote.rule-red {
-    border-top-color: var(--rule-accent);
-    border-top-width: 2px;
+    border-top: var(--line-pen);
   }
 
   .pull-quote > .margin-col,

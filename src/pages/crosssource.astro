@@ -9,7 +9,8 @@ import AudioPlayer from '../components/AudioPlayer.astro';
 import EssayFigure from '../components/EssayFigure.astro';
 import FailureOwners from '../components/FailureOwners.astro';
 import PlayerStepper from '../components/PlayerStepper.astro';
-import { meta, crosssource as cs, writingJudgeBug as wj, cta, home } from '../data/copy';
+import MiniFigure from '../components/MiniFigure.astro';
+import { meta, crosssource as cs, writingJudgeBug as wj, cta, home, caseStudy } from '../data/copy';
 import { failureData } from '../lib/figureData';
 
 const failures = failureData();
@@ -36,10 +37,12 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   path="/crosssource/"
   ogImage="/og/crosssource.png"
   includeSoftwareSourceCode
+  motion
 >
   <Masthead
     label="Case study specification"
     kicker={cs.kicker}
+    crumbs={[...caseStudy.crumbs, { label: 'CrossSource' }]}
     h1={cs.title}
     standfirst={cs.standfirst}
     h1Max="22ch"
@@ -48,6 +51,16 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     repo={{ href: cs.repoHref, label: cs.repoLabel }}
     narr
   >
+    <EssayFigure n={1} title={caseStudy.crosssourceFig1.title} source={caseStudy.crosssourceFig1.source}>
+      <MiniFigure
+        size="wide"
+        label="Citation precision 0.981 to 0.994; citation recall 0.760 to 0.760."
+        rows={[
+          { label: 'Citation precision', fig: { kind: 'dumbbell', min: 0.7, max: 1, from: 0.981, to: 0.994, fromLabel: '0.981', toLabel: '0.994', minLabel: '0.70', maxLabel: '1.00' } },
+          { label: 'Citation recall', fig: { kind: 'dumbbell', min: 0.7, max: 1, from: 0.76, to: 0.76, fromLabel: '0.760', toLabel: '0.760', minLabel: '0.70', maxLabel: '1.00' } },
+        ]}
+      />
+    </EssayFigure>
     <AudioPlayer audio={cs.audio} articleId="crosssource" />
   </Masthead>
 
@@ -131,13 +144,13 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   <Section mark="§7" label="Related writing" narrId="s7-cue">
     <p class="prose related-writing" data-narr="s7-p0">
-      <a href="/writing/the-judge-caught-a-bug/">The judge caught a bug I didn't</a> — on validating the LLM judge behind these numbers.
+      <a href="/writing/the-judge-caught-a-bug/">The judge caught a bug I didn't</a>, on validating the LLM judge behind these numbers.
     </p>
     <p class="prose related-writing" data-narr="s7-p1">
-      <a href="/mirror-eval/">mirror-eval</a> — the same method pointed at what AI search engines say about me.
+      <a href="/mirror-eval/">mirror-eval</a>, the same method pointed at what AI search engines say about me.
     </p>
     <p class="prose related-writing" data-narr="s7-p2">
-      <a href="/screener-eval/">screener-eval</a> — the same counting discipline pointed at LLM résumé screeners, no judge at all.
+      <a href="/screener-eval/">screener-eval</a>, the same counting discipline pointed at LLM résumé screeners, no judge at all.
     </p>
   </Section>
 
@@ -185,7 +198,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     grid-template-columns: 200px 1fr;
     gap: var(--s-6);
     padding-block: var(--s-6);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .method-row:first-child {
@@ -237,7 +250,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     margin-bottom: var(--s-5);
   }
 
-  /* The figure is the point of the section — it gets its own line rather than
+  /* The figure is the point of the section, it gets its own line rather than
      sitting 51px tall inside a 17px paragraph. */
   .stat-figure {
     display: block;
@@ -260,7 +273,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   .rule-list li {
     padding-block: var(--s-5);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
     font-family: var(--font-body);
     font-size: var(--t-body);
     color: var(--ink-body);
@@ -290,7 +303,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     font-size: var(--t-data);
     color: var(--ink-muted);
     padding-block: var(--s-3);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .mono-list a {

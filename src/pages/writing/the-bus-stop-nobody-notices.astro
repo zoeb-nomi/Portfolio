@@ -5,10 +5,9 @@ import Section from '../../components/Section.astro';
 import StatRow from '../../components/StatRow.astro';
 import DataTable from '../../components/DataTable.astro';
 import PullQuote from '../../components/PullQuote.astro';
-import CTASlab from '../../components/CTASlab.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
-import { meta, cta, home, writingBusStop as wb } from '../../data/copy';
+import { meta, cta, home, writingBusStop as wb, writingIndex } from '../../data/copy';
 import { formatDate } from '../../lib/formatDate';
 import { jsonLdString } from '../../lib/jsonLdString';
 
@@ -305,17 +304,36 @@ const articleLd = articleJsonLd({
     }
   </script>
 
-  <CTASlab
-    marginLines={[home.eyebrow.toUpperCase()]}
-    body={home.ctaSlabBody}
-    buttonLabel="More writing →"
-    buttonHref="/writing/"
-    secondaryLabel={cta.bookACall.label}
-    secondaryHref={cta.bookACall.href}
-  />
+  <p class="more-writing"><a href="/writing/">{writingIndex.moreWriting}</a></p>
 </Base>
 
 <style>
+  /* SPEC #48: an off-topic essay ends on a plain link, not the LLM CTA slab. */
+  .more-writing {
+    padding: var(--s-9) var(--gutter) var(--s-11);
+    padding-left: calc(var(--margin-col) + var(--body-inset));
+    border-bottom: var(--line-ink);
+  }
+
+  .more-writing a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    font-family: var(--font-mono);
+    font-size: var(--t-nav);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  @media (max-width: 899px) {
+    .more-writing {
+      padding-left: var(--gutter);
+    }
+  }
+
   .prose + .prose,
   .stats + .prose,
   .table-gap + .prose,
@@ -325,7 +343,7 @@ const articleLd = articleJsonLd({
 
   .stats {
     margin-top: var(--s-6);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .quote-gap,
@@ -576,11 +594,11 @@ const articleLd = articleJsonLd({
 
   .basket-card {
     padding-block: var(--s-4);
-    border-bottom: 1px solid var(--rule);
+    border-bottom: var(--line-hair);
   }
 
   .basket-card:first-child {
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .basket-card-heading {
@@ -641,7 +659,7 @@ const articleLd = articleJsonLd({
     display: block;
     width: 100%;
     height: auto;
-    border: 1px solid var(--rule);
+    border: var(--line-object-muted);
     border-radius: var(--radius);
   }
 
@@ -700,7 +718,7 @@ const articleLd = articleJsonLd({
      poster box alike. :global() because the inline script below replaces
      the <a class="watch-facade"> with a plain document.createElement
      ('button') that copies the className string but not Astro's scoped
-     data-astro-cid attribute — a scoped selector here would silently
+     data-astro-cid attribute, a scoped selector here would silently
      stop matching that swapped-in button. */
   :global(.watch-facade:focus-visible) {
     outline: 2px solid var(--red);

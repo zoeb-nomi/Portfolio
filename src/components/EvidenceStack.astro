@@ -106,7 +106,7 @@ const kindAt = (e: Engine, k: number) => {
     position: absolute;
     inset: 0;
     padding: var(--s-2);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     background: var(--paper);
     transform-style: preserve-3d;
     transform: translateZ(calc(var(--i) * var(--gap)));
@@ -122,7 +122,7 @@ const kindAt = (e: Engine, k: number) => {
 
   .es-cell {
     display: block;
-    border: 1px solid var(--rule);
+    border: var(--line-object-muted);
     transition: background var(--dur-base) ease;
   }
 
@@ -139,7 +139,7 @@ const kindAt = (e: Engine, k: number) => {
   }
 
   .es-cell.is-lost {
-    border: 2px dashed var(--red);
+    border: var(--line-pen-dashed);
   }
 
   /* The label stands at the sheet's front-right corner and faces the reader whatever the tilt. */
@@ -181,7 +181,7 @@ const kindAt = (e: Engine, k: number) => {
     margin: var(--s-2) 0 0;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .es-legend li {

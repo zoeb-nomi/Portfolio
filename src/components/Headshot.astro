@@ -1,12 +1,12 @@
 ---
 // The one headshot <picture>. Three presets, each a different rendered size:
-//   hero  ~240px plate (home hero, Figure)      — fills its container, square
+//   hero  ~240px plate (home hero, Figure)     : fills its container, square
 //   thumb  120px (About masthead)
-//   card   300px (EmbedCard)                    — the parent shrinks it on phones
+//   card   300px (EmbedCard)                   , the parent shrinks it on phones
 // avif -> webp -> jpg, from the same 480w/960w files everywhere. The parent
 // owns placement (margins, grid areas) via the `class` it passes in; this
 // component owns the picture's own box and crop.
-type Size = 'hero' | 'thumb' | 'card';
+type Size = 'hero' | 'thumb' | 'card' | 'about';
 
 interface Props {
   size?: Size;
@@ -21,6 +21,7 @@ const PRESETS: Record<Size, { sizes: string; src: string; dim: number }> = {
   hero: { sizes: '240px', src: '960', dim: 960 },
   thumb: { sizes: '120px', src: '480', dim: 480 },
   card: { sizes: '300px', src: '960', dim: 960 },
+  about: { sizes: '(max-width: 599px) 132px, 200px', src: '480', dim: 480 },
 };
 const { sizes, src, dim } = PRESETS[size];
 
@@ -44,13 +45,17 @@ const eager = loading === 'eager';
 </picture>
 
 <style>
+  /* DESIGN v3 §g: square crop, greyscale, multiplied into the paper so the
+     studio grey becomes paper. No border, frame or shadow. */
   .headshot img {
     display: block;
     object-fit: cover;
     object-position: center 12%;
+    filter: grayscale(1) contrast(1.04);
+    mix-blend-mode: multiply;
   }
 
-  /* hero: the plate is the photograph — a square that fills its container.
+  /* hero: the plate is the photograph, a square that fills its container.
      The HTML width/height attributes (kept for CLS) otherwise win over
      `aspect-ratio` on a replaced element, so height is forced back to auto. */
   .headshot--hero {
@@ -71,6 +76,22 @@ const eager = loading === 'eager';
     display: block;
     width: 120px;
     height: 120px;
+  }
+
+  /* About masthead portrait: 200px desktop, 132px phones. */
+  .headshot--about,
+  .headshot--about img {
+    display: block;
+    width: 200px;
+    height: 200px;
+  }
+
+  @media (max-width: 599px) {
+    .headshot--about,
+    .headshot--about img {
+      width: 132px;
+      height: 132px;
+    }
   }
 
   .headshot--card,

@@ -80,7 +80,7 @@ const total = (c: Count) => c.prompt + c.retrieval;
   .fo-cell {
     display: block;
     aspect-ratio: 1;
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     transition: background var(--dur-slow) ease, border-color var(--dur-slow) ease;
     transition-delay: calc(var(--i, 0) * 60ms + 500ms);
   }
@@ -133,7 +133,7 @@ const total = (c: Count) => c.prompt + c.retrieval;
     gap: var(--s-2);
     margin: var(--s-6) 0 0;
     padding-top: var(--s-4);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
     font-family: var(--font-mono);
     font-size: var(--t-data);
   }

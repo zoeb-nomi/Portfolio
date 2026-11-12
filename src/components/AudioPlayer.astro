@@ -2,7 +2,7 @@
 // Compact in-page narration player. Progressive enhancement, same pattern
 // as the §9 watch-card script: the markup starts as a working native
 // <audio controls> element, and the inline script below swaps it for the
-// custom row once it runs — so a no-JS reader still gets a full player,
+// custom row once it runs, so a no-JS reader still gets a full player,
 // just the browser's own chrome instead of ours.
 interface Chapter {
   id: string;
@@ -439,7 +439,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       //
       // This whole section is deferred to DOMContentLoaded: this script
       // is inline (not `defer`/`module`), so it runs the instant the HTML
-      // parser reaches it — which is up in the masthead, well before the
+      // parser reaches it, which is up in the masthead, well before the
       // rest of the article (every §-section's [data-narr] anchor) has
       // been parsed into the DOM. Querying for them here, synchronously,
       // would only ever find the masthead's own two (title, dek).
@@ -548,7 +548,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         top = Math.min(top, maxTop);
 
         // Right-aligned to the margin column's inner edge (~20px gap before
-        // the text column starts), not spanning its width — a compact
+        // the text column starts), not spanning its width, a compact
         // cluster, not a box.
         let right = 20;
         if (marginCol) {
@@ -559,7 +559,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         // The float must never sit on top of a margin note, disclaimer or
         // caption living in the same margin column: try above the note,
         // then below it, and only fall back to the fixed bottom-bar style
-        // (for this cue only — re-decided every time the highlight moves)
+        // (for this cue only: re-decided every time the highlight moves)
         // if neither clear spot fits in the viewport.
         if (marginCol) {
           // Every section's margin column sits at the same x, so a heading or note from a neighbouring
@@ -609,7 +609,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         if (desktopQuery.matches) {
           positionFloatDesktop();
         } else {
-          // Mobile is a plain fixed bottom bar (CSS only) — clear any
+          // Mobile is a plain fixed bottom bar (CSS only): clear any
           // inline top/right (and the desktop collision fallback) left
           // over from a desktop-width position.
           floatEl.classList.remove('audio-float--bar-fallback');
@@ -623,7 +623,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
         const active = !audioEl.paused || isMidway();
         // Keyboard focus currently inside the float (e.g. Tab landed on
         // Follow or ↑ Player) keeps it visible even if the player has just
-        // scrolled into view — otherwise it can disappear out from under
+        // scrolled into view: otherwise it can disappear out from under
         // focus mid-Tab and flicker back.
         const focusInFloat = document.activeElement instanceof Node && floatEl.contains(document.activeElement);
         const shouldShow = !floatDismissed && !nearEnd && (focusInFloat || (active && !playerInView));
@@ -700,7 +700,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
           root.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
         });
 
-        // Any user scroll intent switches follow off — it never fights the
+        // Any user scroll intent switches follow off, it never fights the
         // reader. Keys/wheel/touch that originate inside the player or the
         // float itself (seeking, the Follow toggle, arrow-key seek) don't
         // count as "the reader wants to scroll".
@@ -777,7 +777,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
             const dy = evt.clientY - downY;
             const drifted = hadPointerdown && Math.sqrt(dx * dx + dy * dy) > 6;
             const selectionAtDown = downSelection;
-            // This click has consumed the recorded gesture — clear it so a
+            // This click has consumed the recorded gesture: clear it so a
             // later, unrelated click never reuses a stale pointerdown.
             downAt = 0;
             downSelection = '';
@@ -860,7 +860,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   .audio-player {
     margin-top: var(--s-6);
     padding-top: var(--s-5);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .audio-el--hidden {
@@ -982,13 +982,13 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   }
 
   /* Plain mono text, deliberately un-pill-like so it never reads as a
-     chapter chip — underline is the only affordance, on hover/focus. */
+     chapter chip: underline is the only affordance, on hover/focus. */
   .audio-speed {
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    min-width: 24px; /* WCAG 2.5.8 minimum target width — was 18px wide */
+    min-width: 24px; /* WCAG 2.5.8 minimum target width: was 18px wide */
     justify-content: center;
     font-family: var(--font-mono);
     font-size: var(--t-micro);
@@ -1086,7 +1086,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     font-size: var(--t-micro);
     color: var(--ink-muted);
     background: transparent;
-    border: 1px solid var(--rule);
+    border: var(--line-object-muted);
     border-radius: var(--radius);
     padding: var(--s-1) var(--s-3);
     white-space: nowrap;
@@ -1130,25 +1130,25 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
      section's own .margin-col), so they're written as :global(). */
 
   /* Once JS has wired up cues, narrated anchors become click-to-seek
-     targets — cursor only, no visual change, so unread paragraphs don't
+     targets: cursor only, no visual change, so unread paragraphs don't
      look different from read ones until they're actually read. */
   :global(body.audio-narr-ready [data-narr]) {
     cursor: pointer;
   }
 
   /* Active-paragraph highlight: a padded box drawn AROUND the block, not
-     on it — negative margin pulls the box out into the gutter by exactly
+     on it: negative margin pulls the box out into the gutter by exactly
      the amount the matching padding adds back inside it, so the box's
      total footprint (and every character's on-screen position) is
      unchanged; a browser sanity check confirms zero shift on the first
      text node's getBoundingClientRect(). The red rule is an inset
      box-shadow at the box's own (now-expanded) left edge, so it lands
-     14px (10px on phones) clear of the first glyph — box-shadow, not a
+     14px (10px on phones) clear of the first glyph: box-shadow, not a
      real border, so it still never takes layout space. Text colour is
      untouched; the tint alone stays well clear of WCAG's 7:1 body-text
-     contrast floor (measured, not just intended — see stage5/MANIFEST.md).
-     One rule for every kind of narrated block — paragraphs, headings,
-     figures, tables, stat strips, the watch gallery — so there's exactly
+     contrast floor (measured, not just intended: see stage5/MANIFEST.md).
+     One rule for every kind of narrated block: paragraphs, headings,
+     figures, tables, stat strips, the watch gallery, so there's exactly
      one highlight treatment on the page, not a paragraph one and a
      "wide block" one. --paper-raised is the fallback for browsers
      without color-mix().
@@ -1157,7 +1157,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
      only cancels out exactly when margin and padding both apply in full,
      and several narrated elements (e.g. .standfirst) carry their own
      page-scoped margin-bottom whose Astro-scoped selector ties this
-     rule's specificity — without !important that page rule wins the
+     rule's specificity, without !important that page rule wins the
      cascade tie and silently keeps the old margin-bottom, breaking the
      cancellation on that one edge (caught by a real getBoundingClientRect
      check, not assumed: the dek shifted -6px vertically until this was
@@ -1173,13 +1173,13 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     border-radius: var(--radius);
     background-color: var(--paper-raised);
     background-color: color-mix(in oklab, var(--red) 7%, var(--paper));
-    border-left: 2px solid var(--rule-accent);
+    border-left: var(--line-pen);
     transition: background-color var(--dur-fast) var(--ease-draw);
   }
 
   @media (max-width: 899px) {
     :global([data-narr].is-reading) {
-      /* Phone gutter is 16px — 10px keeps the box's outer edge inside the
+      /* Phone gutter is 16px: 10px keeps the box's outer edge inside the
          viewport instead of at it, so it never forces horizontal scroll. */
       margin-inline: -10px !important;
       padding-inline: 10px !important;
@@ -1196,7 +1196,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   /* Floating control: play/pause + time + Follow + back-to-player. Built
      once per player and shown only while narration is playing (or
      paused mid-way) and the main player has scrolled out of view. Reads
-     as the site's own language — no boxed chrome, just the same square
+     as the site's own language, no boxed chrome, just the same square
      ink play button the main player uses and plain mono caption text. */
   .audio-float {
     position: fixed;
@@ -1265,7 +1265,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     white-space: nowrap;
   }
 
-  /* Follow / ↑ Player: tiny mono text buttons, uppercase caption style —
+  /* Follow / ↑ Player: tiny mono text buttons, uppercase caption style:
      the same voice as a figcaption or the audio note above, not a UI
      control. No border, no background; underline is the only affordance. */
   .audio-float-follow,
@@ -1326,7 +1326,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     text-decoration-color: var(--red);
   }
 
-  /* Mobile: hairline top border + paper background only — no boxed
+  /* Mobile: hairline top border + paper background only, no boxed
      buttons. Play left, time centre, Follow/↑ grouped right. Safe-area
      aware. JS never sets inline top/right at this breakpoint. */
   @media (max-width: 899px) {
@@ -1337,7 +1337,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       gap: var(--s-3);
       padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
       background: var(--paper);
-      border-top: 1px solid var(--rule);
+      border-top: var(--line-hair);
     }
 
     .audio-float-close {
@@ -1394,7 +1394,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   /* Desktop collision fallback: when the float would overlap a margin
      note/disclaimer/caption in the same column and neither "above" nor
      "below" clears it, JS drops back to the same fixed bottom-bar layout
-     mobile uses, just for that cue — never guessing an overlap. */
+     mobile uses, just for that cue: never guessing an overlap. */
   @media (min-width: 900px) {
     .audio-float.audio-float--bar-fallback {
       position: fixed;
@@ -1407,7 +1407,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       gap: var(--s-3);
       padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
       background: var(--paper);
-      border-top: 1px solid var(--rule);
+      border-top: var(--line-hair);
     }
 
     .audio-float.audio-float--bar-fallback .audio-float-close {

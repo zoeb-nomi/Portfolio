@@ -11,7 +11,7 @@ import EssayFigure from '../components/EssayFigure.astro';
 import EvidenceStack from '../components/EvidenceStack.astro';
 import Dumbbell from '../components/Dumbbell.astro';
 import UnitChart from '../components/UnitChart.astro';
-import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home } from '../data/copy';
+import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home, caseStudy } from '../data/copy';
 import { jsonLdString } from '../lib/jsonLdString';
 import { waveData, vacuumData, judgeData } from '../lib/figureData';
 
@@ -39,12 +39,14 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
   description={meta.mirrorEval.description}
   path="/mirror-eval/"
   ogImage="/og/mirror-eval.png"
+  motion
 >
   <script type="application/ld+json" set:html={jsonLdString(mirrorEvalJsonLd)} is:inline />
 
   <Masthead
     label="Case study specification"
     kicker={me.kicker}
+    crumbs={[...caseStudy.crumbs, { label: 'mirror-eval' }]}
     h1={me.title}
     standfirst={me.standfirst}
     h1Max="26ch"
@@ -53,10 +55,10 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
     repo={{ href: me.repoHref, label: me.repoLabel }}
     narr
   >
-    {me.audio && <AudioPlayer audio={me.audio} articleId="mirror-eval" />}
     <EssayFigure n={1} replay title="Every engine, every search probe" source="Source: Table 1 below, the owned (site or repo) column. Squares are grouped by outcome, so a square's position is not a probe id.">
       <EvidenceStack engines={waves.rows} of={waves.of} fromLabel={waves.fromLabel} toLabel={waves.toLabel} />
     </EssayFigure>
+    {me.audio && <AudioPlayer audio={me.audio} articleId="mirror-eval" />}
   </Masthead>
 
   <Section mark={me.s1.mark} label={me.s1.label} narrId="s1-cue">

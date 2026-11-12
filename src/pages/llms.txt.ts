@@ -13,7 +13,7 @@ import { notes } from '../data/notes';
 export const prerender = true;
 
 const ORIGIN = 'https://www.zoebnomi.com';
-const stripSuffix = (t: string) => t.replace(/\s+—\s+Zoeb Nomi$/, '');
+const stripSuffix = (t: string) => t.replace(/\s+·\s+Zoeb Nomi$/, '');
 
 // Essay list is generated from copy.ts so titles appear and it cannot drift.
 // The judge-bug essay has no standalone data object, so it uses its meta entry.
@@ -27,18 +27,18 @@ const essays = [
 ];
 
 const essayLines = essays.map(
-  (e) => `- Writing — "${e.title}" (${e.blurb}): ${ORIGIN}/writing/${e.slug}/`,
+  (e) => `- Writing: "${e.title}" (${e.blurb}): ${ORIGIN}/writing/${e.slug}/`,
 );
 
 // Notes are listed the same way, newest first, from src/data/notes.ts.
 const noteLines = [...notes]
   .sort((a, b) => b.date.localeCompare(a.date))
-  .map((n) => `- Notes — "${n.title}" (${n.dek}): ${ORIGIN}/notes/${n.slug}/`);
+  .map((n) => `- Notes: "${n.title}" (${n.dek}): ${ORIGIN}/notes/${n.slug}/`);
 
 // Drop the hand-written per-essay lines; keep the "Writing (essays index)" line.
 const base = llmsTxt
   .split('\n')
-  .filter((line) => !/^- Writing( —|:)/.test(line))
+  .filter((line) => !/^- Writing: "/.test(line))
   .join('\n')
   .replace(/\n+$/, '\n');
 

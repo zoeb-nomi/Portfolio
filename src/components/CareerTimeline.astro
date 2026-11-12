@@ -126,11 +126,11 @@ const rows = items
     position: absolute;
     inset-block: var(--s-3);
     inset-inline-start: calc(var(--tl-when) + var(--s-5) + var(--tl-mark) / 2);
-    border-inline-start: 1px solid var(--rule);
+    border-inline-start: var(--line-hair);
   }
 
   .tl-list::after {
-    border-inline-start: 2px solid var(--red);
+    border-inline-start: var(--line-pen);
     margin-inline-start: -1px;
     transform-origin: top;
     transform: scaleY(var(--p));
@@ -160,7 +160,7 @@ const rows = items
     inline-size: var(--s-3);
     block-size: var(--s-3);
     margin: var(--s-2) 0 0 calc((var(--tl-mark) - var(--s-3)) / 2);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     background: var(--ink);
     transition: background var(--dur-base) ease;
   }

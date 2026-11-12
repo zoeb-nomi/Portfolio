@@ -1,5 +1,5 @@
 // Wraps an explicit, known list of canon metric substrings in <strong class="metric">.
-// Deliberately NOT a generic number regex — every bolded token is enumerated in
+// Deliberately NOT a generic number regex, every bolded token is enumerated in
 // src/data/copy.ts against COPY PACK v1, so no number ships that isn't in the pack.
 
 function escapeHtml(input: string): string {

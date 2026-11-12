@@ -1,0 +1,279 @@
+---
+// "Who decides what runs" (DESIGN v3 D-09, Take B B-12/B-23): TradeFrame's
+// decision path. Dashed node = proposes only; solid = decides (D-16).
+//   variant="full"   /builds/ feature row: the nodes, the books, kill switch and ledger.
+//   variant="strip"  home compact ledger: the four step labels on one line.
+// Every label is printed in the HTML. When the figure enters view the motion
+// layer lights the path once, step by step (propose -> validate -> confirm ->
+// execute and record), then clears; Replay plays it again.
+import { builds } from '../data/copy';
+
+interface Props {
+  variant?: 'full' | 'strip';
+  id?: string;
+  /** Strip only: render its own Replay button (false inside a <summary>, where the row panel carries it). */
+  replay?: boolean;
+}
+
+const { variant = 'full', id = 'tf-flow', replay = true } = Astro.props;
+const f = builds.tradeframeFlow;
+const [ai, det, us, india] = f.steps;
+---
+
+{
+  variant === 'strip' ? (
+    <span class="tf-strip" data-flow id={id}>
+      <span class="tf-path">
+        {f.stepLabels.map((s, i) => (
+          <span class:list={['tf-pstep', { 'is-propose': i === 0 }]} data-step={i}>
+            <span class="tf-i" aria-hidden="true">{i + 1}</span>
+            {s}
+          </span>
+        ))}
+      </span>
+      {replay && (
+        <button class="tf-replay" type="button" data-replay="flow" aria-controls={id} hidden>
+          Replay <span aria-hidden="true">↺</span>
+        </button>
+      )}
+    </span>
+  ) : (
+    <figure class="tf" data-flow id={id} aria-labelledby={`${id}-cap`}>
+      <figcaption class="tf-cap" id={`${id}-cap`}>
+        <b>{f.n}</b> {f.title}
+      </figcaption>
+      <div class="tf-flow">
+        <div class="tf-node is-propose" data-step="0">
+          <span class="tf-i" aria-hidden="true">1</span>
+          <b>{ai.name}</b>
+          <span>{ai.text}</span>
+        </div>
+        <span class="tf-arr" aria-hidden="true" data-step="0">→</span>
+        <div class="tf-node" data-step="1">
+          <span class="tf-i" aria-hidden="true">2</span>
+          <b>{det.name}</b>
+          <span>{det.text}</span>
+        </div>
+        <span class="tf-arr" aria-hidden="true" data-step="1">→</span>
+        <div class="tf-books">
+          <div class="tf-node" data-step="2">
+            <span class="tf-i" aria-hidden="true">3</span>
+            <b>{us.name}</b>
+            <span>{us.text}</span>
+          </div>
+          <div class="tf-node" data-step="2">
+            <span class="tf-i" aria-hidden="true">3</span>
+            <b>{india.name}</b>
+            <span>{india.text}</span>
+          </div>
+        </div>
+      </div>
+      <div class="tf-base">
+        {f.base.map((b, i) => (
+          <div class="tf-node" data-step={i === 0 ? '1' : '3'}>
+            {i === 1 && <span class="tf-i" aria-hidden="true">4</span>}
+            <b>{b.name}</b>
+            <span>{b.text}</span>
+          </div>
+        ))}
+      </div>
+      <p class="tf-steps" aria-hidden="true">
+        {f.stepLabels.map((s, i) => (
+          <span data-step={i}>
+            {i + 1} {s}
+          </span>
+        ))}
+      </p>
+      <button class="tf-replay" type="button" data-replay="flow" aria-controls={id} hidden>
+        {f.replay} <span aria-hidden="true">↺</span>
+      </button>
+    </figure>
+  )
+}
+
+<style>
+  .tf {
+    border-top: var(--line-heavy);
+    padding-top: var(--s-3);
+  }
+
+  .tf-cap {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+    margin-bottom: var(--s-5);
+  }
+
+  .tf-cap b {
+    font-weight: 500;
+    color: var(--red-ink);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    margin-right: var(--s-2);
+  }
+
+  .tf-flow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1.1fr);
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .tf-books,
+  .tf-base {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .tf-base {
+    grid-template-columns: 1fr 1fr;
+    margin-top: var(--s-4);
+  }
+
+  .tf-node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--s-3) var(--s-4);
+    border: var(--line-object);
+    background: var(--paper);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+    transition: background-color var(--dur-base) var(--ease-draw), color var(--dur-base) var(--ease-draw);
+  }
+
+  .tf-node b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .tf-node.is-propose {
+    border: var(--line-propose);
+  }
+
+  .tf-i {
+    position: absolute;
+    top: -9px;
+    left: var(--s-3);
+    padding-inline: 4px;
+    background: var(--paper);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--red-ink);
+  }
+
+  .tf-arr {
+    font-family: var(--font-mono);
+    color: var(--ink-muted);
+    transition: color var(--dur-base) var(--ease-draw);
+  }
+
+  .tf-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    margin-top: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  /* A lit step: the node takes the red tint and the label turns red-ink. */
+  .tf-node.on {
+    background: var(--red-tint);
+  }
+
+  .tf-node.on .tf-i,
+  .tf-arr.on,
+  .tf-steps .on,
+  .tf-path .on {
+    color: var(--red-ink);
+  }
+
+  .tf-steps .on {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .tf-replay {
+    margin-top: var(--s-2);
+    min-height: var(--hit-touch);
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .tf-replay[hidden] {
+    display: none;
+  }
+
+  /* strip */
+  .tf-strip {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--s-4);
+  }
+
+  .tf-path {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink);
+  }
+
+  .tf-pstep {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border: var(--line-object);
+    transition: background-color var(--dur-base) var(--ease-draw), color var(--dur-base) var(--ease-draw);
+  }
+
+  .tf-pstep.is-propose {
+    border: var(--line-propose);
+  }
+
+  .tf-path .tf-i {
+    position: static;
+    padding: 0;
+    background: none;
+  }
+
+  .tf-pstep.on {
+    background: var(--red-tint);
+  }
+
+  .tf-strip .tf-replay {
+    margin-top: 0;
+  }
+
+  @media (max-width: 899px) {
+    .tf-flow {
+      grid-template-columns: 1fr;
+    }
+
+    .tf-arr {
+      justify-self: start;
+      transform: rotate(90deg);
+      margin-left: var(--s-5);
+    }
+
+    .tf-base {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

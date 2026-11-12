@@ -16,13 +16,15 @@ interface Props {
   // Keep every data cell on one line (numbers, ids, ranges: "claude-haiku-4-5", "-3.05 to +2.76").
   // Wide tables then scroll sideways instead of breaking a value mid-token. Leave off for prose cells.
   nowrap?: boolean;
+  /** D-14: at <=599px the table stacks into label/value rows instead of scrolling. */
+  stack?: boolean;
 }
 
-const { caption, columns, rows, nowrap = false } = Astro.props;
+const { caption, columns, rows, nowrap = false, stack = true } = Astro.props;
 const [labelHeader, ...dataHeaders] = columns;
 ---
 
-<div class="data-table-scroll">
+<div class:list={['data-table-scroll', { 'is-stack': stack }]}>
 {/* The visible caption sits outside the scroller so it is as wide as the visible
     box (not the whole table) and can leave room for the "scroll" hint beside it.
     The <caption> inside the table stays, visually hidden, for assistive tech. */}
@@ -41,8 +43,8 @@ const [labelHeader, ...dataHeaders] = columns;
       rows.map((row) => (
         <tr>
           <th scope="row">{row.label}</th>
-          {row.cells.map((cell) => (
-            <td class:list={[{ win: cell.win }]}>{cell.text}</td>
+          {row.cells.map((cell, i) => (
+            <td class:list={[{ win: cell.win }]} data-l={dataHeaders[i]}>{cell.text}</td>
           ))}
         </tr>
       ))
@@ -118,10 +120,76 @@ const [labelHeader, ...dataHeaders] = columns;
     }
   }
 
+  /* D-02 booktabs: Heavy above and below, Ink under the head, Hair between rows. */
   .data-table {
     width: 100%;
     font-family: var(--font-mono);
     font-size: var(--t-data);
+    border-top: var(--line-heavy);
+    border-bottom: var(--line-heavy);
+  }
+
+  .data-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  /* D-14: on phones a table stacks into label/value rows; nothing scrolls sideways. */
+  @media (max-width: 599px) {
+    .is-stack .data-table-wrap {
+      overflow: visible;
+    }
+
+    .is-stack .data-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .is-stack .data-table,
+    .is-stack .data-table tbody,
+    .is-stack .data-table tr,
+    .is-stack .data-table th[scope='row'],
+    .is-stack .data-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .is-stack .data-table tr {
+      padding-block: var(--s-3);
+    }
+
+    .is-stack .data-table th[scope='row'] {
+      position: static;
+      padding: 0 0 var(--s-1);
+      color: var(--ink);
+      font-weight: 500;
+      background: none;
+    }
+
+    .is-stack .data-table td {
+      display: grid;
+      grid-template-columns: minmax(7em, 40%) minmax(0, 1fr);
+      column-gap: var(--s-3);
+      padding: 2px 0;
+      text-align: left;
+      white-space: normal;
+    }
+
+    .is-stack .data-table td::before {
+      content: attr(data-l);
+      font-size: var(--t-label);
+      letter-spacing: var(--track-wide);
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .is-stack .scroll-hint,
+    .is-stack.data-table-scroll::after {
+      display: none;
+    }
   }
 
   .dt-caption {
@@ -168,7 +236,7 @@ const [labelHeader, ...dataHeaders] = columns;
   }
 
   .data-table thead th {
-    border-bottom: 1px solid var(--rule-strong);
+    border-bottom: var(--line-ink);
     font-size: var(--t-label);
     letter-spacing: var(--track-caps);
     text-transform: uppercase;
@@ -185,7 +253,7 @@ const [labelHeader, ...dataHeaders] = columns;
   }
 
   .data-table tbody tr {
-    border-bottom: 1px solid var(--rule);
+    border-bottom: var(--line-hair);
     transition: background-color var(--dur-fast) var(--ease-draw);
   }
 

@@ -1,5 +1,5 @@
 ---
-// Public record — the claims-you-can-check block that closes a Work entry.
+// Public record, the claims-you-can-check block that closes a Work entry.
 // Every row is `what` (with the artefacts as underlined red-ink links) on the
 // left and `where` (the surface it lives on) on the right. Rows whose only
 // link is still a placeholder (href starting `TODO_`) are not rendered: an
@@ -21,7 +21,7 @@ interface Props {
 }
 
 const { kicker, items, note, context, flush = false, headingLevel: Heading = 'h3' } = Astro.props;
-const regionLabel = context ? `Public record — ${context}` : 'Public record';
+const regionLabel = context ? `Public record: ${context}` : 'Public record';
 
 const isReady = (item: RecordItem) =>
   item.links.length > 0 && item.links.every((l) => !l.href.startsWith('TODO_'));
@@ -65,7 +65,7 @@ const rows = items.filter(isReady);
 <style>
   /* Strong rule: this block closes the entry's argument. */
   .record {
-    border-top: 1px solid var(--rule-strong);
+    border-top: var(--line-ink);
     padding-top: var(--s-4);
     margin-top: var(--s-8);
   }
@@ -113,7 +113,7 @@ const rows = items.filter(isReady);
     gap: var(--s-6);
     align-items: baseline;
     padding-block: var(--s-3);
-    border-bottom: 1px solid var(--rule);
+    border-bottom: var(--line-hair);
   }
 
   .record-row:last-child {

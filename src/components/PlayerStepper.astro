@@ -34,8 +34,8 @@ const deci = stages.length * seconds * 10;
       {
         stages.map((s, i) => (
           <li>
-            <button type="button" class="ps-chap" data-chap={i} data-tone={s.tone} aria-label={`Go to step ${i + 1}: ${s.title}`}>
-              <span class="ps-chap-n" aria-hidden="true">{i + 1}</span><span class="ps-chap-t" aria-hidden="true">{s.title}</span>
+            <button type="button" class="ps-chap" data-chap={i} data-tone={s.tone}>
+              <span class="visually-hidden">Go to step </span><span class="ps-chap-n">{i + 1}</span><span class="visually-hidden">: </span><span class="ps-chap-t">{s.title}</span>
             </button>
           </li>
         ))
@@ -180,7 +180,7 @@ const deci = stages.length * seconds * 10;
   .ps-screen {
     min-block-size: 11rem;
     padding: var(--s-6);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     background: var(--paper-raised);
   }
 
@@ -195,7 +195,7 @@ const deci = stages.length * seconds * 10;
   /* The chips are created by the script, so they are styled through :global. */
   .ps :global(.ps-chip) {
     padding: var(--s-2) var(--s-3);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     background: var(--paper);
     font-family: var(--font-mono);
     font-size: var(--t-note);
@@ -209,7 +209,7 @@ const deci = stages.length * seconds * 10;
   }
 
   .ps :global(.ps-chip.is-hot) {
-    border: 2px dashed var(--red);
+    border: var(--line-pen-dashed);
     color: var(--red-ink);
   }
 
@@ -249,7 +249,7 @@ const deci = stages.length * seconds * 10;
     inline-size: 100%;
     block-size: 100%;
     padding: var(--s-2) var(--s-3);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     border-block-start: 0;
     border-inline-start: 0;
     background: var(--paper);
@@ -262,7 +262,7 @@ const deci = stages.length * seconds * 10;
   }
 
   .ps-chapters li:first-child .ps-chap {
-    border-inline-start: 1px solid var(--ink);
+    border-inline-start: var(--line-ink);
   }
 
   .ps-chap.is-past {
@@ -297,7 +297,7 @@ const deci = stages.length * seconds * 10;
   .ps-nav {
     min-block-size: var(--s-9);
     padding: 0 var(--s-4);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     background: var(--paper);
     font-family: var(--font-mono);
     font-size: var(--t-micro);
@@ -345,7 +345,7 @@ const deci = stages.length * seconds * 10;
   .ps-speed select {
     min-block-size: var(--s-8);
     padding: 0 var(--s-2);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     border-radius: 0;
     background: var(--paper);
     font-family: var(--font-mono);
@@ -356,7 +356,7 @@ const deci = stages.length * seconds * 10;
   .ps-transcript {
     margin-top: var(--s-5);
     padding-top: var(--s-4);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .ps-tlabel {

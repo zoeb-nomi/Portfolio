@@ -132,7 +132,7 @@ let order = 0;
   .fp-zero {
     position: absolute;
     inset-block: var(--s-1);
-    border-inline-start: 1px solid var(--ink);
+    border-inline-start: var(--line-ink);
   }
 
   /* Interval and mean: the whisker is drawn out from its centre, the marker pops in after it. */
@@ -160,7 +160,7 @@ let order = 0;
   }
 
   .fp-max {
-    border: 2px solid var(--red);
+    border: var(--line-pen);
   }
 
   .fp[data-state='pre'] .fp-wh,
