@@ -34,6 +34,10 @@ jobs:
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:4321/ >/dev/null && break; sleep 1; done
           npm run qa
           npm run tokens
+      - run: npm run a11y
+      - run: npm run links
+      - name: Lighthouse CI (home, builds, case study, writing; desktop and mobile)
+        run: npm run lhci
       - run: npm run audio:check
       - uses: actions/upload-artifact@v4
         if: always()
@@ -42,4 +46,5 @@ jobs:
           path: |
             .astro/qa-report.json
             .astro/tokens-report.json
+            .lighthouseci/
           if-no-files-found: ignore

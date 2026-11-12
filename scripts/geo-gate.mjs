@@ -26,7 +26,6 @@ const POSITIVES = [
   'Mata v. Avianca',
   'punctuation-only claim spans',
   '270K+',
-  '100+',
   '378 sources',
   '~139K',
   '160+ tax strategies',
@@ -114,6 +113,28 @@ const POSITIVES = [
   'github.com/freelawproject/eyecite/pull/360',
   'github.com/freelawproject/eyecite/issues/361',
   '15,988 citations',
+
+  // v3 revamp (I16 #5, SPEC v3 #10), added 2026-11-12. The thesis strings and
+  // the new IA. "100+" left with CP decision 5 (corpus figure withheld).
+  'Agents, workflows and evals',
+  'I ship the workflow and the checks that catch it.',
+  'Shipped, then measured',
+  'What I built, and how I know it works',
+  'Builds',
+  'TradeFrame',
+  'github.com/zoeb-nomi/tradeframe',
+  'zoeb-nomi.github.io/tradeframe',
+  'guard',
+  'Who decides what runs',
+  'cheap-tier-legal-tax-hr',
+  '1,414',
+  '10–15 min',
+  'Fig. 0',
+  'Back to Fig. 0.',
+  '30 min · intro call',
+  'llms.txt (for AI assistants)',
+  'zoebnomi.com/builds/',
+  'If you&#39;re hiring a PM for an agent or LLM product',
 ];
 
 // Instead's production numbers must never be attached to CrossSource. They are
@@ -143,6 +164,22 @@ const NEGATIVE_LITERALS = [
 
   // Relocation language removed sitewide 2026-10-23; keep it out.
   'relocation',
+
+  // v3 (SPEC v3 #10, canon §5 "retire" and "never write"), added 2026-11-12.
+  'LLM Evaluation & RAG Quality',
+  'LLM Evaluation &amp; RAG Quality',
+  'US-morning',
+  'Open to AI PM roles',
+  'Bengaluru (IST)',
+  'I build the evals that catch them',
+  'the hardest trust problem',
+  'that is the point',
+  'quality you can measure',
+  "let's talk about what your evals miss",
+  'let&#39;s talk about what your evals miss',
+  '1,200+ agent runs',
+  // No em dashes anywhere on the site (copy pack rule, R-3).
+  '\u2014',
 ];
 
 // "Filed" as a standalone product name — must not match the common word
@@ -216,6 +253,20 @@ function main() {
     const hits = [...new Set(csScopes.filter((s) => s.text.includes(banned)).map((s) => s.where))];
     if (hits.length) negativesClean = false;
     negativeResults.push({ string: `${banned} (in any CrossSource description)`, present: hits.length > 0, files: hits });
+  }
+
+  // velocity-public.json (I17): a builds[] entry with no hand-written ledger row
+  // must never reach the page (SPEC v3 §3 render rules).
+  const velocityPath = path.join(ROOT, 'public', 'data', 'velocity-public.json');
+  try {
+    const v = JSON.parse(readFileSync(velocityPath, 'utf8'));
+    const buildsHtml = contents.find((c) => c.file === path.join('builds', 'index.html'))?.text ?? '';
+    const ledgerIds = new Set([...buildsHtml.matchAll(/data-build="([^"]+)"/g)].map((m) => m[1]));
+    const orphan = (v.builds ?? []).map((b) => b.id).filter((id) => !ledgerIds.has(id));
+    if (orphan.length) negativesClean = false;
+    negativeResults.push({ string: 'velocity-public.json builds[] without a buildsLedger row', present: orphan.length > 0, files: orphan });
+  } catch {
+    // No velocity file yet: nothing to join.
   }
 
   // ---- report ----

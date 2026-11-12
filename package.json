@@ -13,7 +13,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "node scripts/test-parse-contributions.mjs",
-    "check": "astro check",
+    "check": "astro check && node scripts/design-check.mjs",
     "lint": "node scripts/lint-source.mjs",
     "gate": "node scripts/geo-gate.mjs",
     "qa": "node scripts/qa-sweep.mjs",
@@ -22,19 +22,27 @@
     "audio:test": "npm --prefix scripts/audio test",
     "audio:build": "node scripts/audio/build.mjs",
     "audio:check": "node scripts/audio/check.mjs",
-    "audio:verify": "node scripts/audio/verify.mjs"
+    "audio:verify": "node scripts/audio/verify.mjs",
+    "design": "node scripts/design-check.mjs",
+    "a11y": "node scripts/a11y.mjs",
+    "links": "node scripts/link-check.mjs",
+    "lhci": "lhci autorun --config=lighthouserc.json && lhci autorun --config=lighthouserc.mobile.json",
+    "og": "node scripts/generate-og.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",
     "@fontsource/ibm-plex-mono": "^5.1.0",
     "@fontsource/ibm-plex-sans": "^5.1.0",
     "@fontsource/instrument-serif": "^5.1.0",
+    "animejs": "4.5.0",
     "astro": "^5.2.0",
     "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.14.0",
     "@cloudflare/workers-types": "^4.20260702.1",
+    "@lhci/cli": "^0.15.1",
     "axe-core": "^4.10.2",
     "playwright": "^1.56.0",
     "typescript": "^5.9.3"

@@ -15,56 +15,28 @@ import path from 'node:path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-const STANDING_LINE = 'AI Product Manager · Bengaluru (IST)';
+// Cards, titles, subtitles, numerals and the standing line come from
+// src/data/copy.ts (`ogCards`), bundled on the fly with esbuild, so a card can
+// never drift from its page (SPEC v3 #8). Colours come from design/tokens.css.
+async function loadCopy() {
+  const { build } = await import('esbuild');
+  const out = await build({
+    entryPoints: [path.join(ROOT, 'src/data/copy.ts')],
+    bundle: true,
+    format: 'esm',
+    platform: 'node',
+    write: false,
+    logLevel: 'silent',
+  });
+  const url = 'data:text/javascript;base64,' + Buffer.from(out.outputFiles[0].text).toString('base64');
+  return import(url);
+}
 
-// id → output file (public/og/<id>.png). `num` = { value, caption }.
-const pages = [
-  { id: 'home', // meta.home
-    title: 'Zoeb Nomi', sub: 'AI Product Manager · LLM Evaluation & RAG Quality',
-    num: { value: '0.994', caption: 'citation precision · n=25' } },
-  { id: 'about', // meta.about
-    title: 'About', sub: 'Mechanical engineer turned AI product manager, in Bengaluru.' },
-  { id: 'work', // meta.work
-    title: 'Work', sub: 'Zero-to-one BGV at Keka, LLM output quality at Instead.',
-    num: { value: '4', caption: 'companies · 2 promotions' } },
-  { id: 'evals', // meta.evals
-    title: 'Evals', sub: 'One method: CrossSource, mirror-eval, screener-eval.',
-    num: { value: '3', caption: 'harnesses' } },
-  { id: 'crosssource', // meta.crosssource
-    title: 'CrossSource', sub: 'Open benchmark for legal-RAG citation accuracy.',
-    num: { value: '150', caption: 'v0.3 items · 45 opinions' } },
-  { id: 'mirror-eval', // meta.mirrorEval
-    title: 'mirror-eval', sub: 'What AI search says about a person, measured twice.',
-    num: { value: '13 → 63', caption: 'Perplexity · Claude 0 → 0' } },
-  { id: 'screener-eval', // meta.screenerEval
-    title: 'screener-eval', sub: 'What LLM résumé screeners reward, counted 885 times.',
-    num: { value: '885', caption: 'screener calls' } },
-  { id: 'writing', // meta.writingIndex
-    title: 'Writing', sub: 'Notes on LLM evaluation, judge reliability and RAG quality.' },
-  { id: 'notes', // meta.notesIndex
-    title: 'Notes', sub: 'One counted finding per note.' },
-  { id: 'eval-harness', // meta.writingReflection
-    title: 'I pointed an eval harness at my own reflection',
-    sub: 'Engines fill rather than abstain. The LLM judge failed blind validation.' },
-  { id: 'judge', // meta.writingJudgeBug
-    title: 'The judge caught a bug I didn’t',
-    sub: 'A blind human check found a harness bug the LLM judge could not see.',
-    num: { value: '15/15', caption: 'blind judge agreement' } },
-  { id: 'two-levers', // meta.writingTwoLevers
-    title: '885 screenings, two levers that did not move',
-    sub: 'Employer names and evidence links did nothing to an LLM screener’s score.' },
-  { id: 'bus-stop', // meta.writingBusStop
-    title: 'The bus stop nobody notices',
-    sub: 'Vijayanand Travels’ fifty-year moat in Indian intercity buses.' },
-  { id: 'misses', // meta.writingMisses
-    title: 'Nobody Reports the Misses: Counting False Passes in AI',
-    sub: 'Wrong AI answers get caught. Missed items don’t.' },
-  { id: 'decisions-api-legal-quiz', // meta.writingDecisions
-    title: "I gave OpenAI's Decisions API a quiz written by lawyers",
-    sub: '544 legal questions\none probability each · no safe threshold' },
-  { id: '404', // notFound.message
-    title: '404', sub: 'No source found for that claim.' },
-];
+const { ogCards } = await loadCopy();
+const STANDING_LINE = ogCards.standing;
+const pages = ogCards.cards;
+// The token file's first :root block, embedded so the card uses var(--paper) etc.
+const TOKENS_ROOT = /:root\s*\{[\s\S]*?\n\}/.exec(readFileSync(path.join(ROOT, 'design/tokens.css'), 'utf8'))[0];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 // Arrows are absent from Instrument Serif; render them in the mono face.
@@ -84,6 +56,7 @@ function templateHTML({ title, sub, num }) {
 <head>
 <meta charset="utf-8" />
 <style>
+  ${TOKENS_ROOT}
   @font-face {
     font-family: 'Instrument Serif';
     src: url(data:font/woff2;base64,${instrumentSerif}) format('woff2');
@@ -104,14 +77,14 @@ function templateHTML({ title, sub, num }) {
   html, body {
     width: 1200px;
     height: 630px;
-    background: #f4f1ea;
+    background: var(--paper);
     overflow: hidden;
   }
   .frame {
     position: relative;
     width: 1200px;
     height: 630px;
-    border-top: 10px solid #be241f;
+    border-top: 10px solid var(--red);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -122,7 +95,7 @@ function templateHTML({ title, sub, num }) {
     font-size: 15px;
     letter-spacing: .18em;
     text-transform: uppercase;
-    color: #6d675e;
+    color: var(--ink-muted);
   }
   .main {
     display: flex;
@@ -136,14 +109,14 @@ function templateHTML({ title, sub, num }) {
     font-size: 116px;
     line-height: 0.98;
     letter-spacing: -0.015em;
-    color: #191713;
+    color: var(--ink);
   }
   .kicker {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 28px;
     line-height: 1.32;
     letter-spacing: 0;
-    color: #3b362e;
+    color: var(--ink-body);
     margin-top: 22px;
     text-wrap: balance;
   }
@@ -151,7 +124,7 @@ function templateHTML({ title, sub, num }) {
     flex: 0 0 auto;
     width: 400px;
     text-align: right;
-    border-right: 4px solid #be241f;
+    border-right: 4px solid var(--red);
     padding-right: 28px;
   }
   .num-value {
@@ -159,7 +132,7 @@ function templateHTML({ title, sub, num }) {
     font-size: 190px;
     line-height: 0.9;
     letter-spacing: -0.02em;
-    color: #191713;
+    color: var(--ink);
     white-space: nowrap;
   }
   .arr, .kicker .arr {
@@ -170,7 +143,7 @@ function templateHTML({ title, sub, num }) {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 20px;
     line-height: 1.3;
-    color: #6d675e;
+    color: var(--ink-muted);
     margin-top: 16px;
   }
   .bottom {
@@ -184,13 +157,13 @@ function templateHTML({ title, sub, num }) {
     font-size: 16px;
     letter-spacing: .12em;
     text-transform: uppercase;
-    color: #191713;
+    color: var(--ink);
   }
   .domain {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 16px;
     letter-spacing: .04em;
-    color: #6d675e;
+    color: var(--ink-muted);
   }
 </style>
 </head>
@@ -242,7 +215,7 @@ async function run() {
   const outDir = path.join(ROOT, 'public/og');
   mkdirSync(outDir, { recursive: true });
 
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
   const tab = await ctx.newPage();
 
