@@ -18,16 +18,24 @@ import { meta, home, cta, contributions } from '../data/copy';
     <div class="hero-in">
       <p class="eyebrow">{home.eyebrow}</p>
 
-      <h1 class="hero-h1" id="hero-h1">
-        <span class="line1"
-          >LLM products <span class="nowrap"
-            >fail <span class="underline-wrap"
-              >quietly.<span class="underline" aria-hidden="true" data-underline></span></span
+      <div class="h1-wrap">
+        <h1 class="hero-h1" id="hero-h1">
+          <span class="line1"
+            >LLM products <span class="nowrap"
+              >fail <span class="underline-wrap"
+                >quietly.<span class="underline" aria-hidden="true" data-underline></span></span
+              ></span
             ></span
-          > <span class="unflagged" aria-hidden="true">{home.unflaggedMark}</span></span
-        >
-        <span class="line2">{home.h1Line2}</span>
-      </h1>
+          >
+          <span class="line2">{home.h1Line2}</span>
+        </h1>
+        {/* The reviewer's mark sits outside the <h1> so the heading's text is exactly the
+            sentence. The anchor is set in the display size, so its em offsets track the
+            end of "quietly." at every width (measured at 390, 900 and 1440). */}
+        <span class="mark-anchor" aria-hidden="true">
+          <span class="mark-pos"><span class="unflagged">{home.unflaggedMark}</span></span>
+        </span>
+      </div>
 
       <div class="hero-fig">
         <Fig0 />
@@ -160,11 +168,30 @@ import { meta, home, cta, contributions } from '../data/copy';
     margin-bottom: var(--s-6);
   }
 
-  .hero-h1 {
+  .h1-wrap {
     grid-area: h1;
+    position: relative;
+    margin-bottom: var(--s-8);
+  }
+
+  .hero-h1 {
     font-family: var(--font-display);
     color: var(--ink);
-    margin-bottom: var(--s-8);
+  }
+
+  .mark-anchor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: var(--t-display);
+    pointer-events: none;
+  }
+
+  .mark-pos {
+    position: absolute;
+    left: calc(3.6025em + 1.9px);
+    top: calc(1.4458em - 11.9px);
+    white-space: nowrap;
   }
 
   /* D-04: the display moment, up to 136px at 1440 beside Fig. 0 (measured: two
@@ -209,13 +236,12 @@ import { meta, home, cta, contributions } from '../data/copy';
   }
 
   .unflagged {
-    display: inline-block;
+    display: block;
     font-family: var(--font-mono);
     font-size: var(--t-label);
+    line-height: 0.96; /* the old inline mark's line box, so the glyphs land where they did */
     letter-spacing: var(--track-wide);
     color: var(--red-ink);
-    vertical-align: super;
-    margin-left: 0.15em;
   }
 
   .hero-fig {
@@ -303,7 +329,7 @@ import { meta, home, cta, contributions } from '../data/copy';
       padding-top: var(--s-7);
     }
 
-    .hero-h1 {
+    .h1-wrap {
       margin-bottom: var(--s-8);
     }
 

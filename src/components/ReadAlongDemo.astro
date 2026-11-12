@@ -81,9 +81,10 @@ const total = Math.ceil(dek[2] + 1.5);
 </script>
 
 <style>
+  /* Sits inside a Section's body column on /writing/, which already supplies the
+     column's inset: no horizontal padding of its own (v3.1 alignment sweep). */
   .ra {
-    padding: var(--s-6) var(--gutter);
-    border-block-end: var(--line-hair);
+    padding-block: 0 var(--s-6);
   }
 
   .ra-label {

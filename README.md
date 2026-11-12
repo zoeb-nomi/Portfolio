@@ -12,6 +12,7 @@ Hosted on Cloudflare Pages. Build command `npm run build`, output directory `dis
 
 - **Production** — every commit to `main` builds and auto-deploys. There is no staging environment.
 - **Previews** — commits on any other branch get their own preview deployment at a generated URL. Previews send `X-Robots-Tag: noindex`.
+- **Redirects** — `public/_redirects` sends the v2 URLs (/evals/, /work/, /notes/, /shipping/) to their v3 homes as **302** during a two-week bake period after the v3 deploy; then flip all eight lines to 301.
 - **Rollback** — Cloudflare Pages → the project → **Deployments** → find the last good build → **Rollback to this deployment**. This repoints production immediately without a rebuild. Alternatively revert on `main` and let the normal build redeploy. PRs land as merge commits, so use the **Revert** button on the merged PR, or `git revert -m 1 <merge commit>`; each PR reverts on its own.
 - **Which project?** At the time of writing two Cloudflare Pages projects (`zoebnomi` and `portfolio`) are connected to this repo and both post a preview on every PR (`zoebnomi` at `*.zoebnomi.pages.dev`, `portfolio` at `*.portfolio-a5z.pages.dev`). Roll back `zoebnomi` first (verify once in the Cloudflare dashboard; the `portfolio` project is the second connected project).
 
@@ -21,7 +22,7 @@ Run `node scripts/geo-gate.mjs` against `dist/` before deploying — it is the l
 
 ## Checks
 
-All of these run in CI, in this order (`.github/workflows/ci.yml`): `npm ci`, `npm run build`, `npm run gate`, `npm run check`, `npm run lint`, then `npm run qa` and `npm run tokens` against a running preview, then `npm run audio:check`.
+All of these run in CI, in this order (`.github/workflows/ci.yml`): `npm ci`, `npm run build`, `npm run gate`, `npm run check`, `npm run lint`, then `npm run qa` and `npm run tokens` against a running preview, then `npm run a11y`, `npm run links`, `npm run lhci`, and `npm run audio:check`.
 
 - `npm run check` — `astro check` (types), then `scripts/design-check.mjs` (no palette hex or token declaration outside `design/tokens.css`).
 - `npm run a11y` — axe on every built route at 390/768/1024/1440; fails on serious or critical.

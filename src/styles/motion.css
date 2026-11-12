@@ -52,10 +52,6 @@
   opacity: 0;
 }
 
-.motion .cv[data-count]:not(.is-in) .cv-final {
-  opacity: 0;
-}
-
 .motion [data-ledger]:not(.is-in) .l-item {
   opacity: 0;
 }
@@ -65,7 +61,6 @@
   .motion [data-draw],
   .motion [data-underline],
   .motion [data-pop],
-  .motion .cv-final,
   .motion [data-ledger] .l-item {
     opacity: 1 !important;
     transform: none !important;

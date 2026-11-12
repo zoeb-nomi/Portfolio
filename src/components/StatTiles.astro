@@ -1,7 +1,7 @@
 ---
 // Stat tiles (DESIGN v3 D-07): the proof tile without its figure. Heavy top
 // bar, numeral, label, optional mono source. Used by /builds/#shipping.
-// The numeral counts up once in view (aria-hidden copy; the DOM keeps the value).
+// The numeral renders final; nothing counts (v3.1 review).
 interface Tile {
   value: string;
   unit?: string;
@@ -15,13 +15,6 @@ interface Props {
 
 const { tiles } = Astro.props;
 
-// Parse "12", "90%", "$0.07", "4.2" into a count spec from zero.
-const spec = (v: string) => {
-  const m = /^([^0-9]*)([0-9]+(?:\.[0-9]+)?)(.*)$/.exec(v);
-  if (!m) return null;
-  const decimals = m[2].includes('.') ? m[2].split('.')[1].length : 0;
-  return JSON.stringify({ from: 0, to: Number(m[2]), decimals, prefix: m[1], suffix: m[3], final: v });
-};
 ---
 
 <ul class="tiles" role="list">
@@ -29,10 +22,7 @@ const spec = (v: string) => {
     tiles.map((t) => (
       <li class="tile">
         <p class="t-num">
-          <span class="cv" data-count={spec(t.value)}>
-            <span class="cv-final">{t.value}</span>
-            <span class="cv-run" aria-hidden="true" />
-          </span>
+          {t.value}
           {t.unit && <small>{t.unit}</small>}
         </p>
         <p class="t-lab">{t.label}</p>
@@ -67,18 +57,6 @@ const spec = (v: string) => {
   .t-num small {
     font-size: 0.45em;
     margin-left: 2px;
-  }
-
-  .cv {
-    position: relative;
-    display: inline-block;
-  }
-
-  .cv-run {
-    position: absolute;
-    left: 0;
-    top: 0;
-    white-space: nowrap;
   }
 
   .t-lab {

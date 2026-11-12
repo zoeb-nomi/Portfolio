@@ -113,21 +113,21 @@ Rules:
    `.motion`, which the head script sets only when JS runs, IntersectionObserver exists
    and reduced motion is off, and removes again if the module has not booted in 4 s.
 2. The H1 text never animates. Only its underline draws.
-3. No layout shift: transforms, clip-path wipes, stroke offsets and opacity only; count-ups
-   run in an `aria-hidden` overlay over the real value, which keeps its width.
+3. No layout shift: transforms, clip-path wipes, stroke offsets and opacity only.
+   Numbers never tween: a numeral always shows its final value (no intermediate, wrong
+   values on screen); only lines, bars and marks animate.
 4. Text is revealed with clip-path wipes, not fades, where it is above the fold (Fig. 0), so
    no frame ever renders text at a failing contrast.
-5. Durations: fast 120, base 200, slow 600 (line draws), count 1000, Fig. 0 story 3.2 s.
+5. Durations: fast 120, base 200, slow 600 (line draws), Fig. 0 story 3.2 s.
 
 | element | motion | trigger |
 |---|---|---|
 | Fig. 0 | steps wipe in, stems grow, the red cloud draws, "Released" stamps at 3.2 s; Replay | load |
 | H1 underline | draws left to right | load |
-| Readings | dimension line draws from the datum; value counts from the datum | 50% in view |
-| Ledger rows | settle 10px, 70 ms apart; hover (fine pointer) or tap opens the panel and draws its figure | in view / hover / tap |
+| Readings | the dimension line draws from the datum; the numeral is final from the start (numbers never tween) | 50% in view |
+| Ledger rows | settle 10px, 70 ms apart; click, tap or Enter opens the panel (native details) and draws its figure | in view / click |
 | TradeFrame path | lights propose → validate → confirm → execute and record, then clears; Replay | 60% in view |
 | Case-study Fig. 1, Fig. 2 | bars and dumbbells draw | 60% in view |
-| Writing lead numbers, shipping tiles | count up from zero | in view |
 | Section ticks | the red tick grows on the top rule | in view (CSS scroll-driven on pages without the library) |
 | Pages | native cross-document view transitions; header holds still; eval switcher marker slides | navigation |
 

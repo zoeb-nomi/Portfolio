@@ -11,8 +11,8 @@
 //
 // Rows are native <details>: tap, click or Enter opens the row's panel (its
 // result figure, its guard, its ship date and the case-study action) with no
-// script at all. The motion layer adds hover-to-open on fine pointers and
-// animates the panel height; the content is always in the HTML.
+// script at all. The motion layer only animates the panel height on
+// click/tap (no hover-open); the content is always in the HTML.
 import { buildsLedger, builds } from '../data/copy';
 import type { BuildEntry } from '../data/copy';
 import MiniFigure from './MiniFigure.astro';
@@ -29,7 +29,7 @@ interface Props {
 const { variant = 'full', start = 1 } = Astro.props;
 const entries = Astro.props.entries ?? (variant === 'compact' ? buildsLedger.filter((b) => b.compact) : buildsLedger);
 const pad = (n: number) => String(n).padStart(2, '0');
-const shipped = (b: BuildEntry) => (b.shippedBeforeLedger ? `${builds.beforeLedger} ${b.shippedBeforeLedger}` : '');
+const shipped = (b: BuildEntry) => (b.shippedBeforeLedger ? builds.shippedUntracked(b.shippedBeforeLedger) : '');
 const ext = (href: string) => (isExternal(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {});
 const figLabel = (b: BuildEntry) => `${b.name}: ${b.measured.lead ?? ''} ${b.measured.headline}`.trim();
 const C = builds.columns;

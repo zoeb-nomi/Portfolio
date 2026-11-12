@@ -48,7 +48,7 @@ export const nav: NavItem[] = [
 ];
 
 // Old URLs and their new homes (DESIGN v3 §i). public/_redirects carries the
-// same map as 301s; src/pages/<old>/index.astro stubs hop client-side so a
+// same map (302 while baking, then 301); src/pages/<old> stubs hop client-side so a
 // fragment survives and local previews resolve.
 export const redirects = [
   { from: '/evals/', to: '/builds/#method' },
@@ -101,7 +101,7 @@ export const meta = {
   home: {
     title: 'Zoeb Nomi · AI Product Manager for agents and LLM workflows',
     description:
-      'AI product manager at Instead, in Bengaluru. I ship multi-step AI workflows with the checks built in: evals, traces and guardrails. Public builds: TradeFrame and four eval harnesses.',
+      'AI product manager at Instead, in Bengaluru. I ship multi-step AI workflows with the checks built in: evals, traces and guardrails. Public builds: TradeFrame and five eval harnesses.',
   },
   builds: {
     title: 'Builds · Zoeb Nomi',
@@ -367,8 +367,8 @@ export const home = {
   },
 
   // §1. Readings (B-07): value, datum, change, n and source on every headline
-  // number. The count-up starts from the datum. Three systems, three numbers
-  // (CP §1 proofStrip, U7).
+  // number. The value renders final at once; only the dimension line draws
+  // (v3.1 review: no intermediate values). Three systems, three numbers (CP §1, U7).
   measuredLabel: 'Shipped, then measured',
   readingsRef: 'Fig. 0, step 1.',
   readingsWhy: 'A check is only real if it produces a number someone else can read. Three of them, from three different systems.',
@@ -379,7 +379,6 @@ export const home = {
       kicker: 'R1 · Run time',
       display: '<1',
       unit: 'min',
-      count: { from: 15, to: 1, decimals: 0, prefix: '', suffix: '', final: '<1' },
       figure: { min: 0, max: 15, datum: 12.5, datumBand: [10, 15] as [number, number], value: 0.5, minLabel: '0', maxLabel: '15 min' },
       datum: '10–15 min before',
       change: 'about −90%',
@@ -393,7 +392,6 @@ export const home = {
       display: '0.994',
       unit: '',
       verdict: '✓',
-      count: { from: 0.981, to: 0.994, decimals: 3, prefix: '', suffix: '', final: '0.994' },
       figure: { min: 0.97, max: 1.0, datum: 0.981, value: 0.994, minLabel: '0.97', maxLabel: '1.00', zoomed: 'axis zoomed' },
       datum: '0.981 baseline',
       change: '+0.013',
@@ -406,7 +404,6 @@ export const home = {
       kicker: 'R3 · Revenue',
       display: '$2.7M',
       unit: 'MRR',
-      count: { from: 0, to: 2.7, decimals: 1, prefix: '$', suffix: 'M', final: '$2.7M' },
       figure: { min: 0, max: 2.7, datum: 0, value: 2.7, minLabel: '0', maxLabel: '$2.7M' },
       datum: '0, from zero',
       change: '+$2.7M MRR',
@@ -423,9 +420,9 @@ export const home = {
     ref: 'Fig. 0, steps 2 and 3.',
     why: 'A number means little without the system it checked. Every build is drawn the same way, so you can compare them.',
     closeLine:
-      'One system where the AI proposes and code decides. Four harnesses that count what a model gets wrong. Every new build lands here with its planned and actual ship date.',
+      'One system where the AI proposes and code decides, and three of my five eval harnesses. Every new build is added with the date I planned to ship it and the date I did.',
     allLink: { label: 'All builds →', href: '/builds/' },
-    hint: 'Hover or tap a row to open it.',
+    hint: 'Select a row to open it.',
     next: { label: 'Next: the code behind them', href: '#sec-pm-who-ships-code' },
   },
 
@@ -435,7 +432,7 @@ export const home = {
     h2: 'Three harnesses, one method.',
     methodLine: 'Build the judge. Validate it blind against a human. Count what you can. Report the rest as bands.',
     standfirst:
-      'The measuring half of what I build. Three open harnesses side by side: legal RAG citations, what AI search says about a person, and LLM résumé screeners. Each row is one harness: the question it answers, the number it stands on, and how it was run.',
+      'Five harnesses are listed above; three of them share one method and are compared here side by side: legal RAG citations, what AI search says about a person, and LLM résumé screeners. Each row is one harness: the question it answers, the number it stands on, and how it was run.',
     legend:
       '[judged] scored by an LLM judge that was checked against people · [counted] counted, no judge · [null] the judge failed its check, so the result is reported as bands.',
     ledgerLabel: 'Harnesses',
@@ -545,7 +542,7 @@ export const builds = {
   /** Renders only when velocity-public.json has at least 3 closed builds (SPEC #22). */
   summary:
     '{shipped_n} builds shipped since 10 Nov 2026. {on_time_n} of {shipped_n} on or before the planned date. Median build: {median_days} days, ${median_cost} in model spend.',
-  summarySource: 'Counted from the Paperclip issue log, GitHub and Notion by the velocity collector.',
+  summarySource: 'Counted from the issue log and GitHub.',
   legend: [
     { term: 'Guarded', text: 'the rule or person that stops a bad action.' },
     { term: 'Measured', text: 'the number, its denominator, and how the scorer was checked.' },
@@ -561,13 +558,14 @@ export const builds = {
   columns: { n: '#', build: 'Build', guarded: 'Guarded', measured: 'Measured', shipped: 'Shipped' },
   sections: {
     systems: { mark: '§1', label: 'Systems', note: 'agents, workflows, guarded automation', anchorId: 'systems' },
-    evals: { mark: '§2', label: 'Eval harnesses', note: 'the measuring half', anchorId: 'evals' },
-    method: { mark: '§3', label: 'Method', note: 'one method, three harnesses', anchorId: 'method' },
+    evals: { mark: '§2', label: 'Eval harnesses', note: 'five harnesses', anchorId: 'evals' },
+    method: { mark: '§3', label: 'Method', note: 'three of the five, compared', anchorId: 'method' },
     contributions: { mark: '§4', label: 'Contributions', note: "pull requests to other people's tooling", anchorId: 'contributions' },
     shipping: { mark: '§5', label: 'Shipping numbers', note: 'since 10 Nov 2026', anchorId: 'shipping' },
   },
   evalsWhy: 'Why this matters: a harness is how a step earns the right to run without a person.',
-  beforeLedger: 'before the ledger:',
+  /** Builds that shipped before ship dates were tracked (10 Nov 2026): "Shipped <when> (before ship-date tracking)". */
+  shippedUntracked: (when: string) => `Shipped ${when} (before ship-date tracking)`,
   expand: { open: 'Open', close: 'Close', guard: 'Guarded', shipped: 'Shipped', result: 'Result' },
   close: 'If a row has no number, it says why. Nothing on this page is a demo.',
   tradeframeFlow: {
@@ -582,7 +580,7 @@ export const builds = {
     ],
     base: [
       { name: 'Kill switch, per book', text: 'Can stop new risk. Never exits or stops.' },
-      { name: 'Ledger', text: 'Every decision scored against a do-nothing baseline; returns net of all costs.' },
+      { name: 'Decision log', text: 'Every decision scored against a do-nothing baseline; returns net of all costs.' },
     ],
     stepLabels: ['propose', 'validate', 'confirm', 'execute and record'],
   },
@@ -652,7 +650,7 @@ export const buildsLedger: BuildEntry[] = [
       scorerCheck: '15/15 blind agreement with a person',
     },
     figure: { kind: 'dumbbell', min: 0.97, max: 1, from: 0.981, to: 0.994, fromLabel: '0.981', toLabel: '0.994', minLabel: '0.97', maxLabel: '1.00', zoomed: true },
-    shippedBeforeLedger: 'v0.3 released 20 Oct 2026',
+    shippedBeforeLedger: '20 Oct 2026, v0.3',
     stack: ['Python'],
     links: [
       { label: 'Case study →', href: '/crosssource/' },
@@ -784,7 +782,7 @@ export const shipping = {
   h2: 'What my agents shipped, counted.',
   lede:
     'Every piece of work I hand to my agent system is filed with an acceptance line and a due date. This section counts what landed, what it cost and how long it waited for me.',
-  asOf: 'Pilot figures, 10 to 11 Nov 2026. Replaced by the collector’s public file when it lands.',
+  asOf: 'Pilot figures, 10 to 11 Nov 2026. Pilot: two days of data; updates when the tracker runs.',
   tiles: [
     { value: '12', unit: '', label: 'pieces of work shipped since the system went live on 10 Nov', source: '' },
     { value: '90%', unit: '', label: 'on or before the due date set at filing', source: '9 of 10 with a due date' },
@@ -2427,8 +2425,8 @@ export const work = {
   // the copy pack, these rows are cross-links, not third-party artefacts).
   openWork: {
     kicker: 'Public builds',
-    note: 'One guarded automation system and four eval harnesses, all with code.',
-    ledgerLink: { label: 'Full ledger →', href: '/builds/' },
+    note: 'One guarded automation system and five eval harnesses, all with code.',
+    ledgerLink: { label: 'All builds →', href: '/builds/' },
     items: [
       {
         what: 'TradeFrame: guarded automation where the AI proposes and code decides',
@@ -2470,6 +2468,14 @@ export const work = {
           { label: 'Case study', href: '/mirror-eval/' },
           { label: 'Repo', href: 'https://github.com/zoeb-nomi/mirror-eval' },
           { label: 'Release v1.0', href: 'https://github.com/zoeb-nomi/mirror-eval/releases/tag/v1.0' },
+        ],
+        where: '',
+      },
+      {
+        what: 'decisions-api-legal-quiz: whether any confidence level makes checking safe to skip',
+        links: [
+          { label: 'Essay', href: '/writing/decisions-api-legal-quiz/' },
+          { label: 'Repo', href: 'https://github.com/zoeb-nomi/decisions-api-legal-quiz' },
         ],
         where: '',
       },
@@ -2745,7 +2751,7 @@ export const work = {
 
 export const contributions = {
   kicker: 'PM who ships code',
-  dek: 'Every build on the ledger is a public repository. This is the last year of commits, live from GitHub.',
+  dek: 'Every build above is a public repository. This is the last year of commits, live from GitHub.',
   captionLive: 'contributions in the last year · live from GitHub',
   captionSnapshot: 'contributions in the last year · as of',
   legendLess: 'Less',
@@ -2863,7 +2869,6 @@ export const notesPage = {
     { id: 'mirror-eval', label: 'mirror-eval' },
     { id: 'other', label: 'Other' },
   ],
-  groupSuffix: 'notes',
   section: { mark: '§1', label: 'The note', anchorId: 'note' },
   pointersLabel: 'Where the numbers live',
   videoPause: 'Pause',
@@ -2907,7 +2912,7 @@ export const llmsTxt = `# Zoeb Nomi
 ## Key facts
 
 - Role: Product Manager, Instead (Sep 2025 to present). Multi-step tax workflow: an end-to-end coherence eval across its steps, and latency cut ~90% by re-running only changed inputs. Output quality: a four-dimension rubric and a weekly failure-mode review; ~95% citation accuracy on the production golden set; document ID and sub-type attached to every cited source.
-- Builds ledger: every public build with what it does, how it is guarded, what it was measured against, and planned vs actual ship date: https://www.zoebnomi.com/builds/
+- Builds page: every public build with what it does, how it is guarded, what it was measured against, and planned vs actual ship date: https://www.zoebnomi.com/builds/
 - Guarded automation: TradeFrame (https://github.com/zoeb-nomi/tradeframe), a personal trading system where the AI proposes only, a deterministic layer validates against hard rails, and a person (US book) or validated code (India book) executes. Each book has its own kill switch; every decision is scored against a do-nothing baseline.
 - Flagship public eval harness: CrossSource (https://github.com/zoeb-nomi/crosssource), an open benchmark and evaluation harness for citation accuracy in legal RAG. v0.3 (released 20 Oct 2026, https://github.com/zoeb-nomi/crosssource/releases/tag/v0.3): 150 items (75 qa_citation, 75 citation_check) over 45 public US opinions from CourtListener (27 federal circuit, 18 state supreme court, 2018 or later), 15 legal topics, full provenance per item (opinion ID, URL, exact passage, cited authority). Written labelling protocol (LABELING_PROTOCOL.md v1.1); two blind, independent model raters, Cohen's kappa 0.98 on citation_check and 0.84 on qa_citation; every disagreement plus a 10% audit sample (30 items in all) adjudicated by the maintainer with a third independent model rater, 27 of 30 matched the recommended label. Items are model-drafted and model-checked; no human labelled every item. Sanity run on a 30-item sample, not a full run: claude-sonnet-5-5 citation precision 0.919 / recall 0.718, citation_check accuracy 1.00; gpt-5-mini 0.763 / 0.718, 0.93. DOI (v0.3): https://doi.org/10.5281/zenodo.23493797; DOI (all versions): https://doi.org/10.5281/zenodo.21969577.
 - CrossSource v0.1 result (n = 25): citation-discipline prompting lifted citation precision 0.981 (baseline) → 0.994 (strict); recall 0.760, capped by retrieval; faithfulness 1.000; 100% (15/15) blind human–judge agreement. Corpus: 22 public-domain US court opinions; 25-question golden set; BM25 top-5 retrieval.

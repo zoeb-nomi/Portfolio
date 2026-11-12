@@ -26,8 +26,8 @@ path figure, then Guarded / Measured / Shipped cells.
 
 Rows are native <details>: tap, click or Enter opens the row's panel (its
 result figure, its guard, its ship date and the case-study action) with no
-script at all. The motion layer adds hover-to-open on fine pointers and
-animates the panel height; the content is always in the HTML.
+script at all. The motion layer only animates the panel height on
+click/tap (no hover-open); the content is always in the HTML.
 
 ## Props
 

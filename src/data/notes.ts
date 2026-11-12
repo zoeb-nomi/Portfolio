@@ -912,14 +912,14 @@ export const notes: Note[] = [
     ],
     figure: {
       src: '/content/p27/vendor-voice.png',
-      alt: 'Boxes of hollow squares, one per record, for 239 hiring prompt records by author role: vendor 173 in red, recruiter 36, unknown 27 and hiring manager 3; roles assigned by the collector per record, unknown may include recruiters so the vendor count is a floor, and vendor covers any company\'s content including 42 article records.',
+      alt: 'Boxes of hollow squares, one per record, for 239 hiring prompt records by author role: vendor 173 in red, recruiter 36, unknown 27 and hiring manager 3; roles assigned by the collection script per record, unknown may include recruiters so the vendor count is a floor, and vendor covers any company\'s content including 42 article records.',
       width: 1080,
       height: 1350,
       caption: 'Records by the author-role label.',
       video: {
         src: '/content/p27/vendor-voice.mp4',
         poster: '/content/p27/vendor-voice.png',
-        label: 'Animated version of the figure. Boxes of hollow squares, one per record, for 239 hiring prompt records by author role: vendor 173 in red, recruiter 36, unknown 27 and hiring manager 3; roles assigned by the collector per record, unknown may include recruiters so the vendor count is a floor, and vendor covers any company\'s content including 42 article records.',
+        label: 'Animated version of the figure. Boxes of hollow squares, one per record, for 239 hiring prompt records by author role: vendor 173 in red, recruiter 36, unknown 27 and hiring manager 3; roles assigned by the collection script per record, unknown may include recruiters so the vendor count is a floor, and vendor covers any company\'s content including 42 article records.',
       },
     },
     pointers: [
@@ -928,7 +928,7 @@ export const notes: Note[] = [
       { label: 'README.md', href: 'https://github.com/zoeb-nomi/recruiter-prompt-bank/blob/main/README.md' },
       { label: 'reports/summary.json', href: 'https://github.com/zoeb-nomi/recruiter-prompt-bank/blob/main/reports/summary.json' },
     ],
-    limit: 'Roles assigned by the collector per record. Vendor covers any company\'s content, including 42 article records.',
+    limit: 'Roles assigned by the collection script per record. Vendor covers any company\'s content, including 42 article records.',
   },
   {
     id: 'p29',

@@ -42,11 +42,6 @@ const other = [{ slug: 'the-bus-stop-nobody-notices', e: writingBusStop, audio: 
   num: W.numbers[slug],
 }));
 
-const countSpec = (n: { value: number; display: string }) =>
-  /^\d+$/.test(n.display.replace(/,/g, '')) && !n.display.includes('/')
-    ? JSON.stringify({ from: 0, to: n.value, decimals: 0, prefix: '', suffix: '', final: n.display })
-    : null;
-
 // Notes grouped by build, newest first inside each group.
 const groups = notesPage.groups
   .map((g) => ({ ...g, notes: notes.filter((n) => n.group === g.id).sort((a, b) => b.date.localeCompare(a.date)) }))
@@ -64,14 +59,7 @@ const groups = notesPage.groups
           <li class="essay">
             <div class="essay-link">
               <span class="e-num" aria-hidden="true">
-                {p.num && (countSpec(p.num) ? (
-                  <span class="cv" data-count={countSpec(p.num)}>
-                    <span class="cv-final">{p.num.display}</span>
-                    <span class="cv-run" />
-                  </span>
-                ) : (
-                  p.num.display
-                ))}
+                {p.num?.display}
                 {p.num && <span class="e-unit">{p.num.unit}</span>}
               </span>
               <span class="e-main">
@@ -95,7 +83,7 @@ const groups = notesPage.groups
       groups.map((g) => (
         <div class="ngroup">
           <h3 class="ngroup-h">
-            {g.label} <span>{g.notes.length} {notesPage.groupSuffix}</span>
+            {g.label} <span>{g.notes.length} {g.notes.length === 1 ? 'note' : 'notes'}</span>
           </h3>
           <ul class="notes" role="list">
             {g.notes.map((n) => (
@@ -188,18 +176,6 @@ const groups = notesPage.groups
     letter-spacing: var(--track-tight);
     color: var(--ink);
     font-variant-numeric: tabular-nums;
-  }
-
-  .cv {
-    position: relative;
-    display: inline-block;
-  }
-
-  .cv-run {
-    position: absolute;
-    left: 0;
-    top: 0;
-    white-space: nowrap;
   }
 
   .e-unit {
@@ -299,6 +275,8 @@ const groups = notesPage.groups
 
   .ngroup-h span {
     color: var(--ink-muted);
+    text-transform: none;
+    letter-spacing: var(--track-wide);
   }
 
   .notes {

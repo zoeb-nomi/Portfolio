@@ -13,8 +13,9 @@
 //     values from that state to the final one, then clears them.
 //   - The H1 text never animates; only its underline draws.
 //   - Nothing animates layout: transforms, opacity and stroke offsets only.
-//   - Interaction that is not animation (hover-to-open ledger rows, Replay
+//   - Interaction that is not animation (click/tap-to-open ledger rows, Replay
 //     buttons) works with reduced motion too; it just does not tween.
+//   - Numbers are never tweened: every numeral renders its final value.
 
 import { animate } from 'animejs/animation';
 import { createTimeline } from 'animejs/timeline';
@@ -31,7 +32,7 @@ window.__zmMotion = true;
 const moving = (): boolean => root.classList.contains('motion');
 
 const EASE = 'outCubic';
-const DUR = { fast: 120, base: 200, slow: 600, count: 1000, story: 600 };
+const DUR = { fast: 120, base: 200, slow: 600, story: 600 };
 
 /** Clear the inline values anime left so the CSS final state takes over. */
 const clear = (els: Iterable<Element>, ...props: string[]) => {
@@ -51,32 +52,6 @@ function onceInView(el: Element, fn: () => void, threshold = 0.5): void {
     { threshold, rootMargin: '0px 0px -6% 0px' },
   );
   io.observe(el);
-}
-
-// ---------------------------------------------------------------- count-ups
-type Count = { from: number; to: number; decimals: number; prefix: string; suffix: string; final: string };
-
-/** The DOM keeps the final value (.cv-final); an aria-hidden copy (.cv-run) counts up from the datum. */
-function countUp(cv: HTMLElement, delay = 0): void {
-  const spec = JSON.parse(cv.dataset.count || 'null') as Count | null;
-  const run = cv.querySelector<HTMLElement>('.cv-run');
-  if (!spec || !run) return cv.classList.add('is-in');
-  const fmt = (v: number) => `${spec.prefix}${v.toLocaleString('en-US', { minimumFractionDigits: spec.decimals, maximumFractionDigits: spec.decimals })}${spec.suffix}`;
-  const state = { v: spec.from };
-  run.textContent = fmt(spec.from);
-  animate(state, {
-    v: spec.to,
-    duration: DUR.count,
-    delay,
-    ease: EASE,
-    onUpdate: () => {
-      run.textContent = fmt(state.v);
-    },
-    onComplete: () => {
-      run.textContent = '';
-      cv.classList.add('is-in');
-    },
-  });
 }
 
 // ------------------------------------------------------------ line draws
@@ -179,13 +154,12 @@ function playFlow(fig: HTMLElement): void {
 }
 
 // ------------------------------------------------------------ ledger rows
-/** Open/close a ledger row's panel; animate its height when motion is on. */
+/** Open/close a ledger row's panel on click, tap or Enter (native <details>);
+ *  animate its height when motion is on. No hover behaviour (v3.1 review). */
 function wireLedger(row: HTMLDetailsElement): void {
   const panel = row.querySelector<HTMLElement>('[data-panel]');
   const summary = row.querySelector('summary');
   if (!panel || !summary) return;
-  let pinned = false;
-  let hoverTimer = 0;
   let busy = false;
 
   const reveal = () => {
@@ -193,18 +167,24 @@ function wireLedger(row: HTMLDetailsElement): void {
     if (fig && moving()) playFigure(fig);
   };
 
-  const open = (viaHover: boolean) => {
-    if (row.open) return;
-    row.dataset.hover = viaHover ? '1' : '';
-    if (moving()) {
-      busy = true;
+  // Without motion the native toggle does everything; just draw the figure on open.
+  row.addEventListener('toggle', () => {
+    if (row.open && !busy) reveal();
+  });
+  if (!moving()) return;
+
+  summary.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (busy) return;
+    busy = true;
+    panel.style.overflow = 'hidden';
+    if (!row.open) {
       // Collapse first so the opening frame never flashes at full height.
-      panel.style.overflow = 'hidden';
       panel.style.height = '0px';
       row.open = true;
-      const h = panel.scrollHeight;
+      reveal();
       animate(panel, {
-        height: [0, h],
+        height: [0, panel.scrollHeight],
         opacity: [0, 1],
         duration: 260,
         ease: EASE,
@@ -214,63 +194,18 @@ function wireLedger(row: HTMLDetailsElement): void {
         },
       });
     } else {
-      row.open = true;
+      animate(panel, {
+        height: [panel.scrollHeight, 0],
+        opacity: [1, 0],
+        duration: 200,
+        ease: 'inCubic',
+        onComplete: () => {
+          row.open = false;
+          busy = false;
+          clear([panel], 'height', 'opacity', 'overflow');
+        },
+      });
     }
-    reveal();
-  };
-
-  const close = () => {
-    if (!row.open) return;
-    if (!moving()) {
-      row.open = false;
-      return;
-    }
-    busy = true;
-    panel.style.overflow = 'hidden';
-    animate(panel, {
-      height: [panel.scrollHeight, 0],
-      opacity: [1, 0],
-      duration: 200,
-      ease: 'inCubic',
-      onComplete: () => {
-        busy = false;
-        row.open = false;
-        clear([panel], 'height', 'opacity', 'overflow');
-      },
-    });
-  };
-
-  // Click / tap / Enter: the native toggle, animated. A click pins the row open.
-  summary.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (busy) return;
-    if (row.open && (pinned || row.dataset.hover !== '1')) {
-      pinned = false;
-      close();
-    } else if (row.open) {
-      pinned = true; // opened by hover, now clicked: keep it
-      row.dataset.hover = '';
-    } else {
-      pinned = true;
-      open(false);
-    }
-  });
-
-  // Hover to open on fine pointers, with a short intent delay; closes on leave unless pinned.
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    row.addEventListener('mouseenter', () => {
-      window.clearTimeout(hoverTimer);
-      hoverTimer = window.setTimeout(() => open(true), 140);
-    });
-    row.addEventListener('mouseleave', () => {
-      window.clearTimeout(hoverTimer);
-      if (!pinned && row.dataset.hover === '1') close();
-    });
-  }
-
-  // Opened another way (find-in-page, a hash): still draw the figure.
-  row.addEventListener('toggle', () => {
-    if (row.open && !busy) reveal();
   });
 }
 
@@ -291,7 +226,11 @@ function boot(): void {
       e.stopPropagation();
       if (btn.dataset.replay === 'fig0') {
         const fig = btn.closest<HTMLElement>('[data-fig0]');
-        if (fig) playFig0(fig);
+        if (fig) {
+          // Bring the whole figure into view first, so the replay is seen from step 0.
+          fig.scrollIntoView({ block: 'start' });
+          requestAnimationFrame(() => playFig0(fig));
+        }
       } else {
         const id = btn.getAttribute('aria-controls');
         const target = id ? document.getElementById(id) : btn.closest<HTMLElement>('[data-flow]');
@@ -319,20 +258,14 @@ function boot(): void {
   // Fig. 0 plays on load.
   document.querySelectorAll<HTMLElement>('[data-fig0]').forEach((fig) => requestAnimationFrame(() => playFig0(fig)));
 
-  // Readings: the dimension line draws from the datum, the value counts up from it.
+  // Readings: the dimension line draws from the datum to the value. The numeral
+  // itself is never tweened (no intermediate values are ever shown).
   document.querySelectorAll<HTMLElement>('[data-reading]').forEach((rd, i) => {
     onceInView(rd, () => {
       const d = i * 120;
       draw(Array.from(rd.querySelectorAll<HTMLElement>('[data-draw]')), d);
       pop(Array.from(rd.querySelectorAll<HTMLElement>('[data-pop]')), d + DUR.slow - 120);
-      rd.querySelectorAll<HTMLElement>('.cv[data-count]').forEach((cv) => countUp(cv, d));
     });
-  });
-
-  // Other count-ups (shipping tiles, writing lead numbers).
-  document.querySelectorAll<HTMLElement>('.cv[data-count]').forEach((cv) => {
-    if (cv.closest('[data-reading]')) return;
-    onceInView(cv, () => countUp(cv));
   });
 
   // Mini figures outside ledger panels (case-study Fig. 1, About Fig. 2).

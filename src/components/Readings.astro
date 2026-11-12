@@ -3,8 +3,8 @@
 // ProofStrip). Each headline number is a tile under a Heavy top bar: kicker,
 // numeral, a dimension figure from the datum (hollow) to the value (filled),
 // then the datum line (datum · change · n), the label and the source.
-// The DOM always holds the final numeral; the motion layer counts an
-// aria-hidden copy up from the datum and draws the dimension line (A §f).
+// The numeral is always the final value (never a counted, intermediate one);
+// the motion layer draws only the dimension line from the datum to the value.
 import { home } from '../data/copy';
 
 interface Props {
@@ -26,10 +26,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
         <li class="rd" data-reading>
           <p class="rd-k">{r.kicker}</p>
           <p class="rd-v">
-            <span class="cv" data-count={JSON.stringify(r.count)}>
-              <span class="cv-final">{r.display}</span>
-              <span class="cv-run" aria-hidden="true" />
-            </span>
+            <span class="rd-num">{r.display}</span>
             {r.unit && <span class="rd-unit">{r.unit}</span>}
             {'verdict' in r && r.verdict && (
               <span class="rd-verdict" aria-label="passed">
@@ -100,18 +97,6 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     letter-spacing: var(--track-display);
     color: var(--ink);
     font-variant-numeric: tabular-nums;
-  }
-
-  .cv {
-    position: relative;
-    display: inline-block;
-  }
-
-  .cv-run {
-    position: absolute;
-    left: 0;
-    top: 0;
-    white-space: nowrap;
   }
 
   .rd-unit {

@@ -106,6 +106,8 @@ const icons = ['measure', 'trace', 'guard', 'ship'] as const;
     border-top: var(--line-heavy);
     padding-top: var(--s-3);
     background: var(--paper);
+    /* Replay scrolls the figure to the top; keep it clear of the sticky header. */
+    scroll-margin-top: calc(var(--header-h) + var(--s-4));
   }
 
   .f0-head {

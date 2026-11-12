@@ -8,7 +8,7 @@
 
 Stat tiles (DESIGN v3 D-07): the proof tile without its figure. Heavy top
 bar, numeral, label, optional mono source. Used by /builds/#shipping.
-The numeral counts up once in view (aria-hidden copy; the DOM keeps the value).
+The numeral renders final; nothing counts (v3.1 review).
 Parse "12", "90%", "$0.07", "4.2" into a count spec from zero.
 
 ## Props

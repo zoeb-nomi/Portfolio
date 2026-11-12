@@ -10,8 +10,8 @@ Readings (Take B's B-07, drawn in the A system; replaces the home StatRow /
 ProofStrip). Each headline number is a tile under a Heavy top bar: kicker,
 numeral, a dimension figure from the datum (hollow) to the value (filled),
 then the datum line (datum · change · n), the label and the source.
-The DOM always holds the final numeral; the motion layer counts an
-aria-hidden copy up from the datum and draws the dimension line (A §f).
+The numeral is always the final value (never a counted, intermediate one);
+the motion layer draws only the dimension line from the datum to the value.
 
 ## Props
 

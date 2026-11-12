@@ -116,7 +116,8 @@ const { currentPath } = Astro.props;
     content: '';
     position: absolute;
     left: 0;
-    right: 0;
+    /* The caps tracking adds space after the last letter; end the bar on the glyph. */
+    right: var(--track-caps);
     bottom: 8px;
     border-top: var(--line-pen);
     transform: scaleX(0);
@@ -162,7 +163,10 @@ const { currentPath } = Astro.props;
   }
 
   /* Phones and tablets: role line under the wordmark, then the four items on
-     one row, each 44px tall. The header action lives in the hero instead. */
+     one row, each 44px tall. Items keep their natural width and the row uses
+     space-between, so the three gaps are equal, the first item starts on the
+     content column's left edge and the last ends on its right edge. The red
+     bar spans exactly its item's text (left: 0; right: 0 on the link). */
   @media (max-width: 899px) {
     .bar {
       grid-template-columns: 1fr;
@@ -188,65 +192,12 @@ const { currentPath } = Astro.props;
       gap: 0;
     }
 
-    .primary-nav li {
-      flex: 1 1 0;
-    }
-
-    .primary-nav li:last-child a {
-      justify-content: flex-end;
-    }
-
-    .primary-nav li:nth-child(2) a,
-    .primary-nav li:nth-child(3) a {
-      justify-content: center;
-    }
-
-    .primary-nav a {
-      display: flex;
-      width: 100%;
-    }
-
     .primary-nav a::after {
       bottom: 6px;
     }
 
     .hdr-cta {
       display: none;
-    }
-  }
-
-  @media (max-width: 899px) {
-    .primary-nav a::after {
-      left: 50%;
-      right: auto;
-      width: 3.2em;
-      transform: translateX(-50%) scaleX(0);
-      transform-origin: center;
-    }
-
-    .primary-nav li:first-child a::after {
-      left: 0;
-      transform: scaleX(0);
-      transform-origin: left;
-    }
-
-    .primary-nav li:last-child a::after {
-      left: auto;
-      right: 0;
-      transform: scaleX(0);
-      transform-origin: right;
-    }
-
-    .primary-nav a.current::after,
-    .primary-nav a:hover::after {
-      transform: translateX(-50%) scaleX(1);
-    }
-
-    .primary-nav li:first-child a.current::after,
-    .primary-nav li:first-child a:hover::after,
-    .primary-nav li:last-child a.current::after,
-    .primary-nav li:last-child a:hover::after {
-      transform: scaleX(1);
     }
   }
 </style>

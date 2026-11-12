@@ -1,10 +1,11 @@
 # v3 IA (DESIGN v3 §i). Old URLs keep working; fragments go to the new section.
+# 302 during the bake period; flip all eight to 301 two weeks after the v3 deploy.
 # src/pages/{evals,work,notes/index,shipping}.astro are the client-side fallbacks.
-/evals/     /builds/#method      301
-/evals      /builds/#method      301
-/work/      /about/#record       301
-/work       /about/#record       301
-/notes/     /writing/#notes      301
-/notes      /writing/#notes      301
-/shipping/  /builds/#shipping    301
-/shipping   /builds/#shipping    301
+/evals/     /builds/#method      302
+/evals      /builds/#method      302
+/work/      /about/#record       302
+/work       /about/#record       302
+/notes/     /writing/#notes      302
+/notes      /writing/#notes      302
+/shipping/  /builds/#shipping    302
+/shipping   /builds/#shipping    302

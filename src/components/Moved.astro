@@ -1,6 +1,6 @@
 ---
 // Redirect fallback for an old URL (DESIGN v3 §i). Cloudflare Pages serves the
-// 301 from public/_redirects first; this page exists so the URL still resolves
+// redirect from public/_redirects first (302 while baking, then 301); this page exists so the URL still resolves
 // where _redirects is not applied (local preview, a cached client), and it
 // carries any incoming #fragment across: /evals/#x lands on /builds/#x when
 // that id exists on the new page, else on the mapped section.
