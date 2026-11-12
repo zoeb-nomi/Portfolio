@@ -1,5 +1,7 @@
-/* zoebnomi.com — fonts + resets · The Red Pen v1.0
-   Self-hosted, zero requests to Google Fonts at runtime. */
+/* zoebnomi.com: fonts + resets · The Red Pen v3
+   Tokens come from design/tokens.css, the single source (design/README.md).
+   Self-hosted fonts, zero requests to Google Fonts at runtime. */
+@import '../../design/tokens.css';
 
 /* ---- Instrument Serif (display) ---- */
 @font-face {
@@ -237,7 +239,7 @@ h1, h2 {
   letter-spacing: var(--track-caps);
   text-transform: uppercase;
   padding: var(--s-3) var(--s-5);
-  border: 1px solid var(--rule-strong);
+  border: var(--line-object);
   z-index: var(--z-top);
   transition: top 150ms var(--ease-draw);
 }

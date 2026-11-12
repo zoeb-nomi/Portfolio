@@ -1,5 +1,6 @@
 ---
 import Button from './Button.astro';
+import { cta } from '../data/copy';
 
 interface Props {
   marginLines: string[];
@@ -8,9 +9,13 @@ interface Props {
   buttonHref: string;
   secondaryLabel?: string;
   secondaryHref?: string;
+  /** Mono line under the button; defaults to "30 min · intro call" for Book a call. */
+  buttonNote?: string | null;
 }
 
 const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHref } = Astro.props;
+const buttonNote =
+  Astro.props.buttonNote === undefined ? (buttonHref === cta.bookACall.href ? cta.bookACallNote : null) : Astro.props.buttonNote;
 ---
 
 <div class="cta-slab">
@@ -21,10 +26,13 @@ const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHre
     <div class="body-col">
       <p class="slab-body">{body}</p>
       <div class="slab-actions">
-        <Button href={buttonHref} variant="inverse">{buttonLabel}</Button>
-        {secondaryLabel && secondaryHref && (
-          <Button href={secondaryHref} variant="inverse">{secondaryLabel}</Button>
-        )}
+        <div class="slab-btns">
+          <Button href={buttonHref} variant="inverse">{buttonLabel}</Button>
+          {secondaryLabel && secondaryHref && (
+            <Button href={secondaryHref} variant="inverse">{secondaryLabel}</Button>
+          )}
+        </div>
+        {buttonNote && <p class="slab-note">{buttonNote}</p>}
       </div>
     </div>
   </div>
@@ -67,8 +75,22 @@ const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHre
 
   .slab-actions {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .slab-btns {
+    display: flex;
     gap: var(--s-4);
     flex-wrap: wrap;
+  }
+
+  .slab-note {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-wide);
+    color: var(--on-red-muted);
   }
 
   @media (max-width: 899px) {
@@ -79,7 +101,8 @@ const { marginLines, body, buttonLabel, buttonHref, secondaryLabel, secondaryHre
   }
 
   @media (max-width: 599px) {
-    .slab-actions {
+    .slab-actions,
+    .slab-btns {
       width: 100%;
     }
 

@@ -43,7 +43,7 @@ const { nodes } = Astro.props;
     justify-content: space-between;
     gap: var(--s-1) var(--s-4);
     padding: var(--s-3) var(--s-4);
-    border: 1px solid var(--ink);
+    border: var(--line-object);
     font-family: var(--font-mono);
     font-size: var(--t-data);
     color: var(--ink);
@@ -60,12 +60,12 @@ const { nodes } = Astro.props;
     inset-block-end: 100%;
     inset-inline-start: var(--s-6);
     block-size: var(--s-6);
-    border-inline-start: 1px solid var(--ink);
+    border-inline-start: var(--line-ink);
   }
 
   /* A reviewer's mark: the part that is not on the page. */
   .og-missing {
-    border: 2px dashed var(--red);
+    border: var(--line-pen-dashed);
     color: var(--red-ink);
   }
 

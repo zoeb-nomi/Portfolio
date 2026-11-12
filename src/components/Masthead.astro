@@ -3,13 +3,13 @@
 // body column, closed by a strong rule. One component for every interior page.
 //
 //   default   kicker in the margin column (Writing, Evals, posts, case studies)
-//             — add `spec` / `switcher` / `repo` for the case-study margin
+//            : add `spec` / `switcher` / `repo` for the case-study margin
 //   plain     empty margin column, hidden on phones (Work)
 //   photo     pass `thumbnail`: a 120px headshot in the margin column, no kicker,
 //             stacked above the title on phones (About)
 //
 // Slots: `byline` (a dated line under the standfirst) and the default slot
-// (anything under that — the read-along AudioPlayer). The AudioPlayer finds its
+// (anything under that, the read-along AudioPlayer). The AudioPlayer finds its
 // float anchor via `.masthead-inner > .margin-col`; keep both class names.
 import Headshot from './Headshot.astro';
 import EvalsSwitcher from './EvalsSwitcher.astro';
@@ -35,6 +35,10 @@ interface Props {
   spec?: SpecRow[];
   switcher?: 'CrossSource' | 'mirror-eval' | 'screener-eval';
   repo?: { href: string; label: string };
+  /** Breadcrumb under Builds/Writing (DESIGN v3 §e). Replaces the margin kicker. */
+  crumbs?: { label: string; href?: string }[];
+  /** About: one borderless greyscale portrait, 200px (D-12). */
+  portrait?: { alt: string };
 }
 
 const {
@@ -50,15 +54,18 @@ const {
   spec,
   switcher,
   repo,
+  crumbs,
+  portrait,
 } = Astro.props;
 
-const photo = Boolean(thumbnail);
+const photo = Boolean(thumbnail) || Boolean(portrait);
 const plain = variant === 'plain';
 const hasByline = Astro.slots.has('byline');
 const hasMarginExtras = Boolean(spec || switcher || repo);
 // A kicker alone is just text. Only a margin column that carries a spec block, the evals
 // switcher or a repo link is a real complementary region and gets a name.
 const Margin = hasMarginExtras ? 'aside' : 'div';
+const isCase = Boolean(crumbs) && hasMarginExtras;
 
 const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:${standfirstMax}`]
   .filter(Boolean)
@@ -67,19 +74,19 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
 
 <section class="masthead">
   <div
-    class:list={['masthead-inner', 'grid-margin', { 'is-photo': photo, 'is-plain': plain }]}
+    class:list={['masthead-inner', 'grid-margin', { 'is-photo': photo, 'is-plain': plain, 'is-case': isCase, 'has-crumbs': Boolean(crumbs) }]}
     style={vars || undefined}
   >
     {
       photo ? (
         <div class="margin-col">
-          <Headshot size="thumb" alt={thumbnail!.alt} loading="eager" />
+          <Headshot size={portrait ? 'about' : 'thumb'} alt={(portrait ?? thumbnail)!.alt} loading="eager" />
         </div>
       ) : plain ? (
         <div class="margin-col" aria-hidden="true" />
       ) : (
         <Margin class="margin-col" aria-label={hasMarginExtras ? label : undefined}>
-          <p class:list={['kicker', { 'kicker--stacked': hasMarginExtras }]}>{kicker}</p>
+          {!crumbs && <p class:list={['kicker', { 'kicker--stacked': hasMarginExtras }]}>{kicker}</p>}
           {spec && (
             <dl class="spec-block" data-narr={narr ? 's0-stats' : undefined}>
               {spec.map((s) => (
@@ -100,6 +107,19 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
       )
     }
     <div class="body-col">
+      {
+        crumbs && (
+          <nav class="crumbs" aria-label="Breadcrumb">
+            <ol>
+              {crumbs.map((c, i) => (
+                <li>
+                  {c.href ? <a href={c.href}>{c.label}</a> : <span aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.label}</span>}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
       <h1 class="page-h1" data-narr={narr ? 's0-title' : undefined}>{h1}</h1>
       {
         standfirst && (
@@ -124,8 +144,64 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
 </section>
 
 <style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin-bottom: var(--s-5);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .crumbs li:not(:last-child)::after {
+    content: '/';
+    padding-inline: var(--s-2);
+    color: var(--rule);
+  }
+
+  .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-min);
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--red-ink);
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .crumbs a:hover {
+    color: var(--red);
+  }
+
+  /* Case studies on phones and tablets: result first. Breadcrumb, H1, the
+     result standfirst, Fig. 1 and the audio come before the spec and the
+     switcher (D-10), reordered with CSS, never by duplicating DOM. */
+  @media (max-width: 899px) {
+    .is-case {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .is-case > .body-col {
+      order: 1;
+      padding-bottom: var(--s-4);
+    }
+
+    .is-case > .margin-col {
+      order: 2;
+      padding: 0 var(--gutter) var(--s-9);
+    }
+
+    .has-crumbs:not(.is-case) > .margin-col {
+      display: none;
+    }
+  }
+
   .masthead-inner {
-    border-bottom: 1px solid var(--rule-strong);
+    border-bottom: var(--line-ink);
     --body-pad-end: var(--s-11);
   }
 
@@ -179,7 +255,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     justify-content: space-between;
     gap: var(--s-3);
     padding-block: var(--s-2);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
     font-family: var(--font-mono);
     font-size: var(--t-data);
   }
@@ -254,7 +330,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
   }
 
   .is-photo .standfirst {
-    /* About's dek was never balanced — keep its rag. */
+    /* About's dek was never balanced: keep its rag. */
     text-wrap: pretty;
   }
 

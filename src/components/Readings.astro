@@ -1,0 +1,213 @@
+---
+// Readings (Take B's B-07, drawn in the A system; replaces the home StatRow /
+// ProofStrip). Each headline number is a tile under a Heavy top bar: kicker,
+// numeral, a dimension figure from the datum (hollow) to the value (filled),
+// then the datum line (datum · change · n), the label and the source.
+// The numeral is always the final value (never a counted, intermediate one);
+// the motion layer draws only the dimension line from the datum to the value.
+import { home } from '../data/copy';
+
+interface Props {
+  items?: typeof home.readings;
+}
+
+const { items = home.readings } = Astro.props;
+const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v - min) / (max - min))).toFixed(4);
+---
+
+<ul class="readings" role="list">
+  {
+    items.map((r) => {
+      const f = r.figure;
+      const a = pos(Math.min(f.datum, f.value), f.min, f.max);
+      const b = pos(Math.max(f.datum, f.value), f.min, f.max);
+      const towardsLeft = f.value < f.datum;
+      return (
+        <li class="rd" data-reading>
+          <p class="rd-k">{r.kicker}</p>
+          <p class="rd-v">
+            <span class="rd-num">{r.display}</span>
+            {r.unit && <span class="rd-unit">{r.unit}</span>}
+            {'verdict' in r && r.verdict && (
+              <span class="rd-verdict" aria-label="passed">
+                {r.verdict}
+              </span>
+            )}
+          </p>
+          <div class="rd-fig" aria-hidden="true">
+            <div class="rd-track">
+              {'datumBand' in f && f.datumBand && (
+                <span class="rd-band" style={`--a:${pos(f.datumBand[0], f.min, f.max)};--b:${pos(f.datumBand[1], f.min, f.max)}`} />
+              )}
+              <span class="rd-dim" data-draw style={`--a:${a};--b:${b};--origin:${towardsLeft ? 'right' : 'left'}`} />
+              <span class="rd-mark rd-datum" style={`--x:${pos(f.datum, f.min, f.max)}`} />
+              <span class="rd-mark rd-value" data-pop style={`--x:${pos(f.value, f.min, f.max)}`} />
+            </div>
+            <div class="rd-scale">
+              <span>{f.minLabel}</span>
+              {'zoomed' in f && f.zoomed && <span class="rd-zoom">{f.zoomed}</span>}
+              <span>{f.maxLabel}</span>
+            </div>
+          </div>
+          <p class="rd-datum-line">
+            <span>Datum <b>{r.datum}</b></span>
+            <span>change <b>{r.change}</b></span>
+            <span>{r.n}</span>
+          </p>
+          <p class="rd-label">{r.label}</p>
+          <p class="rd-src">{r.source}</p>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .readings {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--s-8);
+    row-gap: var(--s-9);
+  }
+
+  .rd {
+    border-top: var(--line-heavy);
+    padding-top: var(--s-3);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rd-k {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .rd-v {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    margin-top: var(--s-3);
+    font-family: var(--font-display);
+    font-size: var(--t-stat);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--track-display);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rd-unit {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .rd-verdict {
+    font-size: 0.5em;
+    color: var(--red-ink);
+  }
+
+  .rd-fig {
+    margin-top: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  .rd-track {
+    position: relative;
+    height: 16px;
+    margin-inline: 6px;
+    border-bottom: var(--line-hair);
+  }
+
+  .rd-band {
+    position: absolute;
+    left: calc(var(--a) * 100%);
+    width: calc((var(--b) - var(--a)) * 100%);
+    bottom: 0;
+    height: 8px;
+    background: var(--heat-0);
+  }
+
+  .rd-dim {
+    position: absolute;
+    left: calc(var(--a) * 100%);
+    width: calc((var(--b) - var(--a)) * 100%);
+    bottom: 6px;
+    border-top: var(--line-heavy);
+    transform-origin: var(--origin, left);
+  }
+
+  .rd-mark {
+    position: absolute;
+    bottom: 2px;
+    left: calc(var(--x) * 100%);
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border: var(--line-object);
+    background: var(--paper);
+  }
+
+  .rd-value {
+    background: var(--ink);
+  }
+
+  .rd-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--s-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rd-zoom {
+    font-style: italic;
+  }
+
+  .rd-datum-line {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--s-3);
+    row-gap: 2px;
+    margin-top: var(--s-3);
+    padding-top: var(--s-2);
+    border-top: var(--line-hair);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rd-datum-line b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .rd-label {
+    margin-top: var(--s-3);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+  }
+
+  .rd-src {
+    margin-top: auto;
+    padding-top: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 899px) {
+    .readings {
+      grid-template-columns: 1fr;
+      row-gap: var(--s-8);
+    }
+  }
+</style>

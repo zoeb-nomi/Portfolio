@@ -65,7 +65,7 @@
   grid-template-columns: 200px 1fr;
   gap: var(--s-6);
   padding-block: var(--s-6);
-  border-top: 1px solid var(--rule);
+  border-top: var(--line-hair);
 }
 
 .method-row:first-child {

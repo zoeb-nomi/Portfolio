@@ -11,7 +11,8 @@ import EssayFigure from '../components/EssayFigure.astro';
 import ForestPlot from '../components/ForestPlot.astro';
 import ParserCompare from '../components/ParserCompare.astro';
 import UnitChart from '../components/UnitChart.astro';
-import { meta, screenerEval as se, screenerEvalJsonLd, cta, home } from '../data/copy';
+import MiniFigure from '../components/MiniFigure.astro';
+import { meta, screenerEval as se, screenerEvalJsonLd, cta, home, caseStudy } from '../data/copy';
 import { jsonLdString } from '../lib/jsonLdString';
 import { forestData, flipData, parserData } from '../lib/figureData';
 
@@ -40,12 +41,14 @@ const table3Rows = se.s5.table.rows.map((r) => ({
   description={meta.screenerEval.description}
   path="/screener-eval/"
   ogImage="/og/screener-eval.png"
+  motion
 >
   <script type="application/ld+json" set:html={jsonLdString(screenerEvalJsonLd)} is:inline />
 
   <Masthead
     label="Case study specification"
     kicker={se.kicker}
+    crumbs={[...caseStudy.crumbs, { label: 'screener-eval' }]}
     h1={se.title}
     standfirst={se.standfirst}
     h1Max="26ch"
@@ -54,6 +57,17 @@ const table3Rows = se.s5.table.rows.map((r) => ({
     repo={{ href: se.repoHref, label: se.repoLabel }}
     narr
   >
+    <EssayFigure n={1} title={caseStudy.screenerFig1.title} source={caseStudy.screenerFig1.source}>
+      <MiniFigure
+        size="wide"
+        label="Employer swap moved the score 1.14 points or less; deleting links 0.90 or less; which screener read it, 22.3 points."
+        fig={{ kind: 'bars', max: 25, unit: 'points', bars: [
+          { label: 'employer swap', value: 1.14, display: '≤1.14' },
+          { label: 'links deleted', value: 0.9, display: '≤0.90' },
+          { label: 'which screener', value: 22.3, display: '22.3', mark: true },
+        ] }}
+      />
+    </EssayFigure>
     {se.audio && <AudioPlayer audio={se.audio} articleId="screener-eval" />}
   </Masthead>
 

@@ -1,7 +1,7 @@
 ---
 // Reviewer-annotation. Never carries a fact that exists nowhere else.
 // Renders as <aside> (a real landmark) by default. When already nested inside
-// another <aside> (e.g. Section's margin column), pass as="div" — a landmark
+// another <aside> (e.g. Section's margin column), pass as="div", a landmark
 // should never be nested inside another landmark of the same kind.
 interface Props {
   label?: string;
@@ -17,7 +17,7 @@ const ariaProps = Tag === 'aside' ? { 'aria-label': label } : {};
 
 <style>
   .margin-note {
-    border-left: 2px solid var(--rule-accent);
+    border-left: var(--line-pen);
     padding-left: var(--s-3);
     margin-top: var(--s-6);
   }

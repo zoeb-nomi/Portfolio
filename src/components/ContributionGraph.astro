@@ -4,7 +4,7 @@
 // and never disappears; a small inline script then tries /api/contributions
 // and re-renders with live data on success, updating the caption to match.
 //
-// Monochrome by design (§6 tokens in tokens.css) — never GitHub green.
+// Monochrome by design (§6 tokens in tokens.css): never GitHub green.
 import snapshot from '../data/contributions.json';
 import { contributions as copy } from '../data/copy';
 
@@ -88,7 +88,10 @@ const snapshotDateStr = fetchedAt
   ? new Date(fetchedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   : '';
 
-const initialCaption = `${totalLastYear} ${copy.captionSnapshot} ${snapshotDateStr}`;
+const initialCaptionRest = `${copy.captionSnapshot} ${snapshotDateStr}`;
+// The total sits in its own span, reserved at its final digit count (mono, tabular), so
+// the motion layer can count it up without moving the text after it.
+const totalChars = String(totalLastYear).length;
 
 const rangeLabel =
   days.length > 0
@@ -100,7 +103,7 @@ const rangeLabel =
 const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear} contributions in the last year`;
 ---
 
-<div class="cg" data-contrib-graph data-recent-start={recentWeeksStart}>
+<div class="cg" data-contrib-graph data-recent-start={recentWeeksStart} data-total={totalLastYear}>
   <p class="cg-kicker">{copy.kicker}</p>
 
   <div class="cg-scroll" tabindex="0" role="region" aria-label="GitHub contribution calendar, scrollable">
@@ -136,7 +139,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
   </div>
 
   <div class="cg-footer">
-    <p class="cg-caption" data-contrib-caption>{initialCaption}</p>
+    <p class="cg-caption" data-contrib-caption><span class="cg-total" data-cg-total style={`--chars: ${totalChars}`}>{totalLastYear}</span> <span data-cg-rest>{initialCaptionRest}</span></p>
     <div class="cg-legend" aria-hidden="true">
       <span class="cg-legend-label">{copy.legendLess}</span>
       <span class="cg-legend-swatch" data-level="0"></span>
@@ -150,7 +153,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 </div>
 
 <script>
-  // Progressive enhancement only — the server-rendered snapshot above is a
+  // Progressive enhancement only, the server-rendered snapshot above is a
   // complete, correct graph on its own. This script:
   //   1. scrolls the grid so the most recent ~26 weeks are in view by default
   //      on narrow viewports (fixed 11px cells never shrink below legible size,
@@ -186,7 +189,16 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
         });
 
         if (captionEl && typeof data.total_last_year === 'number') {
-          captionEl.textContent = `${data.total_last_year} contributions in the last year · live from GitHub`;
+          const totalEl = captionEl.querySelector<HTMLElement>('[data-cg-total]');
+          const restEl = captionEl.querySelector<HTMLElement>('[data-cg-rest]');
+          if (totalEl && restEl) {
+            totalEl.textContent = String(data.total_last_year);
+            totalEl.style.setProperty('--chars', String(String(data.total_last_year).length));
+            restEl.textContent = 'contributions in the last year · live from GitHub';
+          } else {
+            captionEl.textContent = `${data.total_last_year} contributions in the last year · live from GitHub`;
+          }
+          root.dataset.total = String(data.total_last_year);
           // Keep the accessible name in step with the visible caption (it said the snapshot's
           // total while the caption showed the live one).
           root.querySelector('.cg-grid')?.setAttribute(
@@ -305,6 +317,24 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     color: var(--ink-muted);
+  }
+
+  /* Reserved at the final digit count so a count-up never shifts the caption. */
+  .cg-total {
+    display: inline-block;
+    min-width: calc(var(--chars, 3) * 1ch);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The most recent week, once, at the end of the sweep (motion layer adds the class). */
+  .cg-cell.cg-pulse {
+    animation: cg-pulse 1200ms var(--ease-draw) 1;
+  }
+
+  @keyframes cg-pulse {
+    0% { outline: var(--line-pen); outline-offset: 0; }
+    100% { outline: var(--line-pen); outline-color: transparent; outline-offset: 3px; }
   }
 
   .cg-legend {

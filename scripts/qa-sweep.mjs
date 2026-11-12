@@ -21,7 +21,7 @@ const IGNORE = /umami|cloudflareinsights|\/api\/contributions/;
 
 // --- allowed font sizes from tokens.css -----------------------------------
 function loadScale() {
-  const css = readFileSync(path.join(ROOT, 'src/styles/tokens.css'), 'utf8');
+  const css = readFileSync(path.join(ROOT, 'design/tokens.css'), 'utf8');
   const fixed = new Set();
   const ranges = [];
   for (const m of css.matchAll(/--t-[\w-]+:\s*([^;]+);/g)) {

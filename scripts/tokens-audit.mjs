@@ -30,7 +30,7 @@ const VIEWPORTS = [
 ];
 
 // --- token set from tokens.css --------------------------------------------
-const css = readFileSync(path.join(ROOT, 'src/styles/tokens.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+const css = readFileSync(path.join(ROOT, 'design/tokens.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 const fixedSizes = new Set();
 const sizeRanges = [];
 for (const m of css.matchAll(/--t-[\w-]+:\s*([^;]+);/g)) {

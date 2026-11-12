@@ -15,9 +15,9 @@
   grid-template-columns: var(--margin-col) 1fr;
 }
 
-/* The margin column: a --rule edge, indented by --gutter on the left. */
+/* The margin column: indented by --gutter on the left. v3 draws no vertical
+   rule here (horizontals only, DESIGN v3 §b rule 1). */
 :where(.grid-margin) > :where(.margin-col) {
-  border-right: 1px solid var(--rule);
   padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
 }
 
@@ -38,14 +38,14 @@
     grid-template-columns: 1fr;
   }
 
+  /* Stacked, the margin column is a bare label with no rule under it, so
+     each section loses a line (DESIGN v3 §d). */
   :where(.grid-margin) > :where(.margin-col) {
-    border-right: 0;
-    border-bottom: 1px solid var(--rule);
-    padding: var(--s-6) var(--gutter);
+    padding: var(--s-9) var(--gutter) 0;
   }
 
   :where(.grid-margin) > :where(.body-col) {
-    padding: var(--s-7) var(--gutter);
+    padding: var(--s-5) var(--gutter) var(--s-11);
   }
 }
 
@@ -53,11 +53,11 @@
    mastheads, timeline entries and page bodies keep their 899px padding. */
 @media (max-width: 599px) {
   :where(.grid-margin--compact) > :where(.margin-col) {
-    padding: var(--s-5) var(--gutter);
+    padding: var(--s-9) var(--gutter) 0;
   }
 
   :where(.grid-margin--compact) > :where(.body-col) {
-    padding: var(--s-6) var(--gutter);
+    padding: var(--s-4) var(--gutter) var(--s-11);
   }
 }
 

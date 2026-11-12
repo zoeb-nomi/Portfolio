@@ -1,9 +1,9 @@
 ---
-// Margin-column switcher on /crosssource and /mirror-eval — lets a reader on
+// Margin-column switcher on /crosssource and /mirror-eval: lets a reader on
 // one case study jump to the other without going back through nav. Three
 // line tiers only: --rule for the divider above it, --red-ink for the
 // current item (no new colors).
-import { evalsSwitcher } from '../data/copy';
+import { evalsSwitcher, evalsSwitcherLabel } from '../data/copy';
 
 interface Props {
   current: 'CrossSource' | 'mirror-eval' | 'screener-eval';
@@ -13,7 +13,7 @@ const { current } = Astro.props;
 ---
 
 <div class="evals-switch">
-  <p class="switch-label">Evals</p>
+  <p class="switch-label">{evalsSwitcherLabel}</p>
   <ul class="switch-list">
     {
       evalsSwitcher.map((s) => (
@@ -35,7 +35,7 @@ const { current } = Astro.props;
   .evals-switch {
     margin-top: var(--s-6);
     padding-top: var(--s-5);
-    border-top: 1px solid var(--rule);
+    border-top: var(--line-hair);
   }
 
   .switch-label {
@@ -72,7 +72,11 @@ const { current } = Astro.props;
     text-decoration-thickness: 2px;
   }
 
+  /* The current marker carries a view-transition name, so moving between case
+     studies slides it from one item to the next instead of swapping (brief §3). */
   .switch-list .current {
+    display: inline-block;
     color: var(--red-ink);
+    view-transition-name: evals-switch-current;
   }
 </style>

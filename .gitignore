@@ -6,3 +6,4 @@ audit-report.json
 .audio-cache/
 .env
 .env.*
+.lighthouseci/

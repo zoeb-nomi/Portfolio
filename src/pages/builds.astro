@@ -1,0 +1,407 @@
+---
+// /builds/ (SPEC #20-22, DESIGN v3 §i): Systems (TradeFrame first), Eval
+// harnesses, Method (the old /evals/), Contributions, Shipping numbers.
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import Section from '../components/Section.astro';
+import BuildsLedger from '../components/BuildsLedger.astro';
+import DataTable from '../components/DataTable.astro';
+import PullQuote from '../components/PullQuote.astro';
+import StatTiles from '../components/StatTiles.astro';
+import CTASlab from '../components/CTASlab.astro';
+import { meta, home, cta, builds as B, buildsLedger, evalsLedger, shipping } from '../data/copy';
+
+const systems = buildsLedger.filter((b) => b.group === 'systems');
+const evals = buildsLedger.filter((b) => b.group === 'evals');
+const contribs = buildsLedger.filter((b) => b.group === 'contributions');
+
+// velocity-public.json (I17) arrives by its own PR. Until it has >= 3 closed
+// builds the summary line is absent, not softened (SPEC #22).
+const velocityPath = path.join(process.cwd(), 'public', 'data', 'velocity-public.json');
+let summary: string | null = null;
+if (existsSync(velocityPath)) {
+  try {
+    const v = JSON.parse(readFileSync(velocityPath, 'utf8'));
+    const s = v?.builds_summary;
+    if (s && s.closed_n >= 3) {
+      summary = B.summary
+        .replaceAll('{shipped_n}', String(s.shipped_n))
+        .replaceAll('{on_time_n}', String(s.on_time_n))
+        .replaceAll('{median_days}', String(s.median_days))
+        .replaceAll('{median_cost}', Number(s.median_cost_usd).toFixed(2));
+    }
+  } catch {
+    summary = null;
+  }
+}
+
+const tableRows = evalsLedger.map((e) => ({
+  label: e.name,
+  cells: [{ text: e.question }, { text: e.table.judge }, { text: e.table.metric }, { text: e.table.sample }, { text: e.table.verdict }],
+}));
+
+// Fig. 2: judge verdicts that matched a blind human label. One ink bar per
+// judge; the status tag at the row end is the only red (SPEC #34).
+const agreement = [
+  { name: 'CrossSource judge', n: 15, of: 15, tag: '[judged]' },
+  { name: 'mirror-eval, judge 1', n: 3, of: 40, tag: '[null]' },
+  { name: 'mirror-eval, judge 2', n: 12, of: 40, tag: '[null]' },
+  { name: 'screener-eval', n: null, of: null, tag: '[counted]' },
+];
+---
+
+<Base title={meta.builds.title} description={meta.builds.description} path="/builds/" ogImage="/og/builds.png" motion>
+  <Masthead kicker={B.kicker} h1={B.h1} standfirst={B.standfirst} h1Max="18ch" standfirstMax="62ch">
+    {summary && <p class="summary">{summary} <span>{B.summarySource}</span></p>}
+    <dl class="legend">
+      {
+        B.legend.map((l) => (
+          <div>
+            <dt>{l.term}</dt>
+            <dd>{l.text}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <nav class="jump" aria-label="On this page">
+      {B.jump.map((j) => <a href={j.href}>{j.label}</a>)}
+    </nav>
+  </Masthead>
+
+  <Section mark={B.sections.systems.mark} label={B.sections.systems.label} sub={B.sections.systems.note} anchorId={B.sections.systems.anchorId} grid>
+    <BuildsLedger variant="feature" entries={systems} />
+  </Section>
+
+  <Section mark={B.sections.evals.mark} label={B.sections.evals.label} sub={B.sections.evals.note} anchorId={B.sections.evals.anchorId} grid>
+    <p class="why">{B.evalsWhy}</p>
+    <p class="legend-line">{home.evals.legend}</p>
+    <BuildsLedger variant="full" entries={evals} />
+  </Section>
+
+  <Section mark={B.sections.method.mark} label={B.sections.method.label} anchorId={B.sections.method.anchorId}>
+    <h3 class="sub-h2">{home.evals.h2}</h3>
+    <p class="dek">{home.evals.standfirst}</p>
+    <PullQuote rule="ink">{home.evals.methodLine}</PullQuote>
+
+    <figure class="ja" aria-labelledby="fig2-cap" data-mini-figure>
+      <figcaption id="fig2-cap"><b>Fig. 2</b> {home.evals.figCaption}</figcaption>
+      <ul class="ja-rows" role="list">
+        {
+          agreement.map((a) => (
+            <li class="ja-row">
+              <span class="ja-name">{a.name}</span>
+              <span class="ja-trk" aria-hidden="true">
+                {a.n !== null ? <span class="ja-bar" data-draw style={`--b:${(a.n / a.of!).toFixed(4)}`} /> : <span class="ja-none">no judge in the loop</span>}
+              </span>
+              <span class="ja-v">{a.n !== null ? `${a.n} of ${a.of}` : 'no judge'}</span>
+              <span class="ja-tag">{a.tag}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="ja-ax" aria-hidden="true"><span>0%</span><span>50%</span><span>100%</span></p>
+      <p class="note">{home.evals.figNote}</p>
+    </figure>
+
+    <div class="compare">
+      <DataTable caption={home.evals.tableCaption} columns={home.evals.tableColumns} rows={tableRows} />
+    </div>
+    <p class="close-line">{home.evals.closeLine}</p>
+  </Section>
+
+  <Section mark={B.sections.contributions.mark} label={B.sections.contributions.label} sub={B.sections.contributions.note} anchorId={B.sections.contributions.anchorId}>
+    <BuildsLedger variant="full" entries={contribs} />
+    <p class="close-line">{B.close}</p>
+  </Section>
+
+  <Section mark={B.sections.shipping.mark} label={B.sections.shipping.label} sub={B.sections.shipping.note} anchorId={B.sections.shipping.anchorId}>
+    <h3 class="sub-h2">{shipping.h2}</h3>
+    <p class="dek">{shipping.lede}</p>
+    <StatTiles tiles={shipping.tiles} />
+    <div class="sentences">
+      <p>{shipping.costSentence}</p>
+      <p>{shipping.controlSentence} <span class="ctl-note">{shipping.controlNote}</span></p>
+    </div>
+    <div class="ship-table">
+      <DataTable
+        caption={`Table 2. ${shipping.table.caption}`}
+        columns={shipping.table.columns}
+        rows={shipping.table.rows.map(([week, ...rest]) => ({ label: week, cells: rest.map((text) => ({ text })) }))}
+        nowrap
+      />
+      <p class="note">{shipping.table.note}</p>
+      <p class="note">{shipping.asOf}</p>
+    </div>
+  </Section>
+
+  <CTASlab
+    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
+    body={home.ctaSlabBody}
+    buttonLabel={cta.bookACall.label}
+    buttonHref={cta.bookACall.href}
+  />
+</Base>
+
+<style>
+  .summary {
+    margin-top: var(--s-5);
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .summary span {
+    display: block;
+    font-weight: 400;
+    font-size: var(--t-label);
+    font-family: var(--font-mono);
+    color: var(--ink-muted);
+  }
+
+  .legend {
+    display: grid;
+    gap: var(--s-1);
+    margin-top: var(--s-6);
+    padding-top: var(--s-3);
+    border-top: var(--line-hair);
+    font-size: var(--t-small);
+    color: var(--ink-body);
+    max-width: 62ch;
+  }
+
+  .legend div {
+    display: flex;
+    gap: var(--s-2);
+  }
+
+  .legend dt {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .legend dt::after {
+    content: ':';
+  }
+
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+    margin-top: var(--s-5);
+  }
+
+  .jump a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .why {
+    font-size: var(--t-small);
+    color: var(--ink-body);
+    max-width: var(--measure);
+  }
+
+  .legend-line {
+    margin-block: var(--s-3) var(--s-6);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+    max-width: 80ch;
+  }
+
+  .sub-h2 {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    max-width: 22ch;
+  }
+
+  .dek {
+    margin-block: var(--s-4) var(--s-8);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
+    max-width: var(--measure);
+  }
+
+  .ja {
+    margin-top: var(--s-11);
+    border-top: var(--line-heavy);
+    padding-top: var(--s-3);
+  }
+
+  .ja figcaption {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    margin-bottom: var(--s-5);
+  }
+
+  .ja figcaption b {
+    font-weight: 500;
+    color: var(--red-ink);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    margin-right: var(--s-2);
+  }
+
+  .ja-rows {
+    list-style: none;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .ja-row,
+  .ja-ax {
+    display: grid;
+    grid-template-columns: 11em minmax(0, 1fr) 6em 6.5em;
+    column-gap: var(--s-4);
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+  }
+
+  .ja-name {
+    color: var(--ink);
+  }
+
+  .ja-trk {
+    position: relative;
+    height: 12px;
+    border-bottom: var(--line-hair);
+  }
+
+  .ja-bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(var(--b) * 100%);
+    background: var(--ink);
+    transform-origin: left;
+  }
+
+  .ja-none {
+    color: var(--ink-muted);
+    font-style: italic;
+  }
+
+  .ja-v {
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ja-tag {
+    color: var(--red-ink);
+  }
+
+  .ja-ax {
+    margin-top: var(--s-1);
+    color: var(--ink-muted);
+  }
+
+  .ja-ax span:nth-child(1) {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .ja-ax span:nth-child(2) {
+    grid-column: 2;
+    justify-self: center;
+  }
+
+  .ja-ax span:nth-child(3) {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .ja-ax span {
+    grid-row: 1;
+  }
+
+  .note {
+    margin-top: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+    max-width: 80ch;
+  }
+
+  .compare {
+    margin-top: var(--s-11);
+  }
+
+  .compare :global(.data-table th),
+  .compare :global(.data-table td) {
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .compare :global(.data-table td) {
+    font-family: var(--font-body);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+  }
+
+  .close-line {
+    margin-top: var(--s-8);
+    font-family: var(--font-display);
+    font-size: var(--t-quote);
+    line-height: var(--lh-heading);
+    color: var(--ink);
+    max-width: 40ch;
+  }
+
+  .sentences {
+    display: grid;
+    gap: var(--s-3);
+    margin-top: var(--s-9);
+    max-width: var(--measure);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
+  }
+
+  .ctl-note {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  .ship-table {
+    margin-top: var(--s-9);
+  }
+
+  @media (min-width: 600px) {
+    .compare :global(.data-table) {
+      min-width: 720px;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .ja-row,
+    .ja-ax {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      row-gap: var(--s-1);
+    }
+
+    .ja-name {
+      grid-column: 1 / -1;
+    }
+
+    .ja-ax span {
+      grid-column: 1 !important;
+    }
+  }
+</style>

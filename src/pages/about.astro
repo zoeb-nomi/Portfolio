@@ -1,100 +1,156 @@
 ---
+// /about/ (DESIGN v3 §e About, I-05): who he is, then the employment record as
+// §2 (#record, absorbing /work/), the public builds, and contact. One square
+// borderless greyscale portrait; no employer logos; the Keka video is a
+// click-to-play embed in the margin column.
 import Base from '../layouts/Base.astro';
 import Masthead from '../components/Masthead.astro';
-import EmbedCard from '../components/EmbedCard.astro';
-import CTASlab from '../components/CTASlab.astro';
+import Section from '../components/Section.astro';
+import TimelineEntry from '../components/TimelineEntry.astro';
+import RecordList from '../components/RecordList.astro';
+import VideoEmbed from '../components/VideoEmbed.astro';
+import MiniFigure from '../components/MiniFigure.astro';
 import CareerTimeline from '../components/CareerTimeline.astro';
-import { meta, about, cta, home } from '../data/copy';
+import CTASlab from '../components/CTASlab.astro';
+import { meta, about, work, cta, home, sources } from '../data/copy';
 import { isExternal } from '../lib/isExternal';
 
-// Order matches the footer's, so the two link rows read as one list.
-const links = [
-  { label: cta.bookACall.label, href: cta.bookACall.href },
-  { label: cta.email.label, href: cta.email.href },
-  { label: cta.linkedin.label, href: cta.linkedin.href },
-  { label: cta.github.label, href: cta.github.href },
-];
-
+const links = [cta.bookACall, cta.email, cta.linkedin, cta.github];
+const S = about.sections;
+const insteadFig = {
+  kind: 'dumbbell' as const,
+  min: 0,
+  max: 15,
+  from: 12.5,
+  to: 0.5,
+  fromLabel: work.insteadFigure.fromLabel,
+  toLabel: work.insteadFigure.toLabel,
+  minLabel: '0',
+  maxLabel: '15 min',
+};
 ---
 
 <Base title={meta.about.title} description={meta.about.description} path="/about/" ogImage="/og/about.png">
-  <Masthead
-    h1={about.h1}
-    standfirst={about.dek}
-    thumbnail={{ alt: about.photoAlt }}
-    standfirstMax="640px"
+  <Masthead h1={about.h1} standfirst={about.dek} portrait={{ alt: about.photoAlt }} standfirstMax="58ch" />
+
+  <Section mark={S.who.mark} label={S.who.label} anchorId={S.who.anchorId}>
+    <p class="prose">{about.bodyPara1}</p>
+    <blockquote class="belief">
+      <p>{about.beliefPre}<strong>{about.beliefStrong}</strong>{about.beliefPost}</p>
+    </blockquote>
+    <p class="profile">
+      {about.profileLink.pre} <a href={sources.kekaProfile.href} target="_blank" rel="noopener noreferrer">{about.profileLink.label}</a>
+    </p>
+    <CareerTimeline items={about.timeline} />
+    <p class="facts">{about.factsRow.join(' · ')}</p>
+  </Section>
+
+  <Section mark={S.record.mark} label={S.record.label} anchorId={S.record.anchorId}>
+    <p class="record-lede">{work.standfirst}</p>
+  </Section>
+
+  <TimelineEntry
+    company={work.instead.company}
+    role={work.instead.role}
+    dateRange={work.instead.dateRange}
+    descriptor={work.instead.descriptor}
+    achievements={work.instead.achievements}
+    note={work.insteadNote}
+    headingLevel="h3"
+    primary
+  >
+    <figure slot="margin" class="m-fig">
+      <MiniFigure fig={insteadFig} label={`${work.insteadFigure.caption}: ${work.insteadFigure.fromLabel} to ${work.insteadFigure.toLabel}`} />
+      <figcaption>{work.insteadFigure.caption}. {work.insteadFigure.note}</figcaption>
+    </figure>
+    <RecordList
+      slot="record"
+      kicker={work.recordKicker}
+      items={work.instead.record.items}
+      note={work.instead.record.note}
+      context={work.instead.company}
+    />
+  </TimelineEntry>
+
+  <TimelineEntry
+    company={work.multiplier.company}
+    role={work.multiplier.role}
+    dateRange={work.multiplier.dateRange}
+    descriptor={work.multiplier.descriptor}
+    achievements={work.multiplier.achievements}
+    headingLevel="h3"
+  >
+    <RecordList
+      slot="record"
+      kicker={work.recordKicker}
+      items={work.multiplier.record.items}
+      note={work.multiplier.record.note}
+      context={work.multiplier.company}
+    />
+  </TimelineEntry>
+
+  <TimelineEntry
+    company={work.keka.company}
+    role={work.keka.role}
+    dateRange={work.keka.dateRange}
+    descriptor={work.keka.descriptor}
+    standfirst={work.keka.standfirst}
+    achievements={work.keka.achievements}
+    headingLevel="h3"
+  >
+    <div slot="margin" class="m-video">
+      <VideoEmbed
+        youtubeId={work.keka.video.youtubeId}
+        title={work.keka.video.title}
+        caption={work.keka.video.caption}
+        poster={work.keka.video.poster}
+        figNo={3}
+      />
+    </div>
+    <RecordList
+      slot="record"
+      kicker={work.recordKicker}
+      items={work.keka.record.items}
+      note={work.keka.record.note}
+      context={work.keka.company}
+    />
+  </TimelineEntry>
+
+  <TimelineEntry
+    company={work.hurix.company}
+    role={work.hurix.role}
+    dateRange={work.hurix.dateRange}
+    achievements={work.hurix.achievements}
+    headingLevel="h3"
   />
 
-  <section class="body-section">
-    <div class="body-inner grid-margin">
-      <div class="margin-col" aria-hidden="true"></div>
-
-      <div class="body-col">
-        <h2 class="visually-hidden">The record</h2>
-        <p class="prose">{about.bodyPara1}</p>
-
-        <EmbedCard
-          kicker={about.embed.kicker}
-          title={about.embed.title}
-          excerpt={about.embed.excerpt}
-          byline={about.embed.byline}
-          href={about.embed.href}
-          linkLabel={about.embed.linkLabel}
-          imageAlt={about.photoAlt}
-          logo={{ src: '/img/logos/keka.png', width: 66, height: 24, alt: 'Keka' }}
-        />
-
-        <CareerTimeline items={about.timeline} />
-
-        <blockquote class="belief">
-          <p>
-            {about.beliefPre}<strong>{about.beliefStrong}</strong>{about.beliefPost}
-          </p>
-        </blockquote>
-      </div>
-    </div>
+  <section class="arc-close">
+    <p>{work.arcClose}</p>
   </section>
 
-  <section class="facts-row">
-    <ul>
-      {about.factsRow.map((fact, i) => (
-        <li>
-          {i === about.factsRow.length - 1 ? (
-            <a href={cta.bookACall.href}>{fact}</a>
-          ) : (
-            fact
-          )}
-        </li>
-      ))}
+  <Section mark={S.builds.mark} label={S.builds.label} anchorId={S.builds.anchorId}>
+    <RecordList kicker={work.openWork.kicker} items={work.openWork.items} note={work.openWork.note} flush />
+    <p class="ledger-link"><a href={work.openWork.ledgerLink.href}>{work.openWork.ledgerLink.label}</a></p>
+    <RecordList kicker={work.contributions.kicker} items={work.contributions.items} note={work.contributions.note} context="Contributions" />
+  </Section>
+
+  <Section mark={S.contact.mark} label={S.contact.label} anchorId={S.contact.anchorId}>
+    <ul class="links-list">
+      {
+        links.map((l) => (
+          <li>
+            <a href={l.href} target={isExternal(l.href) ? '_blank' : undefined} rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}>
+              <span class="link-label">{l.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
     </ul>
-  </section>
-
-  <section class="links-list">
-    <h2 class="visually-hidden">Contact</h2>
-    <ul>
-      {links.map((l) => (
-        <li>
-          <a
-            href={l.href}
-            target={isExternal(l.href) ? '_blank' : undefined}
-            rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}
-          >
-            <span class="link-label">{l.label}</span>
-            <span class="arrow" aria-hidden="true">→</span>
-          </a>
-        </li>
-      ))}
-      <li>
-        <a class="has-detail" href={about.profileRow.href} target="_blank" rel="noopener noreferrer">
-          <span class="link-label">{about.profileRow.label}</span>
-          <span class="link-detail">{about.profileRow.detail}</span>
-        </a>
-      </li>
-    </ul>
-  </section>
+  </Section>
 
   <CTASlab
-    marginLines={[home.eyebrow.toUpperCase()]}
+    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
     body={home.ctaSlabBody}
     buttonLabel={cta.bookACall.label}
     buttonHref={cta.bookACall.href}
@@ -102,23 +158,16 @@ const links = [
 </Base>
 
 <style>
-  /* The body sits on the site's grid — same margin-col | body-col split as
-     every other page — so its text starts at the same x as Work and Home. */
-  .body-section {
-    border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .body-inner {
-    --body-pad-end: var(--s-11);
-  }
-
   .prose {
-    margin-bottom: var(--s-8);
+    max-width: var(--measure);
+    line-height: var(--lh-prose);
+    color: var(--ink-body);
   }
 
   .belief {
-    border-top: 1px solid var(--rule-strong);
-    padding-top: var(--s-7);
+    margin-top: var(--s-8);
+    border-top: var(--line-pen);
+    padding-top: var(--s-6);
   }
 
   .belief p {
@@ -129,80 +178,118 @@ const links = [
     max-width: 46ch;
   }
 
-  /* Instrument Serif ships a 400 face only — 500 would be synthesised. */
   .belief strong {
     font-weight: 400;
     font-style: italic;
   }
 
-  .facts-row ul {
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    border-bottom: 1px solid var(--rule-strong);
-  }
-
-  .facts-row li {
-    padding: var(--s-7) var(--gutter);
-    font-family: var(--font-mono);
-    font-size: var(--t-data);
+  .profile {
+    margin-block: var(--s-6) var(--s-9);
+    font-size: var(--t-small);
     color: var(--ink-body);
-    border-left: 1px solid var(--rule);
+    max-width: var(--measure);
   }
 
-  .facts-row li:first-child {
-    border-left: 0;
-  }
-
-  .facts-row a {
+  .profile a,
+  .ledger-link a {
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
 
-  .links-list ul {
-    list-style: none;
+  .facts {
+    margin-top: var(--s-6);
+    font-family: var(--font-mono);
+    font-size: var(--t-data);
+    color: var(--ink-body);
   }
 
-  /* No top rule on the first row — the facts row above already closed with a
-     strong rule, and two lines with nothing between them is one too many. */
-  .links-list li {
-    border-bottom: 1px solid var(--rule);
+  .record-lede {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    line-height: var(--lh-heading);
+    color: var(--ink);
+    max-width: 34ch;
+  }
+
+  .m-fig {
+    margin-top: var(--s-6);
+  }
+
+  .m-fig figcaption {
+    margin-top: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+  }
+
+  .m-video {
+    margin-top: var(--s-6);
+    max-width: 240px;
+  }
+
+  .arc-close {
+    padding: var(--s-11) var(--gutter);
+    border-bottom: var(--line-ink);
+  }
+
+  .arc-close p {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: var(--lh-title);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    max-width: 30ch;
+    margin-inline: auto;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .ledger-link {
+    margin-block: var(--s-4) var(--s-2);
+  }
+
+  .ledger-link a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+  }
+
+  .links-list {
+    list-style: none;
+    border-top: var(--line-heavy);
+    border-bottom: var(--line-heavy);
+  }
+
+  .links-list li + li {
+    border-top: var(--line-hair);
   }
 
   .links-list a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--s-5);
     min-height: 56px;
-    padding-block: 14px;
-    padding-inline: var(--gutter);
     color: var(--ink);
-    /* The label carries the (red) underline; without this the anchor's own ink
-       underline stacks under it and every label reads as double-underlined. */
     text-decoration: none;
   }
 
   .link-label {
     font-family: var(--font-mono);
-    font-size: var(--t-label-lg);
-    letter-spacing: var(--track-wide);
+    font-size: var(--t-nav);
+    letter-spacing: var(--track-caps);
     text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: 4px;
     text-decoration-color: var(--red-ink);
   }
 
-  .link-detail {
-    font-family: var(--font-mono);
-    font-size: var(--t-note);
-    line-height: var(--lh-snug);
-    color: var(--ink-muted);
-    text-align: right;
-  }
-
-  .links-list .arrow {
+  .arrow {
     color: var(--red-ink);
     transform: translateX(-4px);
     transition: transform var(--dur-fast) var(--ease-draw);
@@ -213,34 +300,12 @@ const links = [
   }
 
   @media (max-width: 899px) {
-    .facts-row ul {
-      grid-template-columns: 1fr;
+    .m-video {
+      max-width: 320px;
     }
 
-    .facts-row li {
-      border-left: 0;
-      border-top: 1px solid var(--rule);
-    }
-
-    .facts-row li:first-child {
-      border-top: 0;
-    }
-
-    /* Only the row that carries a detail line stacks; the arrow rows keep the
-       arrow on the label's line. */
-    .links-list a.has-detail {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--s-2);
-    }
-
-    /* The empty margin column would render as a ruled band under the masthead. */
-    .body-inner > .margin-col {
-      display: none;
-    }
-
-    .link-detail {
-      text-align: left;
+    .arc-close p {
+      font-size: var(--t-h3);
     }
   }
 </style>

@@ -1,0 +1,593 @@
+---
+// BuildsLedger (DESIGN v3 D-08, SPEC #17/#20-22): one row per build, booktabs
+// (Heavy above and below, Ink under the head, Hair between rows). Red only on
+// the verdict tag and the links.
+//
+//   variant="full"     /builds/: # · Build · Guarded · Measured · Shipped at
+//                      >=1100px; each row stacks into label/value pairs below.
+//   variant="compact"  home §2: # · Build · Measured, rows with `compact: true`.
+//   variant="feature"  /builds/ §1 first row (TradeFrame): head, the decision
+//                      path figure, then Guarded / Measured / Shipped cells.
+//
+// Rows are native <details>: tap, click or Enter opens the row's panel (its
+// result figure, its guard, its ship date and the case-study action) with no
+// script at all. The motion layer only animates the panel height on
+// click/tap (no hover-open); the content is always in the HTML.
+import { buildsLedger, builds } from '../data/copy';
+import type { BuildEntry } from '../data/copy';
+import MiniFigure from './MiniFigure.astro';
+import TradeFrameFlow from './TradeFrameFlow.astro';
+import { isExternal } from '../lib/isExternal';
+
+interface Props {
+  variant?: 'full' | 'compact' | 'feature';
+  entries?: BuildEntry[];
+  /** Number shown in the # column for the first row. */
+  start?: number;
+}
+
+const { variant = 'full', start = 1 } = Astro.props;
+const entries = Astro.props.entries ?? (variant === 'compact' ? buildsLedger.filter((b) => b.compact) : buildsLedger);
+const pad = (n: number) => String(n).padStart(2, '0');
+const shipped = (b: BuildEntry) => (b.shippedBeforeLedger ? builds.shippedUntracked(b.shippedBeforeLedger) : '');
+const ext = (href: string) => (isExternal(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {});
+const figLabel = (b: BuildEntry) => `${b.name}: ${b.measured.lead ?? ''} ${b.measured.headline}`.trim();
+const C = builds.columns;
+---
+
+{
+  variant === 'feature' ? (
+    entries.map((b, i) => (
+      <article class="feat" aria-labelledby={`b-${b.id}`} data-build={b.id}>
+        <div class="feat-head">
+          <span class="idx">{pad(start + i)}</span>
+          <div>
+            <h3 class="feat-name" id={`b-${b.id}`}>{b.name}</h3>
+            {b.tag && <span class="tag">{b.tag}</span>}
+            <p class="one">{b.oneLine}</p>
+          </div>
+        </div>
+        <TradeFrameFlow variant="full" id={`flow-${b.id}`} />
+        <dl class="feat-cells">
+          <div>
+            <dt>{C.guarded}</dt>
+            <dd>{b.guarded}</dd>
+          </div>
+          <div>
+            <dt>{C.measured}</dt>
+            <dd>{b.measured.headline}</dd>
+          </div>
+          <div>
+            <dt>{C.shipped}</dt>
+            <dd>
+              <p class="ship">{shipped(b)}</p>
+              <p class="lnks">
+                {b.links.map((l) => (
+                  <a href={l.href} {...ext(l.href)}>
+                    {l.label}
+                  </a>
+                ))}
+              </p>
+            </dd>
+          </div>
+        </dl>
+      </article>
+    ))
+  ) : (
+    <div class:list={['ledger', `is-${variant}`]} data-ledger>
+      <div class="l-head" aria-hidden="true">
+        <span>{C.n}</span>
+        <span>{C.build}</span>
+        {variant === 'full' && <span>{C.guarded}</span>}
+        <span>{C.measured}</span>
+        {variant === 'full' && <span>{C.shipped}</span>}
+        <span />
+      </div>
+      <ul class="l-rows" role="list">
+        {entries.map((b, i) => (
+          <li class="l-item">
+            <details class="l-row" data-build={b.id}>
+              <summary class="l-sum">
+                <span class="idx">{pad(start + i)}</span>
+                <span class="l-build">
+                  <span class="l-name" id={`b-${variant}-${b.id}`}>{b.name}</span>
+                  {b.tag && <span class="tag">{b.tag}</span>}
+                  <span class="one">{b.oneLine}</span>
+                </span>
+                {variant === 'full' && (
+                  <span class="l-cell l-guard">
+                    <span class="l-lab">{C.guarded}</span>
+                    {b.guarded}
+                  </span>
+                )}
+                <span class="l-cell l-meas">
+                  <span class="l-lab">{C.measured}</span>
+                  {b.figure?.kind === 'flow' ? (
+                    <span class="l-flowlead">
+                      <TradeFrameFlow variant="strip" id={`strip-${variant}-${b.id}`} replay={false} />
+                    </span>
+                  ) : (
+                    <>
+                      {b.measured.lead && <span class="l-num">{b.measured.lead}</span>}
+                      <span class="l-mtext">{b.measured.lead ? [b.measured.denominator, variant === 'full' ? b.measured.scorerCheck : null].filter(Boolean).join(' · ') || b.measured.headline : b.measured.headline}</span>
+                    </>
+                  )}
+                </span>
+                {variant === 'full' && (
+                  <span class="l-cell l-ship">
+                    <span class="l-lab">{C.shipped}</span>
+                    {shipped(b)}
+                  </span>
+                )}
+                <span class="l-toggle" aria-hidden="true">
+                  <span class="l-plus" />
+                </span>
+              </summary>
+              <div class="l-panel" data-panel>
+                <div class="l-panel-in">
+                  {b.figure && b.figure.kind === 'flow' && (
+                    <button class="flow-replay" type="button" data-replay="flow" aria-controls={`strip-${variant}-${b.id}`} hidden>
+                      {builds.tradeframeFlow.replay} <span aria-hidden="true">↺</span>
+                    </button>
+                  )}
+                  {b.figure && b.figure.kind !== 'flow' && <MiniFigure fig={b.figure} label={figLabel(b)} />}
+                  <dl class="l-facts">
+                    {(b.measured.lead || b.figure?.kind === 'flow') && (
+                      <div>
+                        <dt>{builds.expand.result}</dt>
+                        <dd>{b.measured.headline}</dd>
+                      </div>
+                    )}
+                    {variant === 'compact' && (
+                      <div>
+                        <dt>{builds.expand.guard}</dt>
+                        <dd>{b.guarded}</dd>
+                      </div>
+                    )}
+                    {variant === 'compact' && (
+                      <div>
+                        <dt>{builds.expand.shipped}</dt>
+                        <dd>{shipped(b)}</dd>
+                      </div>
+                    )}
+                  </dl>
+                  <p class="lnks">
+                    <a class="primary" href={b.primary.href} {...ext(b.primary.href)} aria-describedby={`b-${variant}-${b.id}`}>
+                      {b.primary.label}
+                    </a>
+                    {b.links
+                      .filter((l) => l.href !== b.primary.href)
+                      .map((l) => (
+                        <a href={l.href} {...ext(l.href)} aria-describedby={`b-${variant}-${b.id}`}>
+                          {l.label}
+                        </a>
+                      ))}
+                  </p>
+                </div>
+              </div>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<style>
+  /* ---------- shared ---------- */
+  .idx {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    padding-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tag {
+    display: inline-block;
+    margin-top: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--red-ink);
+  }
+
+  .one {
+    display: block;
+    margin-top: var(--s-2);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+    max-width: 46ch;
+  }
+
+  .lnks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+  }
+
+  .lnks a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-min);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .lnks a.primary {
+    min-height: var(--hit-touch);
+    font-weight: 500;
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+  }
+
+  .lnks a:hover {
+    color: var(--red);
+    text-decoration-thickness: 2px;
+  }
+
+  /* ---------- ledger (booktabs) ---------- */
+  .ledger {
+    border-top: var(--line-heavy);
+    border-bottom: var(--line-heavy);
+  }
+
+  .l-head,
+  .l-sum {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, .75fr) 28px;
+    column-gap: var(--s-5);
+    align-items: start;
+  }
+
+  .is-compact .l-head,
+  .is-compact .l-sum {
+    grid-template-columns: 40px minmax(0, 1.25fr) minmax(0, 1fr) 28px;
+  }
+
+  .l-head {
+    padding-block: var(--s-2);
+    border-bottom: var(--line-ink);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .l-item + .l-item {
+    border-top: var(--line-hair);
+  }
+
+  .l-rows {
+    list-style: none;
+  }
+
+  .l-row {
+    transition: background-color var(--dur-fast) var(--ease-draw);
+  }
+
+  .l-sum {
+    list-style: none;
+    cursor: pointer;
+    padding-block: var(--s-6);
+  }
+
+  .l-sum::-webkit-details-marker {
+    display: none;
+  }
+
+  .l-sum:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .l-name {
+    display: block;
+    overflow-wrap: anywhere;
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+  }
+
+  .l-cell {
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+  }
+
+  .l-lab {
+    display: none;
+  }
+
+  .l-num {
+    display: block;
+    margin-bottom: var(--s-1);
+    font-family: var(--font-display);
+    font-size: var(--t-num);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .l-ship {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  /* The open/close mark: a plus that turns into a minus. */
+  .l-toggle {
+    position: relative;
+    justify-self: end;
+    width: 28px;
+    height: 28px;
+    margin-top: 2px;
+    border: var(--line-object-muted);
+    transition: border-color var(--dur-fast) var(--ease-draw);
+  }
+
+  .l-plus::before,
+  .l-plus::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    top: 13px;
+    border-top: var(--line-object);
+    transition: transform var(--dur-base) var(--ease-draw);
+  }
+
+  .l-plus::after {
+    transform: rotate(90deg);
+  }
+
+  .l-row[open] .l-plus::after {
+    transform: rotate(0deg);
+  }
+
+  .l-row:hover .l-toggle,
+  .l-row[open] .l-toggle {
+    border-color: var(--red);
+  }
+
+  .l-row:hover .l-name,
+  .l-row[open] .l-name {
+    color: var(--red-ink);
+  }
+
+  /* Hover: the row's rule goes Hair -> Ink (A §f). */
+  .l-item:hover + .l-item,
+  .l-item:has(.l-row[open]) + .l-item {
+    border-top: var(--line-ink);
+  }
+
+  .l-panel-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-4) var(--s-8);
+    align-items: start;
+    margin-left: calc(40px + var(--s-5));
+    margin-right: calc(28px + var(--s-5));
+    padding: var(--s-4) 0 var(--s-7);
+    border-top: var(--line-hair);
+  }
+
+  .l-panel-in > :global(.mf),
+  .l-panel-in > .flow-replay {
+    grid-column: 1;
+  }
+
+  .flow-replay {
+    justify-self: start;
+    min-height: var(--hit-touch);
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .flow-replay[hidden] {
+    display: none;
+  }
+
+  .l-flowlead {
+    display: block;
+  }
+
+  .l-facts {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .l-facts:empty {
+    display: none;
+  }
+
+  .l-facts dt {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .l-facts dd {
+    margin-top: 2px;
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+  }
+
+  .l-panel-in > .lnks {
+    grid-column: 1;
+  }
+
+  .is-full .l-name {
+    font-size: clamp(22px, 1.9vw, 26px);
+  }
+
+  /* ---------- stacked rows (D-14): below 1100px every row becomes label/value pairs ---------- */
+  @media (max-width: 1099px) {
+    .l-head {
+      display: none;
+    }
+
+    .l-sum,
+    .is-compact .l-sum {
+      grid-template-columns: 32px minmax(0, 1fr) 28px;
+      row-gap: var(--s-3);
+      padding-block: var(--s-5);
+    }
+
+    .l-build {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .l-toggle {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .l-cell {
+      grid-column: 2 / span 2;
+      display: grid;
+      grid-template-columns: 6.5em minmax(0, 1fr);
+      column-gap: var(--s-3);
+      padding-top: var(--s-2);
+      border-top: var(--line-hair);
+    }
+
+    .l-lab {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--t-label);
+      letter-spacing: var(--track-caps);
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      padding-top: 3px;
+    }
+
+    .l-cell .l-num,
+    .l-cell .l-mtext,
+    .l-cell .l-flowlead {
+      grid-column: 2;
+    }
+
+    .l-panel-in {
+      grid-template-columns: 1fr;
+      margin-left: calc(32px + var(--s-5));
+      margin-right: 0;
+    }
+
+    .l-facts,
+    .is-full .l-panel-in > .lnks,
+    .l-panel-in > .lnks {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .l-cell {
+      grid-template-columns: 1fr;
+      row-gap: 2px;
+    }
+
+    .l-cell .l-num,
+    .l-cell .l-mtext,
+    .l-cell .l-flowlead {
+      grid-column: 1;
+    }
+
+    .l-sum,
+    .is-compact .l-sum {
+      column-gap: var(--s-3);
+    }
+
+    .l-panel-in {
+      margin-left: 0;
+    }
+  }
+
+  /* ---------- feature (TradeFrame) ---------- */
+  .feat {
+    border-top: var(--line-heavy);
+    border-bottom: var(--line-heavy);
+    padding-block: var(--s-6) var(--s-7);
+  }
+
+  .feat-head {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: var(--s-5);
+    margin-bottom: var(--s-7);
+  }
+
+  .feat-name {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-tight);
+    color: var(--ink);
+  }
+
+  .feat .one {
+    font-size: var(--t-body);
+    max-width: 58ch;
+  }
+
+  .feat-cells {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-6) var(--s-8);
+    margin-top: var(--s-7);
+    padding-top: var(--s-4);
+    border-top: var(--line-ink);
+  }
+
+  .feat-cells dt {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: var(--s-2);
+  }
+
+  .feat-cells dd {
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+  }
+
+  .feat .ship {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    margin-bottom: var(--s-2);
+  }
+
+  @media (max-width: 899px) {
+    .feat-head {
+      grid-template-columns: 32px minmax(0, 1fr);
+      column-gap: var(--s-3);
+    }
+
+    .feat-cells {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
