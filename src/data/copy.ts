@@ -321,64 +321,29 @@ export const home = {
     "I'm Zoeb Nomi, a product manager at Instead, an AI-native tax research and planning platform. I work on a multi-step tax workflow from both sides: I test whether its steps stay coherent from first input to final memo, and I cut its run time from 10 to 15 minutes to under a minute. ",
   subheadHighlight: "In tax research, a wrong citation isn't a UX bug. It's a compliance risk.",
 
-  // Fig. 0: the story figure beside the H1 (Take B, B-05/B-19, redrawn in the A
-  // system). Strings are B-26, approved as written, except "zone" -> "section"
-  // in the caption (A has sections, not lettered zones).
+  // Fig. 0, the audit sheet (v3.3): the figure beside the H1. Its cells, counts, caption and the ledger strip
+  // come from src/data/fig0-cells.ts, which reads them out of the case-study copy below; only the frame's
+  // labels live here.
   fig0: {
     n: 'Fig. 0',
-    title: 'How a quiet failure becomes a shipped step',
-    caption:
-      'The argument of this site in one drawing: a failure nobody sees, the four checks built around it, then the release. Each section below expands one step.',
-    replay: 'Replay Fig. 0',
-    output: {
-      n: '0',
-      name: 'The output',
-      doc: 'Memo · step 4 of 6',
-      miss: 'Cites a passage that does not support the claim.',
-      note: 'Fails quietly. Nothing in the output looks wrong.',
-    },
-    steps: [
-      {
-        n: '1',
-        name: 'Measured',
-        text: 'Decide what good output means, then count it. Check the judge blind against a person.',
-        proof: '15/15 · CrossSource judge vs a person',
-      },
-      {
-        n: '2',
-        name: 'Traced',
-        text: 'Every answer can be followed back to where it came from.',
-        proof: 'Document ID and sub-type on every cited source · Instead',
-      },
-      {
-        n: '3',
-        name: 'Guarded',
-        text: 'The model proposes; rules decide what is allowed to run, and when a person must confirm.',
-        proof: 'Hard rails, kill switch per book · TradeFrame',
-      },
-      {
-        n: '4',
-        name: 'Shipped',
-        text: 'It reaches users, on a date I said in advance.',
-        proof: 'Run time 10–15 min → under a minute · Instead',
-      },
-    ],
-    stamp: 'Released',
+    title: 'The audit sheet',
+    replay: 'Replay',
   },
 
   // §1. Readings (B-07): value, datum, change, n and source on every headline
   // number. The value renders final at once; only the dimension line draws
   // (v3.1 review: no intermediate values). Three systems, three numbers (CP §1, U7).
   measuredLabel: 'Shipped, then measured',
-  readingsRef: 'Fig. 0, step 1.',
-  readingsWhy: 'A check is only real if it produces a number someone else can read. Three of them, from three different systems.',
+  readingsRef: 'Fig. 0, the first band.',
+  readingsWhy:
+    'The 15 CrossSource judge verdicts checked against a person are what let R2 be read as a number. A check is only real if it produces a number someone else can read: three of them here, from three different systems.',
   readingsNext: { label: 'Next: the builds these readings came from', href: '#sec-builds' },
 
   // §1 on home (Zoeb, 12 Nov 16:03 IST): the shipping numbers right after the hero,
   // compact. Three tiles and one sentence; the full table stays on /builds/#shipping.
   shippingLabel: 'What my agents shipped',
-  shippingRef: 'Fig. 0, step 4.',
-  shippingWhy: 'Shipped, on a date set when the work was filed, and counted.',
+  shippingRef: 'Fig. 0 counts the checks.',
+  shippingWhy: 'This counts what shipped, on a date set when the work was filed.',
   shippingTiles: 3,
   shippingFull: { label: 'Full table →', href: '/builds/#shipping' },
   shippingNext: { label: 'Next: what my builds were measured on', href: '#sec-shipped-then-measured' },
@@ -426,8 +391,8 @@ export const home = {
   builds: {
     kicker: 'Builds',
     h2: 'What I built, how it is guarded, what it was measured against.',
-    ref: 'Fig. 0, steps 2 and 3.',
-    why: 'A number means little without the system it checked. Every build is drawn the same way, so you can compare them.',
+    ref: 'Fig. 0, four of the six bands.',
+    why: 'Four of the six bands on the sheet came out of two builds below, CrossSource and screener-eval; the other two came out of mirror-eval, on the full ledger. A number means little without the system it checked. Every build is drawn the same way, so you can compare them.',
     closeLine:
       'One system where the AI proposes and code decides, and three of my five eval harnesses. Every new build is added with the date I planned to ship it and the date I did.',
     allLink: { label: 'All builds →', href: '/builds/' },
@@ -457,15 +422,15 @@ export const home = {
       'One judge passed and caught a bug. One judge failed and the study survived on counts. One needed no judge at all. It is the same method I use on anything I build before it runs unchecked.',
   },
 
-  // §3. Contributions graph back-reference.
-  contribRef: 'Fig. 0, step 4, in public.',
-  contribWhy: 'Shipped in the open: the commits behind every build, by day.',
+  // §5. Contributions graph back-reference.
+  contribRef: 'Fig. 0, in public.',
+  contribWhy: 'Every harness behind the sheet is a public repo. These are the commits behind every build, by day.',
 
   // §4. How I work: the canon's four verbs.
   howIWorkLabel: 'How I work',
-  methodsRef: 'Fig. 0, in full.',
+  methodsRef: 'Fig. 0 is 01, drawn.',
   methodsNext: { label: 'Next: the code behind them', href: '#sec-pm-who-ships-code' },
-  methodsWhy: 'The four steps, with the work behind each one.',
+  methodsWhy: 'Decide what good output means, then count it: every square on the sheet is one such count. 02 to 04 are the work around it.',
   methods: [
     {
       n: '01',
@@ -497,7 +462,7 @@ export const home = {
   autonomySource: { pre: 'From', label: 'Nobody Reports the Misses →', href: '/writing/nobody-reports-the-misses/' },
 
   // The closing line before the CTA (B-26).
-  backToFig0: { strong: 'Back to Fig. 0.', text: 'The last step is the one I cannot draw yet: your product.', link: 'Fig. 0 ↑' },
+  backToFig0: { strong: 'Back to Fig. 0.', text: 'The one cell I cannot draw yet: your product.', link: 'Fig. 0 ↑' },
 
   ctaSlabMarginNow: 'NOW: PM AT INSTEAD',
   ctaSlabMarginBefore: 'BEFORE: $2.7M MRR FROM ZERO AT KEKA HR',

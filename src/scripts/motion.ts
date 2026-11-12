@@ -1,6 +1,6 @@
 // The motion and interaction layer (design/README.md §Motion; BUILD_BRIEF §3).
 //
-// Library: anime.js v4, modular imports only (animate, timeline, stagger):
+// Library: anime.js v4, modular imports only (animate, stagger):
 // about 15 KB gzipped, loaded only on the pages that include <Motion /> (home,
 // /builds/, the three case studies, /writing/). First paint never waits on it:
 // it is a deferred module, and every element's final state is in the HTML.
@@ -18,7 +18,6 @@
 //   - Numbers are never tweened: every numeral renders its final value.
 
 import { animate } from 'animejs/animation';
-import { createTimeline } from 'animejs/timeline';
 import { stagger } from 'animejs/utils';
 
 declare global {
@@ -32,7 +31,7 @@ window.__zmMotion = true;
 const moving = (): boolean => root.classList.contains('motion');
 
 const EASE = 'outCubic';
-const DUR = { fast: 120, base: 200, slow: 600, story: 600 };
+const DUR = { fast: 120, base: 200, slow: 600 };
 
 /** Clear the inline values anime left so the CSS final state takes over. */
 const clear = (els: Iterable<Element>, ...props: string[]) => {
@@ -89,46 +88,67 @@ function playFigure(fig: Element): void {
   pop(Array.from(fig.querySelectorAll<HTMLElement>('[data-pop]')), DUR.slow - 120);
 }
 
-// ------------------------------------------------------------ Fig. 0
+// ------------------------------------------------------------ Fig. 0, the audit sheet
+// One red scan line sweeps the sheet once; the failed squares turn red as it passes: each band's red overlay
+// (AuditSheet.astro, .as-red) is revealed by a clip-path whose edge moves with the line, so the whole sweep
+// is seven animated elements. Then the ledger strip under the H1 wipes in.
+const SWEEP = 1100;
+const WIPE = ['inset(0% 100% 0% 0%)', 'inset(0% 0% 0% 0%)'];
+const fig0Timers = new WeakMap<Element, number>();
+
 function playFig0(fig: HTMLElement): void {
-  fig.classList.remove('is-done');
-  const steps = Array.from(fig.querySelectorAll<HTMLElement>('[data-f0-step]'));
-  const conns = Array.from(fig.querySelectorAll<HTMLElement>('[data-f0-conn]'));
-  const cloud = fig.querySelector<SVGPathElement>('[data-f0-cloud]');
-  const note = fig.querySelector<HTMLElement>('[data-f0-note]');
-  const stamp = fig.querySelector<HTMLElement>('[data-f0-stamp]');
+  const bands = fig.querySelector<HTMLElement>('[data-f0-bands]');
+  const scan = fig.querySelector<HTMLElement>('[data-f0-scan]');
+  const reds = Array.from(fig.querySelectorAll<HTMLElement>('[data-f0-red]'));
+  const strip = document.querySelector<HTMLElement>('[data-fig0-strip]');
 
-  const tl = createTimeline({
-    defaults: { ease: EASE },
-    onComplete: () => {
-      fig.classList.add('is-done');
-      clear(steps, 'clip-path', 'transform');
-      clear(conns, 'transform');
-      if (cloud) clear([cloud], 'stroke-dasharray', 'stroke-dashoffset');
-      if (note) clear([note], 'clip-path');
-      if (stamp) clear([stamp], 'clip-path', 'transform');
-    },
-  });
-
-  // Step 0 (the output) rises, then the revision cloud rings the bad citation.
-  // Reveals are clip-path wipes, never fades: text stays at full contrast throughout.
-  const WIPE = ['inset(0% 100% 0% 0%)', 'inset(0% 0% 0% 0%)'];
-  tl.add(steps[0], { clipPath: WIPE, translateY: [8, 0], duration: DUR.story }, 150);
-  if (cloud) {
-    cloud.style.strokeDasharray = '100';
-    tl.add(cloud, { strokeDashoffset: [100, 0], duration: 700, ease: 'inOutSine' }, 650);
+  // Start frame: every square paper-white (the overlays clipped away), the strip clipped away.
+  reds.forEach((r) => (r.style.clipPath = WIPE[0]));
+  if (strip) {
+    strip.classList.remove('is-in');
+    strip.style.clipPath = WIPE[0];
   }
-  if (note) tl.add(note, { clipPath: WIPE, duration: 360 }, 1250);
-  // Steps 1-4: each connector grows, then its step rises (about 0.45 s apart).
-  steps.slice(1).forEach((step, i) => {
-    const at = 1450 + i * 420;
-    if (conns[i]) tl.add(conns[i], { scaleY: [0, 1], duration: 220 }, at);
-    tl.add(step, { clipPath: WIPE, translateY: [8, 0], duration: DUR.story }, at + 120);
-  });
-  // The stamp lands at about 3.2 s.
-  if (stamp) {
-    tl.add(stamp, { clipPath: ['inset(0% 0% 0% 0%)', 'inset(0% 0% 0% 0%)'], duration: 1 }, 3200);
-    tl.add(stamp, { scale: [1.6, 1], rotate: [-12, -3], duration: 380, ease: 'outBack(1.6)' }, 3200);
+  fig.dataset.state = 'run';
+
+  // The line crosses the sheet in SWEEP; each overlay's clip edge crosses with it.
+  if (bands && scan) {
+    scan.style.visibility = 'visible';
+    animate(scan, {
+      translateX: [0, bands.clientWidth],
+      duration: SWEEP,
+      ease: 'linear',
+      onComplete: () => {
+        scan.style.visibility = 'hidden';
+        clear([scan], 'transform');
+      },
+    });
+  }
+  if (reds.length) {
+    animate(reds, {
+      clipPath: WIPE,
+      duration: SWEEP,
+      ease: 'linear',
+      onComplete: () => clear(reds, 'clip-path'),
+    });
+  }
+
+  // The strip wipes in once the line has crossed the sheet (a clip, never a fade: full contrast throughout).
+  if (strip) {
+    window.clearTimeout(fig0Timers.get(fig));
+    fig0Timers.set(
+      fig,
+      window.setTimeout(() => {
+        animate(strip, {
+          clipPath: WIPE,
+          duration: 360,
+          ease: EASE,
+          onComplete: () => {
+            strip.classList.add('is-in');
+            clear([strip], 'clip-path');
+          },
+        });
+      }, SWEEP + 80),
+    );
   }
 }
 
@@ -269,8 +289,8 @@ function boot(): void {
       if (btn.dataset.replay === 'fig0') {
         const fig = btn.closest<HTMLElement>('[data-fig0]');
         if (fig) {
-          // Bring the whole figure into view first, so the replay is seen from step 0.
-          fig.scrollIntoView({ block: 'start' });
+          // The sheet is short and Replay sits in its caption row; just make sure all of it is on screen.
+          fig.scrollIntoView({ block: 'nearest' });
           requestAnimationFrame(() => playFig0(fig));
         }
       } else {
@@ -297,7 +317,7 @@ function boot(): void {
     });
   });
 
-  // Fig. 0 plays on load.
+  // Fig. 0 plays on load: the scan line sweeps the sheet once, then the strip wipes in.
   document.querySelectorAll<HTMLElement>('[data-fig0]').forEach((fig) => requestAnimationFrame(() => playFig0(fig)));
 
   // Readings: the dimension line draws from the datum to the value. The numeral

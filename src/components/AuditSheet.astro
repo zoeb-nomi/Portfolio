@@ -1,0 +1,443 @@
+---
+// Fig. 0, the audit sheet: the home hero's figure. One isometric sheet of squares, one square per real model
+// output that a check read (src/data/fig0-cells.ts reads the counts out of the case-study copy). The sheet is
+// drawn band by band, one band per harness group, and the failed squares are red and lifted a little off the
+// paper. Everything a visitor needs is in the HTML: the final state (red squares, band tags, caption) renders
+// with no JS and under reduced motion.
+//
+// Motion (src/scripts/motion.ts, Fig. 0): on load every square is paper-white ("quiet failures look fine"),
+// one red scan line sweeps the sheet once (1.1 s), the failed squares turn red as it passes, then the ledger
+// strip under the H1 wipes in. The red squares live on one overlay per band (lifted 5px off the paper), and
+// the sweep reveals each overlay with a clip-path that moves with the line: six animated elements, not 86,
+// so the main thread stays idle on a phone. Replay sits in the caption row.
+//
+// Interaction (this file, works without the motion library): the sheet tilts with a hovering pointer, never
+// on touch; hovering a square, or moving a cursor with the arrow keys from the one focusable group, writes
+// that square's harness, what it was and the check into the readout line under the sheet. Screen readers get
+// the group's one-sentence summary and the readout; the squares themselves are decoration.
+import { cols, families, summary, caption, legend } from '../data/fig0-cells';
+import { home } from '../data/copy';
+
+const f = home.fig0;
+---
+
+<figure class="as" id="fig-0" data-fig0 aria-labelledby="fig0-title" style={`--cols:${cols}`}>
+  <figcaption class="as-head">
+    <span><span class="as-n">{f.n}</span><span id="fig0-title">{f.title}</span></span>
+    <button class="as-replay" type="button" data-replay="fig0">{f.replay} <span aria-hidden="true">↺</span></button>
+  </figcaption>
+
+  <div class="as-stage" role="group" tabindex="0" aria-label={summary} aria-describedby="fig0-readout" data-f0-stage>
+    <div class="as-sheet" aria-hidden="true" data-f0-sheet>
+      <div class="as-bands" data-f0-bands>
+        {
+          families.map((fam) => (
+            <div class="as-family">
+              {fam.groups.map(({ g, i }) => (
+                <div
+                  class="as-band"
+                  style={`--rows:${Math.ceil(g.n / cols)}`}
+                  data-g={i}
+                  data-harness={g.harness}
+                  data-what={g.what}
+                  data-check={g.check}
+                  data-pass={g.pass}
+                  data-fail={g.fail}
+                  data-n={g.n}
+                  data-failed={g.failed}
+                >
+                  {Array.from({ length: g.n }, (_, k) => (
+                    <span class:list={['as-cell', { 'is-fail': k >= g.n - g.failed }]} />
+                  ))}
+                  <span class="as-red" data-f0-red>
+                    {Array.from({ length: g.failed }, (_, j) => {
+                      const k = g.n - g.failed + j;
+                      return <i style={`grid-area:${Math.floor(k / cols) + 1} / ${(k % cols) + 1}`} />;
+                    })}
+                  </span>
+                </div>
+              ))}
+              <span class="as-tag">{fam.family}</span>
+            </div>
+          ))
+        }
+        <span class="as-scan" data-f0-scan></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="as-readout" id="fig0-readout" aria-live="polite" data-f0-readout>
+    <span class="as-key"><i class="as-swatch is-fail"></i> {legend.fail}</span>
+    <span class="as-key"><i class="as-swatch"></i> {legend.pass}</span>
+  </p>
+
+  <p class="as-cap">{caption}</p>
+</figure>
+
+<script>
+  import { motionAllowed } from '../scripts/figure-motion';
+
+  document.querySelectorAll<HTMLElement>('[data-fig0]').forEach((fig) => {
+    const stage = fig.querySelector<HTMLElement>('[data-f0-stage]')!;
+    const sheet = fig.querySelector<HTMLElement>('[data-f0-sheet]')!;
+    const readout = fig.querySelector<HTMLElement>('[data-f0-readout]')!;
+    const cells = Array.from(fig.querySelectorAll<HTMLElement>('.as-bands .as-cell'));
+    const legendHtml = readout.innerHTML;
+    let cur = -1;
+
+    const describe = (cell: HTMLElement): string => {
+      const band = cell.closest<HTMLElement>('.as-band')!;
+      const d = band.dataset;
+      const failed = cell.classList.contains('is-fail');
+      const outcome = failed ? d.fail : d.pass;
+      const count = failed ? `${d.failed} of ${d.n} did` : `${Number(d.n) - Number(d.failed)} of ${d.n} did`;
+      return `${d.harness} · ${d.what} · ${d.check}: ${outcome} (${count}).`.replace(/\s+/g, ' ');
+    };
+
+    const show = (cell: HTMLElement | null) => {
+      if (!cell) {
+        readout.innerHTML = legendHtml;
+        return;
+      }
+      readout.textContent = describe(cell);
+    };
+
+    const setCursor = (i: number) => {
+      if (cur >= 0) cells[cur]?.classList.remove('is-cur');
+      cur = Math.max(0, Math.min(cells.length - 1, i));
+      cells[cur].classList.add('is-cur');
+      show(cells[cur]);
+    };
+
+    // Hover: the square under the pointer, by delegation (no listeners on 167 squares).
+    sheet.addEventListener('pointerover', (ev) => {
+      const cell = (ev.target as HTMLElement).closest<HTMLElement>('.as-cell');
+      if (cell) show(cell);
+    });
+    sheet.addEventListener('pointerleave', () => show(cur >= 0 ? cells[cur] : null));
+
+    // Keyboard: one focusable group; arrows move a cursor; Home/End jump; Escape clears.
+    stage.addEventListener('keydown', (ev) => {
+      const cols = Number(getComputedStyle(fig).getPropertyValue('--cols')) || 1;
+      const map: Record<string, () => void> = {
+        ArrowRight: () => setCursor(cur + 1),
+        ArrowLeft: () => setCursor(cur - 1),
+        ArrowDown: () => setCursor(cur < 0 ? 0 : cur + cols),
+        ArrowUp: () => setCursor(cur < 0 ? 0 : cur - cols),
+        Home: () => setCursor(0),
+        End: () => setCursor(cells.length - 1),
+        Escape: () => {
+          if (cur >= 0) cells[cur].classList.remove('is-cur');
+          cur = -1;
+          show(null);
+        },
+      };
+      const fn = map[ev.key];
+      if (!fn) return;
+      ev.preventDefault();
+      fn();
+    });
+    stage.addEventListener('blur', () => {
+      if (cur >= 0) cells[cur].classList.remove('is-cur');
+      cur = -1;
+      show(null);
+    });
+
+    // Tilt, only for a hovering, fine pointer and only with motion allowed. Clamped by the geometry: the
+    // pointer's offset from the stage centre, −0.5 to 0.5, maps to ±8° about x and ±10° about z.
+    if (motionAllowed() && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      stage.addEventListener('pointermove', (ev) => {
+        if (ev.pointerType === 'touch') return;
+        const r = stage.getBoundingClientRect();
+        const x = Math.max(-0.5, Math.min(0.5, (ev.clientX - r.left) / r.width - 0.5));
+        const y = Math.max(-0.5, Math.min(0.5, (ev.clientY - r.top) / r.height - 0.5));
+        sheet.style.setProperty('--tz', `${(x * 20).toFixed(2)}deg`);
+        sheet.style.setProperty('--tx', `${(-y * 16).toFixed(2)}deg`);
+      });
+      stage.addEventListener('pointerleave', () => {
+        sheet.style.setProperty('--tz', '0deg');
+        sheet.style.setProperty('--tx', '0deg');
+      });
+    }
+  });
+</script>
+
+<style>
+  .as {
+    /* The sheet's rest angles and width. The sweep's duration is SWEEP in motion.ts (1.1 s). */
+    --rx: 52deg;
+    --rz: -10deg;
+    --w: 68%;
+    --lift: 7px;
+    border-top: var(--line-heavy);
+    padding-top: var(--s-3);
+    background: var(--paper);
+    scroll-margin-top: calc(var(--header-h) + var(--s-4));
+  }
+
+  .as-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    line-height: var(--lh-label);
+    color: var(--ink);
+    margin-bottom: var(--s-3);
+  }
+
+  .as-n {
+    color: var(--red-ink);
+    font-weight: 500;
+    margin-right: var(--s-2);
+  }
+
+  /* Replay is only useful with motion; it keeps its box either way (no layout shift when it appears). */
+  .as-replay {
+    visibility: hidden;
+    min-block-size: var(--hit-min);
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+    cursor: pointer;
+  }
+
+  :global(.motion) .as-replay {
+    visibility: visible;
+  }
+
+  .as-replay:hover {
+    color: var(--red);
+  }
+
+  /* The stage reserves the figure's box before anything is drawn: zero layout shift. The sheet sits to the
+     right of it so its band tags have room on the left; the tilt is set (--rx, --rz, --w, the end padding)
+     so the drawn sheet stays inside the column at every width from 390 to 1440 (measured). */
+  .as-stage {
+    position: relative;
+    perspective: 1200px;
+    aspect-ratio: 10 / 8.6;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .as-stage:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .as-sheet {
+    position: relative;
+    inline-size: var(--w);
+    padding: var(--s-2);
+    border: var(--line-object);
+    background: var(--paper-raised);
+    /* Tilted about its centre, the drawn sheet sits lower than its layout box (the far half recedes); the
+       negative top margin pulls the layout box up so the drawing starts at the top of the reserved stage. */
+    margin-block: -26% -12%;
+    transform-style: preserve-3d;
+    transform: rotateX(calc(var(--rx) + var(--tx, 0deg))) rotateZ(calc(var(--rz) + var(--tz, 0deg)));
+    transition: transform var(--dur-base) ease-out;
+    will-change: transform;
+  }
+
+  /* Physical depth: a second sheet under the first, set back and offset, carrying the drop shadow, so the
+     paper reads as a pad on a desk and the tilt has something to move against. */
+  .as-sheet::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    border: var(--line-object-muted);
+    transform: translate3d(6px, 8px, -10px);
+    box-shadow: 0 18px 28px -10px color-mix(in oklch, var(--ink) 42%, transparent);
+  }
+
+  .as-bands {
+    position: relative;
+    display: grid;
+    row-gap: 8px;
+    transform-style: preserve-3d;
+  }
+
+  .as-family {
+    position: relative;
+    display: grid;
+    row-gap: 4px;
+    transform-style: preserve-3d;
+  }
+
+  .as-band {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows), 1fr);
+    gap: 3px;
+    transform-style: preserve-3d;
+  }
+
+  /* The paper layer: every output drawn the same, an outlined square. */
+  .as-cell {
+    display: block;
+    aspect-ratio: 1;
+    border: var(--line-object-muted);
+    background: var(--paper-raised);
+  }
+
+  .as-cell.is-cur {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  /* The red layer: the failed outputs, on one grid per band that matches the paper layer's tracks, lifted
+     5px off it. This is the final state; the sweep reveals it with a clip-path moving with the line. */
+  .as-red {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows), 1fr);
+    gap: 3px;
+    transform: translateZ(var(--lift));
+    pointer-events: none;
+  }
+
+  /* Each failed square sits above the paper: lifted on z, with a short shadow back onto the sheet. */
+  .as-red i {
+    display: block;
+    background: var(--red);
+    box-shadow: 3px 4px 4px -1px color-mix(in oklch, var(--ink) 38%, transparent);
+  }
+
+  /* Each harness's tag stands off the left edge of its band, like a row label, and counter-rotates so it
+     faces the reader whatever the tilt. */
+  .as-tag {
+    position: absolute;
+    inset-inline-end: 100%;
+    inset-block-start: 50%;
+    padding-inline-end: var(--s-5);
+    margin-top: -0.5em;
+    transform-origin: 100% 50%;
+    transform: rotateZ(calc(-1 * (var(--rz) + var(--tz, 0deg)))) rotateX(calc(-1 * (var(--rx) + var(--tx, 0deg))));
+    white-space: nowrap;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--ink);
+    pointer-events: none;
+  }
+
+  /* The scan line: 2px of red across the whole sheet, hidden until motion.ts sweeps it. */
+  .as-scan {
+    position: absolute;
+    inset-block: -2px;
+    inset-inline-start: 0;
+    inline-size: 2px;
+    background: var(--red);
+    transform: translateZ(8px);
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Pre-sweep state, only under .motion and only until the figure has run: every square looks fine. The run
+     itself is driven by motion.ts, which moves each overlay's clip edge with the line over --sweep. */
+  :global(.motion) [data-fig0]:not([data-state='run']) .as-red {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  .as-readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+    /* Three lines are reserved: the longest readout line wraps to three in the narrowest column. */
+    min-block-size: calc(3 * var(--lh-snug) * var(--t-label));
+    margin-top: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink);
+  }
+
+  .as-key {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--ink-muted);
+  }
+
+  .as-swatch {
+    display: block;
+    inline-size: var(--s-3);
+    block-size: var(--s-3);
+    border: var(--line-object-muted);
+    background: var(--paper-raised);
+  }
+
+  .as-swatch.is-fail {
+    border-color: var(--red);
+    background: var(--red);
+  }
+
+  .as-cap {
+    margin-top: var(--s-3);
+    padding-top: var(--s-3);
+    border-top: var(--line-hair);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+  }
+
+  /* Phones: the sheet runs the full column under the H1; a gentler tilt keeps every square at readable size. */
+  /* Tablets: the column is wide, so the sheet is capped and sits right; the tags hang off its left edge. */
+  @media (max-width: 899px) {
+    .as {
+      --rx: 48deg;
+      --rz: -8deg;
+      --w: min(70%, 460px);
+    }
+
+    .as-stage {
+      aspect-ratio: auto;
+      block-size: min(76vw, 690px);
+      padding-inline: 110px 60px;
+    }
+  }
+
+  /* Phones: the sheet spans the viewport minus the gutters; the readout carries the band names. */
+  @media (max-width: 599px) {
+    .as {
+      --rx: 46deg;
+      --rz: -5deg;
+      --w: 77%;
+    }
+
+    .as-stage {
+      block-size: auto;
+      aspect-ratio: 10 / 10.2;
+      padding-inline: 0;
+    }
+
+    .as-tag {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .as-sheet {
+      transition: none;
+    }
+  }
+</style>
