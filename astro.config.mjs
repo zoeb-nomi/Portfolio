@@ -17,6 +17,8 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
+      // Old-URL stubs (redirect fallbacks) are noindex and never listed.
+      filter: (page) => !['/evals/', '/work/', '/notes/', '/shipping/'].some((p) => new URL(page).pathname === p),
       serialize(item) {
         const pathname = new URL(item.url).pathname;
         // No lastmod entry -> omit it rather than claim the build date.

@@ -1,11 +1,15 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/layout.css';
 import '../styles/reading.css';
 import '../styles/figures.css';
+import '../styles/motion.css';
+import Motion from '../components/Motion.astro';
+// theme-color must be a literal in <meta>; read it from the token file so the
+// palette is still declared in one place (design/tokens.css).
+import tokensCss from '../../design/tokens.css?raw';
 import {
   site,
   personJsonLd,
@@ -23,6 +27,8 @@ interface Props {
   includeSoftwareSourceCode?: boolean;
   noindex?: boolean;
   ogType?: 'website' | 'article';
+  /** Load the motion layer (anime.js) and arm `.motion` in the head. */
+  motion?: boolean;
 }
 
 const {
@@ -33,7 +39,10 @@ const {
   includeSoftwareSourceCode = false,
   noindex = false,
   ogType = 'website',
+  motion = false,
 } = Astro.props;
+
+const themeColor = /--paper:\s*(#[0-9a-fA-F]{6})/.exec(tokensCss)?.[1];
 
 const canonicalURL = new URL(path, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
@@ -53,7 +62,32 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#f4f1ea" />
+    <meta name="theme-color" content={themeColor} />
+
+    <!-- `.js` when scripts run. On motion pages, `.motion` too, when
+         IntersectionObserver exists and reduced motion is off; removed again
+         if the motion module has not booted in 4 s, so nothing stays hidden. -->
+    <script is:inline define:vars={{ motion }}>
+      (function (d) {
+        d.classList.add('js');
+        // Hash hop from an old-URL stub (src/components/Moved.astro): keep the
+        // fragment the visitor asked for when the new page has that id.
+        var fromHash = new URLSearchParams(window.location.search).get('from-hash');
+        if (fromHash) {
+          document.addEventListener('DOMContentLoaded', function () {
+            var hit = document.getElementById(fromHash) ? fromHash : window.location.hash.slice(1);
+            history.replaceState(null, '', window.location.pathname + (hit ? '#' + hit : ''));
+            var el = hit && document.getElementById(hit);
+            if (el) el.scrollIntoView();
+          });
+        }
+        if (!motion || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('motion');
+        setTimeout(function () {
+          if (!window.__zmMotion) d.classList.remove('motion');
+        }, 4000);
+      })(document.documentElement);
+    </script>
 
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
@@ -73,6 +107,13 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <link
       rel="preload"
       href="/fonts/instrument-serif-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/instrument-serif-latin-400-italic.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -118,6 +159,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
       </main>
       <SiteFooter />
     </div>
+    {motion && <Motion />}
   </body>
 </html>
 
@@ -125,8 +167,6 @@ const ogImageURL = new URL(ogImage, Astro.site);
   .shell {
     max-width: var(--shell-max);
     margin-inline: auto;
-    border-left: 1px solid var(--rule);
-    border-right: 1px solid var(--rule);
     min-height: 100vh;
     display: flex;
     flex-direction: column;

@@ -1,0 +1,73 @@
+/* zoebnomi.com: motion states · The Red Pen v3 (design/README.md §Motion)
+   Every rule that hides or offsets something before it animates lives here,
+   scoped to `.motion` (added in the head only when JS runs, IntersectionObserver
+   exists and reduced motion is off; removed again if the motion module has not
+   booted within 4 s). Without `.motion` every element shows its final state.
+   The library (anime.js) animates inline values from these states to the final
+   ones, then clears them and marks the element `.is-in`. */
+
+/* Page transitions: native cross-document view transitions. The header is
+   named in SiteHeader so it holds still; the page cross-fades. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-base);
+  animation-timing-function: var(--ease-draw);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+/* Section ticks. Pages with the motion module grow them with JS; every other
+   page grows them with a CSS scroll-driven animation where supported (no JS
+   library, no hidden content: unsupported browsers show the final tick). */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .js:not(.motion) [data-tick] {
+      animation: tick-grow linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 60%;
+    }
+  }
+}
+
+@keyframes tick-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.motion [data-tick]:not(.is-in),
+.motion [data-draw]:not(.is-in),
+.motion [data-underline]:not(.is-in) {
+  transform: scaleX(0);
+}
+
+.motion [data-pop]:not(.is-in) {
+  opacity: 0;
+}
+
+.motion .cv[data-count]:not(.is-in) .cv-final {
+  opacity: 0;
+}
+
+.motion [data-ledger]:not(.is-in) .l-item {
+  opacity: 0;
+}
+
+@media print {
+  .motion [data-tick],
+  .motion [data-draw],
+  .motion [data-underline],
+  .motion [data-pop],
+  .motion .cv-final,
+  .motion [data-ledger] .l-item {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

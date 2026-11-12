@@ -1,0 +1,41 @@
+---
+// Redirect fallback for an old URL (DESIGN v3 §i). Cloudflare Pages serves the
+// 301 from public/_redirects first; this page exists so the URL still resolves
+// where _redirects is not applied (local preview, a cached client), and it
+// carries any incoming #fragment across: /evals/#x lands on /builds/#x when
+// that id exists on the new page, else on the mapped section.
+import { meta, redirects } from '../data/copy';
+
+interface Props {
+  from: string;
+}
+
+const { from } = Astro.props;
+const to = redirects.find((r) => r.from === from)?.to ?? '/';
+const canonical = new URL(to.split('#')[0], Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{meta.moved.title}</title>
+    <meta name="description" content={meta.moved.description} />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonical} />
+    <meta http-equiv="refresh" content={`0; url=${to}`} />
+    <script is:inline define:vars={{ to }}>
+      (function () {
+        var hash = window.location.hash;
+        var base = to.split('#')[0];
+        // Keep an incoming fragment only if it is a plain id; the new page checks it exists.
+        var target = hash && /^#[\w-]+$/.test(hash) ? base + '?from-hash=' + hash.slice(1) + '#' + to.split('#')[1] : to;
+        window.location.replace(target);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>This page moved: <a href={to}>{to}</a></p>
+  </body>
+</html>

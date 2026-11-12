@@ -47,7 +47,7 @@
   position: absolute;
   inset-inline: 0;
   inset-block-start: 50%;
-  border-top: 1px solid var(--rule);
+  border-top: var(--line-hair);
 }
 
 .fg-in {
@@ -97,7 +97,7 @@
   inline-size: var(--s-3);
   block-size: var(--s-3);
   margin: calc(var(--s-3) / -2) 0 0 calc(var(--s-3) / -2);
-  border: 1px solid var(--ink);
+  border: var(--line-object);
   background: var(--paper);
 }
 

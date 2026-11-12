@@ -1,130 +1,133 @@
 ---
-import { site, cta } from '../data/copy';
+// Site footer (DESIGN v3 §e, D-06): display-type name, role line, a links row
+// with 44px targets, then a hair rule and a meta row with the nav and the
+// labelled llms.txt link. No top rule: the CTA slab (or the page's last
+// section rule) closes the page above it.
+import { site, cta, nav } from '../data/copy';
+import { isExternal } from '../lib/isExternal';
 
-// The footer line is one string in copy.ts. Split at its separators so a wrapped
-// line never starts with a stray "·" or "—": each separator is glued (with a
-// non-breaking space) to the word before it.
-const parts = site.footerLine.split(' · ').map((part) => part.replace(' — ', '\u00a0— '));
+const links = [cta.bookACall, cta.email, cta.linkedin, cta.github];
+const roleLine = site.footerLine.replace(`${site.name} · `, '');
 ---
 
 <footer class="site-footer">
-  <div class="footer-inner">
-    <p class="footer-line">
-      {parts.map((part, i) => (
-        <>
-          <span class="footer-part">{part}</span>
-          {i < parts.length - 1 && ' '}
-        </>
-      ))}
-    </p>
-    <div class="footer-links">
-      <ul class="footer-ctas">
-        <li><a href={cta.bookACall.href}>{cta.bookACall.label}</a></li>
-        <li><a href={cta.email.href}>{cta.email.label}</a></li>
-        <li><a href={cta.linkedin.href}>{cta.linkedin.label}</a></li>
-        <li><a href={cta.github.href}>{cta.github.label}</a></li>
+  <div class="footer-inner grid-margin">
+    <div class="margin-col" aria-hidden="true"></div>
+    <div class="body-col">
+      <p class="ftr-name">{site.name}</p>
+      <p class="ftr-role">{roleLine}</p>
+      <ul class="ftr-links">
+        {
+          links.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                target={isExternal(l.href) ? '_blank' : undefined}
+                rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}
+              >
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
-      <a class="llms-link" href="/llms.txt">llms.txt</a>
+      <div class="ftr-meta">
+        <nav aria-label="Footer">
+          <ul>
+            {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+          </ul>
+        </nav>
+        <a class="llms-link" href="/llms.txt">llms.txt (for AI assistants)</a>
+      </div>
     </div>
   </div>
 </footer>
 
 <style>
-  .site-footer {
-    padding: var(--s-9) var(--gutter) var(--s-10);
-  }
-
   .footer-inner {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: var(--s-6);
+    --body-pad-end: var(--s-11);
   }
 
-  .footer-line {
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    color: var(--ink-muted);
-    max-width: 34ch;
-    order: 2;
-  }
-
-  .footer-part:not(:last-child)::after {
-    content: '\00a0·';
-  }
-
-  /* llms.txt sits left-aligned under the CTA row, not hanging off its right
-     edge — it reads as a footnote to the row above it. */
-  .footer-links {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--s-3);
-    order: 1;
-  }
-
-  .footer-ctas {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: var(--s-5);
-    list-style: none;
-  }
-
-  .footer-ctas a,
-  .llms-link {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: var(--t-label-lg);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-color: var(--red-ink);
+  .ftr-name {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-tight);
     color: var(--ink);
   }
 
-  /* 44px tap target without changing the row's visual height. */
-  .footer-ctas a {
-    padding-block: 14px;
+  .ftr-role {
+    margin-top: var(--s-2);
+    font-size: var(--t-small);
+    color: var(--ink-muted);
   }
 
-  .footer-ctas a:hover,
-  .llms-link:hover {
+  .ftr-links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--s-6);
+    list-style: none;
+    margin-top: var(--s-4);
+  }
+
+  .ftr-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    font-family: var(--font-mono);
+    font-size: var(--t-nav);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--red-ink);
+    text-underline-offset: 4px;
+  }
+
+  .ftr-links a:hover,
+  .ftr-meta a:hover {
     color: var(--red);
     text-decoration-thickness: 2px;
   }
 
-  .llms-link {
-    /* WCAG 2.5.8: 24px minimum hit area. */
-    min-height: var(--hit-min);
-    padding-block: var(--s-1);
-    color: var(--ink-muted);
-    text-transform: none;
-    font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
+  .ftr-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-top: var(--s-4);
+    padding-top: var(--s-3);
+    border-top: var(--line-hair);
   }
 
-  @media (max-width: 599px) {
-    .footer-inner {
-      flex-direction: column;
-      align-items: flex-start;
+  .ftr-meta ul {
+    display: flex;
+    gap: var(--s-6);
+    list-style: none;
+  }
+
+  .ftr-meta a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+
+  .llms-link {
+    text-decoration: underline !important;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  @media (max-width: 899px) {
+    .footer-inner > .margin-col {
+      display: none;
     }
 
-    .footer-line {
-      order: 2;
-    }
-
-    .footer-links {
-      order: 1;
-      align-items: flex-start;
-    }
-
-    .footer-ctas {
-      flex-wrap: wrap;
-      row-gap: var(--s-3);
+    .footer-inner > .body-col {
+      padding-top: var(--s-9);
     }
   }
 </style>
