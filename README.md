@@ -47,6 +47,10 @@ npx astro preview --host 127.0.0.1 --port 4321    # then: npm run qa, npm run to
 
 `npm run build` runs `prebuild` first, which fetches live GitHub data and rewrites the tracked `src/data/contributions.json`. Unless you meant to refresh the heatmap, run `git checkout -- src/data/contributions.json` before committing.
 
+The home heatmap has two data paths:
+- **Build time:** `scripts/fetch-contributions.mjs` (the `prebuild` step) scrapes the GitHub contributions calendar into `src/data/contributions.json`. The page server-renders that snapshot with the caption "… as of <date>". Commit the refreshed file when you mean to update the fallback.
+- **Request time:** `functions/api/contributions.ts`, a Cloudflare Pages Function cached for 6 h at the edge (1 h in the browser), returns the live calendar. The page swaps it in and the caption becomes "… live from GitHub". If the function fails, the committed snapshot stays.
+
 ## Writing (essays)
 
 Essays are hand-built `.astro` pages in `src/pages/writing/`, not Markdown and not a content collection. The newer ones keep their copy in `src/data/copy.ts` and render through `Base` → `Masthead` → `Section`. To add one:

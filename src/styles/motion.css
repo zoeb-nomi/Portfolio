@@ -56,12 +56,26 @@
   opacity: 0;
 }
 
+/* Contribution heatmap cells before their sweep (home §5). Cells are not text, so a
+   fade here never affects contrast. The total waits hidden (its box keeps its width)
+   until the count starts, so it never shows the final value and then drops to 0. The
+   grid's aria-label carries the total throughout. */
+.motion [data-contrib-graph]:not(.is-in) .cg-cell {
+  opacity: 0;
+  transform: scale(0);
+}
+
+.motion [data-contrib-graph]:not(.is-in):not(.is-counting) [data-cg-total] {
+  visibility: hidden;
+}
+
 @media print {
   .motion [data-tick],
   .motion [data-draw],
   .motion [data-underline],
   .motion [data-pop],
-  .motion [data-ledger] .l-item {
+  .motion [data-ledger] .l-item,
+  .motion [data-contrib-graph] .cg-cell {
     opacity: 1 !important;
     transform: none !important;
   }

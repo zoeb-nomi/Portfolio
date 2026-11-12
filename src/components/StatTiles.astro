@@ -17,7 +17,7 @@ const { tiles } = Astro.props;
 
 ---
 
-<ul class="tiles" role="list">
+<ul class="tiles" role="list" style={`--n: ${tiles.length}`}>
   {
     tiles.map((t) => (
       <li class="tile">
@@ -36,7 +36,7 @@ const { tiles } = Astro.props;
   .tiles {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
     gap: var(--s-8);
   }
 

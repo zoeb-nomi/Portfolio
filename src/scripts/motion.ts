@@ -132,6 +132,48 @@ function playFig0(fig: HTMLElement): void {
   }
 }
 
+// ------------------------------------------------------------ contribution heatmap
+/** One chronological sweep (~1.2 s): cells draw in by date, the total counts up from
+ *  0 to the real total (integers, so every value shown is one the year passed through),
+ *  then the most recent week gets one soft red pulse. Final state is in the HTML;
+ *  titles (date and count) and the accessible summary are untouched. */
+function playHeatmap(graph: HTMLElement): void {
+  const cells = Array.from(graph.querySelectorAll<HTMLElement>('.cg-cell')).sort((a, b) =>
+    (a.dataset.date ?? '').localeCompare(b.dataset.date ?? ''),
+  );
+  if (!cells.length) return graph.classList.add('is-in');
+  const SWEEP = 1200;
+  const per = SWEEP / cells.length;
+  const finish = () => {
+    graph.classList.add('is-in');
+    clear(cells, 'transform', 'opacity');
+    cells.slice(-7).forEach((c) => {
+      c.classList.add('cg-pulse');
+      c.addEventListener('animationend', () => c.classList.remove('cg-pulse'), { once: true });
+    });
+  };
+  animate(cells, { scale: [0, 1], opacity: [0, 1], duration: 220, delay: stagger(per), ease: EASE, onComplete: finish });
+
+  const totalEl = graph.querySelector<HTMLElement>('[data-cg-total]');
+  const total = Number(graph.dataset.total);
+  if (totalEl && Number.isFinite(total) && total > 0) {
+    const state = { v: 0 };
+    totalEl.textContent = '0';
+    graph.classList.add('is-counting');
+    animate(state, {
+      v: total,
+      duration: SWEEP,
+      ease: 'linear',
+      onUpdate: () => {
+        totalEl.textContent = String(Math.round(state.v));
+      },
+      onComplete: () => {
+        totalEl.textContent = graph.dataset.total ?? String(total);
+      },
+    });
+  }
+}
+
 // ------------------------------------------------------------ TradeFrame path
 const flowTimers = new WeakMap<Element, number>();
 
@@ -273,6 +315,9 @@ function boot(): void {
     if (fig.closest('[data-panel]')) return;
     onceInView(fig, () => playFigure(fig), 0.6);
   });
+
+  // Contribution heatmap: one chronological sweep on first view.
+  document.querySelectorAll<HTMLElement>('[data-contrib-graph]').forEach((g) => onceInView(g, () => playHeatmap(g), 0.3));
 
   // TradeFrame decision path: plays once in view.
   document.querySelectorAll<HTMLElement>('[data-flow]').forEach((fig) => onceInView(fig, () => playFlow(fig), 0.6));

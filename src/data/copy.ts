@@ -373,6 +373,15 @@ export const home = {
   readingsRef: 'Fig. 0, step 1.',
   readingsWhy: 'A check is only real if it produces a number someone else can read. Three of them, from three different systems.',
   readingsNext: { label: 'Next: the builds these readings came from', href: '#sec-builds' },
+
+  // §1 on home (Zoeb, 12 Nov 16:03 IST): the shipping numbers right after the hero,
+  // compact. Three tiles and one sentence; the full table stays on /builds/#shipping.
+  shippingLabel: 'What my agents shipped',
+  shippingRef: 'Fig. 0, step 4.',
+  shippingWhy: 'Shipped, on a date set when the work was filed, and counted.',
+  shippingTiles: 3,
+  shippingFull: { label: 'Full table →', href: '/builds/#shipping' },
+  shippingNext: { label: 'Next: what my builds were measured on', href: '#sec-shipped-then-measured' },
   readings: [
     {
       id: 'r1',
@@ -423,7 +432,7 @@ export const home = {
       'One system where the AI proposes and code decides, and three of my five eval harnesses. Every new build is added with the date I planned to ship it and the date I did.',
     allLink: { label: 'All builds →', href: '/builds/' },
     hint: 'Select a row to open it.',
-    next: { label: 'Next: the code behind them', href: '#sec-pm-who-ships-code' },
+    next: { label: 'Next: the method, one step at a time', href: '#sec-how-i-work' },
   },
 
   // Method strings shared by /builds/#method (was /evals/).
@@ -449,13 +458,13 @@ export const home = {
   },
 
   // §3. Contributions graph back-reference.
-  contribRef: 'Fig. 0, step 4.',
-  contribWhy: 'Shipped: the record is public.',
-  contribNext: { label: 'Next: the method, one step at a time', href: '#sec-how-i-work' },
+  contribRef: 'Fig. 0, step 4, in public.',
+  contribWhy: 'Shipped in the open: the commits behind every build, by day.',
 
   // §4. How I work: the canon's four verbs.
   howIWorkLabel: 'How I work',
   methodsRef: 'Fig. 0, in full.',
+  methodsNext: { label: 'Next: the code behind them', href: '#sec-pm-who-ships-code' },
   methodsWhy: 'The four steps, with the work behind each one.',
   methods: [
     {

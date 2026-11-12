@@ -10,7 +10,8 @@ import Headshot from '../components/Headshot.astro';
 import Fig0 from '../components/Fig0.astro';
 import PullQuote from '../components/PullQuote.astro';
 import CTASlab from '../components/CTASlab.astro';
-import { meta, home, cta, contributions } from '../data/copy';
+import StatTiles from '../components/StatTiles.astro';
+import { meta, home, cta, contributions, shipping } from '../data/copy';
 ---
 
 <Base title={meta.home.title} description={meta.home.description} path="/" ogImage="/og/home.png" motion>
@@ -64,6 +65,17 @@ import { meta, home, cta, contributions } from '../data/copy';
 
   <Section
     mark="§1"
+    label={home.shippingLabel}
+    refLine={{ strong: home.shippingRef, text: home.shippingWhy }}
+    next={home.shippingNext}
+  >
+    <StatTiles tiles={shipping.tiles.slice(0, home.shippingTiles)} />
+    <p class="ship-sentence">{shipping.controlSentence}</p>
+    <p class="all-link"><a href={home.shippingFull.href}>{home.shippingFull.label}</a></p>
+  </Section>
+
+  <Section
+    mark="§2"
     label={home.measuredLabel}
     refLine={{ strong: home.readingsRef, text: home.readingsWhy }}
     next={home.readingsNext}
@@ -72,7 +84,7 @@ import { meta, home, cta, contributions } from '../data/copy';
   </Section>
 
   <Section
-    mark="§2"
+    mark="§3"
     label={home.builds.kicker}
     refLine={{ strong: home.builds.ref, text: home.builds.why }}
     next={home.builds.next}
@@ -85,17 +97,7 @@ import { meta, home, cta, contributions } from '../data/copy';
     <p class="all-link"><a href={home.builds.allLink.href}>{home.builds.allLink.label}</a></p>
   </Section>
 
-  <Section
-    mark="§3"
-    label={contributions.kicker}
-    refLine={{ strong: home.contribRef, text: home.contribWhy }}
-    next={home.contribNext}
-  >
-    <p class="contrib-dek">{contributions.dek}</p>
-    <ContributionGraph />
-  </Section>
-
-  <Section mark="§4" label={home.howIWorkLabel} refLine={{ strong: home.methodsRef, text: home.methodsWhy }}>
+  <Section mark="§4" label={home.howIWorkLabel} refLine={{ strong: home.methodsRef, text: home.methodsWhy }} next={home.methodsNext}>
     <ol class="methods" role="list">
       {
         home.methods.map((m) => (
@@ -113,6 +115,11 @@ import { meta, home, cta, contributions } from '../data/copy';
         {home.autonomySource.pre} <a href={home.autonomySource.href}>{home.autonomySource.label}</a>
       </p>
     </div>
+  </Section>
+
+  <Section mark="§5" label={contributions.kicker} refLine={{ strong: home.contribRef, text: home.contribWhy }}>
+    <p class="contrib-dek">{contributions.dek}</p>
+    <ContributionGraph />
   </Section>
 
   <div class="back-to-fig0 grid-margin">
@@ -393,6 +400,13 @@ import { meta, home, cta, contributions } from '../data/copy';
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
+  }
+
+  .ship-sentence {
+    margin-top: var(--s-6);
+    max-width: var(--measure);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
   }
 
   .contrib-dek {
