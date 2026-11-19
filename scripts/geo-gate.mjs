@@ -130,11 +130,10 @@ const POSITIVES = [
   '1,414',
   '10–15 min',
   'Fig. 0',
-  'Back to Fig. 0.',
   '30 min · intro call',
   'llms.txt (for AI assistants)',
   'zoebnomi.com/builds/',
-  'If you&#39;re hiring a PM for an agent or LLM product',
+  'Facing a problem that has to be right? Talk to me.',
 
   // v3.3 (I16 hero), added 2026-11-12: Fig. 0 is the audit sheet. Its counts are read from the case-study
   // copy at build time (src/data/fig0-cells.ts), so the strip's sentence is checked here as words, not numbers.
@@ -142,7 +141,6 @@ const POSITIVES = [
   'failed a check.',
   'caught before anything was published',
   'grouped by outcome',
-  'The one cell I cannot draw yet',
 ];
 
 // Instead's production numbers must never be attached to CrossSource. They are
@@ -193,6 +191,10 @@ const NEGATIVE_LITERALS = [
   'How a quiet failure becomes a shipped step',
   'Fig. 0, step',
   'Fig. 0, in full',
+
+  // v4 (Red Pen, edited; 19 Nov 2026): the page never names its own parts. The v3 story lines are retired.
+  'Back to Fig. 0',
+  'The one cell I cannot draw yet',
 ];
 
 // "Filed" as a standalone product name — must not match the common word

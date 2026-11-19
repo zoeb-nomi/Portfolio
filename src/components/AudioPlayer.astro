@@ -45,6 +45,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
 
 <div
   class="audio-player"
+  id="listen"
   data-audio-player
   data-storage-key={storageKey}
   data-article={articleId}
@@ -869,11 +870,9 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
 
   .audio-caption {
     margin-bottom: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .audio-row {
@@ -895,7 +894,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     border-radius: var(--radius);
     border: 0;
     background: transparent;
-    color: var(--paper);
+    color: var(--color-surface);
     cursor: pointer;
   }
 
@@ -904,7 +903,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     position: absolute;
     inset: 5px;
     border-radius: var(--radius);
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .audio-icon {
@@ -943,7 +942,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     right: 0;
     top: 50%;
     height: 1px;
-    background: var(--rule);
+    background: var(--color-line);
     transform: translateY(-50%);
   }
 
@@ -953,7 +952,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     top: 50%;
     height: 2px;
     width: 0%;
-    background: var(--red);
+    background: var(--color-accent);
     transform: translateY(-50%);
     transition: width 80ms linear;
   }
@@ -965,20 +964,20 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     width: 9px;
     height: 9px;
     border-radius: var(--radius);
-    background: var(--ink);
+    background: var(--color-text);
     transform: translate(-50%, -50%);
     transition: left 80ms linear;
   }
 
   .audio-time {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     white-space: nowrap;
   }
 
   .audio-resume-tag {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* Plain mono text, deliberately un-pill-like so it never reads as a
@@ -990,10 +989,9 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     min-height: var(--hit-touch);
     min-width: 24px; /* WCAG 2.5.8 minimum target width: was 18px wide */
     justify-content: center;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     background: transparent;
     border: 0;
     padding: 0 var(--s-2);
@@ -1005,21 +1003,20 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   @media (hover: hover) {
     .audio-speed:hover {
       text-decoration: underline;
-      text-decoration-color: var(--red);
+      text-decoration-color: var(--color-accent);
     }
   }
 
   .audio-speed:focus-visible {
     text-decoration: underline;
-    text-decoration-color: var(--red);
+    text-decoration-color: var(--color-accent);
   }
 
   .audio-status {
     margin-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .audio-status:empty {
@@ -1033,11 +1030,9 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
 
   .audio-note {
     margin-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* Below 600px: one horizontal-scroll row (no wrap), scrollbar hidden, a
@@ -1069,43 +1064,33 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     scroll-snap-align: start;
   }
 
-  @media (min-width: 600px) {
-    .audio-chapters {
-      flex-wrap: wrap;
-      overflow-x: visible;
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-  }
+  /* Red Pen 5: chapters are one quiet row at every width, not a wall of boxes. */
 
   .audio-chip {
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     background: transparent;
-    border: var(--line-object-muted);
-    border-radius: var(--radius);
-    padding: var(--s-1) var(--s-3);
+    border: 0;
+    padding: var(--s-1) var(--s-2);
     white-space: nowrap;
     cursor: pointer;
   }
 
   @media (hover: hover) {
     .audio-chip:hover {
-      border-color: var(--rule-strong);
-      color: var(--ink);
+      color: var(--color-accent-text);
     }
   }
 
   .audio-chip[aria-current='true'] {
-    border-color: var(--rule-strong);
-    color: var(--ink);
+    color: var(--color-text);
     font-weight: 500;
     text-decoration: underline;
-    text-decoration-color: var(--red);
+    text-decoration-color: var(--color-accent);
     text-decoration-thickness: 2px;
     text-underline-offset: var(--underline-offset);
   }
@@ -1171,8 +1156,8 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     margin-block: -6px !important;
     padding-block: 6px !important;
     border-radius: var(--radius);
-    background-color: var(--paper-raised);
-    background-color: color-mix(in oklab, var(--red) 7%, var(--paper));
+    background-color: var(--color-surface-raised);
+    background-color: color-mix(in oklab, var(--color-accent) 7%, var(--color-surface));
     border-left: var(--line-pen);
     transition: background-color var(--dur-fast) var(--ease-draw);
   }
@@ -1217,9 +1202,9 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     min-height: var(--hit-touch);
     align-items: center;
     justify-content: center;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-small);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     background: transparent;
     border: 0;
     padding: 0;
@@ -1239,7 +1224,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     border-radius: var(--radius);
     border: 0;
     background: transparent;
-    color: var(--paper);
+    color: var(--color-surface);
     cursor: pointer;
   }
 
@@ -1248,7 +1233,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     position: absolute;
     inset: 5px;
     border-radius: var(--radius);
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .audio-float-play .audio-icon {
@@ -1259,9 +1244,9 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   }
 
   .audio-float-time {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     white-space: nowrap;
   }
 
@@ -1276,11 +1261,9 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     justify-content: center;
     display: inline-flex;
     align-items: center;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     background: transparent;
     border: 0;
     padding: 0;
@@ -1290,7 +1273,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
   }
 
   .audio-float-follow {
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .audio-float-dot {
@@ -1299,12 +1282,12 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     height: 6px;
     margin-right: 6px;
     border-radius: var(--radius);
-    background: var(--red);
+    background: var(--color-accent);
     visibility: hidden;
   }
 
   .audio-float-follow[aria-pressed='true'] {
-    color: var(--ink);
+    color: var(--color-text);
     font-weight: 500;
   }
 
@@ -1316,14 +1299,14 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     .audio-float-follow:hover,
     .audio-float-up:hover {
       text-decoration: underline;
-      text-decoration-color: var(--red);
+      text-decoration-color: var(--color-accent);
     }
   }
 
   .audio-float-follow:focus-visible,
   .audio-float-up:focus-visible {
     text-decoration: underline;
-    text-decoration-color: var(--red);
+    text-decoration-color: var(--color-accent);
   }
 
   /* Mobile: hairline top border + paper background only, no boxed
@@ -1336,7 +1319,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       bottom: 0;
       gap: var(--s-3);
       padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
-      background: var(--paper);
+      background: var(--color-surface);
       border-top: var(--line-hair);
     }
 
@@ -1406,7 +1389,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
       align-items: center;
       gap: var(--s-3);
       padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
-      background: var(--paper);
+      background: var(--color-surface);
       border-top: var(--line-hair);
     }
 

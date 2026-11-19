@@ -1,40 +1,36 @@
 # MiniFigure
 
-`src/components/MiniFigure.astro` · new in v3
+## Purpose
+The small before-to-after mark on ledger rows and case-study Fig. 1 and Fig. 2. HTML and hairlines, not SVG, so every label stays at or above the 12px floor.
 
-![MiniFigure](../mocks/2026-11-12-v3/components/MiniFigure.jpg)
-
-## What it is
-
-Mini figure: the small before -> after mark on tiles, ledger rows and case-
-study Fig. 1s (DESIGN v3 D-07, D-16). HTML and hairlines, not SVG, so every
-label stays at or above the 12px floor.
-dumbbell  hollow square = before, filled square = after, joined by a 2px ink
-line; a zoomed axis says so.
-ratio     n of N as a filled share of one track.
-bars      a few ink bars on one scale; `mark` puts the red verdict tick on one.
-The final state is in the HTML. The motion layer draws the joining line and
-the bars from zero (`data-draw`), once, when the figure enters view.
+## Anatomy
+A `role="img"` wrapper with an `aria-label` summary; the inside is `aria-hidden`. Rows (optionally with a row label) each hold one of:
+- `dumbbell`: hollow square = before, filled square = after, joined by a 2px ink line; scale labels, an "axis zoomed" note when `zoomed`, and from/to end labels.
+- `ratio`: n of N as a filled share of one track.
+- `bars`: a few ink bars on one scale; a bar with `mark` gets its value in red text.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `fig` | `Fig?` | one figure (`BuildFigure` except `flow`) |
+| `rows` | `{label?, fig}[]?` | several labelled dumbbells sharing a frame |
+| `size` | `'mini' \| 'wide'` | default `mini` |
+| `label` | `string` | accessible summary, required |
 
-```ts
-  /** One figure, or several labelled dumbbells sharing a frame (case-study Fig. 1). */
-  fig?: Fig;
-  rows?: Row[];
-  size?: 'mini' | 'wide';
-  /** Accessible summary; the figure itself is aria-hidden. */
-  label: string;
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-surface`, `-accent-text` (marked bar value).
+- Empty-track fill: `--heat-0` (a token, not a role).
+- Type and space: `--font-data`, `--t-label`, `--s-1` to `--s-4`.
+- Lines: `--line-object`, `--line-heavy`, `--line-hair`.
+
+## States and motion
+- Reveal: `data-draw` elements (join line, fills) draw from zero and `data-pop` markers pop in once when the figure enters view, or when its ledger panel opens (`src/scripts/motion.ts`). The final state is in the HTML.
+- Reduced motion or no script: final state, no drawing.
+- Ink surface: roles re-point; the `--heat-0` track does not (see the report).
+
+## Accessibility
+The figure is one image with a text summary (`label`); every number should also appear in the surrounding row text.
 
 ## Used on
-
-- `/about/`
-- `/crosssource/`
-- `/screener-eval/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
-- Motion: the final state is in the HTML; the pre-reveal state lives in CSS under `.motion` and the motion layer (`src/scripts/motion.ts`) plays it. Reduced motion shows the final state.
+Pages: `/about/`, `/crosssource/`, `/screener-eval/`.
+Also via: `BuildsLedger`.

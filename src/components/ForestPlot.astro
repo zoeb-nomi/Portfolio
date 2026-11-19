@@ -100,21 +100,20 @@ let order = 0;
 
   .fp-title {
     margin-bottom: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .fp-ci {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .fp-verdict {
     margin-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .fp-zero,
@@ -153,7 +152,7 @@ let order = 0;
     inset-block-start: 50%;
     block-size: var(--s-3);
     margin-block-start: calc(var(--s-3) / -2);
-    background: var(--red);
+    background: var(--color-accent);
     transform-origin: left;
     transition: transform 900ms var(--ease-draw);
     transition-delay: calc(var(--r) * 90ms + 200ms);

@@ -23,6 +23,7 @@ if (only && !pages.length) { console.error(`"${only}" is not in scripts/audio/pa
 
 let failed = false;
 for (const page of pages) {
+  if (page.paused) { console.log(`-    ${page.slug}: paused, player hidden (${page.paused})`); continue; }
   const out = outPaths(page);
   if (!existsSync(out.manifest)) { console.log(`-    ${page.slug}: no audio generated yet (npm run audio:build -- ${page.slug})`); continue; }
 

@@ -1,67 +1,40 @@
 # Masthead
 
-`src/components/Masthead.astro` · changed in v3
+## Purpose
+The page masthead for every interior page: a kicker or case-study block in the margin column, an h1 and standfirst in the body column, closed by an Ink rule.
 
-![Masthead](../mocks/2026-11-12-v3/components/Masthead.jpg)
-
-## What it is
-
-The page masthead: a kicker in the margin column, an h1 + standfirst in the
-body column, closed by a strong rule. One component for every interior page.
-
-default   kicker in the margin column (Writing, Evals, posts, case studies)
-: add `spec` / `switcher` / `repo` for the case-study margin
-plain     empty margin column, hidden on phones (Work)
-photo     pass `thumbnail`: a 120px headshot in the margin column, no kicker,
-stacked above the title on phones (About)
-
-Slots: `byline` (a dated line under the standfirst) and the default slot
-(anything under that, the read-along AudioPlayer). The AudioPlayer finds its
-float anchor via `.masthead-inner > .margin-col`; keep both class names.
-A kicker alone is just text. Only a margin column that carries a spec block, the evals
-switcher or a repo link is a real complementary region and gets a name.
+## Anatomy
+- Margin column: kicker, or breadcrumbs (`crumbs` replace the kicker), `spec` definition list, `EvalsSwitcher`, repo link. It is an `<aside>` only when it carries spec, switcher or repo; a kicker alone is a plain `div`.
+- `photo` mode (`thumbnail` or `portrait`): a `Headshot` in the margin column, no kicker, stacked above the title on phones.
+- `plain` variant: empty margin column, hidden on phones.
+- Body column: `<nav>` breadcrumbs, `<h1>` (steps down when longer than 40 characters), standfirst, byline slot, default slot (for example the AudioPlayer, which finds `.masthead-inner > .margin-col`).
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `h1` | `string` | required |
+| `kicker`, `standfirst` | `string?` | |
+| `label` | `string?` | accessible name for the margin aside |
+| `variant` | `'default' \| 'plain'` | |
+| `thumbnail`, `portrait` | `{alt}?` | thumb (120px) or about (200px) headshot |
+| `h1Max`, `standfirstMax` | `string?` | any CSS length |
+| `narr` | `boolean?` | read-along `data-narr` ids on h1, standfirst, spec |
+| `spec` | `{label, value}[]?` | |
+| `switcher` | `'CrossSource' \| 'mirror-eval' \| 'screener-eval'?` | |
+| `repo` | `{href, label}?` | |
+| `crumbs` | `{label, href?}[]?` | last item gets `aria-current="page"` |
+Slots: `byline`, default.
 
-```ts
-  h1: string;
-  kicker?: string;
-  standfirst?: string;
-  /** Accessible name for the margin-column aside (used only when it carries a spec, switcher or repo link). */
-  label?: string;
-  variant?: 'default' | 'plain';
-  thumbnail?: { alt: string };
-  /** Any CSS length; ch is relative to the h1's own font size. */
-  h1Max?: string;
-  standfirstMax?: string;
-  /** Read-along anchors (data-narr) on the h1, standfirst and spec block. */
-  narr?: boolean;
-  spec?: SpecRow[];
-  switcher?: 'CrossSource' | 'mirror-eval' | 'screener-eval';
-  repo?: { href: string; label: string };
-  /** Breadcrumb under Builds/Writing (DESIGN v3 §e). Replaces the margin kicker. */
-  crumbs?: { label: string; href?: string }[];
-  /** About: one borderless greyscale portrait, 200px (D-12). */
-  portrait?: { alt: string };
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-line`, `--color-link`.
+- Type: `--font-heading`, `--font-text`, `--font-data`, `--wght-head`, `--wdth-head`, `--t-page`, `--t-body`, `--t-data`, `--t-label`, `--t-micro`, `--track-tight`, `--lh-*`.
+- Space and lines: `--s-1` to `--s-11`, `--gutter`, `--hit-min`, `--underline-offset`, `--line-ink` (closing rule), `--line-hair`.
+
+## States and motion
+Static: the component draws no pen mark and has no script (page titles get none from here). Breakpoints 899 and 1099 reflow the columns. Reduced motion and ink surface change nothing.
+
+## Accessibility
+One `<h1>` per page. Breadcrumbs are a labelled `<nav>` with an ordered list. Hover underline on crumbs only; link targets use `--hit-min`.
 
 ## Used on
-
-- `/about/`
-- `/builds/`
-- `/crosssource/`
-- `/mirror-eval/`
-- `/notes/<slug>/`
-- `/screener-eval/`
-- `/writing/`
-- `/writing/decisions-api-legal-quiz/`
-- `/writing/eval-harness-at-my-own-reflection/`
-- `/writing/nobody-reports-the-misses/`
-- `/writing/the-bus-stop-nobody-notices/`
-- `/writing/the-judge-caught-a-bug/`
-- `/writing/two-levers-that-did-not-move/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/about/`, `/builds/`, `/crosssource/`, `/design/`, `/design/components/`, `/mirror-eval/`, `/notes/[slug]/`, `/screener-eval/`, `/writing/`, `/writing/decisions-api-legal-quiz/`, `/writing/eval-harness-at-my-own-reflection/`, `/writing/nobody-reports-the-misses/`, `/writing/the-bus-stop-nobody-notices/`, `/writing/the-judge-caught-a-bug/`, `/writing/two-levers-that-did-not-move/`.

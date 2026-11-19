@@ -131,14 +131,14 @@ const articleLd = articleJsonLd({
 
   .read-along {
     margin-top: var(--s-3);
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-note);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .read-along a {
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -175,11 +175,9 @@ const articleLd = articleJsonLd({
 
   .summary-cap {
     padding-bottom: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .summary-list {
@@ -199,10 +197,10 @@ const articleLd = articleJsonLd({
 
   .summary-kind {
     margin-bottom: var(--s-3);
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-small);
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .summary-fields {
@@ -216,19 +214,17 @@ const articleLd = articleJsonLd({
     display: flex;
     flex-direction: column;
     gap: var(--s-1);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
   }
 
   .summary-field dt {
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .summary-field dd {
     margin: 0;
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
   }
 </style>

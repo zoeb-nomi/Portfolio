@@ -1,30 +1,32 @@
+Status: unused on the site (kept for reference)
+
 # Readings
 
-`src/components/Readings.astro` · new in v3
+## Purpose
+Headline numbers as readings: every number carries its datum, change, n and source (README principle 4). The home page currently builds this section inline, not with this component.
 
-![Readings](../mocks/2026-11-12-v3/components/Readings.jpg)
-
-## What it is
-
-Readings (Take B's B-07, drawn in the A system; replaces the home StatRow /
-ProofStrip). Each headline number is a tile under a Heavy top bar: kicker,
-numeral, a dimension figure from the datum (hollow) to the value (filled),
-then the datum line (datum · change · n), the label and the source.
-The numeral is always the final value (never a counted, intermediate one);
-the motion layer draws only the dimension line from the datum to the value.
+## Anatomy
+A `<ul>`; each tile sits under a Heavy top bar and holds: kicker, numeral (with optional unit and a verdict word), a dimension figure (`aria-hidden`: a hollow datum mark, a filled value mark, a line between, an optional datum band, scale labels, optional zoom note), a datum line ("Datum, change, n"), the label and the source.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `items` | `typeof home.readings` | default: `home.readings` in `src/data/copy.ts` |
+| `compact` | `boolean?` | drop the kicker and datum line; default false |
 
-```ts
-  items?: typeof home.readings;
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-surface`, `-accent-text` (verdict).
+- Track fill: `--heat-0` (a token, not a role).
+- Type: `--font-heading`, `--font-data`, `--wght-head`, `--wdth-head`, `--track-display`, `--t-stat`, `--t-small`, `--t-label`, `--lh-tight`, `--lh-snug`.
+- Space and lines: `--s-1` to `--s-9`, `--line-heavy`, `--line-hair`, `--line-object`.
+
+## States and motion
+- The numeral in the HTML is always the final value. The motion layer draws the dimension line from the datum to the value (`data-draw`) and pops the value mark (`data-pop`) once in view; the numeral is not counted up by this component.
+- Reduced motion or no script: final state. At 899px and below the tiles restack.
+- Ink surface: roles re-point; `--heat-0` does not.
+
+## Accessibility
+The figure is `aria-hidden`; datum, change and n are printed as text. The verdict span has `aria-label="passed"`.
 
 ## Used on
-
-- `/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
-- Motion: the final state is in the HTML; the pre-reveal state lives in CSS under `.motion` and the motion layer (`src/scripts/motion.ts`) plays it. Reduced motion shows the final state.
+No page imports it.

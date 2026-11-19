@@ -1,41 +1,31 @@
 # RecordList
 
-`src/components/RecordList.astro` · changed in v3
+## Purpose
+The public-record block that closes a Work entry: claims you can check. Each row is the claim with its artefacts as links, and where it lives.
 
-![RecordList](../mocks/2026-11-12-v3/components/RecordList.jpg)
-
-## What it is
-
-Public record, the claims-you-can-check block that closes a Work entry.
-Every row is `what` (with the artefacts as underlined red-ink links) on the
-left and `where` (the surface it lives on) on the right. Rows whose only
-link is still a placeholder (href starting `TODO_`) are not rendered: an
-unlinked "public record" row is a claim pretending to be evidence.
-Disambiguates the landmark when several entries each carry a record.
-Drop the block's own top rule and spacing when it directly follows another
-strong rule (e.g. a masthead): at most ONE strong rule between blocks.
-The kicker is the block's heading. h3 inside a work entry; h2 when the list stands alone.
+## Anatomy
+A `<section>` (labelled "Public record", optionally with context) holding a heading (kicker), an optional note and a list of rows: `what` plus underlined links separated by a middle dot, and `where`. A row whose links are empty or start with `TODO_` is not rendered; if none remain, nothing renders.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `kicker` | `string` | the heading text |
+| `items` | `RecordItem[]` | `what`, `links[]`, `where` |
+| `note` | `string?` | |
+| `context` | `string?` | disambiguates the landmark label |
+| `flush` | `boolean?` | drop the top rule and spacing after another strong rule (one strong rule between blocks) |
+| `headingLevel` | `'h2' \| 'h3'` | default `h3` |
 
-```ts
-  kicker: string;
-  items: RecordItem[];
-  note?: string;
-  // Disambiguates the landmark when several entries each carry a record.
-  context?: string;
-  // Drop the block's own top rule and spacing when it directly follows another
-  // strong rule (e.g. a masthead): at most ONE strong rule between blocks.
-  flush?: boolean;
-  // The kicker is the block's heading. h3 inside a work entry; h2 when the list stands alone.
-  headingLevel?: 'h2' | 'h3';
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `--color-text-muted`, `--color-link`.
+- Type and space: `--font-text`, `--font-data`, `--t-small`, `--t-note`, `--t-label`, `--t-micro`, `--lh-*`, `--s-1` to `--s-8`, `--hit-min`, `--underline-offset`.
+- Lines: `--line-ink`, `--line-hair`.
+
+## States and motion
+Static: no script, no animation. Reduced motion changes nothing. Ink surface: roles re-point. Stacks at 899px and below.
+
+## Accessibility
+Labelled region; configurable heading level; external links open in a new tab with `rel="noopener noreferrer"`; link targets use `--hit-min`.
 
 ## Used on
-
-- `/about/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/about/`, `/design/components/`.

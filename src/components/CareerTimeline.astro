@@ -147,10 +147,9 @@ const rows = items
   .tl-when {
     padding-top: var(--s-2);
     text-align: end;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-wide);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
 
@@ -161,40 +160,41 @@ const rows = items
     block-size: var(--s-3);
     margin: var(--s-2) 0 0 calc((var(--tl-mark) - var(--s-3)) / 2);
     border: var(--line-object);
-    background: var(--ink);
+    background: var(--color-text);
     transition: background var(--dur-base) ease;
   }
 
   .tl-org {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
     font-size: var(--t-h3);
-    font-weight: 400;
+    font-weight: var(--wght-head);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     transition: color var(--dur-base) ease;
   }
 
   .tl-role {
     margin-top: var(--s-2);
     max-inline-size: var(--measure);
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-body);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     transition: color var(--dur-base) ease;
   }
 
   .tl-source {
     margin-top: var(--s-2);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-note);
     line-height: var(--lh-snug);
     overflow-wrap: anywhere;
   }
 
   .tl-source a {
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -202,21 +202,21 @@ const rows = items
   /* While live: a marker is hollow until you reach it, red while it is the entry you are on, and the entries
      below the reading line are in the muted ink until you get to them. */
   .tl[data-live] .tl-mark {
-    background: var(--paper);
+    background: var(--color-surface);
   }
 
   .tl[data-live] .tl-item.is-reached .tl-mark {
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .tl[data-live] .tl-item.is-now .tl-mark {
     border: 0;
-    background: var(--red);
+    background: var(--color-accent);
   }
 
   .tl[data-live] .tl-item:not(.is-reached) .tl-org,
   .tl[data-live] .tl-item:not(.is-reached) .tl-role {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   @media (max-width: 899px) {

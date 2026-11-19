@@ -1,0 +1,253 @@
+---
+// The harness panel (Red Pen 5, home): a small dashboard of Zoeb's agent harness, the system he hands work to.
+// Four tiles and a bar per recent item (agent minutes; hover or focus a bar for its kind, slip and model).
+// Data: the committed pilot snapshot (copy.ts `shipping`) renders in the HTML; on load the panel asks the public
+// shipping log (home.v5.harness.liveUrl) for fresher numbers and swaps them in if the file exists and parses.
+// Nothing is hidden while it waits; a failed fetch leaves the snapshot and its label.
+import { home, shipping } from '../data/copy';
+
+const h = home.v5.harness;
+const items = shipping.table.rows.map(([week, kind, min, slip, cost, model]) => ({ week, kind, min: Number(min), slip, cost, model }));
+const maxMin = Math.max(...items.map((i) => i.min));
+const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it.min} agent min · slip ${it.slip} d · API ${it.cost} USD · ${it.model}`;
+---
+
+<div class="hp surface-ink" data-hp data-live-url={h.liveUrl} data-live-label={h.liveLabel}>
+  <div class="hp-bar">
+    <span class="hp-status" data-hp-status><i class="hp-dot" aria-hidden="true"></i><span data-hp-label>{h.snapshotLabel}</span></span>
+    <a class="hp-more" href={h.more.href}>{h.more.label} →</a>
+  </div>
+
+  <dl class="hp-tiles">
+    {
+      shipping.tiles.map((t, i) => (
+        <div class="hp-tile">
+          <dt class="hp-v" data-hp-tile={i}>
+            <span data-tally>{t.value}</span>
+            {t.unit && <span class="hp-u">{t.unit}</span>}
+          </dt>
+          <dd class="hp-l" title={t.label}>{h.tileLabels[i] ?? t.label}</dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <figure class="hp-items">
+    <figcaption class="hp-cap">{h.itemsCaption}</figcaption>
+    <ol class="hp-bars" data-hp-bars>
+      {
+        items.map((it) => (
+          <li class="hp-row" tabindex="0" style={`--v:${(it.min / maxMin).toFixed(3)}`} data-detail={detail(it)}>
+            <span class="hp-k">{it.kind}</span>
+            <span class="hp-track">
+              <span class="hp-fill" />
+            </span>
+            <span class="hp-n">{it.min}</span>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="hp-readout" aria-live="polite" data-hp-readout>{h.hint}</p>
+  </figure>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-hp]').forEach((hp) => {
+    const readout = hp.querySelector<HTMLElement>('[data-hp-readout]')!;
+    const hint = readout.textContent ?? '';
+    hp.querySelectorAll<HTMLElement>('.hp-row').forEach((row) => {
+      const on = () => (readout.textContent = row.dataset.detail ?? '');
+      const off = () => (readout.textContent = hint);
+      row.addEventListener('pointerenter', on);
+      row.addEventListener('focus', on);
+      row.addEventListener('pointerleave', off);
+      row.addEventListener('blur', off);
+    });
+
+    // Live data: the public shipping log (I17). Expected shape: { updated, tiles: [{ value, unit?, label }] }.
+    const url = hp.dataset.liveUrl;
+    if (!url) return;
+    fetch(url, { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d: { updated?: string; tiles?: { value: string; unit?: string; label: string }[] }) => {
+        if (!d?.tiles?.length) return;
+        // Third-party file: accept short strings only, so a bad or hostile file cannot flood the layout.
+        const short = (v: unknown, n: number) => (typeof v === 'string' || typeof v === 'number' ? String(v).slice(0, n) : '');
+        d.tiles.slice(0, 4).forEach((t, i) => {
+          const dt = hp.querySelector<HTMLElement>(`[data-hp-tile="${i}"]`);
+          const dd = dt?.nextElementSibling as HTMLElement | null;
+          const value = short(t?.value, 12);
+          const label = short(t?.label, 60);
+          if (!dt || !dd || !value || !label) return;
+          dt.querySelector('[data-tally]')!.textContent = value;
+          dd.textContent = label;
+        });
+        hp.querySelector('[data-hp-label]')!.textContent = `${hp.dataset.liveLabel} ${short(d.updated, 24)}`.trim();
+        hp.querySelector('[data-hp-status]')!.setAttribute('data-live', '');
+      })
+      .catch(() => {});
+  });
+</script>
+
+<style>
+  .hp {
+    padding: var(--s-6);
+    border: var(--line-object);
+    box-shadow: 10px 10px 0 var(--color-pending);
+  }
+
+  .hp-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-2) var(--s-6);
+    padding-bottom: var(--s-3);
+    border-bottom: var(--line-hair);
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+  }
+
+  .hp-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--color-text-muted);
+  }
+
+  .hp-dot {
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background: var(--color-pending);
+  }
+
+  .hp-status[data-live] .hp-dot {
+    background: var(--color-accent);
+    animation: hp-pulse 1200ms var(--ease-draw) infinite alternate;
+  }
+
+  @keyframes hp-pulse {
+    to {
+      opacity: 0.3;
+    }
+  }
+
+  .hp-more {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--hit-touch);
+    color: var(--color-accent-text);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .hp-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-6);
+    margin-top: var(--s-6);
+  }
+
+  .hp-v {
+    font-family: var(--font-heading);
+    font-size: var(--t-num);
+    font-weight: var(--wght-claim);
+    font-stretch: calc(var(--wdth-tight) * 1%);
+    line-height: 1;
+    letter-spacing: var(--track-display);
+    color: var(--color-text);
+  }
+
+  .hp-u {
+    margin-left: 2px;
+    font-size: 0.5em;
+  }
+
+  .hp-l {
+    margin-top: var(--s-2);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--color-text-body);
+  }
+
+  .hp-items {
+    margin-top: var(--s-8);
+    padding-top: var(--s-4);
+    border-top: var(--line-hair);
+  }
+
+  .hp-cap,
+  .hp-readout {
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    color: var(--color-text-muted);
+  }
+
+  .hp-bars {
+    list-style: none;
+    display: grid;
+    gap: 6px;
+    margin-top: var(--s-3);
+  }
+
+  .hp-row {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr) 3rem;
+    align-items: center;
+    gap: var(--s-3);
+    min-block-size: var(--hit-min);
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    color: var(--color-text-body);
+  }
+
+  .hp-row:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .hp-track {
+    block-size: 10px;
+    background: var(--color-surface);
+  }
+
+  .hp-fill {
+    display: block;
+    block-size: 100%;
+    inline-size: calc(var(--v) * 100%);
+    background: var(--color-text-muted);
+    transition: background-color var(--dur-fast) var(--ease-draw);
+  }
+
+  .hp-row:hover .hp-fill,
+  .hp-row:focus-visible .hp-fill {
+    background: var(--color-accent);
+  }
+
+  .hp-n {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hp-readout {
+    margin-top: var(--s-3);
+    min-block-size: calc(2 * var(--lh-snug) * var(--t-label));
+    color: var(--color-text);
+  }
+
+  @media (max-width: 899px) {
+    .hp {
+      padding: var(--s-4);
+      box-shadow: 6px 6px 0 var(--color-pending);
+    }
+
+    .hp-tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hp-row {
+      grid-template-columns: 6rem minmax(0, 1fr) 2.5rem;
+    }
+  }
+</style>

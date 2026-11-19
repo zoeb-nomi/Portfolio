@@ -92,7 +92,7 @@ function playFigure(fig: Element): void {
 // One red scan line sweeps the sheet once; the failed squares turn red as it passes: each band's red overlay
 // (AuditSheet.astro, .as-red) is revealed by a clip-path whose edge moves with the line, so the whole sweep
 // is seven animated elements. Then the ledger strip under the H1 wipes in.
-const SWEEP = 1100;
+const SWEEP = 1600;
 const WIPE = ['inset(0% 100% 0% 0%)', 'inset(0% 0% 0% 0%)'];
 const fig0Timers = new WeakMap<Element, number>();
 
@@ -317,8 +317,8 @@ function boot(): void {
     });
   });
 
-  // Fig. 0 plays on load: the scan line sweeps the sheet once, then the strip wipes in.
-  document.querySelectorAll<HTMLElement>('[data-fig0]').forEach((fig) => requestAnimationFrame(() => playFig0(fig)));
+  // Fig. 0 plays when it scrolls into view (Red Pen 5: it sits below the live audit now).
+  document.querySelectorAll<HTMLElement>('[data-fig0]').forEach((fig) => onceInView(fig, () => playFig0(fig), 0.35));
 
   // Readings: the dimension line draws from the datum to the value. The numeral
   // itself is never tweened (no intermediate values are ever shown).

@@ -27,7 +27,8 @@
     "a11y": "node scripts/a11y.mjs",
     "links": "node scripts/link-check.mjs",
     "lhci": "lhci autorun --config=lighthouserc.json && lhci autorun --config=lighthouserc.mobile.json",
-    "og": "node scripts/generate-og.mjs"
+    "og": "node scripts/generate-og.mjs",
+    "budget": "node scripts/copy-budget.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

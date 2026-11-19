@@ -107,7 +107,7 @@ const kindAt = (e: Engine, k: number) => {
     inset: 0;
     padding: var(--s-2);
     border: var(--line-object);
-    background: var(--paper);
+    background: var(--color-surface);
     transform-style: preserve-3d;
     transform: translateZ(calc(var(--i) * var(--gap)));
     transition: transform 800ms var(--ease-draw);
@@ -128,13 +128,13 @@ const kindAt = (e: Engine, k: number) => {
 
   .es-cell.is-base {
     border: 0;
-    background: var(--ink);
+    background: var(--color-text);
     transition-delay: calc(var(--k, 0) * 6ms + var(--i, 0) * 70ms);
   }
 
   .es-cell.is-add {
     border: 0;
-    background: var(--red);
+    background: var(--color-accent);
     transition-delay: calc(900ms + var(--k, 0) * 14ms);
   }
 
@@ -151,14 +151,14 @@ const kindAt = (e: Engine, k: number) => {
     transform-origin: 0 0;
     transform: rotateZ(calc(34deg - var(--tz, 0deg))) rotateX(calc(-58deg - var(--tx, 0deg)));
     white-space: nowrap;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .es-tag b {
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .es[data-state='pre'] .es-sheets {
@@ -186,7 +186,7 @@ const kindAt = (e: Engine, k: number) => {
 
   .es-legend li {
     padding: var(--s-3) var(--s-2) 0 0;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-note);
     line-height: var(--lh-snug);
   }
@@ -194,11 +194,11 @@ const kindAt = (e: Engine, k: number) => {
   .es-legend b {
     display: block;
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .es-legend span {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .es-key {
@@ -206,9 +206,9 @@ const kindAt = (e: Engine, k: number) => {
     flex-wrap: wrap;
     gap: var(--s-1) var(--s-5);
     margin-top: var(--s-4);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .es-key span {

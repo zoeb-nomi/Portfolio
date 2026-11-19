@@ -319,11 +319,9 @@ const articleLd = articleJsonLd({
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -352,9 +350,9 @@ const articleLd = articleJsonLd({
   }
 
   .disclaimer {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-top: var(--s-7);
   }
 
@@ -383,49 +381,47 @@ const articleLd = articleJsonLd({
 
   .fig figcaption {
     margin-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .fig-axis {
-    stroke: var(--rule);
+    stroke: var(--color-line);
     stroke-width: 1;
   }
 
   .fig-bar {
-    fill: var(--ink);
+    fill: var(--color-text);
   }
 
   .fig-bar--accent {
-    fill: var(--red-ink);
+    fill: var(--color-accent-text);
   }
 
   .fig-value {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-weight: 500;
-    fill: var(--ink);
+    fill: var(--color-text);
     font-size: 20px;
   }
 
   .fig-margin {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-note);
-    fill: var(--ink-muted);
+    fill: var(--color-text-muted);
   }
 
   .fig-year {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-data);
-    fill: var(--ink-body);
+    fill: var(--color-text-body);
   }
 
   .fig-note {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    fill: var(--ink-muted);
+    fill: var(--color-text-muted);
   }
 
   /* SVG text scales with the figure (viewBox 380 wide): about 0.92 at 390px and
@@ -469,10 +465,10 @@ const articleLd = articleJsonLd({
   }
 
   .hbar-cat {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-data);
     line-height: 1.35;
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .hbar-track {
@@ -491,7 +487,7 @@ const articleLd = articleJsonLd({
     top: -3px;
     bottom: -3px;
     width: 1px;
-    background: var(--ink-muted);
+    background: var(--color-text-muted);
     z-index: 1;
   }
 
@@ -499,7 +495,7 @@ const articleLd = articleJsonLd({
     position: absolute;
     top: 0;
     height: 100%;
-    background: var(--ink);
+    background: var(--color-text);
     left: calc(41.3793% + min(0%, var(--v) * (100% / 87)));
     width: calc(abs(var(--v)) * (100% / 87));
   }
@@ -507,12 +503,12 @@ const articleLd = articleJsonLd({
   .hbar-bar--accent {
     display: flex;
     align-items: center;
-    background: var(--red-ink);
+    background: var(--color-accent-text);
     padding-left: 0.5em;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-small);
     font-weight: 500;
-    color: var(--on-red);
+    color: var(--color-on-accent);
     white-space: nowrap;
   }
 
@@ -521,10 +517,10 @@ const articleLd = articleJsonLd({
     top: 50%;
     left: calc(41.3793% + var(--v) * (100% / 87) + 0.5em);
     transform: translateY(-50%);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-small);
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
     white-space: nowrap;
   }
 
@@ -578,11 +574,9 @@ const articleLd = articleJsonLd({
   }
 
   .basket-cards-caption {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     padding-bottom: var(--s-3);
   }
 
@@ -602,10 +596,10 @@ const articleLd = articleJsonLd({
   }
 
   .basket-card-heading {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-small);
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
     margin: 0 0 var(--s-3);
   }
 
@@ -620,14 +614,12 @@ const articleLd = articleJsonLd({
     display: flex;
     flex-wrap: wrap;
     column-gap: var(--s-2);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
   }
 
   .basket-card-field dt {
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     flex-shrink: 0;
   }
 
@@ -637,12 +629,12 @@ const articleLd = articleJsonLd({
 
   .basket-card-field dd {
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
     margin: 0;
   }
 
   .basket-card-field dd.win {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     font-weight: 500;
   }
 
@@ -665,11 +657,9 @@ const articleLd = articleJsonLd({
 
   .photo figcaption {
     margin-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* §9 watch: lite-embed cards, mirroring VideoEmbed's facade pattern. */
@@ -696,7 +686,7 @@ const articleLd = articleJsonLd({
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
     overflow: hidden;
   }
 
@@ -721,9 +711,9 @@ const articleLd = articleJsonLd({
      data-astro-cid attribute, a scoped selector here would silently
      stop matching that swapped-in button. */
   :global(.watch-facade:focus-visible) {
-    outline: 2px solid var(--red);
+    outline: 2px solid var(--color-accent);
     outline-offset: -4px;
-    box-shadow: inset 0 0 0 6px var(--paper-raised);
+    box-shadow: inset 0 0 0 6px var(--color-surface-raised);
   }
 
   .watch-poster {
@@ -743,11 +733,10 @@ const articleLd = articleJsonLd({
     left: var(--s-3);
     bottom: var(--s-3);
     padding: var(--s-1) var(--s-2);
-    background: var(--red-ink);
-    font-family: var(--font-mono);
+    background: var(--color-accent-text);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    color: var(--on-red);
+    color: var(--color-on-accent);
   }
 
   .watch-frame :global(iframe) {
@@ -760,27 +749,25 @@ const articleLd = articleJsonLd({
   }
 
   .watch-title {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-body);
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
     margin: 0;
   }
 
   .watch-channel {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin: 0;
   }
 
   .watch-why {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-note); /* sans floor is 12px */
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     margin: 0;
   }
 </style>

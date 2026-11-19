@@ -39,17 +39,15 @@ const { current } = Astro.props;
   }
 
   .switch-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-3);
   }
 
   .switch-list {
     list-style: none;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
   }
 
@@ -62,13 +60,13 @@ const { current } = Astro.props;
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-min);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
 
   .switch-list a:hover {
-    color: var(--red);
+    color: var(--color-link);
     text-decoration-thickness: 2px;
   }
 
@@ -76,7 +74,7 @@ const { current } = Astro.props;
      studies slides it from one item to the next instead of swapping (brief §3). */
   .switch-list .current {
     display: inline-block;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     view-transition-name: evals-switch-current;
   }
 </style>

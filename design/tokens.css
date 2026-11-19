@@ -1,87 +1,125 @@
-/* zoebnomi.com design tokens · The Red Pen v3 (Hybrid 1, 12 Nov 2026)
+/* zoebnomi.com design tokens · Red Pen 5, "Live Ink" (19 Nov 2026)
 
    THE single source of every design value on the site. src/styles/base.css
    imports this file; nothing else declares a token, and no other file may
    contain a raw palette hex (scripts/design-check.mjs fails the build).
    Rules for using these values: design/README.md.
-   Tokens only. No selectors beyond :root. Components own their own CSS. */
+   Tokens only. No selectors beyond :root and the .surface-ink mode. Components own their own CSS.
+
+   Red Pen 5 starts from what an editor's red pen does: it catches. The site is
+   a live audit, so the system has three voices and one actor:
+     Zoeb    claims, headings, interface      Archivo (variable: width + weight)
+     Model   the output being checked         Source Serif 4 (variable: optical size)
+     Check   verdicts, numbers, harness names IBM Plex Mono
+     Pen     the only thing that moves on its own, and the only red */
 
 :root {
-  /* Typefaces: three faces, self-hosted (public/fonts). */
-  --font-display: 'Instrument Serif', 'Display Fallback', Georgia, 'Times New Roman', serif;
-  --font-body: 'IBM Plex Sans', 'Body Fallback', -apple-system, 'Segoe UI', Helvetica, sans-serif;
+  /* ---------------------------------------------------------------- voices */
+  --font-display: 'Archivo', 'Display Fallback', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-body: 'Archivo', 'Body Fallback', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-model: 'Source Serif 4', 'Model Fallback', Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', 'Mono Fallback', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* Type roles (the contract, like the colour roles below): components read these, never the faces above, so a
+     derived brand can swap faces. --font-model is Red Pen's own: the model's voice. */
+  --font-heading: var(--font-display);
+  --font-text: var(--font-body);
+  --font-data: var(--font-mono);
 
-  /* Colour. Paper, ink and one red. Red marks only what an editor would mark:
-     verdicts, § and Fig. numbers, links and the action. */
+  /* Archivo's width axis is part of the voice: claims are set wide, reading
+     text normal, dense data a touch narrow. Weight carries emphasis. */
+  --wdth-claim: 112;
+  --wdth-head: 106;
+  --wdth-text: 100;
+  --wdth-tight: 88;
+  --wght-claim: 820;
+  --wght-head: 720;
+  --wght-strong: 620;
+  --wght-text: 400;
+  --wght-quiet: 250;
+
+  /* ---------------------------------------------------------------- colour
+     Paper, ink, one red pen, and graphite for what is only proposed.
+     Two surfaces: paper (where output lives) and ink (where checks run).
+     Each oklch() token has an sRGB hex fallback declared first. */
   --paper: #f4f1ea;
-  --paper-raised: #faf8f3;
-  --ink: #191713;
-  --ink-body: #3b362e;
-  --ink-muted: #6d675e;
-  /* --rule: 1.89:1 on --paper. Same hue as paper, so it reads warm-neutral. */
-  --rule: #b8b1a0;
-  /* Each oklch() token has an sRGB hex fallback declared first; the second
-     declaration wins where oklch is supported. */
-  --red: #be241f;
-  --red: oklch(0.52 0.19 28);
-  --red-ink: #a91515;
-  --red-ink: oklch(0.47 0.18 28);
-  --red-tint: #be241f2e;
-  --red-tint: oklch(0.52 0.19 28 / .18);
-  --on-red: #f4f1ea;
-  --on-red-muted: #fceeec;
-  --on-red-muted: oklch(0.96 0.015 30);
-  /* The drafting grid (Take B), drawn only behind the hero and the Builds
-     ledger. Ink at 5%: a texture, never a line. */
-  --grid-ink: #1917130d;
+  --paper-raised: #fbf9f4;
+  --paper-sunk: #ebe6dc;
+  --ink: #15130f;
+  --ink-body: #37322b;
+  --ink-muted: #6b655b;
+  --rule: #c4bdad;
+  --graphite: #8d877b;
+
+  /* The pen. --red draws marks (lines, circles, fills); --red-ink is red
+     text on paper (AA 4.5:1); --red-glow is the pen on the ink surface. */
+  --red: #e0371f;
+  --red: oklch(0.6 0.205 33);
+  --red-ink: #b3200f;
+  --red-ink: oklch(0.5 0.19 32);
+  --red-tint: #e0371f24;
+  --red-tint: oklch(0.6 0.205 33 / .14);
+  --red-glow: #ff5a3c;
+  --red-glow: oklch(0.68 0.21 35);
+  --on-red: #fff8f0;
+  --on-red-muted: #ffe6df;
+
+  /* The ink surface: the dark sections where checks run. */
+  --surface-ink: #15130f;
+  --surface-ink-raised: #201d18;
+  --on-ink: #efe9dd;
+  --on-ink-body: #cfc8ba;
+  --on-ink-muted: #9b9486;
+  --rule-on-ink: #3a352d;
+
+  /* The drafting grid, behind the hero only. Ink at 5%. */
+  --grid-ink: #15130f0d;
   --grid-step: 24px;
 
-  /* Lines. Four tiers, horizontals only (DESIGN v3 §b). Nothing else draws a
-     line; scripts/lint-source.mjs rejects any other border shorthand.
-       hair   rows inside a block (ledger, table, notes, method)
-       ink    block boundaries: header, section, table-head underline
-       heavy  opens and closes a table, ledger or list of record; top bar of
-              each tile, step and figure
-       pen    margin note, pull quote; the H1 underline at display scale */
+  /* ---------------------------------------------------------------- lines */
   --rule-strong: var(--ink);
   --rule-accent: var(--red);
   --line-hair: 1px solid var(--rule);
   --line-ink: 1px solid var(--ink);
   --line-heavy: 2px solid var(--ink);
   --line-pen: 2px solid var(--red);
-  /* Object outlines (buttons, audio player, diagram nodes): a box only around
-     an object, never around text. Dashed = proposes only (figure grammar). */
   --line-object: 1px solid var(--ink);
   --line-object-muted: 1px solid var(--rule);
-  --line-propose: 1px dashed var(--ink);
+  --line-propose: 1px dashed var(--graphite);
   --line-pen-dashed: 2px dashed var(--red);
+  --line-on-ink: 1px solid var(--rule-on-ink);
 
-  /* Type scale (DESIGN v3 §c). Floor is 12px everywhere. */
-  --t-display: clamp(56px, 9.4vw, 136px);   /* home H1, line 1 */
-  --t-answer: clamp(28px, 3.4vw, 50px);     /* home H1, line 2, italic */
+  /* Pen marks (src/scripts/pen.ts): stroke widths in px at 1x. */
+  --pen-stroke: 2.6;
+  --pen-stroke-heavy: 4;
+
+  /* ---------------------------------------------------------------- type scale
+     Floor is 12px everywhere. */
+  --t-mega: clamp(88px, 15vw, 232px);       /* one number per page, on the ink surface */
+  --t-display: clamp(56px, 8.6vw, 140px);   /* home claim */
   --t-hero: var(--t-display);
-  --t-page: clamp(42px, 5.4vw, 74px);       /* page H1 */
-  --t-stat: clamp(56px, 5.8vw, 84px);       /* tile numeral */
-  --t-h2: clamp(30px, 3.3vw, 46px);
-  --t-num: clamp(30px, 2.6vw, 38px);        /* ledger numeral */
-  --t-h3: clamp(24px, 2.2vw, 30px);         /* row name */
-  --t-quote: clamp(22px, 2.2vw, 28px);
-  --t-slab: clamp(28px, 3.2vw, 40px);       /* CTA slab */
-  --t-display-xl: clamp(44px, 5.8vw, 60px);
-  --t-body: clamp(16px, 1.2vw, 17.5px);
+  --t-page: clamp(44px, 6.2vw, 92px);       /* page H1 */
+  --t-h2: clamp(32px, 4.2vw, 62px);
+  --t-h3: clamp(21px, 1.9vw, 27px);
+  --t-lede: clamp(20px, 1.8vw, 26px);
+  --t-model: clamp(18px, 1.45vw, 21px);     /* model output on a sheet */
+  --t-stat: clamp(56px, 6.4vw, 96px);
+  --t-num: clamp(34px, 3.2vw, 48px);
+  --t-quote: clamp(22px, 2.2vw, 30px);
+  --t-slab: clamp(30px, 4vw, 58px);
+  --t-display-xl: clamp(44px, 5.8vw, 72px);
+  --t-answer: clamp(28px, 3.4vw, 50px);     /* retired; kept for one release */
+  --t-body: clamp(16px, 1.15vw, 17.5px);
   --t-small: 15px;
   --t-data: 13px;
-  --t-nav: 12.5px;
+  --t-nav: 13px;
   --t-label-lg: 12.5px;
   --t-label: 12px;
   --t-note: 12px;
-  --t-micro: 12px;                          /* the floor */
+  --t-micro: 12px;
 
-  /* Reading measure. */
-  --measure: 60ch;
+  --measure: 62ch;
 
-  /* Space: 4px scale. */
+  /* ---------------------------------------------------------------- space: 4px scale */
   --s-1: 4px;
   --s-2: 8px;
   --s-3: 12px;
@@ -95,55 +133,105 @@
   --s-11: 56px;
   --s-12: 72px;
   --s-13: 96px;
+  --s-14: 136px;
+  --s-15: 184px;
 
   /* Grid. */
-  --shell-max: 1200px;
+  --shell-max: 1320px;
   --margin-col: 240px;
-  --gutter: 44px;
+  --gutter: 48px;
   --body-inset: 40px;
   --header-h: 64px;
 
   /* Letter-spacing. */
-  --track-display: -.025em;
-  --track-tight: -.015em;
+  --track-display: -.035em;
+  --track-tight: -.02em;
   --track-normal: 0;
-  --track-caps: .12em;
+  --track-caps: .1em;
   --track-wide: .04em;
 
   /* Line-height. */
   --lh-tight: 1.05;
-  --lh-display: 1.02;
+  --lh-display: .92;
   --lh-title: 1.1;
-  --lh-heading: 1.15;
+  --lh-heading: 1.12;
   --lh-snug: 1.5;
   --lh-base: 1.55;
   --lh-body: 1.6;
   --lh-prose: 1.62;
   --lh-label: 1.7;
 
-  /* Links and hit areas (WCAG 2.5.8). */
   --underline-offset: 3px;
   --hit-min: 24px;
   --hit-touch: 44px;
 
-  /* Shape: square, no shadows. */
   --radius: 0;
 
-  /* Motion. Durations shared by CSS transitions and the motion layer
-     (src/scripts/motion.ts reads none of these at runtime; keep the two in
-     step by hand: fast 120, base 200, slow 600, story 3200). */
+  /* ---------------------------------------------------------------- motion
+     Five verbs, and nothing moves that is not one of them (design/README.md §8):
+       stream   the model writes            --dur-char per character
+       mark     the pen draws a mark        --dur-mark, --ease-pen
+       stamp    a verdict lands             --dur-stamp, --ease-stamp
+       tally    a count settles             --dur-tally
+       reveal   a block enters on scroll    --dur-slow, --ease-draw
+     src/scripts/pen.ts and live-audit.ts mirror these numbers in MOTION. */
   --ease-draw: cubic-bezier(.2, .7, .2, 1);
+  --ease-pen: cubic-bezier(.55, .05, .25, 1);
+  --ease-stamp: cubic-bezier(.3, 1.5, .5, 1);
   --dur-fast: 120ms;
   --dur-base: 200ms;
   --dur-slow: 600ms;
+  --dur-char: 16ms;
+  --dur-mark: 560ms;
+  --dur-stamp: 260ms;
+  --dur-tally: 1400ms;
+
+  /* ---------------------------------------------------------------- semantic roles
+     The contract (Red Pen 5). Components read ONLY these roles for colour, never the primitives above.
+     A derived theme (design/tokens/themes/*) overrides roles, and .surface-ink below re-points them.
+     Custom properties resolve where they are declared, so a mode must override the roles themselves. */
+  --color-surface: var(--paper);
+  --color-surface-raised: var(--paper-raised);
+  --color-surface-sunk: var(--paper-sunk);
+  --color-text: var(--ink);
+  --color-text-body: var(--ink-body);
+  --color-text-muted: var(--ink-muted);
+  --color-line: var(--rule);
+  --color-line-strong: var(--ink);
+  --color-accent: var(--red);
+  --color-accent-text: var(--red-ink);
+  --color-accent-tint: var(--red-tint);
+  --color-on-accent: var(--on-red);
+  --color-on-accent-muted: var(--on-red-muted);
+  --color-pending: var(--graphite);
+  --color-link: var(--red-ink);
+  /* Check states: what a verdict looks like. Red Pen keeps it to ink, red and graphite. */
+  --color-state-pass: var(--ink);
+  --color-state-fail: var(--red);
+  --color-state-warn: var(--graphite);
+  --color-state-na: var(--graphite);
+  /* Data series, for charts that need more than one colour. Red is reserved for the series under test. */
+  --color-series-1: var(--red);
+  --color-series-2: var(--ink);
+  --color-series-3: var(--graphite);
+  --color-series-4: color-mix(in oklch, var(--ink) 55%, var(--paper));
+  --color-series-5: color-mix(in oklch, var(--red) 45%, var(--paper));
+  --color-series-6: color-mix(in oklch, var(--graphite) 45%, var(--paper));
+
+  --type-display: var(--t-display);
+  --type-page: var(--t-page);
+  --type-h2: var(--t-h2);
+  --type-h3: var(--t-h3);
+  --type-body: var(--t-body);
+  --type-small: var(--t-small);
+  --type-label: var(--t-label);
 
   /* Stacking. */
   --z-nav: 100;
   --z-sheet: 200;
   --z-top: 1000;
 
-  /* Contribution heatmap: monochrome, derived from ink. heat-0 is lighter than
-     --rule so the empty to first step stays visible. */
+  /* Contribution heatmap: monochrome, derived from ink. */
   --heat-0: #d5cfc2;
   --heat-1: #a6a39d;
   --heat-2: #797671;
@@ -152,6 +240,57 @@
   --heat-2: color-mix(in oklch, var(--ink) 52%, var(--paper));
   --heat-3: color-mix(in oklch, var(--ink) 74%, var(--paper));
   --heat-4: var(--ink);
+}
+
+/* The ink surface is a mode, not a palette: inside .surface-ink the paper and
+   ink roles swap and the pen glows, so every component that reads roles works
+   on it unchanged (the one selector besides :root this file may hold). */
+.surface-ink {
+  --paper: var(--surface-ink);
+  --paper-raised: var(--surface-ink-raised);
+  --paper-sunk: var(--surface-ink);
+  --ink: var(--on-ink);
+  --ink-body: var(--on-ink-body);
+  --ink-muted: var(--on-ink-muted);
+  --rule: var(--rule-on-ink);
+  --rule-strong: var(--on-ink);
+  --red: var(--red-glow);
+  --red-ink: var(--red-glow);
+  --on-red: var(--surface-ink);
+  --grid-ink: transparent;
+  --line-hair: 1px solid var(--rule-on-ink);
+  --line-ink: 1px solid var(--on-ink);
+  --line-heavy: 2px solid var(--on-ink);
+  --line-pen: 2px solid var(--red-glow);
+  --line-object: 1px solid var(--on-ink);
+  --line-object-muted: 1px solid var(--rule-on-ink);
+
+  /* The roles, re-pointed (components read these). */
+  --color-surface: var(--surface-ink);
+  --color-surface-raised: var(--surface-ink-raised);
+  --color-surface-sunk: var(--surface-ink);
+  --color-text: var(--on-ink);
+  --color-text-body: var(--on-ink-body);
+  --color-text-muted: var(--on-ink-muted);
+  --color-line: var(--rule-on-ink);
+  --color-line-strong: var(--on-ink);
+  --color-accent: var(--red-glow);
+  --color-accent-text: var(--red-glow);
+  --color-accent-tint: color-mix(in oklch, var(--red-glow) 18%, transparent);
+  --color-on-accent: var(--surface-ink);
+  --color-on-accent-muted: var(--surface-ink-raised);
+  --color-pending: var(--on-ink-muted);
+  --color-link: var(--red-glow);
+  --color-state-pass: var(--on-ink);
+  --color-state-fail: var(--red-glow);
+  --color-state-warn: var(--on-ink-muted);
+  --color-state-na: var(--on-ink-muted);
+  --color-series-1: var(--red-glow);
+  --color-series-2: var(--on-ink);
+  --color-series-3: var(--on-ink-muted);
+  --color-series-4: color-mix(in oklch, var(--on-ink) 55%, var(--surface-ink));
+  --color-series-5: color-mix(in oklch, var(--red-glow) 45%, var(--surface-ink));
+  --color-series-6: color-mix(in oklch, var(--on-ink-muted) 45%, var(--surface-ink));
 }
 
 /* Breakpoints: 599 / 899 / 1099 only (custom properties cannot be used in

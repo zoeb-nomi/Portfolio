@@ -1,31 +1,30 @@
+Status: unused on the site (kept for reference)
+
 # ContributionGraph
 
-`src/components/ContributionGraph.astro` · unchanged in v3
+## Purpose
+A month-labelled, monochrome contribution heatmap (never GitHub green). The committed snapshot renders on the server; a script may refresh it from `/api/contributions`.
 
-![ContributionGraph](../mocks/2026-11-12-v3/components/ContributionGraph.jpg)
-
-## What it is
-
-A month-labelled GitHub-style contribution heatmap. Server-renders the
-committed snapshot (src/data/contributions.json) so it works with JS off
-and never disappears; a small inline script then tries /api/contributions
-and re-renders with live data on success, updating the caption to match.
-
-Monochrome by design (§6 tokens in tokens.css): never GitHub green.
-Place each day into a Sun-Sat week grid: row = weekday (0=Sun..6=Sat),
-column = weeks elapsed since the Sunday on/before the first day.
-Month labels: one per column where the month changes from the previous
-labelled column, with a minimum 3-column gap so short months don't crowd.
+## Anatomy
+- Kicker, then a focusable scroll region holding weekday labels and a `role="img"` grid of cells (one per day, `data-level` 0 to 4, `title` per cell) with month labels above.
+- Footer: caption with the total (`data-cg-total`, width reserved so a count-up never shifts it) and a Less/More legend.
 
 ## Props
+None. Data comes from `src/data/contributions.json` (`days`, `total_last_year`, `fetched_at`); copy from `contributions` in `src/data/copy.ts`.
 
-None.
+## Tokens it reads
+- Colour roles: `--color-text-muted`, `--color-surface`.
+- Heat scale: `--heat-0` to `--heat-4` (tokens, not roles).
+- Type and space: `--font-data`, `--t-micro`, `--t-label`, `--s-1`, `--s-3`, `--s-4`, `--radius`, `--line-pen`, `--ease-draw`.
+
+## States and motion
+- Script fetches live data and re-renders levels and caption; on failure the snapshot stays.
+- Narrow screens scroll to the latest ~26 weeks.
+- Reveal and tally: cells wipe in under `[data-contrib-graph]` (`src/styles/motion.css`), the total counts up, and the latest week gets one pen-weight outline pulse (`cg-pulse`, 1200ms). Reduced motion renders the final state.
+- Ink surface: the heat tokens do not re-point (see the report).
+
+## Accessibility
+The grid carries an `aria-label` summary; the scroll region is `tabindex="0"` with a label. Weekday labels and legend are `aria-hidden`.
 
 ## Used on
-
-- `/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+No page imports it.

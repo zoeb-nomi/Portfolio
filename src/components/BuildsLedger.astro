@@ -92,7 +92,7 @@ const C = builds.columns;
                 <span class="l-build">
                   <span class="l-name" id={`b-${variant}-${b.id}`}>{b.name}</span>
                   {b.tag && <span class="tag">{b.tag}</span>}
-                  <span class="one">{b.oneLine}</span>
+                  <span class="one">{variant === 'compact' ? (b.homeLine ?? b.oneLine) : b.oneLine}</span>
                 </span>
                 {variant === 'full' && (
                   <span class="l-cell l-guard">
@@ -176,9 +176,9 @@ const C = builds.columns;
 <style>
   /* ---------- shared ---------- */
   .idx {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     padding-top: 6px;
     font-variant-numeric: tabular-nums;
   }
@@ -186,9 +186,9 @@ const C = builds.columns;
   .tag {
     display: inline-block;
     margin-top: var(--s-1);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .one {
@@ -196,7 +196,7 @@ const C = builds.columns;
     margin-top: var(--s-2);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 46ch;
   }
 
@@ -210,9 +210,9 @@ const C = builds.columns;
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-min);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -220,12 +220,10 @@ const C = builds.columns;
   .lnks a.primary {
     min-height: var(--hit-touch);
     font-weight: 500;
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
   }
 
   .lnks a:hover {
-    color: var(--red);
+    color: var(--color-link);
     text-decoration-thickness: 2px;
   }
 
@@ -251,11 +249,9 @@ const C = builds.columns;
   .l-head {
     padding-block: var(--s-2);
     border-bottom: var(--line-ink);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .l-item + .l-item {
@@ -287,17 +283,19 @@ const C = builds.columns;
   .l-name {
     display: block;
     overflow-wrap: anywhere;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h3);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .l-cell {
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .l-lab {
@@ -307,18 +305,20 @@ const C = builds.columns;
   .l-num {
     display: block;
     margin-bottom: var(--s-1);
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-num);
     line-height: var(--lh-tight);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     font-variant-numeric: tabular-nums;
   }
 
   .l-ship {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* The open/close mark: a plus that turns into a minus. */
@@ -353,12 +353,12 @@ const C = builds.columns;
 
   .l-row:hover .l-toggle,
   .l-row[open] .l-toggle {
-    border-color: var(--red);
+    border-color: var(--color-accent);
   }
 
   .l-row:hover .l-name,
   .l-row[open] .l-name {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   /* Hover: the row's rule goes Hair -> Ink (A §f). */
@@ -387,11 +387,9 @@ const C = builds.columns;
     justify-self: start;
     min-height: var(--hit-touch);
     padding: 0;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -416,18 +414,16 @@ const C = builds.columns;
   }
 
   .l-facts dt {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .l-facts dd {
     margin-top: 2px;
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .l-panel-in > .lnks {
@@ -472,11 +468,9 @@ const C = builds.columns;
 
     .l-lab {
       display: block;
-      font-family: var(--font-mono);
+      font-family: var(--font-data);
       font-size: var(--t-label);
-      letter-spacing: var(--track-caps);
-      text-transform: uppercase;
-      color: var(--ink-muted);
+      color: var(--color-text-muted);
       padding-top: 3px;
     }
 
@@ -537,11 +531,13 @@ const C = builds.columns;
   }
 
   .feat-name {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h2);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .feat .one {
@@ -559,24 +555,22 @@ const C = builds.columns;
   }
 
   .feat-cells dt {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-2);
   }
 
   .feat-cells dd {
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .feat .ship {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-2);
   }
 

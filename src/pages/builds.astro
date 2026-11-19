@@ -112,7 +112,17 @@ const agreement = [
   </Section>
 
   <Section mark={B.sections.contributions.mark} label={B.sections.contributions.label} sub={B.sections.contributions.note} anchorId={B.sections.contributions.anchorId}>
-    <BuildsLedger variant="full" entries={contribs} />
+    <ul class="upstream">
+      {
+        contribs.map((c) => (
+          <li>
+            <a href={c.primary.href} target="_blank" rel="noopener noreferrer">{c.name}</a>
+            <span class="up-line">{c.oneLine}</span>
+            <span class="up-m">{c.measured.headline}</span>
+          </li>
+        ))
+      }
+    </ul>
     <p class="close-line">{B.close}</p>
   </Section>
 
@@ -145,18 +155,54 @@ const agreement = [
 </Base>
 
 <style>
+  /* Red Pen 5: two open pull requests are a footnote to the builds, not a ledger. One line each. */
+  .upstream {
+    list-style: none;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .upstream li {
+    display: grid;
+    gap: var(--s-1);
+    padding-top: var(--s-3);
+    border-top: var(--line-hair);
+  }
+
+  .upstream a {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    font-weight: var(--wght-strong);
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .up-line {
+    color: var(--color-text-body);
+    max-width: var(--measure);
+  }
+
+  .up-m {
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    color: var(--color-text-muted);
+  }
+
   .summary {
     margin-top: var(--s-5);
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .summary span {
     display: block;
     font-weight: 400;
     font-size: var(--t-label);
-    font-family: var(--font-mono);
-    color: var(--ink-muted);
+    font-family: var(--font-data);
+    color: var(--color-text-muted);
   }
 
   .legend {
@@ -166,7 +212,7 @@ const agreement = [
     padding-top: var(--s-3);
     border-top: var(--line-hair);
     font-size: var(--t-small);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 62ch;
   }
 
@@ -177,7 +223,7 @@ const agreement = [
 
   .legend dt {
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .legend dt::after {
@@ -195,43 +241,43 @@ const agreement = [
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
 
   .why {
     font-size: var(--t-small);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: var(--measure);
   }
 
   .legend-line {
     margin-block: var(--s-3) var(--s-6);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     max-width: 80ch;
   }
 
   .sub-h2 {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h2);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 22ch;
   }
 
   .dek {
     margin-block: var(--s-4) var(--s-8);
     line-height: var(--lh-body);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: var(--measure);
   }
 
@@ -242,17 +288,15 @@ const agreement = [
   }
 
   .ja figcaption {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-5);
   }
 
   .ja figcaption b {
     font-weight: 500;
-    color: var(--red-ink);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+    color: var(--color-accent-text);
     margin-right: var(--s-2);
   }
 
@@ -268,12 +312,12 @@ const agreement = [
     grid-template-columns: 11em minmax(0, 1fr) 6em 6.5em;
     column-gap: var(--s-4);
     align-items: center;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
   }
 
   .ja-name {
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .ja-trk {
@@ -286,28 +330,28 @@ const agreement = [
     position: absolute;
     inset: 0 auto 0 0;
     width: calc(var(--b) * 100%);
-    background: var(--ink);
+    background: var(--color-text);
     transform-origin: left;
   }
 
   .ja-none {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     font-style: italic;
   }
 
   .ja-v {
-    color: var(--ink);
+    color: var(--color-text);
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
 
   .ja-tag {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .ja-ax {
     margin-top: var(--s-1);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .ja-ax span:nth-child(1) {
@@ -331,10 +375,10 @@ const agreement = [
 
   .note {
     margin-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     max-width: 80ch;
   }
 
@@ -349,18 +393,20 @@ const agreement = [
   }
 
   .compare :global(.data-table td) {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .close-line {
     margin-top: var(--s-8);
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-quote);
     line-height: var(--lh-heading);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 40ch;
   }
 
@@ -370,13 +416,13 @@ const agreement = [
     margin-top: var(--s-9);
     max-width: var(--measure);
     line-height: var(--lh-body);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .ctl-note {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .ship-table {

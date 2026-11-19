@@ -1,32 +1,33 @@
 # ForestPlot
 
-`src/components/ForestPlot.astro` · unchanged in v3
+## Purpose
+Each lever as a mean marker with its 95% interval on one shared axis, then the screener gap drawn on the same scale. Values are text first; the drawing is decoration.
 
-![ForestPlot](../mocks/2026-11-12-v3/components/ForestPlot.jpg)
-
-## What it is
-
-Forest plot: each lever as a mean marker with its 95% interval on one shared axis, then the screener gap
-drawn on the same scale. The values are text first; the drawing is aria-hidden. It plays once as it scrolls
-into view (zero line, the lever intervals, then the screener bar) and has no controls of its own.
+## Anatomy
+- Groups: a title, then one row per lever (label, track, "mean (lo to hi)" text) and a computed verdict line ("Both intervals include zero..." or "At least one interval stays on one side of zero.").
+- Gap group ("The screener that read the résumé"): zero line, bar to the mean, marker at the largest value, value text and a note.
+- A shared tick axis with an axis label. Track and axis are `aria-hidden`. Shared figure styles are in `src/styles/figures.css`.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `groups` | `Group[]` | `title`, `rows` (`label`, `sub?`, `mean`, `lo`, `hi`) |
+| `gap` | `Gap` | `label`, `sub`, `mean`, `max`, `note` |
+| `min`, `max` | `number` | axis range |
+| `ticks` | `number[]` | axis labels |
+| `axisLabel` | `string` | |
 
-```ts
-  groups: Group[];
-  gap: Gap;
-  min: number;
-  max: number;
-  ticks: number[];
-  axisLabel: string;
-```
+## Tokens it reads
+- Colour roles: `--color-text-muted`, `--color-accent` (gap bar and marker), `--color-accent-text`; intervals and markers use `--color-text` and `--color-surface` through `figures.css`.
+- Type and space: `--font-data`, `--t-micro`, `--track-wide`, `--s-1`, `--s-3`, `--s-6`.
+- Lines: `--line-pen`, `--line-ink`. Motion: `--dur-base`, `--dur-slow`, `--ease-draw`.
+
+## States and motion
+- Reveal: plays once at 35% in view (zero line, the intervals, then the screener bar and marker) from `data-state="pre"`; no controls of its own. Without script or with reduced motion the final state is the HTML.
+- Ink surface: roles re-point.
+
+## Accessibility
+Every mean and interval is printed as text; verdicts are sentences, not colour. The drawing is `aria-hidden`.
 
 ## Used on
-
-- `/screener-eval/`
-- `/writing/two-levers-that-did-not-move/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/screener-eval/`, `/writing/two-levers-that-did-not-move/`.

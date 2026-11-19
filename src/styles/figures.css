@@ -9,10 +9,10 @@
   column-gap: var(--s-4);
   row-gap: var(--s-1);
   align-items: center;
-  font-family: var(--font-mono);
+  font-family: var(--font-data);
   font-size: var(--t-data);
   line-height: var(--lh-snug);
-  color: var(--ink);
+  color: var(--color-text);
 }
 
 .fg-row + .fg-row {
@@ -22,7 +22,7 @@
 .fg-lab small {
   display: block;
   font-size: var(--t-micro);
-  color: var(--ink-muted);
+  color: var(--color-text-muted);
 }
 
 .fg-val {
@@ -33,7 +33,7 @@
 .fg-note {
   grid-column: 2 / -1;
   font-size: var(--t-micro);
-  color: var(--red-ink);
+  color: var(--color-accent-text);
 }
 
 /* The track: a hairline with an inset, so a mark at 0% or 100% stays inside it. */
@@ -75,9 +75,9 @@
   inset-inline-start: calc(var(--x) * 1%);
   inset-block-start: 0;
   transform: translateX(-50%);
-  font-family: var(--font-mono);
+  font-family: var(--font-data);
   font-size: var(--t-micro);
-  color: var(--ink-muted);
+  color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -85,9 +85,9 @@
   grid-column: 2;
   margin-top: var(--s-1);
   text-align: center;
-  font-family: var(--font-mono);
+  font-family: var(--font-data);
   font-size: var(--t-micro);
-  color: var(--ink-muted);
+  color: var(--color-text-muted);
 }
 
 /* Square marks centred on their left offset. */
@@ -98,11 +98,11 @@
   block-size: var(--s-3);
   margin: calc(var(--s-3) / -2) 0 0 calc(var(--s-3) / -2);
   border: var(--line-object);
-  background: var(--paper);
+  background: var(--color-surface);
 }
 
 .fg-pt.is-fill {
-  background: var(--ink);
+  background: var(--color-text);
 }
 
 /* A horizontal run of ink, 2px tall, positioned by left and width. */
@@ -111,7 +111,7 @@
   inset-block-start: 50%;
   block-size: 2px;
   margin-block-start: -1px;
-  background: var(--ink);
+  background: var(--color-text);
 }
 
 @media (max-width: 599px) {

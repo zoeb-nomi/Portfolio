@@ -1,33 +1,29 @@
 # CareerTimeline
 
-`src/components/CareerTimeline.astro` · unchanged in v3
+## Purpose
+The About record as a vertical timeline, newest first. Dates left, a spine in the middle, organisation as the headline, then role and detail, then a source link if one exists.
 
-![CareerTimeline](../mocks/2026-11-12-v3/components/CareerTimeline.jpg)
-
-## What it is
-
-The About record as a vertical timeline, newest first, current role on top. The dates sit on the left, a spine
-runs down the middle, and each entry reads: organisation (the headline), then role and detail, then a source
-link if one exists. As you read down, the spine fills red, each marker fills as you pass it, and the entries
-you have not reached yet are set in the muted ink. Everything is always on the page; reduced motion and no
-script show it fully lit and still. A row with no link shows none: it is a claim taken on trust, and the page
-does not imply otherwise.
-"2019" is the year 2019; "2021–2022" runs to the end of 2022; "2025–present" has no end.
-"Product Manager, Instead · owning production LLM output quality" -> org "Instead", role "Product Manager",
-detail "owning production LLM output quality". The copy stays one string in copy.ts.
-Newest first: whatever is still running, then by when it ended, then by when it began.
+## Anatomy
+`<ol>` of items: `.tl-when` (year), `.tl-mark` (aria-hidden), and `.tl-what` with an `<h3>` organisation, a role line and an optional source link. A row with no source shows none: it is a claim on trust. Each `body` string is split on " · " and the first comma, so the copy stays one string.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `items` | `Item[]` | `year` ("2019", "2021-2022", "2025-present"), `body`, `source` (`{label, href}` or null). A year that does not parse throws at build time |
 
-```ts
-  items: Item[];
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-surface`, `-accent`, `--color-link` (source links).
+- Type and space: `--font-heading`, `--font-text`, `--font-data`, `--wght-head`, `--wdth-head`, `--t-h3`, `--t-body`, `--t-note`, `--t-label`, `--track-tight`, `--track-wide`, `--lh-*`, `--s-1` to `--s-9`, `--measure`, `--underline-offset`.
+- Lines: `--line-hair` (spine), `--line-pen` (the filled spine), `--line-object` (marker).
+
+## States and motion
+- Without script: everything fully lit and still.
+- With script (and motion allowed): `--p` scales the pen-weight spine from the top as you scroll; markers go from hollow to `--color-text` once reached; the current entry's marker is `--color-accent`; entries not yet reached are `--color-text-muted`.
+- Reduced motion: `motionAllowed()` is false, so the live state is never set.
+- Ink surface: roles re-point, unchanged.
+
+## Accessibility
+Real ordered list and `<h3>` per organisation; the markers are decorative. Source links open in a new tab with `rel="noopener noreferrer"`. At 899px and below the date column collapses.
 
 ## Used on
-
-- `/about/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/about/`.

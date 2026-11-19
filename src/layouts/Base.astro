@@ -6,6 +6,7 @@ import '../styles/layout.css';
 import '../styles/reading.css';
 import '../styles/figures.css';
 import '../styles/motion.css';
+import '../styles/pen.css';
 import Motion from '../components/Motion.astro';
 // theme-color must be a literal in <meta>; read it from the token file so the
 // palette is still declared in one place (design/tokens.css).
@@ -106,21 +107,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <!-- Fonts: self-hosted, preload the three above-the-fold files only (display, body, mono) -->
     <link
       rel="preload"
-      href="/fonts/instrument-serif-latin-400-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/instrument-serif-latin-400-italic.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/ibm-plex-sans-latin-400-normal.woff2"
+      href="/fonts/archivo-latin-wdth-normal.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -152,6 +139,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <div class="red-thread" aria-hidden="true"></div>
     <div class="shell">
       <SiteHeader currentPath={path} />
       <main id="main" tabindex="-1">
@@ -160,6 +148,9 @@ const ogImageURL = new URL(ogImage, Astro.site);
       <SiteFooter />
     </div>
     {motion && <Motion />}
+    <script>
+      import '../scripts/pen-scroll';
+    </script>
   </body>
 </html>
 

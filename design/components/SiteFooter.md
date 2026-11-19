@@ -1,25 +1,25 @@
 # SiteFooter
 
-`src/components/SiteFooter.astro` · changed in v3
+## Purpose
+The site footer on the ink surface: name, role line, contact links, then the footer nav and the design and llms.txt links.
 
-![SiteFooter](../mocks/2026-11-12-v3/components/SiteFooter.jpg)
-
-## What it is
-
-Site footer (DESIGN v3 §e, D-06): display-type name, role line, a links row
-with 44px targets, then a hair rule and a meta row with the nav and the
-labelled llms.txt link. No top rule: the CTA slab (or the page's last
-section rule) closes the page above it.
+## Anatomy
+`footer.site-footer.surface-ink.bleed`: an empty (aria-hidden) margin column; body column with the name (Archivo), the role line, a links row (Book a call, email, LinkedIn, GitHub; 44px targets), and a hair rule above a meta row holding a labelled `<nav aria-label="Footer">` and two small links (design system, `llms.txt`). No top rule: the CTA slab or the last section rule closes the page above it.
 
 ## Props
+None. Content comes from `site`, `cta`, `nav` and `designLink` in `src/data/copy.ts`.
 
-None.
+## Tokens it reads
+- Colour roles: `--color-text`, `--color-text-muted`, `--color-link` (all resolved on the ink surface).
+- Type: `--font-heading`, `--font-text`, `--wght-head`, `--wdth-head`, `--track-tight`, `--t-h3`, `--t-small`, `--t-label`, `--lh-heading`.
+- Space and lines: `--s-2` to `--s-11`, `--hit-touch`, `--underline-offset`, `--line-hair`.
+
+## States and motion
+Static. Link hover changes colour and underline. Reduced motion changes nothing. It is the ink surface by construction (`.surface-ink`), so it re-points roles itself. Collapses at 899px.
+
+## Accessibility
+Labelled footer nav; external links open with `rel="noopener noreferrer"`; targets are 44px.
 
 ## Used on
-
-- `via Base`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Also via: `layout Base`.
+Rendered by Base on every page.

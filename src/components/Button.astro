@@ -26,55 +26,63 @@ const external = isExternal(href);
     align-items: center;
     justify-content: center;
     min-height: var(--hit-touch);
-    padding: 13px 22px;
-    font-family: var(--font-mono);
-    font-size: var(--t-label-lg);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
+    padding: 14px 24px;
+    font-family: var(--font-text);
+    font-weight: var(--wght-strong);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-size: 16px;
     text-decoration: none;
     border-radius: var(--radius);
     border: 1px solid transparent;
     transition: background-color var(--dur-fast) var(--ease-draw), color var(--dur-fast) var(--ease-draw),
-      border-color var(--dur-fast) var(--ease-draw), transform var(--dur-fast) var(--ease-draw);
+      border-color var(--dur-fast) var(--ease-draw), transform var(--dur-fast) var(--ease-draw),
+      box-shadow var(--dur-fast) var(--ease-draw);
+  }
+
+  /* Red Pen 5: a button is an object on the desk. Hover lifts it off the paper; press sets it down. */
+  .rp-button:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 3px 3px 0 var(--color-text);
   }
 
   .rp-button:active {
-    transform: translateY(1px);
+    transform: none;
+    box-shadow: none;
   }
 
   .rp-button--primary {
-    background: var(--red);
-    color: var(--on-red);
-    border-color: var(--red);
+    background: var(--color-accent-text);
+    color: var(--color-on-accent);
+    border-color: var(--color-accent-text);
   }
 
   .rp-button--primary:hover {
-    background: var(--red-ink);
-    border-color: var(--red-ink);
+    background: var(--color-accent-text);
+    border-color: var(--color-text);
   }
 
   .rp-button--secondary {
     background: transparent;
-    color: var(--ink);
-    border-color: var(--rule-strong);
+    color: var(--color-text);
+    border-color: var(--color-line-strong);
   }
 
   .rp-button--secondary:hover {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--color-text);
+    color: var(--color-surface);
   }
 
   .rp-button--inverse {
-    background: var(--paper);
-    color: var(--red-ink);
-    border-color: var(--paper);
+    background: var(--color-surface);
+    color: var(--color-accent-text);
+    border-color: var(--color-surface);
   }
 
   /* paper -> paper-raised was 1.06:1, i.e. no visible hover on the red slab.
      Same ink fill as the secondary variant. */
   .rp-button--inverse:hover {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--paper);
+    background: var(--color-text);
+    border-color: var(--color-text);
+    color: var(--color-surface);
   }
 </style>

@@ -1,36 +1,28 @@
 # UnitChart
 
-`src/components/UnitChart.astro` · unchanged in v3
+## Purpose
+One square per case, filled when the thing counted happened: "3 of 40" felt as three filled squares in a field of 40.
 
-![UnitChart](../mocks/2026-11-12-v3/components/UnitChart.jpg)
-
-## What it is
-
-Unit chart: one square per case, filled when the thing being counted
-happened. "3 of 40" is easier to feel as 3 filled squares in a field of 40
-than as a percentage. The squares are decoration (aria-hidden); the row's
-visible text carries the numbers, so screen readers get them too.
+## Anatomy
+A row per item: a head (label and value text, tabular) and a grid of squares (`aria-hidden`). A key below names what filled and empty squares mean.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `rows` | `Row[]` | `label`, `filled`, `of`, `text` (the visible value, for example "3 of 40 · 8%") |
+| `cols` | `number` | squares per line |
+| `filledMeans`, `emptyMeans` | `string` | key text |
 
-```ts
-  rows: Row[];
-  /** Squares per line. */
-  cols: number;
-  /** What a filled square means, shown as the key. */
-  filledMeans: string;
-  emptyMeans: string;
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `--color-text-muted`.
+- Type and space: `--font-data`, `--t-micro`, `--t-data`, `--s-1` to `--s-5`.
+- Lines: `--line-object`. Motion: `--dur-base`.
+
+## States and motion
+Reveal: when motion is allowed, filled squares start empty (`data-state="pre"`) and fill in order once at 35% in view (`mountFigures`); the `EssayFigure` Replay link plays it again. Without script or with reduced motion the final fill is the HTML. Ink surface: roles re-point.
+
+## Accessibility
+The squares are decoration; the row's visible text carries the numbers.
 
 ## Used on
-
-- `/mirror-eval/`
-- `/screener-eval/`
-- `/writing/eval-harness-at-my-own-reflection/`
-- `/writing/nobody-reports-the-misses/`
-- `/writing/two-levers-that-did-not-move/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/design/components/`, `/mirror-eval/`, `/screener-eval/`, `/writing/eval-harness-at-my-own-reflection/`, `/writing/nobody-reports-the-misses/`, `/writing/two-levers-that-did-not-move/`.

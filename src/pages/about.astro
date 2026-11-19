@@ -1,8 +1,8 @@
 ---
 // /about/ (DESIGN v3 §e About, I-05): who he is, then the employment record as
 // §2 (#record, absorbing /work/), the public builds, and contact. One square
-// borderless greyscale portrait; no employer logos; the Keka video is a
-// click-to-play embed in the margin column.
+// borderless greyscale portrait; employer logos in §2 for recall (Red Pen 5); the Keka video is a
+// click-to-play embed in Keka's main column, under the paragraph it shows.
 import Base from '../layouts/Base.astro';
 import Masthead from '../components/Masthead.astro';
 import Section from '../components/Section.astro';
@@ -17,6 +17,13 @@ import { isExternal } from '../lib/isExternal';
 
 const links = [cta.bookACall, cta.email, cta.linkedin, cta.github];
 const S = about.sections;
+// Employer marks for recall (Red Pen 5): ink monochrome, from scripts/process-logos.mjs.
+const logos = [
+  { file: 'instead', name: work.instead.company, w: 180 },
+  { file: 'multiplier', name: work.multiplier.company, w: 160 },
+  { file: 'keka', name: work.keka.company, w: 133 },
+  { file: 'hurix', name: work.hurix.company, w: 261 },
+];
 const insteadFig = {
   kind: 'dumbbell' as const,
   min: 0,
@@ -47,6 +54,15 @@ const insteadFig = {
 
   <Section mark={S.record.mark} label={S.record.label} anchorId={S.record.anchorId}>
     <p class="record-lede">{work.standfirst}</p>
+    <ul class="logos" aria-label={about.logosLabel}>
+      {
+        logos.map((l) => (
+          <li>
+            <img src={`/img/logos/${l.file}.png`} alt={l.name} width={l.w} height="48" loading="lazy" decoding="async" />
+          </li>
+        ))
+      }
+    </ul>
   </Section>
 
   <TimelineEntry
@@ -98,7 +114,7 @@ const insteadFig = {
     achievements={work.keka.achievements}
     headingLevel="h3"
   >
-    <div slot="margin" class="m-video">
+    <div slot="video" class="k-video">
       <VideoEmbed
         youtubeId={work.keka.video.youtubeId}
         title={work.keka.video.title}
@@ -149,6 +165,22 @@ const insteadFig = {
     </ul>
   </Section>
 
+  <Section mark={S.site.mark} label={S.site.label} anchorId={S.site.anchorId}>
+    <p class="site-line">{about.siteLine}</p>
+    <ul class="links-list">
+      {
+        about.siteLinks.map((l) => (
+          <li>
+            <a href={l.href}>
+              <span class="link-label">{l.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
   <CTASlab
     marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
     body={home.ctaSlabBody}
@@ -161,7 +193,7 @@ const insteadFig = {
   .prose {
     max-width: var(--measure);
     line-height: var(--lh-prose);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .belief {
@@ -170,45 +202,71 @@ const insteadFig = {
     padding-top: var(--s-6);
   }
 
+  /* One voice (Red Pen 5): the belief is Zoeb's, so it is all Archivo; the claim is carried by weight alone. */
   .belief p {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-text) * 1%);
+    font-weight: 400;
     font-size: var(--t-h3);
     line-height: 1.3;
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 46ch;
   }
 
   .belief strong {
-    font-weight: 400;
-    font-style: italic;
+    font-weight: var(--wght-claim);
+    font-stretch: calc(var(--wdth-head) * 1%);
+  }
+
+  .logos {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-6) var(--s-10);
+    margin-top: var(--s-8);
+  }
+
+  .logos img {
+    display: block;
+    block-size: var(--s-7);
+    inline-size: auto;
+    opacity: 0.85;
+  }
+
+  .k-video {
+    max-width: 40rem;
+    margin-block: var(--s-6) var(--s-2);
   }
 
   .profile {
     margin-block: var(--s-6) var(--s-9);
     font-size: var(--t-small);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: var(--measure);
   }
 
   .profile a,
   .ledger-link a {
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
 
   .facts {
     margin-top: var(--s-6);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-data);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .record-lede {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h3);
     line-height: var(--lh-heading);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 34ch;
   }
 
@@ -218,16 +276,12 @@ const insteadFig = {
 
   .m-fig figcaption {
     margin-top: var(--s-2);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
-  .m-video {
-    margin-top: var(--s-6);
-    max-width: 240px;
-  }
 
   .arc-close {
     padding: var(--s-11) var(--gutter);
@@ -235,11 +289,13 @@ const insteadFig = {
   }
 
   .arc-close p {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h2);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 30ch;
     margin-inline: auto;
     text-align: center;
@@ -254,10 +310,14 @@ const insteadFig = {
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+  }
+
+  .site-line {
+    max-width: var(--measure);
+    margin-bottom: var(--s-4);
+    color: var(--color-text-body);
   }
 
   .links-list {
@@ -275,22 +335,20 @@ const insteadFig = {
     align-items: center;
     justify-content: space-between;
     min-height: 56px;
-    color: var(--ink);
+    color: var(--color-text);
     text-decoration: none;
   }
 
   .link-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: 4px;
-    text-decoration-color: var(--red-ink);
+    text-decoration-color: var(--color-link);
   }
 
   .arrow {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     transform: translateX(-4px);
     transition: transform var(--dur-fast) var(--ease-draw);
   }
@@ -300,9 +358,6 @@ const insteadFig = {
   }
 
   @media (max-width: 899px) {
-    .m-video {
-      max-width: 320px;
-    }
 
     .arc-close p {
       font-size: var(--t-h3);

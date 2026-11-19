@@ -9,9 +9,11 @@ import { home } from '../data/copy';
 
 interface Props {
   items?: typeof home.readings;
+  /** v4 home: drop the datum line (the figure already draws datum to value; the full reading lives on the case study). */
+  compact?: boolean;
 }
 
-const { items = home.readings } = Astro.props;
+const { items = home.readings, compact = false } = Astro.props;
 const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v - min) / (max - min))).toFixed(4);
 ---
 
@@ -24,7 +26,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
       const towardsLeft = f.value < f.datum;
       return (
         <li class="rd" data-reading>
-          <p class="rd-k">{r.kicker}</p>
+          {!compact && <p class="rd-k">{r.kicker}</p>}
           <p class="rd-v">
             <span class="rd-num">{r.display}</span>
             {r.unit && <span class="rd-unit">{r.unit}</span>}
@@ -49,11 +51,11 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
               <span>{f.maxLabel}</span>
             </div>
           </div>
-          <p class="rd-datum-line">
+          {!compact && <p class="rd-datum-line">
             <span>Datum <b>{r.datum}</b></span>
             <span>change <b>{r.change}</b></span>
             <span>{r.n}</span>
-          </p>
+          </p>}
           <p class="rd-label">{r.label}</p>
           <p class="rd-src">{r.source}</p>
         </li>
@@ -79,11 +81,9 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
   }
 
   .rd-k {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .rd-v {
@@ -91,32 +91,32 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     align-items: baseline;
     gap: var(--s-2);
     margin-top: var(--s-3);
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-stat);
     line-height: var(--lh-tight);
     letter-spacing: var(--track-display);
-    color: var(--ink);
+    color: var(--color-text);
     font-variant-numeric: tabular-nums;
   }
 
   .rd-unit {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .rd-verdict {
     font-size: 0.5em;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .rd-fig {
     margin-top: var(--s-4);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .rd-track {
@@ -152,11 +152,11 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     height: 10px;
     margin-left: -5px;
     border: var(--line-object);
-    background: var(--paper);
+    background: var(--color-surface);
   }
 
   .rd-value {
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .rd-scale {
@@ -178,30 +178,30 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     margin-top: var(--s-3);
     padding-top: var(--s-2);
     border-top: var(--line-hair);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
 
   .rd-datum-line b {
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .rd-label {
     margin-top: var(--s-3);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .rd-src {
     margin-top: auto;
     padding-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   @media (max-width: 899px) {

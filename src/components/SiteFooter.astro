@@ -3,14 +3,14 @@
 // with 44px targets, then a hair rule and a meta row with the nav and the
 // labelled llms.txt link. No top rule: the CTA slab (or the page's last
 // section rule) closes the page above it.
-import { site, cta, nav } from '../data/copy';
+import { site, cta, nav, designLink, llmsLink } from '../data/copy';
 import { isExternal } from '../lib/isExternal';
 
 const links = [cta.bookACall, cta.email, cta.linkedin, cta.github];
 const roleLine = site.footerLine.replace(`${site.name} · `, '');
 ---
 
-<footer class="site-footer">
+<footer class="site-footer surface-ink bleed">
   <div class="footer-inner grid-margin">
     <div class="margin-col" aria-hidden="true"></div>
     <div class="body-col">
@@ -37,7 +37,10 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
             {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
           </ul>
         </nav>
-        <a class="llms-link" href="/llms.txt">llms.txt (for AI assistants)</a>
+        <span class="ftr-extra">
+          <a class="llms-link" href={designLink.href}>{designLink.label}</a>
+          <a class="llms-link" href={llmsLink.href}>{llmsLink.label}</a>
+        </span>
       </div>
     </div>
   </div>
@@ -48,18 +51,25 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
     --body-pad-end: var(--s-11);
   }
 
+  footer.surface-ink {
+    margin-top: 0;
+    padding-block: var(--s-9) var(--s-6);
+  }
+
   .ftr-name {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h3);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .ftr-role {
     margin-top: var(--s-2);
     font-size: var(--t-small);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .ftr-links {
@@ -74,19 +84,18 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink);
+    font-family: var(--font-text);
+    font-weight: 500;
+    font-size: var(--t-small);
+    color: var(--color-text);
     text-decoration: underline;
-    text-decoration-color: var(--red-ink);
+    text-decoration-color: var(--color-link);
     text-underline-offset: 4px;
   }
 
   .ftr-links a:hover,
   .ftr-meta a:hover {
-    color: var(--red);
+    color: var(--color-link);
     text-decoration-thickness: 2px;
   }
 
@@ -112,8 +121,14 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
     align-items: center;
     min-height: var(--hit-touch);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     text-decoration: none;
+  }
+
+  .ftr-extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-6);
   }
 
   .llms-link {

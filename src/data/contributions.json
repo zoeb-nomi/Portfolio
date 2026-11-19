@@ -1,43 +1,8 @@
 {
   "source": "snapshot",
-  "fetched_at": "2026-11-12T10:45:15.732Z",
-  "total_last_year": 284,
+  "fetched_at": "2026-11-19T10:25:26.920Z",
+  "total_last_year": 301,
   "days": [
-    {
-      "date": "2025-11-09",
-      "level": 0,
-      "count": 0
-    },
-    {
-      "date": "2025-11-10",
-      "level": 0,
-      "count": 0
-    },
-    {
-      "date": "2025-11-11",
-      "level": 0,
-      "count": 0
-    },
-    {
-      "date": "2025-11-12",
-      "level": 0,
-      "count": 0
-    },
-    {
-      "date": "2025-11-13",
-      "level": 0,
-      "count": 0
-    },
-    {
-      "date": "2025-11-14",
-      "level": 0,
-      "count": 0
-    },
-    {
-      "date": "2025-11-15",
-      "level": 0,
-      "count": 0
-    },
     {
       "date": "2025-11-16",
       "level": 0,
@@ -1845,8 +1810,43 @@
     },
     {
       "date": "2026-11-12",
+      "level": 2,
+      "count": 10
+    },
+    {
+      "date": "2026-11-13",
+      "level": 1,
+      "count": 4
+    },
+    {
+      "date": "2026-11-14",
+      "level": 0,
+      "count": 0
+    },
+    {
+      "date": "2026-11-15",
+      "level": 0,
+      "count": 0
+    },
+    {
+      "date": "2026-11-16",
+      "level": 0,
+      "count": 0
+    },
+    {
+      "date": "2026-11-17",
+      "level": 1,
+      "count": 3
+    },
+    {
+      "date": "2026-11-18",
       "level": 1,
       "count": 1
+    },
+    {
+      "date": "2026-11-19",
+      "level": 0,
+      "count": 0
     }
   ]
 }

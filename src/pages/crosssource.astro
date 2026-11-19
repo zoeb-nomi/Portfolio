@@ -61,7 +61,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
         ]}
       />
     </EssayFigure>
-    <AudioPlayer audio={cs.audio} articleId="crosssource" />
+    {!cs.audioPaused && <AudioPlayer audio={cs.audio} articleId="crosssource" />}
   </Masthead>
 
   <Section mark={cs.s1.mark} label={cs.s1.label} narrId="s1-cue">
@@ -166,7 +166,8 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
 <style>
   .prose em {
-    font-family: var(--font-display);
+    font-family: var(--font-model);
+    font-weight: 400;
     font-style: italic;
   }
 
@@ -175,7 +176,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-min);
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -185,7 +186,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   }
 
   .highlight {
-    background-image: linear-gradient(transparent 62%, var(--red-tint) 62%);
+    background-image: linear-gradient(transparent 62%, var(--color-accent-tint) 62%);
   }
 
   .method-list {
@@ -206,30 +207,29 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   }
 
   .method-row dt {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .method-row dd {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-body);
     line-height: var(--lh-body);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 60ch;
   }
 
   .method-row dd em {
-    font-family: var(--font-display);
+    font-family: var(--font-model);
+    font-weight: 400;
     font-style: italic;
   }
 
   .method-row code {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-data);
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
     padding: 2px 4px;
   }
 
@@ -242,10 +242,10 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   }
 
   .stat-lead {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-body);
     line-height: var(--lh-prose);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 60ch;
     margin-bottom: var(--s-5);
   }
@@ -254,11 +254,13 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
      sitting 51px tall inside a 17px paragraph. */
   .stat-figure {
     display: block;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h2);
     line-height: 1;
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     margin-bottom: var(--s-7);
   }
 
@@ -274,9 +276,9 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   .rule-list li {
     padding-block: var(--s-5);
     border-top: var(--line-hair);
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-body);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 60ch;
   }
 
@@ -286,11 +288,9 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
 
   .status-line {
     display: inline-block;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-5);
   }
 
@@ -299,9 +299,9 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   }
 
   .mono-list li {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-data);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     padding-block: var(--s-3);
     border-top: var(--line-hair);
   }
@@ -311,7 +311,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-min);
-    color: var(--red-ink);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }

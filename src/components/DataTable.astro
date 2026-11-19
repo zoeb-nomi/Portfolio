@@ -83,7 +83,7 @@ const [labelHeader, ...dataHeaders] = columns;
     inset-block: 0;
     inset-inline-end: 0;
     width: var(--s-8);
-    background: linear-gradient(to left, var(--paper), transparent);
+    background: linear-gradient(to left, var(--color-surface), transparent);
     pointer-events: none;
     opacity: 0;
   }
@@ -92,11 +92,10 @@ const [labelHeader, ...dataHeaders] = columns;
     position: absolute;
     inset-block-start: 0;
     inset-inline-end: var(--s-1);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
     line-height: 1;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     pointer-events: none;
     opacity: 0;
     z-index: 1; /* above the edge fade */
@@ -123,7 +122,7 @@ const [labelHeader, ...dataHeaders] = columns;
   /* D-02 booktabs: Heavy above and below, Ink under the head, Hair between rows. */
   .data-table {
     width: 100%;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-data);
     border-top: var(--line-heavy);
     border-bottom: var(--line-heavy);
@@ -164,7 +163,7 @@ const [labelHeader, ...dataHeaders] = columns;
     .is-stack .data-table th[scope='row'] {
       position: static;
       padding: 0 0 var(--s-1);
-      color: var(--ink);
+      color: var(--color-text);
       font-weight: 500;
       background: none;
     }
@@ -181,9 +180,7 @@ const [labelHeader, ...dataHeaders] = columns;
     .is-stack .data-table td::before {
       content: attr(data-l);
       font-size: var(--t-label);
-      letter-spacing: var(--track-wide);
-      text-transform: uppercase;
-      color: var(--ink-muted);
+      color: var(--color-text-muted);
     }
 
     .is-stack .scroll-hint,
@@ -194,11 +191,9 @@ const [labelHeader, ...dataHeaders] = columns;
 
   .dt-caption {
     text-align: left;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     padding-bottom: var(--s-3);
     /* Matches the wrap's inline padding so the caption stays aligned with the table. */
     padding-inline: var(--s-1);
@@ -231,16 +226,13 @@ const [labelHeader, ...dataHeaders] = columns;
 
   @media (max-width: 599px) {
     .data-table thead th {
-      letter-spacing: var(--track-wide);
     }
   }
 
   .data-table thead th {
     border-bottom: var(--line-ink);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .data-table th[scope='col']:first-child,
@@ -249,7 +241,7 @@ const [labelHeader, ...dataHeaders] = columns;
   }
 
   .data-table th[scope='row'] {
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .data-table tbody tr {
@@ -258,11 +250,11 @@ const [labelHeader, ...dataHeaders] = columns;
   }
 
   .data-table tbody tr:hover {
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
   }
 
   .data-table td {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .data-table--nowrap td {
@@ -276,27 +268,27 @@ const [labelHeader, ...dataHeaders] = columns;
       position: sticky;
       inset-inline-start: 0;
       z-index: 1;
-      background: var(--paper);
+      background: var(--color-surface);
       padding-inline-end: var(--s-3);
     }
 
     .data-table tbody tr:hover th[scope='row'] {
-      background: var(--paper-raised);
+      background: var(--color-surface-raised);
     }
   }
 
   .data-table td.win {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     font-weight: 500;
   }
 
   .data-table td:last-child,
   .data-table th[scope='col']:last-child {
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .data-table td.win:last-child {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 </style>
 

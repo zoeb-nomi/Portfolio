@@ -35,11 +35,13 @@ import { notFound } from '../data/copy';
 
   /* Same setting as every other page h1 (Masthead .page-h1). */
   .code {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-page);
     line-height: var(--lh-display);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 20ch;
     text-wrap: balance;
   }
@@ -55,7 +57,7 @@ import { notFound } from '../data/copy';
   .miss-cell {
     aspect-ratio: 1;
     border: var(--line-object);
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .miss-cell.is-missing {
@@ -64,9 +66,9 @@ import { notFound } from '../data/copy';
   }
 
   .miss-caption {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .exits {
@@ -83,16 +85,14 @@ import { notFound } from '../data/copy';
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label-lg);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .home-link:hover {
-    color: var(--red-ink);
+    color: var(--color-link);
   }
 </style>

@@ -40,11 +40,15 @@ export const site = {
 
 // v3 IA (DESIGN v3 §i, I-01): four items at every width. Builds owns the case
 // studies; Writing owns the notes.
+// Footer-only link to the design page (Red Pen 5): not in the header nav.
+export const designLink = { label: 'How this site is built', href: '/design/' };
+export const llmsLink = { label: 'llms.txt (for AI assistants)', href: '/llms.txt' };
+
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Builds', href: '/builds/', activePrefixes: ['/crosssource/', '/mirror-eval/', '/screener-eval/'] },
   { label: 'Writing', href: '/writing/', activePrefixes: ['/notes/'] },
-  { label: 'About', href: '/about/' },
+  { label: 'About', href: '/about/', activePrefixes: ['/design/'] },
 ];
 
 // Old URLs and their new homes (DESIGN v3 §i). public/_redirects carries the
@@ -156,6 +160,14 @@ export const meta = {
     title: "OpenAI's Decisions API, quizzed by lawyers",
     description:
       "544 LegalBench questions through OpenAI's Decisions API. At 90% confidence it was 88% right. Counted, not scored, with the curve and the code.",
+  },
+  designComponents: {
+    title: 'The components · Zoeb Nomi',
+    description: 'Every component in the Red Pen design system behind zoebnomi.com, live, with real data.',
+  },
+  design: {
+    title: 'How this site is built · Zoeb Nomi',
+    description: 'The Red Pen design system behind zoebnomi.com: three voices, one pen, two surfaces and five kinds of motion, and why.',
   },
   about: {
     title: 'About Zoeb Nomi · AI Product Manager at Instead, Bengaluru',
@@ -308,6 +320,72 @@ export const screenerEvalJsonLd = {
 // ---------------------------------------------------------------------------
 
 export const home = {
+  // v4 (Red Pen, edited; 19 Nov 2026): one claim per screen, the page never names its own parts.
+  // Home budget 300 rendered words (scripts/copy-budget.mjs).
+  // Red Pen 5 (19 Nov 2026): the home page is a live audit. The answer below is an example, written for the
+  // hero; its three claims are checked against public record (Mata v. Avianca, No. 22-cv-1461, S.D.N.Y.;
+  // sanctions order 22 June 2023; the brief's Varghese cite does not exist). Marks: tick = checked and fine,
+  // strike + insert = wrong and corrected, circle = wrong and flagged.
+  v5: {
+    audit: {
+      label: 'Model answer',
+      status: { stream: 'Generating', check: 'Checking 3 claims', done: '2 caught · 1 passed' },
+      replay: 'Run it again',
+      promptLabel: 'Prompt',
+      prompt: 'Has a court sanctioned lawyers for citing cases a chatbot made up?',
+      answer: [
+        { t: 'Yes. In ' },
+        { t: 'Mata v. Avianca', mark: 'tick', check: 'citation_check', note: 'case found, S.D.N.Y.', verdict: 'pass' },
+        { t: ', a federal court in New York sanctioned two lawyers in ' },
+        { t: '2021', mark: 'strike', insert: '2023', check: 'date_check', note: 'order dated 22 June 2023', verdict: 'fail' },
+        { t: '. Their brief relied on ' },
+        { t: 'Varghese v. China Southern Airlines, 925 F.3d 1339', mark: 'circle', check: 'citation_check', note: 'no such case. The answer calls an invented cite real.', verdict: 'fail' },
+        { t: ', a real Eleventh Circuit ruling.' },
+      ] as { t: string; mark?: 'tick' | 'strike' | 'circle'; insert?: string; check?: string; note?: string; verdict?: 'pass' | 'fail' }[],
+      tally: '3 claims checked. 2 caught before anything was published.',
+      caption: 'An example answer, marked the way my eval harnesses mark one. It reads fine until something checks it.',
+    },
+    harness: {
+      h2: 'My agent harness, counted as it runs.',
+      sub: 'I hand work to agents. Each item gets an acceptance line and a due date, and is checked before I merge it.',
+      // Short tile labels for the home panel; the full definitions stay on /builds/#shipping.
+      tileLabels: ['items shipped since 10 Nov', 'on time', 'API spend per item', 'median, ready to merged'],
+      // Runtime source (I17 tracker, decision D1): the public shipping log, refreshed nightly. Until it exists the
+      // panel shows the pilot snapshot below, labelled as such. Empty = no fetch (a 404 fails CI and logs a console
+      // error for visitors). Set to 'https://cdn.jsdelivr.net/gh/zoeb-nomi/shipping-log@main/shipping.json' once
+      // that repo is public.
+      liveUrl: '',
+      snapshotLabel: 'Pilot data, 10–11 Nov; live feed soon',
+      liveLabel: 'Live, updated',
+      itemsCaption: 'Agent minutes per item',
+      hint: 'Select a bar.',
+      more: { label: 'How this is measured', href: '/builds/#shipping' },
+    },
+    claim2Pre: 'I ship the workflow and ',
+    claim2Pen: 'the checks that catch it.',
+    sheetH2: 'I ran 167 model outputs through three of my eval harnesses. A check read every one.',
+    sheetSub: 'Each square is one output. Red means a check caught it failing. Read on their own, none of them looked wrong.',
+    readingsH2: 'Every number here is a reading.',
+    buildsH2: 'Shipped, then measured',
+    buildsSub: 'Four of the systems and harnesses I built, each with the rule that guards it.',
+    open: 'Open',
+  },
+  v4: {
+    lede: 'I ship the workflow and the checks that catch it.',
+    proofCaught: 'All of them were caught before anything was published.',
+    emailLink: 'or email me',
+    aboutLabel: 'PM who ships code',
+    aboutH2: 'I work where the model meets the workflow.',
+    about:
+      "I'm a PM at Instead, an AI-native tax research platform. A wrong citation there is a compliance risk, so I build the checks into the workflow.",
+    verbs: [
+      { name: 'Measure', line: 'Define good output, then count it.' },
+      { name: 'Trace', line: 'Every answer leads to its source.' },
+      { name: 'Guard', line: 'The model proposes; rules decide.' },
+      { name: 'Ship', line: 'Ship it, then keep measuring.' },
+    ],
+    aboutLink: { label: 'More about me →', href: '/about/' },
+  },
   eyebrow: 'AI Product Manager · Agents, workflows and evals',
   h1Line1: 'LLM products fail quietly.',
   h1Underline: 'quietly.',
@@ -357,7 +435,7 @@ export const home = {
       datum: '10–15 min before',
       change: 'about −90%',
       n: 'production runs, count not public',
-      label: 'run time of a multi-step tax workflow, after scoping edits to changed inputs',
+      label: 'run time of a multi-step tax workflow',
       source: 'Instead, production',
     },
     {
@@ -370,7 +448,7 @@ export const home = {
       datum: '0.981 baseline',
       change: '+0.013',
       n: 'n = 25',
-      label: 'citation precision with strict citation prompting; recall 0.760',
+      label: 'citation precision with strict prompting',
       source: 'CrossSource v0.1',
     },
     {
@@ -382,7 +460,7 @@ export const home = {
       datum: '0, from zero',
       change: '+$2.7M MRR',
       n: '28 US enterprise clients',
-      label: 'from zero, Background Verification on the Checkr API',
+      label: 'Background Verification, built on the Checkr API',
       source: 'Keka HR',
     },
   ],
@@ -466,7 +544,8 @@ export const home = {
 
   ctaSlabMarginNow: 'NOW: PM AT INSTEAD',
   ctaSlabMarginBefore: 'BEFORE: $2.7M MRR FROM ZERO AT KEKA HR',
-  ctaSlabBody: "If you're hiring a PM for an agent or LLM product, I'd like to hear what it has to get right.",
+  // Red Pen 5 (Zoeb, 19 Nov 2026): open-ended but confident, so it covers hiring and future services alike.
+  ctaSlabBody: 'Facing a problem that has to be right? Talk to me.',
 };
 
 // ---------------------------------------------------------------------------
@@ -489,6 +568,8 @@ export interface BuildEntry {
   id: string;
   name: string;
   oneLine: string;
+  /** v4: a shorter line for the compact ledger on home (falls back to oneLine). */
+  homeLine?: string;
   kind: BuildKind;
   group: 'systems' | 'evals' | 'contributions';
   /** Legend tag on eval rows: [judged] / [counted] / [null] (R-1 definitions). */
@@ -565,6 +646,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'tradeframe',
     name: 'TradeFrame',
     oneLine: 'A personal trading system where an AI judgment layer proposes trades and a deterministic layer decides what may run.',
+    homeLine: 'AI proposes trades; deterministic code decides what runs.',
     kind: 'guarded automation',
     group: 'systems',
     tag: '[guarded automation]',
@@ -587,6 +669,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'cheap-tier-legal-tax-hr',
     name: 'cheap-tier-legal-tax-hr',
     oneLine: 'Where a 10-cent model can sit in a tax, legal or HR workflow, and what has to back it up.',
+    homeLine: 'Where a 10-cent model is safe in tax, legal and HR work.',
     kind: 'eval harness',
     group: 'evals',
     tag: '[counted]',
@@ -612,6 +695,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'crosssource',
     name: 'CrossSource',
     oneLine: "An open harness that checks whether a legal RAG answer's citations support its claims.",
+    homeLine: 'Checks whether legal RAG citations support the claim.',
     kind: 'eval harness',
     group: 'evals',
     tag: '[judged]',
@@ -639,6 +723,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'screener-eval',
     name: 'screener-eval',
     oneLine: 'A paired, repeated test of what an LLM résumé screener actually rewards.',
+    homeLine: 'What an LLM résumé screener actually rewards.',
     kind: 'eval harness',
     group: 'evals',
     tag: '[counted]',
@@ -784,6 +869,104 @@ export const shipping = {
 };
 
 // ---------------------------------------------------------------------------
+// /design/ · how this site is built, and why (Red Pen 5, 19 Nov 2026)
+// ---------------------------------------------------------------------------
+
+export const designPage = {
+  kicker: 'Design system',
+  h1: 'How this site is built, and why',
+  standfirst:
+    'The design system is called Red Pen. This page shows its rules working: three voices, one pen, two surfaces and five kinds of motion. The rules come from one fact about my work. LLM output reads fine until something checks it.',
+  principles: {
+    mark: '§1',
+    label: 'First principles',
+    items: [
+      { h: 'The subject is the quiet failure.', p: 'So the site does not describe checking. It performs it: the home page opens on a model answer and a pen that checks it.' },
+      { h: 'There are always three parties.', p: 'I decide, the model answers, a check reads the answer. Each gets its own typeface, so you can always tell who is speaking.' },
+      { h: 'The pen is the only actor.', p: 'Red moves only to mark something, the way an editor\'s pen does. Nothing red is decoration.' },
+    ],
+  },
+  voices: {
+    mark: '§2',
+    label: 'Three voices',
+    items: [
+      { who: 'Me', face: 'Archivo', sample: 'Ship the check with the workflow.', note: 'Claims, headings, body. A variable face: width and weight carry emphasis.' },
+      { who: 'The model', face: 'Source Serif 4', sample: 'The court held the citation was valid.', note: 'Output on trial, and case names from the record, in italic.' },
+      { who: 'The check', face: 'IBM Plex Mono', sample: 'citation_check: no such case', note: 'Verdicts, check names, data and sources. Never uppercase.' },
+    ],
+    axesLabel: 'Try Archivo\'s axes',
+    width: 'Width',
+    weight: 'Weight',
+  },
+  pen: {
+    mark: '§3',
+    label: 'One pen',
+    lead: 'Every red stroke is a proofreader\'s mark with one meaning. Each is drawn by script over real text, with a seeded wobble, so it looks the same on every visit but no two marks match.',
+    marks: [
+      { mark: 'tick', word: 'found', means: 'checked, and it holds' },
+      { mark: 'strike', word: '2021', means: 'wrong; the correction goes above' },
+      { mark: 'circle', word: 'Varghese', means: 'wrong, and flagged' },
+      { mark: 'underline', word: 'quietly', means: 'stress' },
+      { mark: 'box', word: 'Trace', means: 'scope' },
+    ],
+    replay: 'Point at a word to draw its mark again.',
+  },
+  surfaces: {
+    mark: '§4',
+    label: 'Two surfaces',
+    lead: 'Paper is where output lives. Ink is where checks run: the proof, the harness, the call to action. Ink is a mode, not a second palette: the same components read the same roles and the pen glows.',
+    paper: 'Paper',
+    ink: 'Ink',
+    swatches: ['paper', 'ink', 'red pen', 'red text', 'graphite'],
+  },
+  motion: {
+    mark: '§5',
+    label: 'Five kinds of motion',
+    lead: 'Nothing moves unless it is one of these. The finished page is in the HTML; motion starts from it, and reduced motion keeps it still.',
+    verbs: [
+      { v: 'Stream', d: 'the model writes, token by token', t: '16 ms a character' },
+      { v: 'Mark', d: 'the pen draws a mark', t: '260 to 900 ms, by length' },
+      { v: 'Stamp', d: 'a verdict lands', t: '260 ms, a small overshoot' },
+      { v: 'Tally', d: 'a count settles on its number', t: '1.4 s' },
+      { v: 'Reveal', d: 'a block or a scan line arrives', t: '600 ms' },
+    ],
+  },
+  rules: {
+    mark: '§6',
+    label: 'Rules it keeps',
+    items: [
+      'Every number is a reading: value, datum, n and source.',
+      'Long text is never cut to fit a layout. It moves to the page that holds it.',
+      'Red text is always the darker red, for contrast. The bright red is only for marks.',
+      'No em dashes, no uppercase labels, no italic headings.',
+      'Every value lives in one token file, and the build fails on anything else.',
+    ],
+    checks: 'Checked on every build: tokens, line tiers, required and banned strings, accessibility at four widths, links, Lighthouse and a copy budget for home.',
+  },
+  next: { label: 'See every component, live', href: '/design/components/' },
+};
+
+export const designComponents = {
+  kicker: 'Design system',
+  h1: 'The components',
+  standfirst:
+    'Every component on the site, live, with real data from the pages that use it. Each one reads colour roles only, so it works on paper, on the ink surface and in the themes my other projects derive from Red Pen.',
+  back: { label: 'How this site is built', href: '/design/' },
+  specNote: 'Spec:',
+  groups: {
+    actions: { mark: '§1', label: 'Actions', lead: 'Three buttons. Primary is the one action a block wants; the ink surface re-points the roles, so the same markup works there.' },
+    numbers: { mark: '§2', label: 'Numbers', lead: 'A number is a reading: value, what it counts, and where it comes from.' },
+    figures: { mark: '§3', label: 'Figures', lead: 'Ink is the data; red is the series under test or the cell a check failed.' },
+    record: { mark: '§4', label: 'Records and tables', lead: 'Sources stay in mono at the row end, so a claim and its proof read on one line.' },
+    voice: { mark: '§5', label: 'Voice', lead: 'A pull quote is Zoeb speaking at size. It is the only place body copy gets bigger.' },
+    live: { mark: '§6', label: 'Live', lead: 'The two components that run: the audit sheet (on home, with the live audit above it) and the harness panel.' },
+  },
+  buttons: { primary: 'Book a call', secondary: 'See the builds', inverse: 'Read the method' },
+  onPaper: 'On paper',
+  onInk: 'On ink',
+};
+
+// ---------------------------------------------------------------------------
 // 3 · CROSSSOURCE: pack §3
 // ---------------------------------------------------------------------------
 
@@ -803,6 +986,9 @@ export const crosssource = {
 
   // Narration from scripts/audio (spoken versions of the tables and lists are in scripts/audio/pages.json).
   audio: { ...audioCrosssource, cues: audioCrosssource.cues as [string, number, number][] },
+  // Narration predates the #32 rewrite of this page, so the player is hidden until it is rebuilt
+  // (scripts/audio/pages.json "paused"). Set false after npm run audio:build -- crosssource.
+  audioPaused: true,
 
   s1: {
     mark: '§1',
@@ -2788,6 +2974,12 @@ export const about = {
     detail: '"Meet Zoeb Nomi: the rabbit-hole explorer and CoreHR maestro" · Keka Product blog · Jan 2025 →',
     href: sources.kekaProfile.href,
   },
+  logosLabel: 'Companies I have worked at',
+  siteLine: 'The site is built the way I build products: one system, every value checked on each build.',
+  siteLinks: [
+    { label: 'How this site is built, and why', href: '/design/' },
+    { label: 'Every component, live', href: '/design/components/' },
+  ],
   beliefPre: 'What I believe: ',
   beliefStrong: 'an AI feature is not done until you can say how often it is wrong.',
   beliefPost:
@@ -2801,6 +2993,7 @@ export const about = {
     record: { mark: '§2', label: 'The record', anchorId: 'record' },
     builds: { mark: '§3', label: 'Public builds', anchorId: 'public-builds' },
     contact: { mark: '§4', label: 'Contact', anchorId: 'contact' },
+    site: { mark: '§5', label: 'This site', anchorId: 'site' },
   },
   profileLink: { pre: 'Keka wrote a profile of me in Jan 2025:', label: '"Meet Zoeb Nomi: the rabbit-hole explorer and CoreHR maestro" →' },
   kekaVideoLabel: 'Fig. 3. Background Verification in Keka, product video. Click to play.',
@@ -2862,6 +3055,7 @@ export const writingIndex = {
     'Essays on building AI systems that have to be right: when a step can run without a person, how to count the misses, and what a confidence score is worth. Each one comes with its data and code.',
   listenLabel: 'Listen, and read along',
   essaysLabel: { mark: '§1', label: 'Essays', anchorId: 'essays' },
+  listen: 'Listen',
   notesLabel: { mark: '§2', label: 'Notes', anchorId: 'notes' },
   notesLead:
     'One counted finding per note, with its denominator, its figure and the file the numbers come from. The short version of what I post on LinkedIn and X.',
@@ -2885,6 +3079,7 @@ export const llmsTxt = `# Zoeb Nomi
 
 ## Key facts
 
+- Positioning: LLM products fail quietly. I ship the workflow and the checks that catch it.
 - Role: Product Manager, Instead (Sep 2025 to present). Multi-step tax workflow: an end-to-end coherence eval across its steps, and latency cut ~90% by re-running only changed inputs. Output quality: a four-dimension rubric and a weekly failure-mode review; ~95% citation accuracy on the production golden set; document ID and sub-type attached to every cited source.
 - Builds page: every public build with what it does, how it is guarded, what it was measured against, and planned vs actual ship date: https://www.zoebnomi.com/builds/
 - Guarded automation: TradeFrame (https://github.com/zoeb-nomi/tradeframe), a personal trading system where the AI proposes only, a deterministic layer validates against hard rails, and a person (US book) or validated code (India book) executes. Each book has its own kill switch; every decision is scored against a do-nothing baseline.
@@ -2915,6 +3110,8 @@ export const llmsTxt = `# Zoeb Nomi
 - screener-eval case study: https://www.zoebnomi.com/screener-eval/
 - About (who he is, and the employment record at #record): https://www.zoebnomi.com/about/
 - Writing (essays; notes, one counted finding each, at #notes): https://www.zoebnomi.com/writing/
+- How this site is built (the Red Pen design system and why): https://www.zoebnomi.com/design/
+- The components (every Red Pen component, live): https://www.zoebnomi.com/design/components/
 `;
 
 // ---------------------------------------------------------------------------
@@ -2928,6 +3125,8 @@ export const ogCards = {
     { id: 'home', title: site.name, sub: home.h1Line2, num: { value: home.readings[0].display + ' min', caption: '10–15 min before · Instead' } },
     { id: 'builds', title: 'Builds', sub: 'What I built, how it is guarded, what it was measured against.', num: { value: String(buildsLedger.length), caption: 'public builds and contributions' } },
     { id: 'about', title: 'About', sub: 'Mechanical engineer turned AI product manager, in Bengaluru.' },
+    { id: 'design-components', title: 'The components', sub: 'Every Red Pen component, live, with real data.' },
+    { id: 'design', title: 'How this site is built', sub: 'Red Pen: three voices, one pen, two surfaces, five kinds of motion.' },
     { id: 'crosssource', title: 'CrossSource', sub: 'Open benchmark for legal-RAG citation accuracy.', num: { value: '0.981 → 0.994', caption: 'citation precision · n = 25' } },
     { id: 'mirror-eval', title: 'mirror-eval', sub: 'What AI search says about a person, measured twice.', num: { value: '13 → 63', caption: 'Perplexity · Claude 0 → 0' } },
     { id: 'screener-eval', title: 'screener-eval', sub: 'What LLM résumé screeners reward, counted 885 times.', num: { value: '22.3', caption: 'points: which screener read it' } },

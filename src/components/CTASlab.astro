@@ -18,7 +18,7 @@ const buttonNote =
   Astro.props.buttonNote === undefined ? (buttonHref === cta.bookACall.href ? cta.bookACallNote : null) : Astro.props.buttonNote;
 ---
 
-<div class="cta-slab">
+<div class="cta-slab surface-ink bleed">
   <div class="slab-inner grid-margin">
     <div class="margin-col">
       {marginLines.map((line) => <p>{line}</p>)}
@@ -27,7 +27,7 @@ const buttonNote =
       <p class="slab-body">{body}</p>
       <div class="slab-actions">
         <div class="slab-btns">
-          <Button href={buttonHref} variant="inverse">{buttonLabel}</Button>
+          <Button href={buttonHref} variant="primary">{buttonLabel}</Button>
           {secondaryLabel && secondaryHref && (
             <Button href={secondaryHref} variant="inverse">{secondaryLabel}</Button>
           )}
@@ -39,8 +39,9 @@ const buttonNote =
 </div>
 
 <style>
+  /* Red Pen 5: the call to action sits on the ink surface, where the pen glows. */
   .cta-slab {
-    background: var(--red);
+    padding-block: var(--s-6);
   }
 
   /* The slab draws no column rule. */
@@ -49,11 +50,9 @@ const buttonNote =
   }
 
   .margin-col p {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--on-red-muted);
+    color: var(--color-text-muted);
     line-height: var(--lh-label);
   }
 
@@ -66,10 +65,12 @@ const buttonNote =
   }
 
   .slab-body {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-slab);
     line-height: var(--lh-heading);
-    color: var(--on-red);
+    color: var(--color-text);
     max-width: 26ch;
   }
 
@@ -87,10 +88,9 @@ const buttonNote =
   }
 
   .slab-note {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
-    letter-spacing: var(--track-wide);
-    color: var(--on-red-muted);
+    color: var(--color-text-muted);
   }
 
   @media (max-width: 899px) {

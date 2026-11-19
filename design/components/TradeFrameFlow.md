@@ -1,34 +1,33 @@
 # TradeFrameFlow
 
-`src/components/TradeFrameFlow.astro` · new in v3
+## Purpose
+"Who decides what runs": TradeFrame's decision path. A dashed node proposes only; a solid node decides.
 
-![TradeFrameFlow](../mocks/2026-11-12-v3/components/TradeFrameFlow.jpg)
-
-## What it is
-
-"Who decides what runs" (DESIGN v3 D-09, Take B B-12/B-23): TradeFrame's
-decision path. Dashed node = proposes only; solid = decides (D-16).
-variant="full"   /builds/ feature row: the nodes, the books, kill switch and ledger.
-variant="strip"  home compact ledger: the four step labels on one line.
-Every label is printed in the HTML. When the figure enters view the motion
-layer lights the path once, step by step (propose -> validate -> confirm ->
-execute and record), then clears; Replay plays it again.
+## Anatomy
+- `full`: a `<figure>` with caption, four numbered steps (propose, validate, confirm in the two books, execute and record), the base nodes (kill switch, ledger), a step-label line (`aria-hidden`) and a Replay button.
+- `strip`: one line of the four step labels (the first is the dashed proposing step), with an optional Replay button.
+- Every label is printed in the HTML; text comes from `builds.tradeframeFlow` in `src/data/copy.ts`.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `variant` | `'full' \| 'strip'` | default `full` |
+| `id` | `string?` | element id; Replay uses it for `aria-controls`. Default `tf-flow` |
+| `replay` | `boolean?` | strip only: render its own Replay button (false inside a `<summary>`, where the row panel carries it). Default true |
 
-```ts
-  variant?: 'full' | 'strip';
-  id?: string;
-  /** Strip only: render its own Replay button (false inside a <summary>, where the row panel carries it). */
-  replay?: boolean;
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-surface`, `-accent-text`, `--color-accent-tint` (a lit step).
+- Type: `--font-data`, `--t-label`, `--t-small`, `--lh-snug`.
+- Space and lines: `--s-1` to `--s-5`, `--line-object`, `--line-propose` (dashed), `--line-heavy`, `--hit-touch`, `--underline-offset`. Motion: `--dur-base`, `--ease-draw`.
+
+## States and motion
+- Reveal: once at 60% in view, `motion.ts` lights the path step by step (propose, validate, confirm, execute and record), then clears. Replay plays it again; the button is `hidden` until script runs.
+- A lit node takes the `--color-accent-tint` wash and its index and label turn red text.
+- Without script or with reduced motion nothing is lit and all labels are readable.
+- Ink surface: roles re-point (the tint becomes the glow wash).
+
+## Accessibility
+The figure is labelled by its caption; step numbers and arrows are `aria-hidden`; Replay has `aria-controls`.
 
 ## Used on
-
-- (not rendered by any page; kept for reuse)
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
-- Motion: the final state is in the HTML; the pre-reveal state lives in CSS under `.motion` and the motion layer (`src/scripts/motion.ts`) plays it. Reduced motion shows the final state.
+Also via: `BuildsLedger`.

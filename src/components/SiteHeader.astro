@@ -42,7 +42,7 @@ const { currentPath } = Astro.props;
 <style>
   .site-header {
     border-bottom: var(--line-ink);
-    background: var(--paper);
+    background: var(--color-surface);
     view-transition-name: site-header;
   }
 
@@ -68,25 +68,25 @@ const { currentPath } = Astro.props;
     align-items: baseline;
     gap: var(--s-4);
     text-decoration: none;
-    color: var(--ink);
+    color: var(--color-text);
     min-height: var(--hit-touch);
     align-self: center;
     padding-block: var(--s-3);
   }
 
   .wm-name {
-    font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+    font-family: var(--font-heading);
+    font-weight: var(--wght-claim);
+    font-stretch: calc(var(--wdth-claim) * 1%);
+    font-size: 17px;
+    letter-spacing: var(--track-tight);
     white-space: nowrap;
   }
 
   .wm-role {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     white-space: nowrap;
   }
 
@@ -102,12 +102,11 @@ const { currentPath } = Astro.props;
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+    font-family: var(--font-text);
+    font-weight: 520;
+    font-size: var(--t-small);
     text-decoration: none;
-    color: var(--ink);
+    color: var(--color-text);
     white-space: nowrap;
   }
 
@@ -117,8 +116,8 @@ const { currentPath } = Astro.props;
     position: absolute;
     left: 0;
     /* The caps tracking adds space after the last letter; end the bar on the glyph. */
-    right: var(--track-caps);
-    bottom: 8px;
+    right: 0;
+    bottom: 9px;
     border-top: var(--line-pen);
     transform: scaleX(0);
     transform-origin: left;
@@ -131,19 +130,17 @@ const { currentPath } = Astro.props;
   }
 
   .primary-nav a.current {
-    color: var(--red-ink);
+    color: var(--color-link);
   }
 
   .hdr-cta {
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
-    color: var(--red-ink);
+    font-family: var(--font-text);
+    font-weight: var(--wght-strong);
+    font-size: var(--t-small);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: 5px;
     text-decoration-thickness: 1px;
@@ -151,7 +148,7 @@ const { currentPath } = Astro.props;
   }
 
   .hdr-cta:hover {
-    color: var(--red);
+    color: var(--color-accent-text);
     text-decoration-thickness: 2px;
   }
 

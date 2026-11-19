@@ -57,6 +57,13 @@ for (const file of SCAN.flatMap(walk)) {
       if (/^#\d{1,3}$/.test(m[0])) continue; // "#360", "#1": issue numbers, not colours
       if (palette.has(norm(m[0]))) problems.push(`${rel}:${i + 1}  palette hex ${m[0]} outside design/tokens.css; use var(--token)`);
     }
+    // Red Pen 5 contract: components read colour roles (--color-*), never the primitives, so a derived theme or
+    // the ink surface can re-point every colour by overriding roles alone. pen.css paints the ink surface itself.
+    if (/^src\/.*\.(css|astro|ts)$/.test(rel) && rel !== 'src/styles/pen.css') {
+      for (const m of line.matchAll(/var\(--(paper|paper-raised|paper-sunk|ink|ink-body|ink-muted|rule|rule-strong|graphite|red|red-ink|red-tint|on-red|on-red-muted|font-display|font-body|font-mono)\)/g)) {
+        problems.push(`${rel}:${i + 1}  reads primitive ${m[0]}; read a --color-* or --font-heading/text/data role instead`);
+      }
+    }
     if (/\.(css|astro)$/.test(rel)) {
       for (const m of line.matchAll(/(?<=^\s*|[{;]\s*)(--[a-z0-9-]+)\s*:/gi)) {
         if (names.has(m[1])) problems.push(`${rel}:${i + 1}  declares token ${m[1]}; tokens are declared only in design/tokens.css`);

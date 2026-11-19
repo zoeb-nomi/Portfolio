@@ -46,6 +46,7 @@
     },
     {
       "slug": "crosssource",
+      "paused": "Page text was rewritten in #32 after this audio was built. Player hidden until: npm run audio:build -- crosssource, then delete this line and audioPaused in copy.ts.",
       "path": "/crosssource/",
       "title": "CrossSource: measuring whether a RAG system can be trusted to cite the law",
       "chapterTitles": {
