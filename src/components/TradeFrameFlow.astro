@@ -101,13 +101,13 @@ const [ai, det, us, india] = f.steps;
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-5);
   }
 
   .tf-cap b {
     font-weight: 500;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     margin-right: var(--s-2);
   }
 
@@ -136,16 +136,16 @@ const [ai, det, us, india] = f.steps;
     gap: 2px;
     padding: var(--s-3) var(--s-4);
     border: var(--line-object);
-    background: var(--paper);
+    background: var(--color-surface);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     transition: background-color var(--dur-base) var(--ease-draw), color var(--dur-base) var(--ease-draw);
   }
 
   .tf-node b {
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .tf-node.is-propose {
@@ -157,15 +157,15 @@ const [ai, det, us, india] = f.steps;
     top: -9px;
     left: var(--s-3);
     padding-inline: 4px;
-    background: var(--paper);
+    background: var(--color-surface);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .tf-arr {
     font-family: var(--font-mono);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     transition: color var(--dur-base) var(--ease-draw);
   }
 
@@ -176,19 +176,19 @@ const [ai, det, us, india] = f.steps;
     margin-top: var(--s-4);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* A lit step: the node takes the red tint and the label turns red-ink. */
   .tf-node.on {
-    background: var(--red-tint);
+    background: var(--color-accent-tint);
   }
 
   .tf-node.on .tf-i,
   .tf-arr.on,
   .tf-steps .on,
   .tf-path .on {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .tf-steps .on {
@@ -203,7 +203,7 @@ const [ai, det, us, india] = f.steps;
     padding: 0;
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -226,7 +226,7 @@ const [ai, det, us, india] = f.steps;
     gap: var(--s-1) var(--s-3);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .tf-pstep {
@@ -250,7 +250,7 @@ const [ai, det, us, india] = f.steps;
   }
 
   .tf-pstep.on {
-    background: var(--red-tint);
+    background: var(--color-accent-tint);
   }
 
   .tf-strip .tf-replay {

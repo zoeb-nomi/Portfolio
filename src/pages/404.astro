@@ -41,7 +41,7 @@ import { notFound } from '../data/copy';
     font-size: var(--t-page);
     line-height: var(--lh-display);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 20ch;
     text-wrap: balance;
   }
@@ -57,7 +57,7 @@ import { notFound } from '../data/copy';
   .miss-cell {
     aspect-ratio: 1;
     border: var(--line-object);
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .miss-cell.is-missing {
@@ -68,7 +68,7 @@ import { notFound } from '../data/copy';
   .miss-caption {
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .exits {
@@ -90,10 +90,10 @@ import { notFound } from '../data/copy';
     letter-spacing: var(--track-wide);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .home-link:hover {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 </style>

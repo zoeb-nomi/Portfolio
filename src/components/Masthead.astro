@@ -151,27 +151,27 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     margin-bottom: var(--s-5);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .crumbs li:not(:last-child)::after {
     content: '/';
     padding-inline: var(--s-2);
-    color: var(--rule);
+    color: var(--color-line);
   }
 
   .crumbs a {
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-min);
-    color: var(--ink);
+    color: var(--color-text);
     text-decoration: underline;
-    text-decoration-color: var(--red-ink);
+    text-decoration-color: var(--color-accent-text);
     text-underline-offset: var(--underline-offset);
   }
 
   .crumbs a:hover {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   /* Case studies on phones and tablets: result first. Breadcrumb, H1, the
@@ -206,7 +206,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
   .kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .kicker--stacked {
@@ -220,7 +220,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     font-size: var(--t-page);
     line-height: var(--lh-display);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     margin-bottom: var(--s-6);
     max-width: var(--h1-max, none);
   }
@@ -235,7 +235,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     font-family: var(--font-body);
     font-size: var(--t-body);
     line-height: var(--lh-prose);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: var(--standfirst-max, 62ch);
   }
 
@@ -246,7 +246,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
   .byline {
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* Case-study margin column: the spec block, the evals switcher, the repo link. */
@@ -269,11 +269,11 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
   }
 
   .spec-row dt {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .spec-row dd {
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   /* In the 200px margin column (900-1099px) label and value no longer fit on one line:
@@ -294,7 +294,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
     margin-top: calc(var(--s-6) - var(--s-1));
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
     overflow-wrap: anywhere;

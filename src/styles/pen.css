@@ -28,7 +28,7 @@ svg.pen-layer {
 
 .pen-path {
   fill: none;
-  stroke: var(--red);
+  stroke: var(--color-accent);
   stroke-width: 2.6px;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -36,7 +36,7 @@ svg.pen-layer {
 
 /* The pen's mark is a tapered fill: thin at both ends, full in the middle, ink sitting in the paper. */
 .pen-ink {
-  fill: var(--red);
+  fill: var(--color-accent);
   opacity: .92;
 }
 
@@ -61,7 +61,7 @@ svg.pen-layer {
 }
 
 .pen-path.graphite {
-  stroke: var(--graphite);
+  stroke: var(--color-pending);
   stroke-width: 1.5px;
 }
 
@@ -89,7 +89,7 @@ svg.pen-layer {
       inset-block: 0;
       inset-inline-start: 0;
       inline-size: 3px;
-      background: var(--red);
+      background: var(--color-accent);
       transform-origin: top;
       z-index: var(--z-top);
       pointer-events: none;

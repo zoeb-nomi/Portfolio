@@ -177,7 +177,7 @@ const insteadFig = {
   .prose {
     max-width: var(--measure);
     line-height: var(--lh-prose);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .belief {
@@ -193,7 +193,7 @@ const insteadFig = {
     font-weight: 400;
     font-size: var(--t-h3);
     line-height: 1.3;
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 46ch;
   }
 
@@ -226,13 +226,13 @@ const insteadFig = {
   .profile {
     margin-block: var(--s-6) var(--s-9);
     font-size: var(--t-small);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: var(--measure);
   }
 
   .profile a,
   .ledger-link a {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -241,7 +241,7 @@ const insteadFig = {
     margin-top: var(--s-6);
     font-family: var(--font-mono);
     font-size: var(--t-data);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .record-lede {
@@ -250,7 +250,7 @@ const insteadFig = {
     font-weight: var(--wght-head);
     font-size: var(--t-h3);
     line-height: var(--lh-heading);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 34ch;
   }
 
@@ -263,7 +263,7 @@ const insteadFig = {
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
 
@@ -279,7 +279,7 @@ const insteadFig = {
     font-size: var(--t-h2);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 30ch;
     margin-inline: auto;
     text-align: center;
@@ -313,7 +313,7 @@ const insteadFig = {
     align-items: center;
     justify-content: space-between;
     min-height: 56px;
-    color: var(--ink);
+    color: var(--color-text);
     text-decoration: none;
   }
 
@@ -322,11 +322,11 @@ const insteadFig = {
     font-size: var(--t-nav);
     text-decoration: underline;
     text-underline-offset: 4px;
-    text-decoration-color: var(--red-ink);
+    text-decoration-color: var(--color-accent-text);
   }
 
   .arrow {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     transform: translateX(-4px);
     transition: transform var(--dur-fast) var(--ease-draw);
   }

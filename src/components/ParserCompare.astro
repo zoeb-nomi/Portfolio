@@ -74,8 +74,8 @@ let line = 0;
 
 <style>
   .pc {
-    --pc-1: var(--ink);
-    --pc-2: var(--red);
+    --pc-1: var(--color-text);
+    --pc-2: var(--color-accent);
   }
 
   .pc-show {
@@ -89,7 +89,7 @@ let line = 0;
   .pc-legend {
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .pc-check {
@@ -99,7 +99,7 @@ let line = 0;
     min-block-size: var(--hit-min);
     font-family: var(--font-mono);
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
     cursor: pointer;
   }
 
@@ -107,7 +107,7 @@ let line = 0;
     inline-size: var(--s-4);
     block-size: var(--s-4);
     margin: 0;
-    accent-color: var(--ink);
+    accent-color: var(--color-text);
   }
 
   .pc-sw {
@@ -131,13 +131,13 @@ let line = 0;
     margin-bottom: var(--s-2);
     font-family: var(--font-mono);
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .pc-name small {
     margin-inline-start: var(--s-2);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .pc-line {
@@ -165,7 +165,7 @@ let line = 0;
 
   /* Red Pen 5: --red is the pen's mark colour (3.9:1 on paper); red text uses --red-ink. */
   .pc-line--v2 .pc-ver {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     transition: color var(--dur-base) ease;
   }
 
@@ -180,7 +180,7 @@ let line = 0;
     grid-column: 2;
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* One square per field. ok: solid. missing: hollow. wrong: hollow with a cross. garbled: a square inside a square. */
@@ -188,7 +188,7 @@ let line = 0;
     position: relative;
     display: block;
     aspect-ratio: 1;
-    border: 1px solid var(--c, var(--ink));
+    border: 1px solid var(--c, var(--color-text));
     background: transparent;
     transition: opacity var(--dur-base) ease;
     transition-delay: calc(var(--line, 0) * 260ms + var(--i, 0) * 12ms);
@@ -196,13 +196,13 @@ let line = 0;
 
   .pc-cell.is-ok {
     border: 0;
-    background: var(--c, var(--ink));
+    background: var(--c, var(--color-text));
   }
 
   .pc-cell.is-garbled {
     border: 0;
-    background: var(--c, var(--ink));
-    box-shadow: inset 0 0 0 3px var(--paper);
+    background: var(--c, var(--color-text));
+    box-shadow: inset 0 0 0 3px var(--color-surface);
   }
 
   /* The v4.2 colour is the 2px red line tier, so its hollow squares are drawn at 2px. */
@@ -221,7 +221,7 @@ let line = 0;
     content: '';
     position: absolute;
     inset: 50% -1px auto;
-    border-top: 1px solid var(--c, var(--ink));
+    border-top: 1px solid var(--c, var(--color-text));
     transform: rotate(45deg);
   }
 
@@ -236,7 +236,7 @@ let line = 0;
     margin-top: var(--s-5);
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .pc-key span {
@@ -260,7 +260,7 @@ let line = 0;
 
   .pc[data-v1='off'] .pc-line--v1 .pc-ver,
   .pc[data-v2='off'] .pc-line--v2 .pc-ver {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .pc[data-state='pre'] .pc-line .pc-cell {

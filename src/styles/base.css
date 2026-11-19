@@ -127,8 +127,8 @@ body {
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink-body);
+  background: var(--color-surface);
+  color: var(--color-text-body);
   font-family: var(--font-body);
   font-size: var(--t-body);
   line-height: var(--lh-base);
@@ -172,7 +172,7 @@ a {
    this rule outranks Astro's scoped component rules (.class[data-astro-cid])
    without !important. Anchors that are not text links are excluded by class. */
 main a:hover:not(.rp-button):not(.facade):not(.watch-facade):not(.skip-link):not(.cta-slab a):not(.post-list a):not([class*='card']):not(.audio-chip):not(.evals-switch a) {
-  color: var(--red-ink);
+  color: var(--color-accent-text);
   text-decoration-thickness: 2px;
 }
 
@@ -210,8 +210,8 @@ table {
 }
 
 ::selection {
-  background: var(--red-tint);
-  color: var(--ink);
+  background: var(--color-accent-tint);
+  color: var(--color-text);
 }
 
 /* ---- Numerals ---- */
@@ -243,7 +243,7 @@ h1, h2 {
 }
 
 :focus-visible {
-  outline: 2px solid var(--red);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
@@ -252,8 +252,8 @@ h1, h2 {
   position: absolute;
   top: -100px;
   left: var(--s-5);
-  background: var(--paper);
-  color: var(--red-ink);
+  background: var(--color-surface);
+  color: var(--color-accent-text);
   font-family: var(--font-mono);
   font-size: var(--t-label);
   padding: var(--s-3) var(--s-5);
@@ -313,7 +313,7 @@ h1, h2 {
     content: ' (' attr(href) ')';
     font-family: var(--font-mono);
     font-size: 9px;
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     word-break: break-all;
   }
 }

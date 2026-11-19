@@ -9,7 +9,7 @@
 .method-row code {
   font-family: var(--font-mono);
   font-size: var(--t-data);
-  background: var(--paper-raised);
+  background: var(--color-surface-raised);
   padding: 2px 4px;
 }
 
@@ -50,7 +50,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--hit-min);
-  color: var(--red-ink);
+  color: var(--color-accent-text);
   text-decoration: underline;
   text-underline-offset: var(--underline-offset);
 }
@@ -75,14 +75,14 @@
 .method-row dt {
   font-family: var(--font-mono);
   font-size: var(--t-label);
-  color: var(--ink-muted);
+  color: var(--color-text-muted);
 }
 
 .method-row dd {
   font-family: var(--font-body);
   font-size: var(--t-body);
   line-height: var(--lh-body);
-  color: var(--ink-body);
+  color: var(--color-text-body);
   max-width: 60ch;
 }
 
@@ -101,13 +101,13 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--hit-min);
-  color: var(--red-ink);
+  color: var(--color-accent-text);
   text-decoration: underline;
   text-underline-offset: var(--underline-offset);
 }
 
 .repo-cta .sep {
-  color: var(--ink-muted);
+  color: var(--color-text-muted);
 }
 
 @media (max-width: 899px) {

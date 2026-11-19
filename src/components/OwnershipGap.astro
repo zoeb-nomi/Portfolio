@@ -46,7 +46,7 @@ const { nodes } = Astro.props;
     border: var(--line-object);
     font-family: var(--font-mono);
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   /* The connector between one node and the next: a hairline. */
@@ -66,16 +66,16 @@ const { nodes } = Astro.props;
   /* A reviewer's mark: the part that is not on the page. */
   .og-missing {
     border: var(--line-pen-dashed);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .og-mark {
     font-size: var(--t-micro);
     letter-spacing: var(--track-wide);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .og-missing .og-mark {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 </style>

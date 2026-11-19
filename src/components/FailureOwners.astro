@@ -68,7 +68,7 @@ const total = (c: Count) => c.prompt + c.retrieval;
     margin-bottom: var(--s-2);
     font-family: var(--font-mono);
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .fo-cells {
@@ -86,12 +86,12 @@ const total = (c: Count) => c.prompt + c.retrieval;
   }
 
   .fo-cell.is-prompt {
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .fo-cell.is-retrieval {
     border: 0;
-    background: var(--red);
+    background: var(--color-accent);
   }
 
   .fo-cell.is-fixed {
@@ -102,7 +102,7 @@ const total = (c: Count) => c.prompt + c.retrieval;
   /* Start frame: the fixed squares are still failures, then they empty out. */
   .fo[data-state='pre'] .fo-cells .fo-cell.is-fixed {
     border-style: solid;
-    background: var(--ink);
+    background: var(--color-text);
     transition: none;
   }
 
@@ -113,7 +113,7 @@ const total = (c: Count) => c.prompt + c.retrieval;
     margin-top: var(--s-5);
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .fo-key span {
@@ -146,12 +146,12 @@ const total = (c: Count) => c.prompt + c.retrieval;
   }
 
   .fo-stats dt {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .fo-stats dd {
     margin: 0;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .fo-anno {
@@ -159,6 +159,6 @@ const total = (c: Count) => c.prompt + c.retrieval;
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     line-height: var(--lh-snug);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 </style>

@@ -63,7 +63,7 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
     margin-bottom: var(--s-2);
     font-family: var(--font-mono);
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   /* Columns shrink with the container, so the field never overflows on a phone. */
@@ -80,7 +80,7 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
   }
 
   .uc-cell.on {
-    background: var(--ink);
+    background: var(--color-text);
     transition: background var(--dur-base) ease;
     transition-delay: calc(var(--row, 0) * 160ms + var(--i, 0) * 14ms);
   }
@@ -99,7 +99,7 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
     margin-top: var(--s-5);
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .uc-key {

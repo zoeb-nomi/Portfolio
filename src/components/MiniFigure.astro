@@ -95,7 +95,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
   .mf {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
 
@@ -111,7 +111,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
   }
 
   .mf-rowlabel {
-    color: var(--ink);
+    color: var(--color-text);
     padding-top: 2px;
   }
 
@@ -139,11 +139,11 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     height: 10px;
     margin-left: -5px;
     border: var(--line-object);
-    background: var(--paper);
+    background: var(--color-surface);
   }
 
   .mf-after {
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .mf-scale {
@@ -154,7 +154,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
   }
 
   .mf-zoom {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     font-style: italic;
   }
 
@@ -162,11 +162,11 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     display: flex;
     gap: var(--s-2);
     margin-top: var(--s-1);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .mf-arrow {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .mf-to {
@@ -184,7 +184,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     position: absolute;
     inset: 0 auto 0 0;
     width: calc(var(--b) * 100%);
-    background: var(--ink);
+    background: var(--color-text);
     transform-origin: left;
   }
 
@@ -201,7 +201,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
   }
 
   .mf-barlabel {
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .mf-bartrack {
@@ -212,11 +212,11 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
 
   .mf-barval {
     text-align: right;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .mf-bar.is-mark .mf-barval {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     font-weight: 500;
   }
 

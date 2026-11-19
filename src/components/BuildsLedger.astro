@@ -178,7 +178,7 @@ const C = builds.columns;
   .idx {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     padding-top: 6px;
     font-variant-numeric: tabular-nums;
   }
@@ -188,7 +188,7 @@ const C = builds.columns;
     margin-top: var(--s-1);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .one {
@@ -196,7 +196,7 @@ const C = builds.columns;
     margin-top: var(--s-2);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 46ch;
   }
 
@@ -212,7 +212,7 @@ const C = builds.columns;
     min-height: var(--hit-min);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -223,7 +223,7 @@ const C = builds.columns;
   }
 
   .lnks a:hover {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration-thickness: 2px;
   }
 
@@ -251,7 +251,7 @@ const C = builds.columns;
     border-bottom: var(--line-ink);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .l-item + .l-item {
@@ -289,13 +289,13 @@ const C = builds.columns;
     font-size: var(--t-h3);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .l-cell {
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .l-lab {
@@ -311,14 +311,14 @@ const C = builds.columns;
     font-size: var(--t-num);
     line-height: var(--lh-tight);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     font-variant-numeric: tabular-nums;
   }
 
   .l-ship {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* The open/close mark: a plus that turns into a minus. */
@@ -353,12 +353,12 @@ const C = builds.columns;
 
   .l-row:hover .l-toggle,
   .l-row[open] .l-toggle {
-    border-color: var(--red);
+    border-color: var(--color-accent);
   }
 
   .l-row:hover .l-name,
   .l-row[open] .l-name {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   /* Hover: the row's rule goes Hair -> Ink (A §f). */
@@ -389,7 +389,7 @@ const C = builds.columns;
     padding: 0;
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -416,14 +416,14 @@ const C = builds.columns;
   .l-facts dt {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .l-facts dd {
     margin-top: 2px;
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .l-panel-in > .lnks {
@@ -470,7 +470,7 @@ const C = builds.columns;
       display: block;
       font-family: var(--font-mono);
       font-size: var(--t-label);
-      color: var(--ink-muted);
+      color: var(--color-text-muted);
       padding-top: 3px;
     }
 
@@ -537,7 +537,7 @@ const C = builds.columns;
     font-size: var(--t-h2);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .feat .one {
@@ -557,20 +557,20 @@ const C = builds.columns;
   .feat-cells dt {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-2);
   }
 
   .feat-cells dd {
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .feat .ship {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-bottom: var(--s-2);
   }
 

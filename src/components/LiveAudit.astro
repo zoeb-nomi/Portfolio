@@ -250,9 +250,9 @@ const claims = a.answer.filter((s) => s.mark);
 <style>
   .la {
     position: relative;
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
     border: var(--line-object);
-    box-shadow: 10px 10px 0 var(--ink);
+    box-shadow: 10px 10px 0 var(--color-text);
     padding: var(--s-5) var(--s-6) var(--s-5);
   }
 
@@ -265,11 +265,11 @@ const claims = a.answer.filter((s) => s.mark);
     border-bottom: var(--line-hair);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .la-label {
-    color: var(--ink);
+    color: var(--color-text);
     font-weight: 500;
   }
 
@@ -283,18 +283,18 @@ const claims = a.answer.filter((s) => s.mark);
     inline-size: 8px;
     block-size: 8px;
     border-radius: 50%;
-    background: var(--red);
+    background: var(--color-accent);
   }
 
   .la-status[data-tone='stream'] .la-dot,
   .la-status[data-tone='check'] .la-dot {
-    background: var(--graphite);
+    background: var(--color-pending);
     animation: la-pulse 900ms var(--ease-draw) infinite alternate;
   }
 
   .la-status[data-tone='done'],
   .la:not(.is-running) .la-status {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   @keyframes la-pulse {
@@ -307,13 +307,13 @@ const claims = a.answer.filter((s) => s.mark);
     margin-top: var(--s-4);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .la-who {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     margin-right: var(--s-2);
   }
 
@@ -334,7 +334,7 @@ const claims = a.answer.filter((s) => s.mark);
     font-size: var(--t-model);
     line-height: 1.9;
     font-variation-settings: 'opsz' 20;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   /* Stream: tokens are present in the HTML; under .motion they wait to be emitted. */
@@ -348,7 +348,7 @@ const claims = a.answer.filter((s) => s.mark);
     block-size: 1.05em;
     margin-left: 2px;
     vertical-align: -0.15em;
-    background: var(--ink);
+    background: var(--color-text);
     animation: la-blink 700ms steps(2) infinite;
   }
 
@@ -372,7 +372,7 @@ const claims = a.answer.filter((s) => s.mark);
   .mk.fail.is-hit,
   :global(html:not(.motion)) .mk.fail,
   .la.is-done .mk.fail {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   /* No-JS fallbacks for each mark: the SVG pen replaces them once pen.ts is ready. */
@@ -384,13 +384,13 @@ const claims = a.answer.filter((s) => s.mark);
 
   :global(html:not(.pen-ready)) .mk-strike {
     text-decoration: line-through;
-    text-decoration-color: var(--red);
+    text-decoration-color: var(--color-accent);
     text-decoration-thickness: 2px;
   }
 
   :global(html:not(.pen-ready)) .mk-tick::before {
     content: '✓ ';
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   /* The insert sits above the struck word, in the pen's hand: red, mono, small. */
@@ -403,7 +403,7 @@ const claims = a.answer.filter((s) => s.mark);
     font-family: var(--font-mono);
     font-size: var(--t-small);
     font-weight: 500;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     transform: translate(-1.1em, -1.25em);
     opacity: 0;
   }
@@ -422,7 +422,7 @@ const claims = a.answer.filter((s) => s.mark);
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     opacity: 0;
   }
 
@@ -434,11 +434,11 @@ const claims = a.answer.filter((s) => s.mark);
   .la-check {
     display: block;
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .la-note.fail .la-check {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .la-v {
@@ -471,7 +471,7 @@ const claims = a.answer.filter((s) => s.mark);
 
   .la-tally {
     font-weight: var(--wght-strong);
-    color: var(--ink);
+    color: var(--color-text);
     opacity: 0;
   }
 
@@ -485,7 +485,7 @@ const claims = a.answer.filter((s) => s.mark);
     min-block-size: var(--hit-touch);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -499,7 +499,7 @@ const claims = a.answer.filter((s) => s.mark);
     margin-top: var(--s-2);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* The pen layer, shared by every mark on this sheet. */
@@ -514,7 +514,7 @@ const claims = a.answer.filter((s) => s.mark);
 
   @media (max-width: 899px) {
     .la {
-      box-shadow: 6px 6px 0 var(--ink);
+      box-shadow: 6px 6px 0 var(--color-text);
       padding: var(--s-4);
     }
 

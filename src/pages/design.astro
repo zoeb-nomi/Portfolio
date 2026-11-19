@@ -172,7 +172,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     max-width: var(--measure);
     font-size: var(--t-lede);
     line-height: var(--lh-body);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .hint,
@@ -180,7 +180,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     margin-top: var(--s-4);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* §1 */
@@ -203,7 +203,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     font-weight: var(--wght-claim);
     font-stretch: calc(var(--wdth-tight) * 1%);
     line-height: 1;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .p-h {
@@ -212,7 +212,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
 
   .p-p {
     max-width: var(--measure);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   /* §2 */
@@ -231,18 +231,18 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   .v-who {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .v-face {
     margin-left: var(--s-2);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .v-sample {
     font-size: var(--t-h2);
     line-height: var(--lh-tight);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .v-me {
@@ -261,25 +261,25 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   .v-check {
     font-family: var(--font-mono);
     font-size: var(--t-h3);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .v-note {
     max-width: var(--measure);
     font-size: var(--t-small);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .axes {
     margin-top: var(--s-6);
     padding: var(--s-6);
-    background: var(--paper-sunk);
+    background: var(--color-surface-sunk);
   }
 
   .axes-label {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .axes-word {
@@ -290,7 +290,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     font-stretch: calc(var(--wdth-head) * 1%);
     line-height: 1;
     letter-spacing: var(--track-display);
-    color: var(--ink);
+    color: var(--color-text);
     overflow-wrap: anywhere;
   }
 
@@ -305,13 +305,13 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     gap: var(--s-2);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .axes-controls input {
     inline-size: 100%;
     min-block-size: var(--hit-touch);
-    accent-color: var(--red-ink);
+    accent-color: var(--color-accent-text);
   }
 
   /* §3 */
@@ -334,17 +334,17 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     justify-self: start;
     font-family: var(--font-model);
     font-size: var(--t-h3);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .mk-kind {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .mk-means {
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   /* §4 */
@@ -359,29 +359,29 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     display: grid;
     gap: var(--s-3);
     padding: var(--s-6);
-    background: var(--paper);
+    background: var(--color-surface);
   }
 
   .sf.surface-ink {
-    background: var(--paper);
+    background: var(--color-surface);
   }
 
   .sf-name {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .sf-line {
     font-family: var(--font-model);
     font-size: var(--t-model);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .sf-check {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .swatches {
@@ -405,13 +405,13 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
 
   .sw-name {
     font-size: var(--t-small);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .sw-var {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* §5 */
@@ -435,17 +435,17 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     font-size: var(--t-h3);
     font-weight: var(--wght-head);
     font-stretch: calc(var(--wdth-head) * 1%);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .vb-d {
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .vb-t {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     text-align: right;
   }
 
@@ -455,11 +455,11 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
     gap: var(--s-3);
     max-width: var(--measure);
     padding-left: var(--s-5);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .rules li::marker {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   @media (max-width: 899px) {

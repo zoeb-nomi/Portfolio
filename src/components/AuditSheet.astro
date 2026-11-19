@@ -151,7 +151,7 @@ const f = home.fig0;
     --w: 100%;
     border-top: var(--line-heavy);
     padding-top: var(--s-3);
-    background: var(--paper);
+    background: var(--color-surface);
     scroll-margin-top: calc(var(--header-h) + var(--s-4));
   }
 
@@ -164,12 +164,12 @@ const f = home.fig0;
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-label);
-    color: var(--ink);
+    color: var(--color-text);
     margin-bottom: var(--s-3);
   }
 
   .as-n {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     font-weight: 500;
     margin-right: var(--s-2);
   }
@@ -184,7 +184,7 @@ const f = home.fig0;
     font: inherit;
     letter-spacing: inherit;
     text-transform: inherit;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
     cursor: pointer;
@@ -195,7 +195,7 @@ const f = home.fig0;
   }
 
   .as-replay:hover {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   /* The stage reserves the figure's box before anything is drawn: zero layout shift. The sheet sits to the
@@ -215,7 +215,7 @@ const f = home.fig0;
     inline-size: var(--w);
     padding: var(--s-2);
     border: var(--line-object);
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
   }
 
   .as-bands {
@@ -243,11 +243,11 @@ const f = home.fig0;
     display: block;
     aspect-ratio: 1;
     border: var(--line-object-muted);
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
   }
 
   .as-cell.is-cur {
-    outline: 2px solid var(--ink);
+    outline: 2px solid var(--color-text);
     outline-offset: 1px;
   }
 
@@ -266,7 +266,7 @@ const f = home.fig0;
   /* Each failed square sits above the paper: lifted on z, with a short shadow back onto the sheet. */
   .as-red i {
     display: block;
-    background: var(--red);
+    background: var(--color-accent);
   }
 
   /* Each harness's tag is a plain row label above its band. */
@@ -276,7 +276,7 @@ const f = home.fig0;
     font-size: var(--t-label);
     font-weight: 500;
     line-height: 1;
-    color: var(--ink);
+    color: var(--color-text);
     pointer-events: none;
   }
 
@@ -286,7 +286,7 @@ const f = home.fig0;
     inset-block: -2px;
     inset-inline-start: 0;
     inline-size: 2px;
-    background: var(--red);
+    background: var(--color-accent);
     visibility: hidden;
     pointer-events: none;
   }
@@ -307,14 +307,14 @@ const f = home.fig0;
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .as-key {
     display: inline-flex;
     align-items: center;
     gap: var(--s-2);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .as-swatch {
@@ -322,12 +322,12 @@ const f = home.fig0;
     inline-size: var(--s-3);
     block-size: var(--s-3);
     border: var(--line-object-muted);
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
   }
 
   .as-swatch.is-fail {
-    border-color: var(--red);
-    background: var(--red);
+    border-color: var(--color-accent);
+    background: var(--color-accent);
   }
 
   .as-cap {
@@ -337,7 +337,7 @@ const f = home.fig0;
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
 </style>

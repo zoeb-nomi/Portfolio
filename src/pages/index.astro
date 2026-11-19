@@ -183,7 +183,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-stretch: calc(var(--wdth-claim) * 1%);
     line-height: var(--lh-display);
     letter-spacing: var(--track-display);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 14ch;
     text-wrap: balance;
   }
@@ -193,7 +193,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
   .quiet {
     display: inline-block;
     font-weight: var(--wght-quiet);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   :global(.motion) .quiet {
@@ -203,11 +203,11 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
   @keyframes go-quiet {
     from {
       font-weight: var(--wght-claim);
-      color: var(--ink);
+      color: var(--color-text);
     }
     to {
       font-weight: var(--wght-quiet);
-      color: var(--ink-muted);
+      color: var(--color-text-muted);
     }
   }
 
@@ -228,13 +228,13 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-stretch: calc(var(--wdth-head) * 1%);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 22ch;
     text-wrap: balance;
   }
 
   .claim2-pen {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .hero-cta {
@@ -249,7 +249,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     font-weight: 500;
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
@@ -259,7 +259,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     margin-top: var(--s-2);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   /* ---------- 2. proof (ink) ---------- */
@@ -278,7 +278,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-size: var(--t-h3);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 24ch;
   }
 
@@ -297,7 +297,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-stretch: calc(var(--wdth-tight) * 1%);
     line-height: 0.82;
     letter-spacing: var(--track-display);
-    color: var(--red);
+    color: var(--color-accent);
     font-variant-numeric: tabular-nums;
   }
 
@@ -305,12 +305,12 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-size: var(--t-h3);
     font-weight: var(--wght-head);
     font-stretch: calc(var(--wdth-head) * 1%);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .proof-sub {
     margin-top: var(--s-6);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 36ch;
   }
 
@@ -319,12 +319,12 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     padding-top: var(--s-4);
     border-top: var(--line-hair);
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 36ch;
   }
 
   .sheet-fig :global(.as-cell) {
-    border-color: var(--rule);
+    border-color: var(--color-line);
   }
 
   /* ---------- shared block ---------- */
@@ -343,12 +343,12 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-size: var(--t-h2);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 18ch;
   }
 
   .block-sub {
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 36ch;
   }
 
@@ -374,7 +374,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-stretch: calc(var(--wdth-tight) * 1%);
     line-height: 1;
     letter-spacing: var(--track-display);
-    color: var(--ink);
+    color: var(--color-text);
     padding-bottom: var(--s-2);
   }
 
@@ -388,7 +388,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
   .r-label {
     margin-top: var(--s-4);
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 26ch;
   }
 
@@ -398,12 +398,12 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .r-src {
     margin-top: var(--s-1);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .harness-panel {
@@ -434,13 +434,13 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
 
   .build-a:hover,
   .build-a:focus-visible {
-    background: var(--paper-raised);
+    background: var(--color-surface-raised);
   }
 
   .b-n {
     font-family: var(--font-mono);
     font-size: var(--t-small);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .b-main {
@@ -456,24 +456,24 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-stretch: calc(var(--wdth-head) * 1%);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     overflow-wrap: anywhere;
   }
 
   .b-line {
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 52ch;
   }
 
   .b-kind {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .b-go {
     font-size: var(--t-h3);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     transition: transform var(--dur-base) var(--ease-draw);
   }
 
@@ -488,7 +488,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     min-height: var(--hit-touch);
     margin-top: var(--s-4);
     font-weight: 500;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }
@@ -509,7 +509,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
   .about-label {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     margin-bottom: var(--s-4);
   }
 
@@ -517,7 +517,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     margin-top: var(--s-6);
     font-size: var(--t-lede);
     line-height: var(--lh-heading);
-    color: var(--ink-body);
+    color: var(--color-text-body);
     max-width: 34ch;
   }
 
@@ -539,7 +539,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-weight: var(--wght-claim);
     font-stretch: calc(var(--wdth-claim) * 1%);
     line-height: var(--lh-heading);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .verb dt span {
@@ -550,7 +550,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     margin-top: var(--s-3);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   /* ---------- 6. call (ink) ---------- */
@@ -562,7 +562,7 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     font-size: var(--t-slab);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
-    color: var(--ink);
+    color: var(--color-text);
     max-width: 22ch;
   }
 

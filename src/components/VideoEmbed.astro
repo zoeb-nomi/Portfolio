@@ -82,7 +82,7 @@ const playLabel = `Play: ${title}`;
     width: 100%;
     aspect-ratio: 16 / 9;
     /* Ink ground: the glyph and plate still read if the poster never arrives. */
-    background: var(--ink);
+    background: var(--color-text);
     overflow: hidden;
   }
 
@@ -130,17 +130,17 @@ const playLabel = `Play: ${title}`;
     width: 64px;
     height: 64px;
     border-radius: var(--radius);
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--color-text);
+    color: var(--color-surface);
     /* A paper hairline so the disc still reads against a dark frame of the
        poster, or against the ink ground when the poster does not load. */
-    box-shadow: 0 0 0 1px var(--paper);
+    box-shadow: 0 0 0 1px var(--color-surface);
     transition: background-color var(--dur-fast) var(--ease-draw);
   }
 
   .facade:hover .glyph,
   .facade:focus-visible .glyph {
-    background: var(--red-ink);
+    background: var(--color-accent-text);
   }
 
   /* .frame clips its children, so the global ring (offset +3px) was drawn outside the box
@@ -156,7 +156,7 @@ const playLabel = `Play: ${title}`;
     left: var(--s-3);
     bottom: var(--s-3);
     padding: var(--s-1) var(--s-2);
-    background: var(--ink);
+    background: var(--color-text);
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     letter-spacing: var(--track-wide);
@@ -177,7 +177,7 @@ const playLabel = `Play: ${title}`;
     font-size: var(--t-micro);
     line-height: var(--lh-snug);
     letter-spacing: var(--track-wide);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     max-width: 60ch;
   }
 
@@ -190,7 +190,7 @@ const playLabel = `Play: ${title}`;
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     letter-spacing: var(--track-wide);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }

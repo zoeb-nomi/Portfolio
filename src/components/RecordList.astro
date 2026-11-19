@@ -88,7 +88,7 @@ const rows = items.filter(isReady);
   .record-kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     line-height: var(--lh-label);
   }
 
@@ -96,7 +96,7 @@ const rows = items.filter(isReady);
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     line-height: var(--lh-body);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     text-align: right;
     max-width: 52ch;
   }
@@ -122,7 +122,7 @@ const rows = items.filter(isReady);
     font-family: var(--font-body);
     font-size: var(--t-small);
     line-height: var(--lh-base);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   /* Hit area >= 24px (WCAG 2.5.8): the padding grows the target, the equal
@@ -133,21 +133,21 @@ const rows = items.filter(isReady);
     padding-block: var(--s-1);
     margin-block: calc(-1 * var(--s-1));
     min-height: var(--hit-min); /* WCAG 2.5.8 floor */
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
     overflow-wrap: anywhere;
   }
 
   .sep {
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .where {
     font-family: var(--font-mono);
     font-size: var(--t-note);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     text-align: right;
   }
 

@@ -52,12 +52,31 @@ ship. Everything below follows from three facts about him.
 | `--red-glow` | the pen on the ink surface | paper |
 | `--surface-ink` + `--on-ink*` | the ink surface | paper sections |
 
-**The ink surface is a mode.** `.surface-ink` (declared in `tokens.css`) swaps the paper
-and ink roles and turns the pen to `--red-glow`, so any component that reads roles works on
-it unchanged. Pair it with `.bleed` to run a section edge to edge.
+**Two tiers: primitives and roles.** The table above lists the *primitives* (the values).
+Components never read them. Every colour in `src/` reads a *role*, and `npm run check`
+fails on any primitive read (design-check):
 
-**Semantic roles** (`--color-surface`, `-text`, `-accent`, `-pending` and the rest) are what
-a side-project theme overrides; the primitives above sit under them.
+| role | paper (default) | ink surface | means |
+|---|---|---|---|
+| `--color-surface`, `-surface-raised`, `-surface-sunk` | paper, paper-raised, paper-sunk | surface-ink, surface-ink-raised | the page; an object on it; a well |
+| `--color-text`, `-text-body`, `-text-muted` | ink, ink-body, ink-muted | on-ink, on-ink-body, on-ink-muted | headings and numerals; running text; labels and sources |
+| `--color-line`, `-line-strong` | rule, ink | rule-on-ink, on-ink | hair rules; the rule that opens a block |
+| `--color-accent` | red | red-glow | the pen's stroke |
+| `--color-accent-text` | red-ink | red-glow | red text (links, verdicts, primary button) |
+| `--color-accent-tint`, `-on-accent` | red-tint, on-red | glow at 18%, surface-ink | a red wash; text on a red fill |
+| `--color-pending` | graphite | on-ink-muted | proposed or not yet checked |
+| `--color-state-pass`, `-fail`, `-warn`, `-na` | ink, red, graphite, graphite | on-ink, red-glow, on-ink-muted | a check's verdict |
+| `--color-series-1` to `-6` | red, ink, graphite, then mixes | the same on ink | chart series; red is the series under test |
+
+**The ink surface is a mode.** `.surface-ink` (declared in `tokens.css`) re-points the
+roles, so any component works on it unchanged. A custom property resolves where it is
+declared, so a mode or theme must override the **roles**. Overriding a primitive inside
+a scope does not reach a role resolved at `:root`. Pair it with `.bleed` to run a section
+edge to edge.
+
+**Derived systems** (other projects) are themes over the same roles. Their DTCG sources
+live in `design/tokens/` and their docs live in `design/systems/<name>/`. A theme may add roles,
+but core declares every role name first, so Red Pen components can read it.
 
 ## 3. Lines
 

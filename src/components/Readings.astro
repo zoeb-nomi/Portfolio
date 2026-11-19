@@ -83,7 +83,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
   .rd-k {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .rd-v {
@@ -97,26 +97,26 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     font-size: var(--t-stat);
     line-height: var(--lh-tight);
     letter-spacing: var(--track-display);
-    color: var(--ink);
+    color: var(--color-text);
     font-variant-numeric: tabular-nums;
   }
 
   .rd-unit {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .rd-verdict {
     font-size: 0.5em;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .rd-fig {
     margin-top: var(--s-4);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .rd-track {
@@ -152,11 +152,11 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     height: 10px;
     margin-left: -5px;
     border: var(--line-object);
-    background: var(--paper);
+    background: var(--color-surface);
   }
 
   .rd-value {
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .rd-scale {
@@ -180,20 +180,20 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     border-top: var(--line-hair);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
 
   .rd-datum-line b {
     font-weight: 500;
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .rd-label {
     margin-top: var(--s-3);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
-    color: var(--ink-body);
+    color: var(--color-text-body);
   }
 
   .rd-src {
@@ -201,7 +201,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
     padding-top: var(--s-3);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   @media (max-width: 899px) {

@@ -47,7 +47,7 @@ const { rows, max, heading } = Astro.props;
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     letter-spacing: var(--track-wide);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .bl-list {
@@ -64,7 +64,7 @@ const { rows, max, heading } = Astro.props;
     row-gap: var(--s-1);
     font-family: var(--font-mono);
     font-size: var(--t-data);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .bl-row + .bl-row {
@@ -80,13 +80,13 @@ const { rows, max, heading } = Astro.props;
   .bl-fill {
     display: block;
     block-size: 100%;
-    background: var(--ink);
+    background: var(--color-text);
   }
 
   .bl-note {
     grid-column: 2 / -1;
     font-size: var(--t-micro);
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   @media (max-width: 599px) {

@@ -109,7 +109,7 @@ const headingId = anchorId ?? `sec-${slug}`;
     font-stretch: calc(var(--wdth-head) * 1%);
     letter-spacing: var(--track-tight);
     line-height: var(--lh-heading);
-    color: var(--ink);
+    color: var(--color-text);
   }
 
   .mark-label .mark {
@@ -119,7 +119,7 @@ const headingId = anchorId ?? `sec-${slug}`;
     font-size: var(--t-small);
     font-weight: 500;
     letter-spacing: 0;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .mark-sub {
@@ -127,21 +127,21 @@ const headingId = anchorId ?? `sec-${slug}`;
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
   }
 
   .ref-line {
     font-family: var(--font-mono);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
-    color: var(--ink-muted);
+    color: var(--color-text-muted);
     max-width: 72ch;
     margin-bottom: var(--s-6);
   }
 
   .ref-line strong {
     font-weight: 500;
-    color: var(--red-ink);
+    color: var(--color-accent-text);
   }
 
   .next-line {
@@ -155,12 +155,12 @@ const headingId = anchorId ?? `sec-${slug}`;
     min-height: var(--hit-touch);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    color: var(--ink);
+    color: var(--color-text);
     text-decoration: none;
   }
 
   .next-line a span {
-    color: var(--red-ink);
+    color: var(--color-accent-text);
     transition: transform var(--dur-base) var(--ease-draw);
   }
 

@@ -182,19 +182,34 @@
   --dur-tally: 1400ms;
 
   /* ---------------------------------------------------------------- semantic roles
-     Components written from v4 on read these. A side-project theme swaps the
-     primitives above; every role follows. */
+     The contract (Red Pen 5). Components read ONLY these roles for colour, never the primitives above.
+     A derived theme (design/tokens/themes/*) overrides roles, and .surface-ink below re-points them.
+     Custom properties resolve where they are declared, so a mode must override the roles themselves. */
   --color-surface: var(--paper);
   --color-surface-raised: var(--paper-raised);
+  --color-surface-sunk: var(--paper-sunk);
   --color-text: var(--ink);
   --color-text-body: var(--ink-body);
   --color-text-muted: var(--ink-muted);
   --color-line: var(--rule);
+  --color-line-strong: var(--ink);
   --color-accent: var(--red);
   --color-accent-text: var(--red-ink);
   --color-accent-tint: var(--red-tint);
   --color-on-accent: var(--on-red);
   --color-pending: var(--graphite);
+  /* Check states: what a verdict looks like. Red Pen keeps it to ink, red and graphite. */
+  --color-state-pass: var(--ink);
+  --color-state-fail: var(--red);
+  --color-state-warn: var(--graphite);
+  --color-state-na: var(--graphite);
+  /* Data series, for charts that need more than one colour. Red is reserved for the series under test. */
+  --color-series-1: var(--red);
+  --color-series-2: var(--ink);
+  --color-series-3: var(--graphite);
+  --color-series-4: color-mix(in oklch, var(--ink) 55%, var(--paper));
+  --color-series-5: color-mix(in oklch, var(--red) 45%, var(--paper));
+  --color-series-6: color-mix(in oklch, var(--graphite) 45%, var(--paper));
 
   --type-display: var(--t-display);
   --type-page: var(--t-page);
@@ -242,6 +257,31 @@
   --line-pen: 2px solid var(--red-glow);
   --line-object: 1px solid var(--on-ink);
   --line-object-muted: 1px solid var(--rule-on-ink);
+
+  /* The roles, re-pointed (components read these). */
+  --color-surface: var(--surface-ink);
+  --color-surface-raised: var(--surface-ink-raised);
+  --color-surface-sunk: var(--surface-ink);
+  --color-text: var(--on-ink);
+  --color-text-body: var(--on-ink-body);
+  --color-text-muted: var(--on-ink-muted);
+  --color-line: var(--rule-on-ink);
+  --color-line-strong: var(--on-ink);
+  --color-accent: var(--red-glow);
+  --color-accent-text: var(--red-glow);
+  --color-accent-tint: color-mix(in oklch, var(--red-glow) 18%, transparent);
+  --color-on-accent: var(--surface-ink);
+  --color-pending: var(--on-ink-muted);
+  --color-state-pass: var(--on-ink);
+  --color-state-fail: var(--red-glow);
+  --color-state-warn: var(--on-ink-muted);
+  --color-state-na: var(--on-ink-muted);
+  --color-series-1: var(--red-glow);
+  --color-series-2: var(--on-ink);
+  --color-series-3: var(--on-ink-muted);
+  --color-series-4: color-mix(in oklch, var(--on-ink) 55%, var(--surface-ink));
+  --color-series-5: color-mix(in oklch, var(--red-glow) 45%, var(--surface-ink));
+  --color-series-6: color-mix(in oklch, var(--on-ink-muted) 45%, var(--surface-ink));
 }
 
 /* Breakpoints: 599 / 899 / 1099 only (custom properties cannot be used in
