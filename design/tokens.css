@@ -8,7 +8,7 @@
 
 :root {
   /* Typefaces: three faces, self-hosted (public/fonts). */
-  --font-display: 'Instrument Serif', 'Display Fallback', Georgia, 'Times New Roman', serif;
+  --font-display: 'Source Serif 4 Display', 'Display Fallback', Georgia, 'Times New Roman', serif;
   --font-body: 'IBM Plex Sans', 'Body Fallback', -apple-system, 'Segoe UI', Helvetica, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Mono Fallback', ui-monospace, 'SF Mono', Menlo, monospace;
 
@@ -58,7 +58,7 @@
   --line-pen-dashed: 2px dashed var(--red);
 
   /* Type scale (DESIGN v3 §c). Floor is 12px everywhere. */
-  --t-display: clamp(56px, 9.4vw, 136px);   /* home H1, line 1 */
+  --t-display: clamp(50px, 7.4vw, 106px);   /* home H1 (v4: Source Serif 4 Display sets wider than Instrument Serif) */
   --t-answer: clamp(28px, 3.4vw, 50px);     /* v3 home H1 line 2; retired on home in v4, kept for one release */
   --t-lede: clamp(22px, 2.3vw, 32px);       /* v4: the plain sans line under the home H1 */
   --t-hero: var(--t-display);

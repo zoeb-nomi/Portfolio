@@ -59,7 +59,7 @@ border widths and vertical structural rules outside figure and object components
 
 ## 4. Type
 
-Instrument Serif (display), IBM Plex Sans (body), IBM Plex Mono (labels and data). Weights
+Source Serif 4 Display (display; replaced Instrument Serif in v4), IBM Plex Sans (body), IBM Plex Mono (labels and data). Weights
 400/500 only, self-hosted. Floor 12px everywhere.
 
 | role | token | 390 → 1440 | face |
