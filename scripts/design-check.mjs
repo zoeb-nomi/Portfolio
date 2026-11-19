@@ -60,8 +60,8 @@ for (const file of SCAN.flatMap(walk)) {
     // Red Pen 5 contract: components read colour roles (--color-*), never the primitives, so a derived theme or
     // the ink surface can re-point every colour by overriding roles alone. pen.css paints the ink surface itself.
     if (/^src\/.*\.(css|astro|ts)$/.test(rel) && rel !== 'src/styles/pen.css') {
-      for (const m of line.matchAll(/var\(--(paper|paper-raised|paper-sunk|ink|ink-body|ink-muted|rule|rule-strong|graphite|red|red-ink|red-tint)\)/g)) {
-        problems.push(`${rel}:${i + 1}  reads primitive ${m[0]}; read a --color-* role instead`);
+      for (const m of line.matchAll(/var\(--(paper|paper-raised|paper-sunk|ink|ink-body|ink-muted|rule|rule-strong|graphite|red|red-ink|red-tint|font-display|font-body|font-mono)\)/g)) {
+        problems.push(`${rel}:${i + 1}  reads primitive ${m[0]}; read a --color-* or --font-heading/text/data role instead`);
       }
     }
     if (/\.(css|astro)$/.test(rel)) {

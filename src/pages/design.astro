@@ -134,6 +134,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   <Section mark={D.rules.mark} label={D.rules.label}>
     <ul class="rules">{D.rules.items.map((r) => <li>{r}</li>)}</ul>
     <p class="checks">{D.rules.checks}</p>
+    <p class="next"><a href={D.next.href}>{D.next.label} →</a></p>
   </Section>
 </Base>
 
@@ -178,9 +179,22 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   .hint,
   .checks {
     margin-top: var(--s-4);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
+  }
+
+  .next {
+    margin-top: var(--s-8);
+    font-family: var(--font-heading);
+    font-size: var(--t-h3);
+    font-weight: var(--wght-head);
+  }
+
+  .next a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
   }
 
   /* §1 */
@@ -198,7 +212,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
 
   .p-n {
     grid-row: span 2;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-size: var(--t-num);
     font-weight: var(--wght-claim);
     font-stretch: calc(var(--wdth-tight) * 1%);
@@ -229,7 +243,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .v-who {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
   }
@@ -246,7 +260,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .v-me {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-weight: var(--wght-claim);
     font-stretch: calc(var(--wdth-claim) * 1%);
     letter-spacing: var(--track-display);
@@ -259,7 +273,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .v-check {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-h3);
     color: var(--color-accent-text);
   }
@@ -277,14 +291,14 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .axes-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
   .axes-word {
     margin-block: var(--s-4);
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-size: var(--t-display);
     font-weight: var(--wght-head);
     font-stretch: calc(var(--wdth-head) * 1%);
@@ -303,7 +317,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   .axes-controls label {
     display: grid;
     gap: var(--s-2);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-body);
   }
@@ -338,7 +352,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .mk-kind {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-accent-text);
   }
@@ -367,7 +381,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .sf-name {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
   }
@@ -379,7 +393,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .sf-check {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-accent-text);
   }
@@ -409,7 +423,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .sw-var {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
   }
@@ -431,7 +445,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .vb-v {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-size: var(--t-h3);
     font-weight: var(--wght-head);
     font-stretch: calc(var(--wdth-head) * 1%);
@@ -443,7 +457,7 @@ const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
   }
 
   .vb-t {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
     text-align: right;

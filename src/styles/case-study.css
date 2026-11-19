@@ -7,7 +7,7 @@
 
 .prose code,
 .method-row code {
-  font-family: var(--font-mono);
+  font-family: var(--font-data);
   font-size: var(--t-data);
   background: var(--color-surface-raised);
   padding: 2px 4px;
@@ -50,7 +50,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--hit-min);
-  color: var(--color-accent-text);
+  color: var(--color-link);
   text-decoration: underline;
   text-underline-offset: var(--underline-offset);
 }
@@ -73,13 +73,13 @@
 }
 
 .method-row dt {
-  font-family: var(--font-mono);
+  font-family: var(--font-data);
   font-size: var(--t-label);
   color: var(--color-text-muted);
 }
 
 .method-row dd {
-  font-family: var(--font-body);
+  font-family: var(--font-text);
   font-size: var(--t-body);
   line-height: var(--lh-body);
   color: var(--color-text-body);
@@ -92,7 +92,7 @@
 
 .repo-cta {
   margin-top: var(--s-6);
-  font-family: var(--font-mono);
+  font-family: var(--font-data);
   font-size: var(--t-micro);
 }
 
@@ -101,7 +101,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--hit-min);
-  color: var(--color-accent-text);
+  color: var(--color-link);
   text-decoration: underline;
   text-underline-offset: var(--underline-offset);
 }

@@ -103,7 +103,7 @@ const headingId = anchorId ?? `sec-${slug}`;
 
   /* Red Pen 5: the section label is a real heading in the margin, in Zoeb's voice; the § number above it is the pen's. */
   .mark-label {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-size: var(--t-h3);
     font-weight: var(--wght-head);
     font-stretch: calc(var(--wdth-head) * 1%);
@@ -115,7 +115,7 @@ const headingId = anchorId ?? `sec-${slug}`;
   .mark-label .mark {
     display: block;
     margin-bottom: var(--s-2);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-small);
     font-weight: 500;
     letter-spacing: 0;
@@ -124,14 +124,14 @@ const headingId = anchorId ?? `sec-${slug}`;
 
   .mark-sub {
     margin-top: var(--s-1);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
     color: var(--color-text-muted);
   }
 
   .ref-line {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     line-height: var(--lh-snug);
     color: var(--color-text-muted);
@@ -153,14 +153,14 @@ const headingId = anchorId ?? `sec-${slug}`;
     align-items: center;
     gap: var(--s-2);
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text);
     text-decoration: none;
   }
 
   .next-line a span {
-    color: var(--color-accent-text);
+    color: var(--color-link);
     transition: transform var(--dur-base) var(--ease-draw);
   }
 

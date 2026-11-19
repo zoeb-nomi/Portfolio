@@ -174,7 +174,7 @@ const groups = notesPage.groups
   .e-num {
     display: flex;
     flex-direction: column;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-stretch: calc(var(--wdth-head) * 1%);
     font-weight: var(--wght-head);
     font-size: var(--t-num);
@@ -186,7 +186,7 @@ const groups = notesPage.groups
 
   .e-unit {
     margin-top: var(--s-1);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     letter-spacing: 0;
     line-height: var(--lh-snug);
@@ -200,14 +200,14 @@ const groups = notesPage.groups
   }
 
   .e-kicker {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
   .e-title {
     margin-top: var(--s-2);
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-stretch: calc(var(--wdth-head) * 1%);
     font-weight: var(--wght-head);
     font-size: clamp(26px, 2.4vw, 34px);
@@ -269,7 +269,7 @@ const groups = notesPage.groups
     align-items: center;
     gap: 0 var(--s-1);
     margin-top: var(--s-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
   }
@@ -291,7 +291,7 @@ const groups = notesPage.groups
     gap: var(--s-3);
     padding-bottom: var(--s-2);
     border-bottom: var(--line-ink);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text);
   }
@@ -331,12 +331,12 @@ const groups = notesPage.groups
   }
 
   .notes a:hover .n-title {
-    color: var(--color-accent-text);
-    text-decoration-color: var(--color-accent-text);
+    color: var(--color-link);
+    text-decoration-color: var(--color-link);
   }
 
   .n-date {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
     white-space: nowrap;

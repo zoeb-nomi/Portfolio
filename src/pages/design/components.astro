@@ -1,0 +1,170 @@
+---
+// /design/components/ (Red Pen 5): the component library, live. Every specimen renders the real component with
+// the real data of a page that uses it (no sample numbers), and names its spec in design/components/.
+// Copy: copy.ts `designComponents`. Linked from /design/.
+import Base from '../../layouts/Base.astro';
+import Masthead from '../../components/Masthead.astro';
+import Section from '../../components/Section.astro';
+import Button from '../../components/Button.astro';
+import StatTiles from '../../components/StatTiles.astro';
+import Dumbbell from '../../components/Dumbbell.astro';
+import UnitChart from '../../components/UnitChart.astro';
+import DataTable from '../../components/DataTable.astro';
+import RecordList from '../../components/RecordList.astro';
+import PullQuote from '../../components/PullQuote.astro';
+import AuditSheet from '../../components/AuditSheet.astro';
+import HarnessPanel from '../../components/HarnessPanel.astro';
+import { meta, designComponents as D, shipping, home, evalsLedger, work } from '../../data/copy';
+import { waveData, flipData } from '../../lib/figureData';
+
+const G = D.groups;
+const waves = waveData();
+const flips = flipData();
+const tableRows = evalsLedger.map((e) => ({
+  label: e.name,
+  cells: [{ text: e.question }, { text: e.table.judge }, { text: e.table.metric }, { text: e.table.sample }, { text: e.table.verdict }],
+}));
+---
+
+<Base title={meta.designComponents.title} description={meta.designComponents.description} path="/design/components/" ogImage="/og/design-components.png" motion>
+  <Masthead kicker={D.kicker} h1={D.h1} standfirst={D.standfirst}>
+    <p class="back"><a href={D.back.href}>← {D.back.label}</a></p>
+  </Masthead>
+
+  <Section mark={G.actions.mark} label={G.actions.label}>
+    <p class="lead">{G.actions.lead}</p>
+    <div class="pair">
+      <div class="spec">
+        <p class="spec-name">{D.onPaper}</p>
+        <div class="row">
+          <Button href="/about/#contact" variant="primary">{D.buttons.primary}</Button>
+          <Button href="/builds/" variant="secondary">{D.buttons.secondary}</Button>
+        </div>
+      </div>
+      <div class="spec surface-ink">
+        <p class="spec-name">{D.onInk}</p>
+        <div class="row">
+          <Button href="/about/#contact" variant="primary">{D.buttons.primary}</Button>
+          <Button href="/builds/#method" variant="inverse">{D.buttons.inverse}</Button>
+        </div>
+      </div>
+    </div>
+    <p class="file">{D.specNote} <code>design/components/Button.md</code></p>
+  </Section>
+
+  <Section mark={G.numbers.mark} label={G.numbers.label}>
+    <p class="lead">{G.numbers.lead}</p>
+    <div class="spec wide"><StatTiles tiles={shipping.tiles} /></div>
+    <p class="file">{D.specNote} <code>design/components/StatTiles.md</code></p>
+  </Section>
+
+  <Section mark={G.figures.mark} label={G.figures.label}>
+    <p class="lead">{G.figures.lead}</p>
+    <div class="spec wide">
+      <Dumbbell rows={waves.rows} max={waves.max} ticks={waves.ticks} fromLabel={waves.fromLabel} toLabel={waves.toLabel} unit={`of ${waves.of}`} />
+    </div>
+    <p class="file">{D.specNote} <code>design/components/Dumbbell.md</code></p>
+    <div class="spec wide">
+      <UnitChart rows={flips.rows} cols={flips.cols} filledMeans="postings where it happened" emptyMeans="postings where it did not" />
+    </div>
+    <p class="file">{D.specNote} <code>design/components/UnitChart.md</code></p>
+  </Section>
+
+  <Section mark={G.record.mark} label={G.record.label}>
+    <p class="lead">{G.record.lead}</p>
+    <div class="spec wide">
+      <RecordList kicker={work.recordKicker} items={work.keka.record.items} note={work.keka.record.note} context={work.keka.company} flush />
+    </div>
+    <p class="file">{D.specNote} <code>design/components/RecordList.md</code></p>
+    <div class="spec wide">
+      <DataTable caption={home.evals.tableCaption} columns={home.evals.tableColumns} rows={tableRows} />
+    </div>
+    <p class="file">{D.specNote} <code>design/components/DataTable.md</code></p>
+  </Section>
+
+  <Section mark={G.voice.mark} label={G.voice.label}>
+    <p class="lead">{G.voice.lead}</p>
+    <div class="spec wide"><PullQuote rule="ink">{home.evals.methodLine}</PullQuote></div>
+    <p class="file">{D.specNote} <code>design/components/PullQuote.md</code></p>
+  </Section>
+
+  <Section mark={G.live.mark} label={G.live.label}>
+    <p class="lead">{G.live.lead}</p>
+    <div class="spec wide surface-ink"><AuditSheet /></div>
+    <p class="file">{D.specNote} <code>design/components/AuditSheet.md</code></p>
+    <div class="spec-bare"><HarnessPanel /></div>
+    <p class="file">{D.specNote} <code>design/components/HarnessPanel.md</code></p>
+  </Section>
+</Base>
+
+<style>
+  .back {
+    margin-top: var(--s-4);
+    font-size: var(--t-small);
+  }
+
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    color: var(--color-link);
+  }
+
+  .lead {
+    max-width: var(--measure);
+    font-size: var(--t-lede);
+    line-height: var(--lh-body);
+    color: var(--color-text-body);
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: var(--s-6);
+    border: var(--line-object);
+  }
+
+  .spec {
+    padding: var(--s-6);
+    background: var(--color-surface);
+  }
+
+  .spec.wide {
+    margin-top: var(--s-6);
+    border: var(--line-hair);
+  }
+
+  .spec-bare {
+    margin-top: var(--s-6);
+  }
+
+  .spec-name {
+    margin-bottom: var(--s-4);
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    color: var(--color-text-muted);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-4);
+  }
+
+  .file {
+    margin-top: var(--s-2);
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 899px) {
+    .pair {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .spec {
+      padding: var(--s-4);
+    }
+  }
+</style>

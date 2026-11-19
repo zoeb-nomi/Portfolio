@@ -7,7 +7,7 @@
    (.repo-cta, .table-intro, ...) overrides any single property regardless of which
    stylesheet loads first. */
 :where(.prose) {
-  font-family: var(--font-body);
+  font-family: var(--font-text);
   font-size: var(--t-body);
   line-height: var(--lh-prose);
   color: var(--color-text-body);
@@ -21,7 +21,7 @@
 /* "Case study → · Repo →": the closing row of links under an essay. */
 .links-line {
   margin-top: var(--s-6);
-  font-family: var(--font-mono);
+  font-family: var(--font-data);
   font-size: var(--t-micro);
 }
 
@@ -30,7 +30,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--hit-min);
-  color: var(--color-accent-text);
+  color: var(--color-link);
   text-decoration: underline;
   text-underline-offset: var(--underline-offset);
 }

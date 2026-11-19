@@ -160,6 +160,10 @@ export const meta = {
     description:
       "544 LegalBench questions through OpenAI's Decisions API. At 90% confidence it was 88% right. Counted, not scored, with the curve and the code.",
   },
+  designComponents: {
+    title: 'The components · Zoeb Nomi',
+    description: 'Every component in the Red Pen design system behind zoebnomi.com, live, with real data.',
+  },
   design: {
     title: 'How this site is built · Zoeb Nomi',
     description: 'The Red Pen design system behind zoebnomi.com: three voices, one pen, two surfaces and five kinds of motion, and why.',
@@ -935,6 +939,27 @@ export const designPage = {
     ],
     checks: 'Checked on every build: tokens, line tiers, required and banned strings, accessibility at four widths, links, Lighthouse and a copy budget for home.',
   },
+  next: { label: 'See every component, live', href: '/design/components/' },
+};
+
+export const designComponents = {
+  kicker: 'Design system',
+  h1: 'The components',
+  standfirst:
+    'Every component on the site, live, with real data from the pages that use it. Each one reads colour roles only, so it works on paper, on the ink surface and in the themes my other projects derive from Red Pen.',
+  back: { label: 'How this site is built', href: '/design/' },
+  specNote: 'Spec:',
+  groups: {
+    actions: { mark: '§1', label: 'Actions', lead: 'Three buttons. Primary is the one action a block wants; the ink surface re-points the roles, so the same markup works there.' },
+    numbers: { mark: '§2', label: 'Numbers', lead: 'A number is a reading: value, what it counts, and where it comes from.' },
+    figures: { mark: '§3', label: 'Figures', lead: 'Ink is the data; red is the series under test or the cell a check failed.' },
+    record: { mark: '§4', label: 'Records and tables', lead: 'Sources stay in mono at the row end, so a claim and its proof read on one line.' },
+    voice: { mark: '§5', label: 'Voice', lead: 'A pull quote is Zoeb speaking at size. It is the only place body copy gets bigger.' },
+    live: { mark: '§6', label: 'Live', lead: 'The two components that run: the audit sheet (on home, with the live audit above it) and the harness panel.' },
+  },
+  buttons: { primary: 'Book a call', secondary: 'See the builds', inverse: 'Read the method' },
+  onPaper: 'On paper',
+  onInk: 'On ink',
 };
 
 // ---------------------------------------------------------------------------
@@ -3073,6 +3098,7 @@ export const llmsTxt = `# Zoeb Nomi
 - About (who he is, and the employment record at #record): https://www.zoebnomi.com/about/
 - Writing (essays; notes, one counted finding each, at #notes): https://www.zoebnomi.com/writing/
 - How this site is built (the Red Pen design system and why): https://www.zoebnomi.com/design/
+- The components (every Red Pen component, live): https://www.zoebnomi.com/design/components/
 `;
 
 // ---------------------------------------------------------------------------
@@ -3086,6 +3112,7 @@ export const ogCards = {
     { id: 'home', title: site.name, sub: home.h1Line2, num: { value: home.readings[0].display + ' min', caption: '10–15 min before · Instead' } },
     { id: 'builds', title: 'Builds', sub: 'What I built, how it is guarded, what it was measured against.', num: { value: String(buildsLedger.length), caption: 'public builds and contributions' } },
     { id: 'about', title: 'About', sub: 'Mechanical engineer turned AI product manager, in Bengaluru.' },
+    { id: 'design-components', title: 'The components', sub: 'Every Red Pen component, live, with real data.' },
     { id: 'design', title: 'How this site is built', sub: 'Red Pen: three voices, one pen, two surfaces, five kinds of motion.' },
     { id: 'crosssource', title: 'CrossSource', sub: 'Open benchmark for legal-RAG citation accuracy.', num: { value: '0.981 → 0.994', caption: 'citation precision · n = 25' } },
     { id: 'mirror-eval', title: 'mirror-eval', sub: 'What AI search says about a person, measured twice.', num: { value: '13 → 63', caption: 'Perplexity · Claude 0 → 0' } },

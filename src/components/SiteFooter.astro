@@ -57,7 +57,7 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
   }
 
   .ftr-name {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-stretch: calc(var(--wdth-head) * 1%);
     font-weight: var(--wght-head);
     font-size: var(--t-h3);
@@ -84,18 +84,18 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-weight: 500;
     font-size: var(--t-small);
     color: var(--color-text);
     text-decoration: underline;
-    text-decoration-color: var(--color-accent-text);
+    text-decoration-color: var(--color-link);
     text-underline-offset: 4px;
   }
 
   .ftr-links a:hover,
   .ftr-meta a:hover {
-    color: var(--color-accent-text);
+    color: var(--color-link);
     text-decoration-thickness: 2px;
   }
 

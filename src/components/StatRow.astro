@@ -44,7 +44,7 @@ const { value, verdict = null, sub = null, label, provenance = null } = Astro.pr
   }
 
   .stat-figure {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-stretch: calc(var(--wdth-head) * 1%);
     font-weight: var(--wght-head);
     font-size: var(--t-stat);
@@ -62,7 +62,7 @@ const { value, verdict = null, sub = null, label, provenance = null } = Astro.pr
   }
 
   .stat-sub {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-quote);
     color: var(--color-text-muted);
     margin-left: var(--s-2);
@@ -70,14 +70,14 @@ const { value, verdict = null, sub = null, label, provenance = null } = Astro.pr
   }
 
   .stat-label {
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-small);
     color: var(--color-text-body);
     line-height: var(--lh-snug);
   }
 
   .provenance {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label-lg);
     color: var(--color-text-muted);
   }

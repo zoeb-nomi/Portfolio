@@ -17,7 +17,7 @@ const { tiles } = Astro.props;
 
 ---
 
-<ul class="tiles" role="list" style={`--n: ${tiles.length}`}>
+<ul class="tiles" role="list" >
   {
     tiles.map((t) => (
       <li class="tile">
@@ -36,20 +36,23 @@ const { tiles } = Astro.props;
   .tiles {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
+    /* Tiles wrap by the room they get, not by viewport, so a big numeral never runs into its neighbour. */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
     gap: var(--s-8);
   }
 
   .tile {
+    container-type: inline-size;
     border-top: var(--line-heavy);
     padding-top: var(--s-3);
   }
 
   .t-num {
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-stretch: calc(var(--wdth-head) * 1%);
     font-weight: var(--wght-head);
-    font-size: var(--t-stat);
+    /* The numeral fits its tile: full size when there is room, smaller in a narrow tile. */
+    font-size: min(var(--t-stat), 30cqi);
     line-height: var(--lh-tight);
     letter-spacing: var(--track-display);
     color: var(--color-text);
@@ -70,14 +73,9 @@ const { tiles } = Astro.props;
 
   .t-src {
     margin-top: var(--s-2);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
-  @media (max-width: 1099px) {
-    .tiles {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
 </style>

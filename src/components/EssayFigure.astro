@@ -50,7 +50,7 @@ const { n, title, source, href, hrefLabel, replay = false } = Astro.props;
     align-items: baseline;
     justify-content: space-between;
     gap: var(--s-1) var(--s-4);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: var(--t-label);
     color: var(--color-text-muted);
     line-height: var(--lh-label);
@@ -79,14 +79,14 @@ const { n, title, source, href, hrefLabel, replay = false } = Astro.props;
 
   .ef-source {
     margin-top: var(--s-5);
-    font-family: var(--font-body);
+    font-family: var(--font-text);
     font-size: var(--t-note);
     line-height: var(--lh-snug);
     color: var(--color-text-muted);
   }
 
   .ef-source a {
-    color: var(--color-accent-text);
+    color: var(--color-link);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
   }

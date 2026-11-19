@@ -19,6 +19,11 @@
   --font-body: 'Archivo', 'Body Fallback', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
   --font-model: 'Source Serif 4', 'Model Fallback', Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', 'Mono Fallback', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* Type roles (the contract, like the colour roles below): components read these, never the faces above, so a
+     derived brand can swap faces. --font-model is Red Pen's own: the model's voice. */
+  --font-heading: var(--font-display);
+  --font-text: var(--font-body);
+  --font-data: var(--font-mono);
 
   /* Archivo's width axis is part of the voice: claims are set wide, reading
      text normal, dense data a touch narrow. Weight carries emphasis. */
@@ -198,6 +203,7 @@
   --color-accent-tint: var(--red-tint);
   --color-on-accent: var(--on-red);
   --color-pending: var(--graphite);
+  --color-link: var(--red-ink);
   /* Check states: what a verdict looks like. Red Pen keeps it to ink, red and graphite. */
   --color-state-pass: var(--ink);
   --color-state-fail: var(--red);
@@ -272,6 +278,7 @@
   --color-accent-tint: color-mix(in oklch, var(--red-glow) 18%, transparent);
   --color-on-accent: var(--surface-ink);
   --color-pending: var(--on-ink-muted);
+  --color-link: var(--red-glow);
   --color-state-pass: var(--on-ink);
   --color-state-fail: var(--red-glow);
   --color-state-warn: var(--on-ink-muted);
