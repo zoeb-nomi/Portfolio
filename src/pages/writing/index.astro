@@ -1,11 +1,11 @@
 ---
-// /writing/ (DESIGN v3 D-11, I-06..I-08; v4: one line per essay, newest note per group, the rest behind a Disclosure): essays lead with their number; notes
+// /writing/ (DESIGN v3 D-11, I-06..I-08): essays lead with their number; notes
 // are grouped by build in compact rows (#notes, absorbing /notes/); the
 // off-topic essay sits on the Other writing shelf (#other).
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
-import Disclosure from '../../components/Disclosure.astro';
+import ReadAlongDemo from '../../components/ReadAlongDemo.astro';
 import {
   meta,
   notesPage,
@@ -28,14 +28,14 @@ const essays = [
   { slug: 'the-judge-caught-a-bug', e: writingJudgeBug, audio: writingJudgeBugAudio.duration },
   { slug: 'two-levers-that-did-not-move', e: writingTwoLevers, audio: writingTwoLevers.audio?.duration },
   { slug: 'eval-harness-at-my-own-reflection', e: writingReflection, audio: writingReflection.audio?.duration },
-].map(({ slug, e, audio }) => ({ slug, href: `/writing/${slug}/`, title: e.title, kicker: e.kicker, dek: W.lines[slug] ?? e.dek, date: e.date, readingTime: e.readingTime, audio, num: W.numbers[slug] }));
+].map(({ slug, e, audio }) => ({ slug, href: `/writing/${slug}/`, title: e.title, kicker: e.kicker, dek: e.dek, date: e.date, readingTime: e.readingTime, audio, num: W.numbers[slug] }));
 
 const other = [{ slug: 'the-bus-stop-nobody-notices', e: writingBusStop, audio: writingBusStop.audio?.duration }].map(({ slug, e, audio }) => ({
   slug,
   href: `/writing/${slug}/`,
   title: e.title,
   kicker: e.kicker,
-  dek: W.lines[slug] ?? e.dek,
+  dek: e.dek,
   date: e.date,
   readingTime: e.readingTime,
   audio,
@@ -52,6 +52,7 @@ const groups = notesPage.groups
   <Masthead kicker={W.kicker} h1={W.h1} standfirst={W.lead} h1Max="22ch" standfirstMax="60ch" />
 
   <Section mark={W.essaysLabel.mark} label={W.essaysLabel.label} anchorId={W.essaysLabel.anchorId}>
+    <ReadAlongDemo />
     <ol class="essays" role="list">
       {
         essays.map((p) => (
@@ -85,7 +86,7 @@ const groups = notesPage.groups
             {g.label} <span>{g.notes.length} {g.notes.length === 1 ? 'note' : 'notes'}</span>
           </h3>
           <ul class="notes" role="list">
-            {g.notes.slice(0, 1).map((n) => (
+            {g.notes.map((n) => (
               <li>
                 <a href={`/notes/${n.slug}/`}>
                   <span class="n-title">{n.title}</span>
@@ -94,20 +95,6 @@ const groups = notesPage.groups
               </li>
             ))}
           </ul>
-          {g.notes.length > 1 && (
-            <Disclosure label={W.moreNotes(g.notes.length - 1)}>
-              <ul class="notes" role="list">
-                {g.notes.slice(1).map((n) => (
-                  <li>
-                    <a href={`/notes/${n.slug}/`}>
-                      <span class="n-title">{n.title}</span>
-                      <time class="n-date" datetime={n.date}>{formatDate(n.date)}</time>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </Disclosure>
-          )}
         </div>
       ))
     }

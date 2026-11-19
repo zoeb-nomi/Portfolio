@@ -2894,21 +2894,13 @@ export const notesPage = {
 export const writingIndex = {
   kicker: 'Writing',
   h1: 'Writing',
-  lead: 'Essays on AI systems that have to be right, each with its data and code.',
-  /** v4: one line per essay on the index (the full dek stays on the essay and in llms.txt). */
-  lines: {
-    'decisions-api-legal-quiz': 'Is there a confidence score above which you can stop checking? Not in this data.',
-    'nobody-reports-the-misses': "How I'd count false passes in six kinds of regulated work.",
-    'the-judge-caught-a-bug': 'A 15/15 judge and a broken instrument in the same pipeline.',
-    'two-levers-that-did-not-move': 'Employer names and links did not move the score. The screener did.',
-    'eval-harness-at-my-own-reflection': 'What four AI search engines say about me, counted twice.',
-    'the-bus-stop-nobody-notices': 'A fifty-year moat in Indian buses, and a ₹50,000 test of whether I understand it.',
-  } as Record<string, string>,
-  moreNotes: (n: number) => `${n} more ${n === 1 ? 'note' : 'notes'}`,
+  lead:
+    'Essays on building AI systems that have to be right: when a step can run without a person, how to count the misses, and what a confidence score is worth. Each one comes with its data and code.',
   listenLabel: 'Listen, and read along',
   essaysLabel: { mark: '§1', label: 'Essays', anchorId: 'essays' },
   notesLabel: { mark: '§2', label: 'Notes', anchorId: 'notes' },
-  notesLead: 'One counted finding per note, with its denominator and source file.',
+  notesLead:
+    'One counted finding per note, with its denominator, its figure and the file the numbers come from. The short version of what I post on LinkedIn and X.',
   otherLabel: { mark: '§3', label: 'Other writing', anchorId: 'other' },
   otherNote: 'Off the AI topic, written so it can be wrong.',
   moreWriting: 'More writing →',

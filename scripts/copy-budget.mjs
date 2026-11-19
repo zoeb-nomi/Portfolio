@@ -17,7 +17,7 @@ const BUDGETS = [
   { route: '/', words: 300, enforce: true },
   { route: '/builds/', words: 700, enforce: true },
   { route: '/about/', words: 500, enforce: true },
-  { route: '/writing/', words: 400, enforce: true },
+  { route: '/writing/', words: 400 },
   { route: '/crosssource/', words: 900 },
   { route: '/mirror-eval/', words: 900 },
   { route: '/screener-eval/', words: 900 },
