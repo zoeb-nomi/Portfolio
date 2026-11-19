@@ -45,6 +45,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
 
 <div
   class="audio-player"
+  id="listen"
   data-audio-player
   data-storage-key={storageKey}
   data-article={articleId}
@@ -1067,14 +1068,7 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     scroll-snap-align: start;
   }
 
-  @media (min-width: 600px) {
-    .audio-chapters {
-      flex-wrap: wrap;
-      overflow-x: visible;
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-  }
+  /* Red Pen 5: chapters are one quiet row at every width, not a wall of boxes. */
 
   .audio-chip {
     display: inline-flex;
@@ -1084,22 +1078,19 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     font-size: var(--t-micro);
     color: var(--ink-muted);
     background: transparent;
-    border: var(--line-object-muted);
-    border-radius: var(--radius);
-    padding: var(--s-1) var(--s-3);
+    border: 0;
+    padding: var(--s-1) var(--s-2);
     white-space: nowrap;
     cursor: pointer;
   }
 
   @media (hover: hover) {
     .audio-chip:hover {
-      border-color: var(--rule-strong);
-      color: var(--ink);
+      color: var(--red-ink);
     }
   }
 
   .audio-chip[aria-current='true'] {
-    border-color: var(--rule-strong);
     color: var(--ink);
     font-weight: 500;
     text-decoration: underline;

@@ -3014,6 +3014,7 @@ export const writingIndex = {
     'Essays on building AI systems that have to be right: when a step can run without a person, how to count the misses, and what a confidence score is worth. Each one comes with its data and code.',
   listenLabel: 'Listen, and read along',
   essaysLabel: { mark: '§1', label: 'Essays', anchorId: 'essays' },
+  listen: 'Listen',
   notesLabel: { mark: '§2', label: 'Notes', anchorId: 'notes' },
   notesLead:
     'One counted finding per note, with its denominator, its figure and the file the numbers come from. The short version of what I post on LinkedIn and X.',

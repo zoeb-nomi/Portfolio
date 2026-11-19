@@ -5,7 +5,6 @@
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
-import ReadAlongDemo from '../../components/ReadAlongDemo.astro';
 import {
   meta,
   notesPage,
@@ -52,7 +51,6 @@ const groups = notesPage.groups
   <Masthead kicker={W.kicker} h1={W.h1} standfirst={W.lead} h1Max="22ch" standfirstMax="60ch" />
 
   <Section mark={W.essaysLabel.mark} label={W.essaysLabel.label} anchorId={W.essaysLabel.anchorId}>
-    <ReadAlongDemo />
     <ol class="essays" role="list">
       {
         essays.map((p) => (
@@ -67,7 +65,13 @@ const groups = notesPage.groups
                 <a class="e-title" href={p.href} aria-describedby={`d-${p.slug}`}>{p.title}</a>
                 <span class="e-dek" id={`d-${p.slug}`}>{p.dek}</span>
                 <span class="e-meta">
-                  <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read{p.audio ? ` · ${formatClock(p.audio)} audio` : ''}
+                  <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read
+                  {p.audio && (
+                    <a class="e-listen" href={`${p.href}#listen`} aria-label={`${W.listen} ${p.title}, ${formatClock(p.audio)}`}>
+                      <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="M4 2.5v11l10-5.5z" fill="currentColor" /></svg>
+                      {W.listen} {formatClock(p.audio)}
+                    </a>
+                  )}
                 </span>
               </span>
             </div>
@@ -244,7 +248,26 @@ const groups = notesPage.groups
     }
   }
 
+  .e-listen {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    min-height: var(--hit-touch);
+    margin-left: var(--s-3);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .e-listen:hover {
+    text-decoration-thickness: 2px;
+  }
+
   .e-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--s-1);
     margin-top: var(--s-3);
     font-family: var(--font-mono);
     font-size: var(--t-label);
