@@ -172,7 +172,7 @@ a {
    this rule outranks Astro's scoped component rules (.class[data-astro-cid])
    without !important. Anchors that are not text links are excluded by class. */
 main a:hover:not(.rp-button):not(.facade):not(.watch-facade):not(.skip-link):not(.cta-slab a):not(.post-list a):not([class*='card']):not(.audio-chip):not(.evals-switch a) {
-  color: var(--red);
+  color: var(--red-ink);
   text-decoration-thickness: 2px;
 }
 
@@ -256,8 +256,6 @@ h1, h2 {
   color: var(--red-ink);
   font-family: var(--font-mono);
   font-size: var(--t-label);
-  letter-spacing: var(--track-caps);
-  text-transform: uppercase;
   padding: var(--s-3) var(--s-5);
   border: var(--line-object);
   z-index: var(--z-top);

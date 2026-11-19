@@ -230,7 +230,8 @@ export async function mark(host: HTMLElement, target: Element, kind: MarkKind, o
   const boxes = boxesOf(target, host);
   if (!boxes.length) return;
   const seed = hash((opts.key ?? '') + kind + (target.textContent ?? ''));
-  const list = kind === 'tick' || kind === 'caret' || kind === 'cross' ? [kind === 'tick' ? boxes[0] : boxes[boxes.length - 1]] : boxes;
+  // One mark per line for strike and circle; underline, caret and cross take the last line, a tick the first.
+  const list = kind === 'tick' ? [boxes[0]] : kind === 'underline' || kind === 'caret' || kind === 'cross' ? [boxes[boxes.length - 1]] : boxes;
   for (let i = 0; i < list.length; i++) {
     await stroke(svg, markPath(kind, list[i], seed + i), { ...opts, delay: i === 0 ? opts.delay : 0 });
   }

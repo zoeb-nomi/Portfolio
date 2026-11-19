@@ -69,9 +69,9 @@ for (const el of document.querySelectorAll<HTMLElement>('[data-pen]')) {
   let done = false;
   const start = () => {
     done = true;
-    draw(el, motion() && !still);
+    draw(el, !still);
   };
-  if (still || !motion()) start();
+  if (still) start();
   else inView(el, start);
   new ResizeObserver(() => done && redraw(el)).observe(el);
 }

@@ -4,7 +4,7 @@
    imports this file; nothing else declares a token, and no other file may
    contain a raw palette hex (scripts/design-check.mjs fails the build).
    Rules for using these values: design/README.md.
-   Tokens only. No selectors beyond :root. Components own their own CSS.
+   Tokens only. No selectors beyond :root and the .surface-ink mode. Components own their own CSS.
 
    Red Pen 5 starts from what an editor's red pen does: it catches. The site is
    a live audit, so the system has three voices and one actor:
@@ -218,6 +218,30 @@
   --heat-2: color-mix(in oklch, var(--ink) 52%, var(--paper));
   --heat-3: color-mix(in oklch, var(--ink) 74%, var(--paper));
   --heat-4: var(--ink);
+}
+
+/* The ink surface is a mode, not a palette: inside .surface-ink the paper and
+   ink roles swap and the pen glows, so every component that reads roles works
+   on it unchanged (the one selector besides :root this file may hold). */
+.surface-ink {
+  --paper: var(--surface-ink);
+  --paper-raised: var(--surface-ink-raised);
+  --paper-sunk: var(--surface-ink);
+  --ink: var(--on-ink);
+  --ink-body: var(--on-ink-body);
+  --ink-muted: var(--on-ink-muted);
+  --rule: var(--rule-on-ink);
+  --rule-strong: var(--on-ink);
+  --red: var(--red-glow);
+  --red-ink: var(--red-glow);
+  --on-red: var(--surface-ink);
+  --grid-ink: transparent;
+  --line-hair: 1px solid var(--rule-on-ink);
+  --line-ink: 1px solid var(--on-ink);
+  --line-heavy: 2px solid var(--on-ink);
+  --line-pen: 2px solid var(--red-glow);
+  --line-object: 1px solid var(--on-ink);
+  --line-object-muted: 1px solid var(--rule-on-ink);
 }
 
 /* Breakpoints: 599 / 899 / 1099 only (custom properties cannot be used in

@@ -10,7 +10,7 @@ const links = [cta.bookACall, cta.email, cta.linkedin, cta.github];
 const roleLine = site.footerLine.replace(`${site.name} · `, '');
 ---
 
-<footer class="site-footer">
+<footer class="site-footer surface-ink bleed">
   <div class="footer-inner grid-margin">
     <div class="margin-col" aria-hidden="true"></div>
     <div class="body-col">
@@ -48,8 +48,15 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
     --body-pad-end: var(--s-11);
   }
 
+  footer.surface-ink {
+    margin-top: 0;
+    padding-block: var(--s-9) var(--s-6);
+  }
+
   .ftr-name {
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h3);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
@@ -74,10 +81,9 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--t-small);
     color: var(--ink);
     text-decoration: underline;
     text-decoration-color: var(--red-ink);
@@ -86,7 +92,7 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
 
   .ftr-links a:hover,
   .ftr-meta a:hover {
-    color: var(--red);
+    color: var(--red-ink);
     text-decoration-thickness: 2px;
   }
 

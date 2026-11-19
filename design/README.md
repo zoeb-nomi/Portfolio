@@ -1,201 +1,198 @@
-# zoebnomi.com design system: The Red Pen v4
+# zoebnomi.com design system: Red Pen 5, "Live Ink"
 
 This is the one place the design system lives. `design/tokens.css` holds every value;
 this page holds the rules; `design/components/` has one page per component;
-`design/mocks/` keeps the approved mocks and the dated before/after shots. hq and Notion
-point here and copy nothing. v3 is Hybrid 1 (12 Nov 2026): Take A's bones (DESIGN_V3
-D-01 to D-18, I-01 to I-10), Take B's story (Fig. 0, readings, back-references), and a
-motion layer on top. v4 (19 Nov 2026) is "Red Pen, edited": the same paper, ink and pen with the
-volume and the stock tropes taken out (one claim per screen, copy budgets the build enforces, a
-semantic token layer for side-project themes, Source Serif 4 Display). The review behind it:
-`design/mocks/2026-11-19-v4/`.
+`design/mocks/` keeps dated before/after shots. hq and Notion point here and copy nothing.
+
+**History.** v3 (12 Nov 2026) was the editorial Red Pen: paper, ink, a red pen as a colour.
+v4 (19 Nov 2026) cut its volume and was rejected: it edited the page but did not evolve the
+system. **Red Pen 5** (19 Nov 2026) starts again from first principles. It keeps the seed
+(paper, ink, one red) and changes what the pen *is*: not a colour, an actor.
+
+## 0. First principles
+
+The site has one job: show, inside ten seconds, that Zoeb catches the failures other people
+ship. Everything below follows from three facts about him.
+
+1. **His subject is the quiet failure.** LLM output reads fine until something checks it.
+   So the site does not describe checking; it performs it. The home page is a live audit.
+2. **There are always three parties.** Zoeb (who decides), the model (whose output is on
+   trial) and the check (which reads the output). The type system gives each its own voice.
+3. **The pen is the only actor.** An editor's red pen moves only when it catches something.
+   On this site red is the only thing that moves on its own, and it moves only to mark.
 
 ## 1. Principles
 
-1. **Paper, ink, one red.** Red is the editor's pen. It marks only what an editor marks:
-   verdicts (`[judged]`, a ✓), § and Fig. numbers, links and the one action. Never a
-   heading, body text or a numeral.
-2. **A ledger, not a brochure.** Records open and close the same way (booktabs). Rules
-   run horizontally. Boxes go only around objects (buttons, diagram nodes, the memo in
-   Fig. 0, the audio player), never around text.
-3. **Every number is a reading.** Value, datum (what it is measured from), change, n and
-   source. Hollow = before, filled = after.
-4. **The page tells one argument.** Home is Fig. 0 expanded: each section says which step
-   of Fig. 0 it proves ("Fig. 0, step n"), ends with a "Next:" line, and the page closes on
-   "Back to Fig. 0".
-5. **Motion explains, then gets out of the way.** The HTML is the final state. Motion
-   never hides content from someone who has no script, a slow script or reduced motion.
-6. **One screen, one claim (v4).** A section is a heading that is the claim, one proof and
-   one link. Method, caveats, legends and full tables go one tap deeper, in a Disclosure.
-7. **The page never names its own parts (v4).** No "Fig. 0, step n", no "Next:" lines, no
-   captions that explain what a section is for. Figure numbers live inside a figure.
-8. **Mono is for numbers and labels (v4).** Never a sentence over 16 words; red text never
-   runs past 8 words. `npm run budget` checks both.
+1. **Three voices, one actor.** Zoeb speaks in Archivo, the model in Source Serif 4, the
+   check in IBM Plex Mono. The pen (red) acts on all three. Never set a voice in another's face.
+2. **The pen marks; it never decorates.** Every red stroke is a proofreader's mark with a
+   meaning: tick (checked, fine), strike + caret (wrong, corrected), circle (wrong,
+   flagged), underline (stress), box (scoped). No red fills behind text, no red headings.
+3. **Show the check, not the claim about it.** Prefer a live artifact (an answer being
+   marked, a sheet of outputs) over a sentence saying what was measured.
+4. **Every number is a reading.** Value, datum, change, n and source.
+5. **Two surfaces.** Paper is where output lives. Ink is where checks run: the proof, the
+   call to action and the footer. The ink surface is a token mode, not a second palette.
+6. **The final state is in the HTML.** Motion starts from it and returns to it; no script,
+   slow script or reduced motion loses nothing.
+7. **Your words stay whole.** Long text is not cut; it moves to the page that holds it
+   (Builds, About, the case studies). Home carries one claim per screen.
+8. **The page never names its own parts.** No "Fig. 0, step n", no "Next:" lines.
 
-## 2. Colour tokens (meaning, not just value)
-
-Values live only in `design/tokens.css`; this table says what each colour means.
+## 2. Colour (meaning, not just value)
 
 | token | means | never |
 |---|---|---|
-| `--paper` | the page | |
-| `--paper-raised` | an object's fill (the memo in Fig. 0, code) | a card around text |
-| `--ink` | headings, numerals, Ink and Heavy rules | |
-| `--ink-body` | running text | |
-| `--ink-muted` | labels, captions, sources | body copy |
-| `--rule` | Hair rules, empty tracks | text |
-| `--red` / `--red-ink` | the pen: action, verdict, § and Fig. marks, links (`--red-ink` for text) | headings, numerals, lateness |
-| `--red-tint` | highlight behind a sentence; a lit step in a figure | |
-| `--grid-ink` | the drafting grid, behind the hero and the Builds ledger only | site-wide texture |
-| `--heat-0..4` | the contribution heatmap only | |
+| `--paper`, `--paper-raised`, `--paper-sunk` | the page; an object on it (the audit sheet, a card you can press) | a box around text |
+| `--ink`, `--ink-body`, `--ink-muted` | Zoeb's voice: headings, numerals / running text / labels and sources | |
+| `--rule` | hair rules, empty cells | text |
+| `--graphite` | the pencil: what is only proposed or pending (a passed check's leader line, a pending status) | a verdict |
+| `--red` | the pen's stroke: marks, the scroll thread, failed cells | text on paper (3.9:1) |
+| `--red-ink` | red text on paper (AA 4.5:1): verdicts, links, the primary button | headings, body |
+| `--red-glow` | the pen on the ink surface | paper |
+| `--surface-ink` + `--on-ink*` | the ink surface | paper sections |
 
-No dark mode in v3 (D-18). No green, blue or amber; state is never colour alone.
+**The ink surface is a mode.** `.surface-ink` (declared in `tokens.css`) swaps the paper
+and ink roles and turns the pen to `--red-glow`, so any component that reads roles works on
+it unchanged. Pair it with `.bleed` to run a section edge to edge.
 
-**Semantic roles (v4).** New code reads the roles, not the primitives: `--color-surface`,
-`--color-surface-raised`, `--color-text`, `--color-text-body`, `--color-text-muted`,
-`--color-line`, `--color-accent`, `--color-accent-text`, `--color-accent-tint`,
-`--color-on-accent`. A side-project theme overrides the primitives under the roles and keeps
-every rule on this page. The DTCG JSON port (generated `tokens.css`) is the next release.
+**Semantic roles** (`--color-surface`, `-text`, `-accent`, `-pending` and the rest) are what
+a side-project theme overrides; the primitives above sit under them.
 
-## 3. The four line tiers (horizontals only)
+## 3. Lines
 
-| tier | token | spec | use | never |
-|---|---|---|---|---|
-| Hair | `--line-hair` | 1px rule | rows inside a block | block boundaries |
-| Ink | `--line-ink` | 1px ink | block boundaries: header, section, table head | rows |
-| Heavy | `--line-heavy` | 2px ink | opens and closes a table, ledger or list of record; the top bar of a tile, step, figure | sections |
-| Pen | `--line-pen` | 2px red | margin note, pull quote, the stamp | anything structural |
+Four tiers, horizontals only: Hair (`--line-hair`, rows), Ink (`--line-ink`, block
+boundaries), Heavy (`--line-heavy`, opens and closes a record), Pen (`--line-pen`, a margin
+note or a stamp). Objects use `--line-object`. Every hand-drawn mark comes from `pen.ts`,
+never from a border.
 
-Objects use `--line-object` (1px ink box), `--line-object-muted` and `--line-propose`
-(1px dashed: "proposes only" in a diagram). One rule per boundary: a Heavy rule that
-closes a ledger replaces the Hair under its last row. The one exception is the H1
-underline under "quietly." (0.03em, the pen at display scale). `lint-source` rejects raw
-border widths and vertical structural rules outside figure and object components.
+**Objects cast a hard shadow.** An object you can act on (the audit sheet, a button on
+hover) sits on the desk with a hard, unblurred offset shadow in ink. Nothing else has a
+shadow, and no shadow is ever blurred.
 
-## 4. Type
+## 4. Type: three voices
 
-Source Serif 4 Display (display, a static opsz 60 instance; replaced Instrument Serif in v4), IBM Plex Sans (body), IBM Plex Mono (labels and data). Weights
-400/500 only, self-hosted. Floor 12px everywhere.
-
-| role | token | 390 → 1440 | face |
+| voice | face | axes | used for |
 |---|---|---|---|
-| home H1 | `--t-display` | 50 → 106 | serif, -0.025em |
-| home lede (v4) | `--t-lede` | 22 → 32 | sans, not italic |
-| page H1 | `--t-page` | 42 → 74 | serif |
-| tile numeral | `--t-stat` | 56 → 84 | serif |
-| H2 | `--t-h2` | 30 → 46 | serif |
-| ledger numeral | `--t-num` | 30 → 38 | serif |
-| H3 / row name | `--t-h3` | 24 → 30 | serif |
-| quote / CTA | `--t-quote` / `--t-slab` | 22–28 / 28–40 | serif |
-| body | `--t-body` | 16 → 17.5 | sans |
-| small | `--t-small` | 15 | sans |
-| data | `--t-data` | 13 | mono |
-| nav, buttons | `--t-nav` | 12.5 | mono caps .12em |
-| label, caption | `--t-label` | 12 | mono caps .12em |
+| Zoeb | Archivo (variable) | weight 100 to 900, width 62 to 125% | claims, headings, body, interface |
+| Model | Source Serif 4 (variable) | weight, optical size | model output on a sheet; case names and quoted record in italic |
+| Check | IBM Plex Mono 400/500 | | verdicts, harness and check names, data, sources |
 
-v4 names seven type roles for new code (`--type-display`, `-page`, `-h2`, `-h3`, `-body`,
-`-small`, `-label`); the sizes above stay valid as aliases. No italic display line anywhere.
+Archivo's two axes are part of the voice, set by tokens: claims are wide and heavy
+(`--wdth-claim` 112, `--wght-claim` 820), headings a little wide (`--wdth-head` 106,
+`--wght-head` 720), mega numerals narrow (`--wdth-tight` 88). `--wght-quiet` (250) is the
+one light weight: it sets the word "quietly" in the home claim, which the motion layer
+fades from heavy to quiet.
 
-Numbers inside sentences are sans 500 with tabular figures; mono is for data cells, labels
-and sources only.
+| role | token | 390 → 1440 |
+|---|---|---|
+| mega numeral (ink surface) | `--t-mega` | 88 → 232 |
+| home claim | `--t-display` | 56 → 140 |
+| page H1 (long titles step down) | `--t-page` | 44 → 92 |
+| H2 | `--t-h2` | 32 → 62 |
+| reading numeral | `--t-stat` | 56 → 96 |
+| row name | `--t-num` | 34 → 48 |
+| H3 / section label | `--t-h3` | 21 → 27 |
+| lede | `--t-lede` | 20 → 26 |
+| model output | `--t-model` | 18 → 21 |
+| body | `--t-body` | 16 → 17.5 |
+| label, mono | `--t-label` | 12 |
+
+**Mono is never uppercase** and never tracked; caps labels are a stock trope (Krebs's slop
+list). No italic in Archivo (none ships); italic means the model or the record, in serif.
+All three families ship unmodified from Fontsource with their OFL licences
+(`public/fonts/OFL-*.txt`).
 
 ## 5. Space and grid
 
-4px scale `--s-1`…`--s-13`. Shell 1200px, no side edges. Margin column 240px (200 at
-≤1099), gutters 44/28/20, body inset 40. Breakpoints 599 / 899 / 1099 only. Sections pad
-40px on desktop; on phones the margin column is a bare "§n LABEL" with no rule under it.
-Prose stops at 60ch; ledgers, tables and tiles use the full body width. Tables stack into
-label/value rows at ≤599px instead of scrolling (D-14).
+4px scale `--s-1` to `--s-15` (136 and 184 are new for section rhythm). Shell 1320px;
+`.bleed` sections run to the viewport edge with their content kept on the shell. Margin
+column 240px (200 at ≤1099), gutters 48/28/20. Breakpoints 599 / 899 / 1099 only.
+Asymmetry is the default on home: 4 + 8 columns, never three equal tiles in a row except
+the readings.
 
 ## 6. Figure grammar
 
-- A figure opens with a Heavy rule and a caption: **Fig. n** (or **Table n.**) in red-ink
-  mono caps, then the title in mono. Source line under it, in words.
-- Hollow square = before (datum). Filled square = after (value). A 2px ink line joins them.
-- A zoomed axis says "axis zoomed". A range datum is a light band.
-- Agreement is drawn as ink bars; the only red is the verdict tag at the row end.
-- Dashed node = proposes only; solid node = decides.
-- Figures are HTML and hairlines (labels stay ≥12px). SVG only for marks and icons.
+Unchanged from v3: a figure opens with a Heavy rule and its caption; hollow = before,
+filled = after; dashed node = proposes, solid = decides; HTML and hairlines, SVG only for
+marks.
 
-## 7. Motion
+## 7. The pen: marks
 
-**Library: anime.js v4** (MIT), modular imports only (`animejs/animation`, `/timeline`,
-`/utils`). Chosen over Motion (motion.dev, about 23 KB gzipped for `animate` + `inView`
-with JS-value tweens) and GSAP 3 + ScrollTrigger (about 45 KB): anime's documented API
-covers DOM, SVG stroke and plain-object count-ups plus timelines at about 15 KB gzipped
-(17.2 KB with our layer, `src/scripts/motion.ts`). Loaded only by pages that render
-`<Motion />` (Base `motion` prop): home, /builds/, the three case studies, /writing/.
+`src/scripts/pen.ts` draws every mark. Marks are generated from the target's box with a
+seeded wobble: the same on every load and resize, but no two alike. Each is an SVG path in
+one `svg.pen-layer` over its host, `aria-hidden`.
+
+| mark | proofreading meaning | used for |
+|---|---|---|
+| tick | checked, fine | a claim that passed |
+| strike + caret | delete, insert | a wrong fact and its correction |
+| circle | query: this is wrong | an invented citation; a build name on hover |
+| underline | stress | the claim's key word; a page title; a reading |
+| box | scope | a verb (Trace) |
+| leader | see the margin | from a mark to its verdict |
+
+Any element can ask for a mark without a component: `data-pen="underline"` (drawn when it
+scrolls into view), `data-pen-on="hover"` (drawn on pointer or focus), `data-pen-delay`,
+`data-pen-heavy`, `data-pen-target` (mark a child, host on the parent). `pen-scroll.ts`
+runs on every page from Base.
+
+## 8. Motion: five verbs
+
+Nothing moves unless it is one of these. Durations and curves are tokens.
+
+| verb | what moves | token | where |
+|---|---|---|---|
+| **stream** | the model writes, token by token, with a caret | `--dur-char` | the live audit |
+| **mark** | the pen draws (stroke-dashoffset only; duration scales with length) | `--dur-mark`, `--ease-pen` | every mark |
+| **stamp** | a verdict lands: a small overshoot from 86% | `--dur-stamp`, `--ease-stamp` | margin verdicts, the insert, the tally |
+| **tally** | a count settles from zero to its HTML value | `--dur-tally` | the mega numeral, readings |
+| **reveal** | a block enters, or the audit sheet's scan line sweeps | `--dur-slow`, `--ease-draw` | Fig. 0, ledger rows |
+
+Plus two ambient pieces, both CSS only: the **red thread** (scroll progress down the left
+edge, `animation-timeline: scroll()`) and **go-quiet** (the claim's last word fades from
+`--wght-claim` to `--wght-quiet` once on load).
 
 Rules:
-1. The final state is in the HTML. Pre-reveal states live in `src/styles/motion.css` under
-   `.motion`, which the head script sets only when JS runs, IntersectionObserver exists
-   and reduced motion is off, and removes again if the module has not booted in 4 s.
-2. The H1 text never animates. Only its underline draws.
-3. No layout shift: transforms, clip-path wipes, stroke offsets and opacity only.
-   Numbers never tween: a numeral always shows its final value (no intermediate, wrong
-   values on screen); only lines, bars and marks animate.
-4. Text is revealed with clip-path wipes, not fades, where it is above the fold (Fig. 0), so
-   no frame ever renders text at a failing contrast.
-5. Durations: fast 120, base 200, slow 600 (line draws), Fig. 0 story 3.2 s.
+1. The final state is in the HTML; pre-states live under `.motion` (home) or are drawn by
+   the script itself (marks). Reduced motion: every mark renders final at once, tallies do
+   not run, the thread is hidden.
+2. Only transforms, opacity, clip-path, stroke offsets and font-weight animate. No layout
+   shift (CLS stays under 0.03).
+3. A tally's element always holds the final number; the count-up only rewrites it while it
+   runs.
+4. The live audit replays only when asked ("Run it again").
 
 | element | motion | trigger |
 |---|---|---|
-| Fig. 0 (v4: flat sheet, no tilt, no shadow, no Replay) | one red scan line sweeps the sheet (1.1 s), failed squares turn red, the proof line wipes in | load |
-| H1 underline | draws left to right | load |
-| Readings | the dimension line draws from the datum; the numeral is final from the start (numbers never tween) | 50% in view |
-| Ledger rows | settle 10px, 70 ms apart; click, tap or Enter opens the panel (native details) and draws its figure | in view / click |
-| TradeFrame path | lights propose → validate → confirm → execute and record, then clears; Replay | 60% in view |
-| Case-study Fig. 1, Fig. 2 | bars and dumbbells draw | 60% in view |
-| Section ticks | the red tick grows on the top rule | in view (CSS scroll-driven on pages without the library) |
-| Pages | native cross-document view transitions; header holds still; eval switcher marker slides | navigation |
-
-## 8. Component catalogue
-
-One page each in `design/components/` (props, variants, pages, screenshot). New in v4:
-**Disclosure** (depth one tap away). Changed in v4: Readings (`compact`), BuildsLedger
-(`homeLine` on compact rows), TimelineEntry (`lead`, `moreLabel`), AuditSheet (flat). New in v3:
-**Fig0, Readings, BuildsLedger (full / compact / feature), TradeFrameFlow (full / strip),
-MiniFigure, StatTiles, Motion, Moved**. Changed: SiteHeader, SiteFooter, Section,
-Masthead (breadcrumb, case-study fold), CTASlab, Headshot, DataTable (booktabs, stacking),
-TimelineEntry, PullQuote, EvalsSwitcher, PlayerStepper, ReadAlongDemo, RecordList.
-Unchanged figure and media components: AudioPlayer, BarList, Button, CareerTimeline,
-ContributionGraph, Dumbbell, EssayFigure, EvidenceStack, FailureOwners, ForestPlot,
-MarginNote, OwnershipGap, ParserCompare, StatRow, UnitChart, VideoEmbed. Removed in v3:
-MobileNav, HarnessLedger, ProofStrip, EmbedCard, EssayThumb, Figure, employer logos.
-
-| | | |
-|---|---|---|
-| ![Fig0](mocks/2026-11-12-v3/components/Fig0.jpg) Fig0 | ![Readings](mocks/2026-11-12-v3/components/Readings.jpg) Readings | ![BuildsLedger](mocks/2026-11-12-v3/components/BuildsLedger-compact.jpg) BuildsLedger |
-| ![TradeFrameFlow](mocks/2026-11-12-v3/components/TradeFrameFlow.jpg) TradeFrameFlow | ![MiniFigure](mocks/2026-11-12-v3/components/MiniFigure.jpg) MiniFigure | ![StatTiles](mocks/2026-11-12-v3/components/StatTiles.jpg) StatTiles |
-| ![SiteHeader](mocks/2026-11-12-v3/components/SiteHeader.jpg) SiteHeader | ![Section](mocks/2026-11-12-v3/components/Section.jpg) Section | ![CTASlab](mocks/2026-11-12-v3/components/CTASlab.jpg) CTASlab |
+| Home claim | "quietly" goes quiet, then the pen underlines it | load |
+| Live audit | stream, then per claim: mark, leader, stamp; then the tally stamps | fonts ready |
+| Proof numeral | tally to 86 | in view |
+| Fig. 0 audit sheet | the scan line sweeps (1.6 s), failed squares turn red | 35% in view |
+| Readings | the pen underlines each numeral; numerals tally | in view |
+| Build rows | the pen circles the name | hover, focus |
+| Page titles | the pen underlines the last line | load |
+| Scroll | the red thread grows down the left edge | scroll |
 
 ## 9. Do and don't
 
 | do | don't |
 |---|---|
+| Let the pen catch something real | Draw a red line for decoration |
+| Give the model's words the serif and the check's words mono | Set a quote, a claim and a verdict in the same face |
 | Put a number next to its datum, n and source | Leave a headline number alone |
-| Close every record with a Heavy rule | Draw a vertical rule or a box around text |
-| Use red for a verdict, a § mark or the action | Colour lateness, headings or numerals red |
-| Stack a table into label/value rows on phones | Make a phone reader scroll sideways |
+| Use the ink surface for proof and the call to action | Make a whole page dark |
+| Keep Zoeb's long text on its own page | Cut his copy to fit a budget |
 | Write copy in `src/data/copy.ts` | Type a string into an `.astro` file |
 | Use a colon or comma | Use an em dash (the geo-gate fails the build) |
-| Reveal with a wipe or a draw, from the final state | Hide content until a script runs |
-| One portrait, greyscale, multiplied into the paper | Frames, shadows, employer logos |
-| Put method and caveats in a Disclosure | Explain a section in a caption above it |
-| Let the heading be the claim | Write a mono caption, then a heading, then body, then a footnote |
+| Keep red text in `--red-ink` | Set body-size text in `--red` (3.9:1) |
+| Sentence case everywhere | Uppercase mono labels |
 
-### 9a. Copy budgets (v4)
+### 9a. Copy budgets
 
-Rendered words in `<main>`, closed Disclosures not counted. Enforced by `npm run budget`.
-
-| page | budget | v3 | v4 |
-|---|---|---|---|
-| Home | 300 | 1,450 | 291 |
-| Builds | 700 | 1,355 | 699 |
-| About | 500 | 1,156 | 497 |
-| Writing | 400 | 835 | 396 |
-| Case studies | 900 | 1,140 to 1,780 | report only until the narration is rebuilt |
-| Essays | none | | essays are meant to be long |
+`npm run budget` counts rendered words in `<main>`. Home is enforced at 450 (the live
+audit's example answer, about 90 words, is an artifact on the page). Every other page is
+report-only: its text is Zoeb's and stays whole.
 
 ## 10. Adding a component
 
@@ -204,7 +201,7 @@ Rendered words in `<main>`, closed Disclosures not counted. Enforced by `npm run
    its motion (the component page is generated from that comment and the Props interface).
 3. Values only from `design/tokens.css`; lines only from the four tiers; copy from
    `copy.ts`. Animated parts: final state in CSS, pre-state under `.motion` in
-   `src/styles/motion.css`, behaviour in `src/scripts/motion.ts`.
+   `src/styles/motion.css`, behaviour in `src/scripts/motion.ts`; pen marks via `data-pen` or `src/scripts/pen.ts`.
 4. Add `design/components/<Name>.md` and a screenshot in `design/mocks/<date>/components/`.
 5. Run `npm run check` (astro check + design-check), `lint`, `gate`, `a11y`, `links`, `lhci`.
 
@@ -247,7 +244,7 @@ tiers), `npm run gate` (required and banned strings, em dashes included), `npm r
 (internal links, fragments, redirect targets; `-- --external` for outbound), `npm run lhci`
 (home, /builds/, a case study, /writing/; perf ≥ 90, a11y ≥ 95, SEO ≥ 95, CLS < 0.1, desktop
 and mobile), `npm run qa` and `npm run tokens` (rendered sweeps), `npm run audio:check`,
-`npm run budget` (v4 copy budgets and the slop audit).
+`npm run budget` (home copy budget and the slop audit).
 
 In a cloud container whose Chromium differs from the pinned Playwright, pass
 `CHROME=/opt/pw-browsers/chromium` to a11y, links, og and budget, and for lhci

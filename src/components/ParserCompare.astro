@@ -89,8 +89,6 @@ let line = 0;
   .pc-legend {
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     color: var(--ink-muted);
   }
 
@@ -163,6 +161,11 @@ let line = 0;
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     color: var(--c);
+  }
+
+  /* Red Pen 5: --red is the pen's mark colour (3.9:1 on paper); red text uses --red-ink. */
+  .pc-line--v2 .pc-ver {
+    color: var(--red-ink);
     transition: color var(--dur-base) ease;
   }
 

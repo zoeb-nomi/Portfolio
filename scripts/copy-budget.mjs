@@ -14,7 +14,8 @@ import { serveDist } from './lib/serve-dist.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const BUDGETS = [
-  { route: '/', words: 300, enforce: true },
+  // Red Pen 5: the live audit's example answer (about 90 words) is an artifact on the page, so home's budget is 450.
+  { route: '/', words: 450, enforce: true },
   { route: '/builds/', words: 700 },
   { route: '/about/', words: 500 },
   { route: '/writing/', words: 400 },

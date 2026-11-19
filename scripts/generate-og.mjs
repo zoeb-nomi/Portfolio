@@ -46,7 +46,7 @@ function b64(file) {
   return readFileSync(path.join(ROOT, 'public/fonts', file)).toString('base64');
 }
 
-const displayFace = b64('source-serif-4-display-latin-400-normal.woff2');
+const displayFace = b64('archivo-latin-wdth-normal.woff2');
 const plexMono = b64('ibm-plex-mono-latin-400-normal.woff2');
 const plexMonoMedium = b64('ibm-plex-mono-latin-500-normal.woff2');
 
@@ -58,9 +58,10 @@ function templateHTML({ title, sub, num }) {
 <style>
   ${TOKENS_ROOT}
   @font-face {
-    font-family: 'Source Serif 4 Display';
+    font-family: 'Archivo';
     src: url(data:font/woff2;base64,${displayFace}) format('woff2');
-    font-weight: 400;
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
     font-style: normal;
   }
   @font-face {
@@ -92,9 +93,7 @@ function templateHTML({ title, sub, num }) {
   }
   .top {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 15px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
+    font-size: 18px;
     color: var(--ink-muted);
   }
   .main {
@@ -105,15 +104,18 @@ function templateHTML({ title, sub, num }) {
   }
   .text { flex: 1 1 auto; min-width: 0; }
   .title {
-    font-family: 'Source Serif 4 Display', Georgia, serif;
-    font-size: 116px;
-    line-height: 0.98;
-    letter-spacing: -0.015em;
+    font-family: 'Archivo', Arial, sans-serif;
+    font-weight: 820;
+    font-stretch: 112%;
+    font-size: 104px;
+    line-height: 0.94;
+    letter-spacing: -0.035em;
     color: var(--ink);
   }
   .kicker {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 28px;
+    font-family: 'Archivo', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 30px;
     line-height: 1.32;
     letter-spacing: 0;
     color: var(--ink-body);
@@ -128,11 +130,13 @@ function templateHTML({ title, sub, num }) {
     padding-right: 28px;
   }
   .num-value {
-    font-family: 'Source Serif 4 Display', Georgia, serif;
+    font-family: 'Archivo', Arial, sans-serif;
+    font-weight: 820;
+    font-stretch: 88%;
     font-size: 190px;
     line-height: 0.9;
-    letter-spacing: -0.02em;
-    color: var(--ink);
+    letter-spacing: -0.035em;
+    color: var(--red-ink);
     white-space: nowrap;
   }
   .arr, .kicker .arr {
@@ -156,7 +160,6 @@ function templateHTML({ title, sub, num }) {
     font-weight: 500;
     font-size: 16px;
     letter-spacing: .12em;
-    text-transform: uppercase;
     color: var(--ink);
   }
   .domain {

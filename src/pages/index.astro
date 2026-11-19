@@ -22,8 +22,6 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
 ---
 
 <Base title={meta.home.title} description={meta.home.description} path="/" ogImage="/og/home.png" motion>
-  <div class="red-thread" aria-hidden="true"></div>
-
   <!-- 1. Hero -->
   <section class="hero" aria-labelledby="hero-h1">
     <h1 class="hero-h1" id="hero-h1">
@@ -157,10 +155,6 @@ const verbMarks = ['underline', 'box', 'circle', 'tick'] as const;
     <p class="cta-note">{cta.bookACallNote}</p>
   </section>
 </Base>
-
-<script>
-  import '../scripts/pen-scroll';
-</script>
 
 <style>
   /* ---------- 1. hero ---------- */

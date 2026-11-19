@@ -139,6 +139,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <div class="red-thread" aria-hidden="true"></div>
     <div class="shell">
       <SiteHeader currentPath={path} />
       <main id="main" tabindex="-1">
@@ -147,6 +148,9 @@ const ogImageURL = new URL(ogImage, Astro.site);
       <SiteFooter />
     </div>
     {motion && <Motion />}
+    <script>
+      import '../scripts/pen-scroll';
+    </script>
   </body>
 </html>
 

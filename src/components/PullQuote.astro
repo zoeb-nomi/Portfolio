@@ -40,14 +40,14 @@ const { kicker, rule = 'ink' } = Astro.props;
   .kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     color: var(--red-ink);
     line-height: var(--lh-label);
   }
 
   .quote {
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-quote);
     line-height: 1.3;
     letter-spacing: var(--track-tight);

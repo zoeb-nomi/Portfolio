@@ -197,8 +197,6 @@ const agreement = [
     min-height: var(--hit-touch);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
@@ -221,6 +219,8 @@ const agreement = [
 
   .sub-h2 {
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h2);
     line-height: var(--lh-heading);
     letter-spacing: var(--track-tight);
@@ -251,8 +251,6 @@ const agreement = [
   .ja figcaption b {
     font-weight: 500;
     color: var(--red-ink);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     margin-right: var(--s-2);
   }
 
@@ -358,6 +356,8 @@ const agreement = [
   .close-line {
     margin-top: var(--s-8);
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-quote);
     line-height: var(--lh-heading);
     color: var(--ink);

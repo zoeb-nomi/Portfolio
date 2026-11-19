@@ -91,8 +91,6 @@ const total = Math.ceil(dek[2] + 1.5);
     margin-bottom: var(--s-3);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     color: var(--ink-muted);
   }
 
@@ -112,6 +110,8 @@ const total = Math.ceil(dek[2] + 1.5);
 
   .ra-line--title {
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-h3);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
@@ -163,8 +163,6 @@ const total = Math.ceil(dek[2] + 1.5);
     background: none;
     font-family: var(--font-mono);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);

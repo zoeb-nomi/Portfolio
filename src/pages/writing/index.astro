@@ -171,6 +171,8 @@ const groups = notesPage.groups
     display: flex;
     flex-direction: column;
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-num);
     line-height: var(--lh-tight);
     letter-spacing: var(--track-tight);
@@ -196,14 +198,14 @@ const groups = notesPage.groups
   .e-kicker {
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     color: var(--ink-muted);
   }
 
   .e-title {
     margin-top: var(--s-2);
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: clamp(26px, 2.4vw, 34px);
     line-height: var(--lh-title);
     letter-spacing: var(--track-tight);
@@ -268,8 +270,6 @@ const groups = notesPage.groups
     border-bottom: var(--line-ink);
     font-family: var(--font-mono);
     font-size: var(--t-label);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
     color: var(--ink);
   }
 

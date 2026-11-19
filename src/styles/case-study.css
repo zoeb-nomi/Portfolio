@@ -75,8 +75,6 @@
 .method-row dt {
   font-family: var(--font-mono);
   font-size: var(--t-label);
-  letter-spacing: var(--track-caps);
-  text-transform: uppercase;
   color: var(--ink-muted);
 }
 

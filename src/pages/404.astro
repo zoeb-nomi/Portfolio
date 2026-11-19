@@ -36,6 +36,8 @@ import { notFound } from '../data/copy';
   /* Same setting as every other page h1 (Masthead .page-h1). */
   .code {
     font-family: var(--font-display);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-weight: var(--wght-head);
     font-size: var(--t-page);
     line-height: var(--lh-display);
     letter-spacing: var(--track-tight);
@@ -86,7 +88,6 @@ import { notFound } from '../data/copy';
     font-family: var(--font-mono);
     font-size: var(--t-label-lg);
     letter-spacing: var(--track-wide);
-    text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: var(--underline-offset);
     color: var(--ink);

@@ -2,28 +2,9 @@
    Values come from design/tokens.css only. */
 
 /* ---- The ink surface ----
-   A section where checks run. It is a mode, not a palette: inside .surface-ink
-   the paper and ink roles swap and the pen glows, so every component that reads
-   roles works on it unchanged. */
+   A section where checks run. The mode's token swap lives in design/tokens.css;
+   this rule only paints the surface. */
 .surface-ink {
-  --paper: var(--surface-ink);
-  --paper-raised: var(--surface-ink-raised);
-  --paper-sunk: var(--surface-ink);
-  --ink: var(--on-ink);
-  --ink-body: var(--on-ink-body);
-  --ink-muted: var(--on-ink-muted);
-  --rule: var(--rule-on-ink);
-  --rule-strong: var(--on-ink);
-  --red: var(--red-glow);
-  --red-ink: var(--red-glow);
-  --on-red: var(--surface-ink);
-  --grid-ink: transparent;
-  --line-hair: 1px solid var(--rule-on-ink);
-  --line-ink: 1px solid var(--on-ink);
-  --line-heavy: 2px solid var(--on-ink);
-  --line-pen: 2px solid var(--red-glow);
-  --line-object: 1px solid var(--on-ink);
-  --line-object-muted: 1px solid var(--rule-on-ink);
   background: var(--surface-ink);
   color: var(--on-ink-body);
 }
