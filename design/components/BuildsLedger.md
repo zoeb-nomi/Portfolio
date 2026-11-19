@@ -1,50 +1,40 @@
 # BuildsLedger
 
-`src/components/BuildsLedger.astro` · new in v3
+## Purpose
+One row per build, set as a booktabs table: Heavy rule above and below, Ink under the head, Hair
+between rows. Red text only on the tag, links, the replay control and the hovered/open row name.
 
-![BuildsLedger](../mocks/2026-11-12-v3/components/BuildsLedger.jpg)
-
-Variant `compact`:
-
-![BuildsLedger compact](../mocks/2026-11-12-v3/components/BuildsLedger-compact.jpg)
-
-Variant `feature`:
-
-![BuildsLedger feature](../mocks/2026-11-12-v3/components/BuildsLedger-feature.jpg)
-
-## What it is
-
-BuildsLedger (DESIGN v3 D-08, SPEC #17/#20-22): one row per build, booktabs
-(Heavy above and below, Ink under the head, Hair between rows). Red only on
-the verdict tag and the links.
-
-variant="full"     /builds/: # · Build · Guarded · Measured · Shipped at
->=1100px; each row stacks into label/value pairs below.
-variant="compact"  home §2: # · Build · Measured, rows with `compact: true`.
-variant="feature"  /builds/ §1 first row (TradeFrame): head, the decision
-path figure, then Guarded / Measured / Shipped cells.
-
-Rows are native <details>: tap, click or Enter opens the row's panel (its
-result figure, its guard, its ship date and the case-study action) with no
-script at all. The motion layer only animates the panel height on
-click/tap (no hover-open); the content is always in the HTML.
+## Anatomy
+- `full` (/builds/): index, build (name, tag, one line), Guarded, Measured, Shipped at 1100px and up; below that each row stacks into label/value pairs.
+- `compact`: index, build, Measured; shows entries with `compact: true` and prefers `homeLine`.
+- `feature`: an `<article>` per entry: head, the `TradeFrameFlow` decision path, then a Guarded / Measured / Shipped `<dl>`.
+- Rows are native `<details>`: the summary is the row, the panel holds the result figure, guard, ship date and case-study action.
+- A `strip` TradeFrameFlow stands in as the Measured cell for entries with `figure.kind === 'flow'`.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `variant` | `'full' \| 'compact' \| 'feature'` | default `full` |
+| `entries` | `BuildEntry[]?` | default: `buildsLedger` (compact: only `compact: true` rows) |
+| `start` | `number?` | number shown for the first row, default 1 |
 
-```ts
-  variant?: 'full' | 'compact' | 'feature';
-  entries?: BuildEntry[];
-  /** Number shown in the # column for the first row. */
-  start?: number;
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-accent`, `-accent-text`, `--color-link` (links).
+- Type: `--font-heading`, `--font-data`, `--wght-head`, `--wdth-head`, `--track-tight`, `--t-label`, `--t-small`, `--t-body`, `--t-num`, `--t-h2`, `--t-h3`, `--lh-*`.
+- Lines and space: `--line-heavy`, `--line-ink`, `--line-hair`, `--line-object`, `--line-object-muted`, `--s-1` to `--s-8`, `--hit-touch`, `--hit-min`.
+- Motion: `--dur-fast`, `--dur-base`, `--ease-draw`.
+
+## States and motion
+- Hover or open row: name turns `--color-accent-text`, the plus toggle gets an `--color-accent` border and rotates when open.
+- Reveal: rows under `[data-ledger]` fade in as the ledger enters view (`.motion` pre-state in `src/styles/motion.css`, `motion.ts`). The panel height animates on click or tap only (no hover-open).
+- Reduced motion or no script: all rows visible, panels open and close natively.
+- Ink surface: roles re-point, no change needed.
+
+## Accessibility
+- `<details>/<summary>` gives keyboard and screen-reader behaviour with no script; summary has a visible `:focus-visible` style.
+- Row links use `aria-describedby` to the build name; external links open with `rel="noopener noreferrer"`.
+- The replay button is `hidden` until script runs and has `aria-controls`.
 
 ## Used on
-
-- `/`
-- `/builds/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
-- Motion: the final state is in the HTML; the pre-reveal state lives in CSS under `.motion` and the motion layer (`src/scripts/motion.ts`) plays it. Reduced motion shows the final state.
+Pages: `/builds/`.
+Only the `feature` and `full` variants are used; `compact` has no caller.

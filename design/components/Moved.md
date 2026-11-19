@@ -1,30 +1,25 @@
 # Moved
 
-`src/components/Moved.astro` · new in v3
+## Purpose
+Redirect fallback for an old URL. Cloudflare serves the real redirect from `public/_redirects`; this page keeps the URL resolving where that is not applied (local preview, a cached client) and carries an incoming `#fragment` across.
 
-## What it is
-
-Redirect fallback for an old URL (DESIGN v3 §i). Cloudflare Pages serves the
-301 from public/_redirects first; this page exists so the URL still resolves
-where _redirects is not applied (local preview, a cached client), and it
-carries any incoming #fragment across: /evals/#x lands on /builds/#x when
-that id exists on the new page, else on the mapped section.
+## Anatomy
+A full HTML document (not wrapped in Base): `noindex`, a canonical link to the target, a `meta refresh`, an inline script that replaces the location (keeping a plain `#id` as `?from-hash=`), and a body line "This page moved" with a link.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `from` | `string` | the old path; the target is the matching `to` in `redirects` (`src/data/copy.ts`), else `/` |
 
-```ts
-  from: string;
-```
+## Tokens it reads
+None. It ships no stylesheet and renders unstyled.
+
+## States and motion
+No motion. Works without script through `meta refresh`. Reduced motion and ink surface do not apply.
+
+## Accessibility
+Sets `lang="en"` and a plain link to the new location, so a reader without refresh or script can still follow it.
 
 ## Used on
-
-- `/evals/`
-- `/notes/`
-- `/shipping/`
-- `/work/`
-- `via Base`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/evals/`, `/notes/`, `/shipping/`, `/work/`.
+The stubs are the old `/notes/`, `/shipping/`, `/work/` and `/evals/` URLs; Base only mentions it in a comment about hash hops.

@@ -1,30 +1,30 @@
 # ParserCompare
 
-`src/components/ParserCompare.astro` · unchanged in v3
+## Purpose
+Two résumé versions, one row of squares each, per parser. Both are shown at rest; two checkboxes grey a version out so the other can be read alone. Squares are grouped by outcome, not field order.
 
-![ParserCompare](../mocks/2026-11-12-v3/components/ParserCompare.jpg)
-
-## What it is
-
-Two résumé versions, one row of 29 squares each, per parser. Both versions are shown at rest; the two
-checkboxes grey a version out so the other can be read alone. v4.1 is drawn in ink and v4.2 in red (the
-reviewer's colour for "after"). The squares are grouped by outcome, not by field order. Every count is also
-written out as text, so nothing depends on colour.
+## Anatomy
+- "Show" group with a checkbox per version (v1 in ink, v2 in red, the reviewer's colour for "after").
+- Per parser: a name with sub line, then two lines (version tag, `aria-hidden` squares, a text line "n ok · n missing · n wrong · n garbled").
+- A key (`aria-hidden`) for ok, missing, wrong, garbled.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `rows` | `Row[]` | `label`, `sub`, `v1`, `v2` (counts: ok, missing, wrong, garbled) |
+| `v1Label`, `v2Label` | `string?` | defaults "Résumé v4.1" and "Résumé v4.2" |
 
-```ts
-  rows: Row[];
-  v1Label?: string;
-  v2Label?: string;
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-muted`, `-surface`, `-accent` (v2 squares), `-accent-text` (v2 version tag).
+- Type and space: `--font-data`, `--t-micro`, `--t-data`, `--s-1` to `--s-9`, `--hit-min`. Motion: `--dur-base`.
+
+## States and motion
+- Toggling a box sets `data-v1` or `data-v2` to `off` on the root, which greys that version's cells and tag.
+- Reveal: squares fill in line by line once at 35% in view (`mountFigures`). Without script or with reduced motion the final state shows.
+- Ink surface: roles re-point.
+
+## Accessibility
+Every count is also written as text, so nothing depends on colour. The checkbox group has `role="group"` and a label; targets use `--hit-min`.
 
 ## Used on
-
-- `/screener-eval/`
-- `/writing/two-levers-that-did-not-move/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/screener-eval/`, `/writing/two-levers-that-did-not-move/`.

@@ -1,33 +1,28 @@
 # Headshot
 
-`src/components/Headshot.astro` · changed in v3
+## Purpose
+The one headshot `<picture>`. It owns the image's box, crop and format ladder; the parent owns placement.
 
-![Headshot](../mocks/2026-11-12-v3/components/Headshot.jpg)
-
-## What it is
-
-The one headshot <picture>. Three presets, each a different rendered size:
-hero  ~240px plate (home hero, Figure)     : fills its container, square
-thumb  120px (About masthead)
-card   300px (EmbedCard)                   , the parent shrinks it on phones
-avif -> webp -> jpg, from the same 480w/960w files everywhere. The parent
-owns placement (margins, grid areas) via the `class` it passes in; this
-component owns the picture's own box and crop.
+## Anatomy
+`<picture>` with AVIF, WebP and JPG sources (480w and 960w files in `/img/`), then an `<img>` with width and height set for CLS. The photo is grayscale with `mix-blend-mode: multiply`, cropped to centre 12%.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `size` | `'hero' \| 'thumb' \| 'card' \| 'about'` | default `hero`: fills its container, square; `thumb` 120px; `card` 300px; `about` 200px (132px at 599px and below) |
+| `alt` | `string` | required |
+| `loading` | `'eager' \| 'lazy'` | default `lazy`; eager also sets `decoding="sync"` |
+| `class` | `string?` | placement from the parent |
 
-```ts
-  size?: Size;
-  alt: string;
-  loading?: 'eager' | 'lazy';
-  class?: string;
-```
+## Tokens it reads
+None. Sizes are fixed per preset in the component; the only breakpoint is 599px. It reads no colour role: the photograph is neutral grayscale.
+
+## States and motion
+Static; no hover and no animation. Reduced motion and the ink surface change nothing (the multiply blend assumes a light backdrop, so keep it on paper).
+
+## Accessibility
+`alt` is required by the type. Intrinsic width and height reserve space.
 
 ## Used on
-
-- `/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Pages: `/`.
+Also via: `Masthead`.

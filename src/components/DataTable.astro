@@ -94,7 +94,6 @@ const [labelHeader, ...dataHeaders] = columns;
     inset-inline-end: var(--s-1);
     font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
     line-height: 1;
     color: var(--color-text-muted);
     pointer-events: none;
@@ -181,7 +180,6 @@ const [labelHeader, ...dataHeaders] = columns;
     .is-stack .data-table td::before {
       content: attr(data-l);
       font-size: var(--t-label);
-      letter-spacing: var(--track-wide);
       color: var(--color-text-muted);
     }
 
@@ -195,7 +193,6 @@ const [labelHeader, ...dataHeaders] = columns;
     text-align: left;
     font-family: var(--font-data);
     font-size: var(--t-micro);
-    letter-spacing: var(--track-wide);
     color: var(--color-text-muted);
     padding-bottom: var(--s-3);
     /* Matches the wrap's inline padding so the caption stays aligned with the table. */
@@ -229,7 +226,6 @@ const [labelHeader, ...dataHeaders] = columns;
 
   @media (max-width: 599px) {
     .data-table thead th {
-      letter-spacing: var(--track-wide);
     }
   }
 

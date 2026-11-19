@@ -1,28 +1,28 @@
 # MarginNote
 
-`src/components/MarginNote.astro` · unchanged in v3
+## Purpose
+A reviewer's annotation in the margin column. It never carries a fact that exists nowhere else.
 
-![MarginNote](../mocks/2026-11-12-v3/components/MarginNote.jpg)
-
-## What it is
-
-Reviewer-annotation. Never carries a fact that exists nowhere else.
-Renders as <aside> (a real landmark) by default. When already nested inside
-another <aside> (e.g. Section's margin column), pass as="div", a landmark
-should never be nested inside another landmark of the same kind.
+## Anatomy
+An `<aside>` (default) or `<div>` holding one `<p>` from the slot, with a pen-weight rule on its left edge. Pass `as="div"` when it would nest inside another `<aside>`.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `label` | `string?` | `aria-label` for the aside; default "Reviewer's note". Ignored for `div` |
+| `as` | `'aside' \| 'div'` | default `aside` |
 
-```ts
-  label?: string;
-  as?: 'aside' | 'div';
-```
+## Tokens it reads
+- Colour roles: `--color-accent-text` (note text).
+- Type and space: `--font-data`, `--t-note`, `--lh-body`, `--s-3`, `--s-6`.
+- Lines: `--line-pen` (left rule).
+
+## States and motion
+Static. No script, no reduced-motion rule needed. Ink surface: the role re-points to the glow.
+
+## Accessibility
+As an `<aside>` it is a labelled landmark; avoid nesting landmarks (use `as="div"`).
 
 ## Used on
-
-- `/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
+Also via: `Section`, `TimelineEntry`.
+Its callers are `Section` (the `note` prop) and `TimelineEntry` (the `note` prop).

@@ -42,6 +42,7 @@ export const site = {
 // studies; Writing owns the notes.
 // Footer-only link to the design page (Red Pen 5): not in the header nav.
 export const designLink = { label: 'How this site is built', href: '/design/' };
+export const llmsLink = { label: 'llms.txt (for AI assistants)', href: '/llms.txt' };
 
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },

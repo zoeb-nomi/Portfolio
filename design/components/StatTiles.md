@@ -1,28 +1,26 @@
 # StatTiles
 
-`src/components/StatTiles.astro` · new in v3
+## Purpose
+The proof tile without a figure: a Heavy top bar, a numeral, a label and an optional mono source.
 
-![StatTiles](../mocks/2026-11-12-v3/components/StatTiles.jpg)
-
-## What it is
-
-Stat tiles (DESIGN v3 D-07): the proof tile without its figure. Heavy top
-bar, numeral, label, optional mono source. Used by /builds/#shipping.
-The numeral renders final; nothing counts (v3.1 review).
-Parse "12", "90%", "$0.07", "4.2" into a count spec from zero.
+## Anatomy
+A `<ul>` of tiles; each holds the value (with a small unit), the label and an optional source line.
 
 ## Props
+| prop | type | notes |
+|---|---|---|
+| `tiles` | `Tile[]` | `value`, `unit?`, `label`, `source?` |
 
-```ts
-  tiles: Tile[];
-```
+## Tokens it reads
+- Colour roles: `--color-text`, `-text-body`, `-text-muted`.
+- Type: `--font-heading`, `--font-data`, `--wght-head`, `--wdth-head`, `--track-display`, `--t-stat`, `--t-small`, `--t-label`, `--lh-tight`, `--lh-snug`.
+- Space and lines: `--s-2`, `--s-3`, `--s-8`, `--line-heavy`.
+
+## States and motion
+Static. The numeral renders final and nothing counts (no tally here). Reduced motion and ink surface change nothing beyond the role re-point.
+
+## Accessibility
+Real list; each number sits beside its label and source as text.
 
 ## Used on
-
-- `/builds/`
-
-## Rules
-
-- Values only from `design/tokens.css`; lines only from the `--line-*` tiers (see `design/README.md`).
-- Copy comes from `src/data/copy.ts`, never typed into the component.
-- Motion: the final state is in the HTML; the pre-reveal state lives in CSS under `.motion` and the motion layer (`src/scripts/motion.ts`) plays it. Reduced motion shows the final state.
+Pages: `/builds/`, `/design/components/`.

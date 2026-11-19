@@ -89,7 +89,7 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
   .hp {
     padding: var(--s-6);
     border: var(--line-object);
-    box-shadow: 10px 10px 0 var(--color-accent);
+    box-shadow: 10px 10px 0 var(--color-pending);
   }
 
   .hp-bar {
@@ -235,7 +235,7 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
   @media (max-width: 899px) {
     .hp {
       padding: var(--s-4);
-      box-shadow: 6px 6px 0 var(--color-accent);
+      box-shadow: 6px 6px 0 var(--color-pending);
     }
 
     .hp-tiles {

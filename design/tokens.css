@@ -202,6 +202,7 @@
   --color-accent-text: var(--red-ink);
   --color-accent-tint: var(--red-tint);
   --color-on-accent: var(--on-red);
+  --color-on-accent-muted: var(--on-red-muted);
   --color-pending: var(--graphite);
   --color-link: var(--red-ink);
   /* Check states: what a verdict looks like. Red Pen keeps it to ink, red and graphite. */
@@ -277,6 +278,7 @@
   --color-accent-text: var(--red-glow);
   --color-accent-tint: color-mix(in oklch, var(--red-glow) 18%, transparent);
   --color-on-accent: var(--surface-ink);
+  --color-on-accent-muted: var(--surface-ink-raised);
   --color-pending: var(--on-ink-muted);
   --color-link: var(--red-glow);
   --color-state-pass: var(--on-ink);

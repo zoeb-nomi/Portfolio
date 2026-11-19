@@ -3,7 +3,7 @@
 // with 44px targets, then a hair rule and a meta row with the nav and the
 // labelled llms.txt link. No top rule: the CTA slab (or the page's last
 // section rule) closes the page above it.
-import { site, cta, nav, designLink } from '../data/copy';
+import { site, cta, nav, designLink, llmsLink } from '../data/copy';
 import { isExternal } from '../lib/isExternal';
 
 const links = [cta.bookACall, cta.email, cta.linkedin, cta.github];
@@ -39,7 +39,7 @@ const roleLine = site.footerLine.replace(`${site.name} · `, '');
         </nav>
         <span class="ftr-extra">
           <a class="llms-link" href={designLink.href}>{designLink.label}</a>
-          <a class="llms-link" href="/llms.txt">llms.txt (for AI assistants)</a>
+          <a class="llms-link" href={llmsLink.href}>{llmsLink.label}</a>
         </span>
       </div>
     </div>

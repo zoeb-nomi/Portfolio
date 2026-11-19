@@ -1,18 +1,16 @@
 ---
-// Fig. 0, the audit sheet: the home hero's figure. One flat sheet of squares (v4: no tilt, no shadow), one square per real model
+// The audit sheet (Red Pen 5: the proof block on home, on the ink surface). One flat sheet of squares, one square per real model
 // output that a check read (src/data/fig0-cells.ts reads the counts out of the case-study copy). The sheet is
-// drawn band by band, one band per harness group, and the failed squares are red and lifted a little off the
-// paper. Everything a visitor needs is in the HTML: the final state (red squares, band tags, caption) renders
+// drawn band by band, one band per harness group, and the failed squares are red. Everything a visitor needs is in the HTML: the final state (red squares, band tags, caption) renders
 // with no JS and under reduced motion.
 //
 // Motion (src/scripts/motion.ts, Fig. 0): on load every square is paper-white ("quiet failures look fine"),
-// one red scan line sweeps the sheet once (1.1 s), the failed squares turn red as it passes, then the ledger
-// strip under the H1 wipes in. The red squares live on one overlay per band (lifted 5px off the paper), and
+// one red scan line sweeps the sheet once (1.6 s), the failed squares turn red as it passes, then the ledger
+// strip under the H1 wipes in. The red squares live on one overlay per band , and
 // the sweep reveals each overlay with a clip-path that moves with the line: six animated elements, not 86,
-// so the main thread stays idle on a phone. Replay sits in the caption row.
+// so the main thread stays idle on a phone. (The motion library still has a replay handler; this sheet shows no Replay button.)
 //
-// Interaction (this file, works without the motion library): the sheet tilts with a hovering pointer, never
-// on touch; hovering a square, or moving a cursor with the arrow keys from the one focusable group, writes
+// Interaction (this file, works without the motion library): hovering a square, or moving a cursor with the arrow keys from the one focusable group, writes
 // that square's harness, what it was and the check into the readout line under the sheet. Screen readers get
 // the group's one-sentence summary and the readout; the squares themselves are decoration.
 import { cols, families, summary, caption, legend } from '../data/fig0-cells';
@@ -147,7 +145,7 @@ const f = home.fig0;
 
 <style>
   .as {
-    /* The sheet's rest angles and width. The sweep's duration is SWEEP in motion.ts (1.1 s). */
+    /* The sheet's rest angles and width. The sweep's duration is SWEEP in motion.ts (1.6 s). */
     --w: 100%;
     border-top: var(--line-heavy);
     padding-top: var(--s-3);
@@ -263,7 +261,7 @@ const f = home.fig0;
     pointer-events: none;
   }
 
-  /* Each failed square sits above the paper: lifted on z, with a short shadow back onto the sheet. */
+  /* The failed squares, one overlay per band. */
   .as-red i {
     display: block;
     background: var(--color-accent);
