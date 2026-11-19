@@ -59,7 +59,8 @@
 
   /* Type scale (DESIGN v3 §c). Floor is 12px everywhere. */
   --t-display: clamp(56px, 9.4vw, 136px);   /* home H1, line 1 */
-  --t-answer: clamp(28px, 3.4vw, 50px);     /* home H1, line 2, italic */
+  --t-answer: clamp(28px, 3.4vw, 50px);     /* v3 home H1 line 2; retired on home in v4, kept for one release */
+  --t-lede: clamp(22px, 2.3vw, 32px);       /* v4: the plain sans line under the home H1 */
   --t-hero: var(--t-display);
   --t-page: clamp(42px, 5.4vw, 74px);       /* page H1 */
   --t-stat: clamp(56px, 5.8vw, 84px);       /* tile numeral */
@@ -136,6 +137,29 @@
   --dur-fast: 120ms;
   --dur-base: 200ms;
   --dur-slow: 600ms;
+
+  /* v4 semantic roles (19 Nov 2026). Components written from v4 on read these, not the primitives above,
+     so a side-project theme can swap paper, ink and accent and keep every role. Values alias the primitives;
+     the v3 names stay valid. The DTCG JSON port (follow-up release) generates this block. */
+  --color-surface: var(--paper);
+  --color-surface-raised: var(--paper-raised);
+  --color-text: var(--ink);
+  --color-text-body: var(--ink-body);
+  --color-text-muted: var(--ink-muted);
+  --color-line: var(--rule);
+  --color-accent: var(--red);
+  --color-accent-text: var(--red-ink);
+  --color-accent-tint: var(--red-tint);
+  --color-on-accent: var(--on-red);
+
+  /* v4 type steps: seven roles. The v3 size names map onto them; new code uses these. */
+  --type-display: var(--t-display);
+  --type-page: var(--t-page);
+  --type-h2: var(--t-h2);
+  --type-h3: var(--t-h3);
+  --type-body: var(--t-body);
+  --type-small: var(--t-small);
+  --type-label: var(--t-label);
 
   /* Stacking. */
   --z-nav: 100;

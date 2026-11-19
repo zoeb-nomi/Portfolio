@@ -140,7 +140,7 @@ export const failed = groups.reduce((a, g) => a + g.failed, 0);
 
 /** Columns on the sheet: ten, so every group reads as a tally in tens (15 is a row and a half, 30 three rows,
  *  40 four, 21 two and one) and a square is at least 24px wide on a 390px phone (350px of column, ten across). */
-export const cols = 10;
+export const cols = 15; // v4: flat sheet, wider than tall
 
 /** The ledger strip under the H1, and the one-sentence summary for screen readers. True numbers only. */
 export const strip = {
@@ -166,6 +166,6 @@ const harnessCount = families.length;
 export const summary = `${total} model outputs from ${harnessCount} eval harnesses, one square each; ${failed} failed a check and are marked red. Arrow keys read one square at a time.`;
 
 export const caption =
-  'Each square is one model output a check read, from the three case studies on this site. Squares are grouped by outcome, so a square\'s position is not an item id. Hover or arrow through a square to see which harness, what it was, and which check read it.';
+  'One square per model output a check read, grouped by outcome, so a position is not an item id. Hover or arrow through the squares to see which check read each one.';
 
 export const legend = { fail: 'failed a check', pass: 'passed' };

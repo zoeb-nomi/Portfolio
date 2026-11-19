@@ -9,9 +9,11 @@ import { home } from '../data/copy';
 
 interface Props {
   items?: typeof home.readings;
+  /** v4 home: drop the datum line (the figure already draws datum to value; the full reading lives on the case study). */
+  compact?: boolean;
 }
 
-const { items = home.readings } = Astro.props;
+const { items = home.readings, compact = false } = Astro.props;
 const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v - min) / (max - min))).toFixed(4);
 ---
 
@@ -49,11 +51,11 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
               <span>{f.maxLabel}</span>
             </div>
           </div>
-          <p class="rd-datum-line">
+          {!compact && <p class="rd-datum-line">
             <span>Datum <b>{r.datum}</b></span>
             <span>change <b>{r.change}</b></span>
             <span>{r.n}</span>
-          </p>
+          </p>}
           <p class="rd-label">{r.label}</p>
           <p class="rd-src">{r.source}</p>
         </li>

@@ -1,5 +1,5 @@
 ---
-// Fig. 0, the audit sheet: the home hero's figure. One isometric sheet of squares, one square per real model
+// Fig. 0, the audit sheet: the home hero's figure. One flat sheet of squares (v4: no tilt, no shadow), one square per real model
 // output that a check read (src/data/fig0-cells.ts reads the counts out of the case-study copy). The sheet is
 // drawn band by band, one band per harness group, and the failed squares are red and lifted a little off the
 // paper. Everything a visitor needs is in the HTML: the final state (red squares, band tags, caption) renders
@@ -24,7 +24,6 @@ const f = home.fig0;
 <figure class="as" id="fig-0" data-fig0 aria-labelledby="fig0-title" style={`--cols:${cols}`}>
   <figcaption class="as-head">
     <span><span class="as-n">{f.n}</span><span id="fig0-title">{f.title}</span></span>
-    <button class="as-replay" type="button" data-replay="fig0">{f.replay} <span aria-hidden="true">↺</span></button>
   </figcaption>
 
   <div class="as-stage" role="group" tabindex="0" aria-label={summary} aria-describedby="fig0-readout" data-f0-stage>
@@ -143,32 +142,13 @@ const f = home.fig0;
       show(null);
     });
 
-    // Tilt, only for a hovering, fine pointer and only with motion allowed. Clamped by the geometry: the
-    // pointer's offset from the stage centre, −0.5 to 0.5, maps to ±8° about x and ±10° about z.
-    if (motionAllowed() && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      stage.addEventListener('pointermove', (ev) => {
-        if (ev.pointerType === 'touch') return;
-        const r = stage.getBoundingClientRect();
-        const x = Math.max(-0.5, Math.min(0.5, (ev.clientX - r.left) / r.width - 0.5));
-        const y = Math.max(-0.5, Math.min(0.5, (ev.clientY - r.top) / r.height - 0.5));
-        sheet.style.setProperty('--tz', `${(x * 20).toFixed(2)}deg`);
-        sheet.style.setProperty('--tx', `${(-y * 16).toFixed(2)}deg`);
-      });
-      stage.addEventListener('pointerleave', () => {
-        sheet.style.setProperty('--tz', '0deg');
-        sheet.style.setProperty('--tx', '0deg');
-      });
-    }
   });
 </script>
 
 <style>
   .as {
     /* The sheet's rest angles and width. The sweep's duration is SWEEP in motion.ts (1.1 s). */
-    --rx: 52deg;
-    --rz: -10deg;
-    --w: 68%;
-    --lift: 7px;
+    --w: 100%;
     border-top: var(--line-heavy);
     padding-top: var(--s-3);
     background: var(--paper);
@@ -225,11 +205,7 @@ const f = home.fig0;
      so the drawn sheet stays inside the column at every width from 390 to 1440 (measured). */
   .as-stage {
     position: relative;
-    perspective: 1200px;
-    aspect-ratio: 10 / 8.6;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    display: block;
   }
 
   .as-stage:focus-visible {
@@ -242,39 +218,18 @@ const f = home.fig0;
     padding: var(--s-2);
     border: var(--line-object);
     background: var(--paper-raised);
-    /* Tilted about its centre, the drawn sheet sits lower than its layout box (the far half recedes); the
-       negative top margin pulls the layout box up so the drawing starts at the top of the reserved stage. */
-    margin-block: -26% -12%;
-    transform-style: preserve-3d;
-    transform: rotateX(calc(var(--rx) + var(--tx, 0deg))) rotateZ(calc(var(--rz) + var(--tz, 0deg)));
-    transition: transform var(--dur-base) ease-out;
-    will-change: transform;
-  }
-
-  /* Physical depth: a second sheet under the first, set back and offset, carrying the drop shadow, so the
-     paper reads as a pad on a desk and the tilt has something to move against. */
-  .as-sheet::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--paper);
-    border: var(--line-object-muted);
-    transform: translate3d(6px, 8px, -10px);
-    box-shadow: 0 18px 28px -10px color-mix(in oklch, var(--ink) 42%, transparent);
   }
 
   .as-bands {
     position: relative;
     display: grid;
     row-gap: 8px;
-    transform-style: preserve-3d;
   }
 
   .as-family {
     position: relative;
     display: grid;
     row-gap: 4px;
-    transform-style: preserve-3d;
   }
 
   .as-band {
@@ -283,7 +238,6 @@ const f = home.fig0;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     grid-template-rows: repeat(var(--rows), 1fr);
     gap: 3px;
-    transform-style: preserve-3d;
   }
 
   /* The paper layer: every output drawn the same, an outlined square. */
@@ -308,7 +262,6 @@ const f = home.fig0;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     grid-template-rows: repeat(var(--rows), 1fr);
     gap: 3px;
-    transform: translateZ(var(--lift));
     pointer-events: none;
   }
 
@@ -316,23 +269,13 @@ const f = home.fig0;
   .as-red i {
     display: block;
     background: var(--red);
-    box-shadow: 3px 4px 4px -1px color-mix(in oklch, var(--ink) 38%, transparent);
   }
 
-  /* Each harness's tag stands off the left edge of its band, like a row label, and counter-rotates so it
-     faces the reader whatever the tilt. */
+  /* Each harness's tag is a plain row label above its band. */
   .as-tag {
-    position: absolute;
-    inset-inline-end: 100%;
-    inset-block-start: 50%;
-    padding-inline-end: var(--s-5);
-    margin-top: -0.5em;
-    transform-origin: 100% 50%;
-    transform: rotateZ(calc(-1 * (var(--rz) + var(--tz, 0deg)))) rotateX(calc(-1 * (var(--rx) + var(--tx, 0deg))));
-    white-space: nowrap;
-    text-align: right;
+    order: -1;
     font-family: var(--font-mono);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     font-weight: 500;
     line-height: 1;
     color: var(--ink);
@@ -346,7 +289,6 @@ const f = home.fig0;
     inset-inline-start: 0;
     inline-size: 2px;
     background: var(--red);
-    transform: translateZ(8px);
     visibility: hidden;
     pointer-events: none;
   }
@@ -400,44 +342,4 @@ const f = home.fig0;
     color: var(--ink-muted);
   }
 
-  /* Phones: the sheet runs the full column under the H1; a gentler tilt keeps every square at readable size. */
-  /* Tablets: the column is wide, so the sheet is capped and sits right; the tags hang off its left edge. */
-  @media (max-width: 899px) {
-    .as {
-      --rx: 48deg;
-      --rz: -8deg;
-      --w: min(70%, 460px);
-    }
-
-    .as-stage {
-      aspect-ratio: auto;
-      block-size: min(76vw, 690px);
-      padding-inline: 110px 60px;
-    }
-  }
-
-  /* Phones: the sheet spans the viewport minus the gutters; the readout carries the band names. */
-  @media (max-width: 599px) {
-    .as {
-      --rx: 46deg;
-      --rz: -5deg;
-      --w: 77%;
-    }
-
-    .as-stage {
-      block-size: auto;
-      aspect-ratio: 10 / 10.2;
-      padding-inline: 0;
-    }
-
-    .as-tag {
-      display: none;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .as-sheet {
-      transition: none;
-    }
-  }
 </style>

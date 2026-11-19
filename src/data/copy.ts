@@ -308,6 +308,26 @@ export const screenerEvalJsonLd = {
 // ---------------------------------------------------------------------------
 
 export const home = {
+  // v4 (Red Pen, edited; 19 Nov 2026): one claim per screen, the page never names its own parts.
+  // Home budget 300 rendered words (scripts/copy-budget.mjs).
+  v4: {
+    lede: 'I ship the workflow and the checks that catch it.',
+    proofCaught: 'All of them were caught before anything was published.',
+    emailLink: 'or email me',
+    measuredH2: 'Three numbers from three systems.',
+    buildsH2: 'What I built, and how it is guarded.',
+    aboutLabel: 'PM who ships code',
+    aboutH2: 'I work where the model meets the workflow.',
+    about:
+      "I'm a PM at Instead, an AI-native tax research platform. I cut a multi-step tax workflow from 10 to 15 minutes to under a minute, and I build the checks that say when it is wrong. In tax research, a wrong citation isn't a UX bug. It's a compliance risk.",
+    verbs: [
+      { name: 'Measure', line: 'Decide what good output means, then count it.' },
+      { name: 'Trace', line: 'Every answer leads back to its source.' },
+      { name: 'Guard', line: 'The model proposes; rules decide what runs.' },
+      { name: 'Ship', line: 'Put it in front of users, then keep measuring.' },
+    ],
+    aboutLink: { label: 'More about me →', href: '/about/' },
+  },
   eyebrow: 'AI Product Manager · Agents, workflows and evals',
   h1Line1: 'LLM products fail quietly.',
   h1Underline: 'quietly.',
