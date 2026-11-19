@@ -67,7 +67,7 @@ const groups = notesPage.groups
                 <span class="e-meta">
                   <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read
                   {p.audio && (
-                    <a class="e-listen" href={`${p.href}#listen`} aria-label={`${W.listen} ${p.title}, ${formatClock(p.audio)}`}>
+                    <a class="e-listen" href={`${p.href}#listen`} aria-label={`${W.listen} ${formatClock(p.audio)}: ${p.title}`}>
                       <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="M4 2.5v11l10-5.5z" fill="currentColor" /></svg>
                       {W.listen} {formatClock(p.audio)}
                     </a>

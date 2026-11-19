@@ -26,7 +26,7 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
             <span data-tally>{t.value}</span>
             {t.unit && <span class="hp-u">{t.unit}</span>}
           </dt>
-          <dd class="hp-l">{t.label}</dd>
+          <dd class="hp-l" title={t.label}>{h.tileLabels[i] ?? t.label}</dd>
         </div>
       ))
     }

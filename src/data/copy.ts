@@ -342,14 +342,16 @@ export const home = {
     },
     harness: {
       h2: 'My agent harness, counted as it runs.',
-      sub: 'I hand work to a system of agents. Each item is filed with an acceptance line and a due date, checked before it reaches me, and merged by me.',
+      sub: 'I hand work to agents. Each item gets an acceptance line and a due date, and is checked before I merge it.',
+      // Short tile labels for the home panel; the full definitions stay on /builds/#shipping.
+      tileLabels: ['items shipped since 10 Nov', 'on time', 'API spend per item', 'median, ready to merged'],
       // Runtime source (I17 tracker, decision D1): the public shipping log, refreshed nightly. Until it exists the
       // panel shows the pilot snapshot below, labelled as such.
       liveUrl: 'https://cdn.jsdelivr.net/gh/zoeb-nomi/shipping-log@main/shipping.json',
-      snapshotLabel: 'Pilot snapshot, 10 to 11 Nov 2026',
+      snapshotLabel: 'Pilot snapshot, 10–11 Nov 2026',
       liveLabel: 'Live, updated',
-      itemsCaption: 'Recent items, agent minutes per item',
-      hint: 'Point at a bar for the item.',
+      itemsCaption: 'Agent minutes per item',
+      hint: 'Point at a bar.',
       more: { label: 'How this is measured', href: '/builds/#shipping' },
     },
     claim2Pre: 'I ship the workflow and ',
