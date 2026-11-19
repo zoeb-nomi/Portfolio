@@ -2940,6 +2940,7 @@ export const about = {
     detail: '"Meet Zoeb Nomi: the rabbit-hole explorer and CoreHR maestro" · Keka Product blog · Jan 2025 →',
     href: sources.kekaProfile.href,
   },
+  logosLabel: 'Companies I have worked at',
   beliefPre: 'What I believe: ',
   beliefStrong: 'an AI feature is not done until you can say how often it is wrong.',
   beliefPost:
