@@ -1,6 +1,7 @@
 ---
 import { renderMetrics } from '../utils/metrics';
 import MarginNote from './MarginNote.astro';
+import Disclosure from './Disclosure.astro';
 
 interface Achievement {
   kicker: string | null;
@@ -26,6 +27,9 @@ interface Props {
   note?: string | null;
   /** h2 when the entries stand alone; h3 inside About's §2 The record. */
   headingLevel?: 'h2' | 'h3';
+  /** v4: show only the first `lead` achievements; the rest and the record slot go behind a Disclosure. */
+  lead?: number;
+  moreLabel?: string;
 }
 
 const {
@@ -39,7 +43,12 @@ const {
   logo = null,
   note = null,
   headingLevel: Heading = 'h2',
+  lead,
+  moreLabel = 'More',
 } = Astro.props;
+const shown = lead === undefined ? achievements : achievements.slice(0, lead);
+const rest = lead === undefined ? [] : achievements.slice(lead);
+const collapse = lead !== undefined;
 ---
 
 <div class:list={['entry', 'grid-margin', { primary }]}>
@@ -66,17 +75,33 @@ const {
     {descriptor && <p class="descriptor">{descriptor}</p>}
     {standfirst && <p class="standfirst">{standfirst}</p>}
     <slot name="video" />
-    <ul class="achievements">
-      {
-        achievements.map((a) => (
+    {shown.length > 0 && (
+      <ul class="achievements">
+        {shown.map((a) => (
           <li>
             {a.kicker && <p class="kicker">{a.kicker}</p>}
             <p class="achievement-text" set:html={renderMetrics(a.text, a.metrics)} />
           </li>
-        ))
-      }
-    </ul>
-    <slot name="record" />
+        ))}
+      </ul>
+    )}
+    {collapse ? (
+      <Disclosure label={moreLabel}>
+        {rest.length > 0 && (
+          <ul class="achievements">
+            {rest.map((a) => (
+              <li>
+                {a.kicker && <p class="kicker">{a.kicker}</p>}
+                <p class="achievement-text" set:html={renderMetrics(a.text, a.metrics)} />
+              </li>
+            ))}
+          </ul>
+        )}
+        <slot name="record" />
+      </Disclosure>
+    ) : (
+      <slot name="record" />
+    )}
   </div>
 </div>
 

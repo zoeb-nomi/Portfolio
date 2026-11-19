@@ -16,7 +16,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BUDGETS = [
   { route: '/', words: 300, enforce: true },
   { route: '/builds/', words: 700, enforce: true },
-  { route: '/about/', words: 500 },
+  { route: '/about/', words: 500, enforce: true },
   { route: '/writing/', words: 400 },
   { route: '/crosssource/', words: 900 },
   { route: '/mirror-eval/', words: 900 },
