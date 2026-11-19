@@ -1,7 +1,7 @@
 // QA sweep — overflow, axe, font-weight, font-size scale, console/network.
 // Run against a live site:  npx astro preview --host 127.0.0.1 --port 4321 &  npm run qa
 // Env: BASE_URL (default http://127.0.0.1:4321). Report: .astro/qa-report.json
-// Exit 1 on: overflow, axe violation, font-weight > 500, or any 4xx/5xx request.
+// Exit 1 on: overflow, axe violation, font-weight > WEIGHT_MAX (heaviest --wght-* token), or any 4xx/5xx request.
 // Font-size deviations, console errors and failed requests are WARN only.
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -11,6 +11,9 @@ import { chromium } from 'playwright';
 import { sitemapPages } from './lib/pages.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// Red Pen 5: weight is a variable axis; the ceiling is the heaviest --wght-* token in tokens.css (was a fixed 500).
+const WEIGHT_MAX = Math.max(...[...readFileSync(path.join(ROOT, 'design/tokens.css'), 'utf8').matchAll(/--wght-[a-z]+:\s*(\d+)/g)].map((m) => Number(m[1])), 500);
 const BASE = (process.env.BASE_URL || 'http://127.0.0.1:4321').replace(/\/$/, '');
 // Every page in the built sitemap, plus /404.html (see scripts/lib/pages.mjs). Nothing to add by hand.
 const PAGES = sitemapPages(ROOT);
@@ -94,7 +97,7 @@ async function sweep(p) {
         const els = await page.evaluate(textElements);
         const heavy = new Map(), bad = new Map();
         for (const e of els) {
-          if (e.weight > 500) heavy.set(`${e.sel}=${e.weight}`, (heavy.get(`${e.sel}=${e.weight}`) || 0) + 1);
+          if (e.weight > WEIGHT_MAX) heavy.set(`${e.sel}=${e.weight}`, (heavy.get(`${e.sel}=${e.weight}`) || 0) + 1);
           if (!sizeOk(e.size)) bad.set(`${e.size}px`, [...(bad.get(`${e.size}px`) || []), e.sel]);
         }
         r.heavy = [...heavy].map(([k, n]) => `${k} x${n}`);

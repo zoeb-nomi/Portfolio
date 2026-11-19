@@ -48,7 +48,7 @@ export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Builds', href: '/builds/', activePrefixes: ['/crosssource/', '/mirror-eval/', '/screener-eval/'] },
   { label: 'Writing', href: '/writing/', activePrefixes: ['/notes/'] },
-  { label: 'About', href: '/about/' },
+  { label: 'About', href: '/about/', activePrefixes: ['/design/'] },
 ];
 
 // Old URLs and their new homes (DESIGN v3 §i). public/_redirects carries the
@@ -2970,6 +2970,11 @@ export const about = {
     href: sources.kekaProfile.href,
   },
   logosLabel: 'Companies I have worked at',
+  siteLine: 'The site is built the way I build products: one system, every value checked on each build.',
+  siteLinks: [
+    { label: 'How this site is built, and why', href: '/design/' },
+    { label: 'Every component, live', href: '/design/components/' },
+  ],
   beliefPre: 'What I believe: ',
   beliefStrong: 'an AI feature is not done until you can say how often it is wrong.',
   beliefPost:
@@ -2983,6 +2988,7 @@ export const about = {
     record: { mark: '§2', label: 'The record', anchorId: 'record' },
     builds: { mark: '§3', label: 'Public builds', anchorId: 'public-builds' },
     contact: { mark: '§4', label: 'Contact', anchorId: 'contact' },
+    site: { mark: '§5', label: 'This site', anchorId: 'site' },
   },
   profileLink: { pre: 'Keka wrote a profile of me in Jan 2025:', label: '"Meet Zoeb Nomi: the rabbit-hole explorer and CoreHR maestro" →' },
   kekaVideoLabel: 'Fig. 3. Background Verification in Keka, product video. Click to play.',

@@ -4,7 +4,7 @@
 // Env: BASE_URL (default http://127.0.0.1:4321). Report: .astro/tokens-report.json
 //
 //   (a) WARN  computed font-sizes outside the type tokens (fixed px + clamp ranges)
-//   (b) FAIL  font-weight > 500
+//   (b) FAIL  font-weight > WEIGHT_MAX (heaviest --wght-* token)
 //   (c) FAIL  text / background colours outside the palette (probed from tokens.css)
 //   (d) WARN  border / outline colour+width combos other than {1px ink, 1px rule, 2px red}
 //   (e) WARN  border-radius other than 0
@@ -19,6 +19,9 @@ import { chromium } from 'playwright';
 import { sitemapPages } from './lib/pages.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// Red Pen 5: weight is a variable axis; the ceiling is the heaviest --wght-* token in tokens.css (was a fixed 500).
+const WEIGHT_MAX = Math.max(...[...readFileSync(path.join(ROOT, 'design/tokens.css'), 'utf8').matchAll(/--wght-[a-z]+:\s*(\d+)/g)].map((m) => Number(m[1])), 500);
 const BASE = (process.env.BASE_URL || 'http://127.0.0.1:4321').replace(/\/$/, '');
 // Every page in the built sitemap, plus /404.html (see scripts/lib/pages.mjs). Nothing to add by hand.
 const PAGES = sitemapPages(ROOT);
@@ -44,12 +47,12 @@ const sizeOk = (px) =>
   sizeRanges.some(([lo, hi]) => px >= lo - 0.05 && px <= hi + 0.05);
 
 const colourTokens = [
-  ...new Set([...css.matchAll(/(--(?:paper|ink|rule|red|on-red|heat)[\w-]*):/g)].map((m) => m[1])),
+  ...new Set([...css.matchAll(/(--(?:paper|ink|rule|red|on-red|heat|surface-ink|on-ink|graphite)[\w-]*):/g)].map((m) => m[1])),
 ];
 
 // --- in-page probe ----------------------------------------------------------
 // Returns aggregated records: { cat, key, sel, n }. Runs once per page+viewport.
-const probe = ({ colourTokens, fixed, ranges }) => {
+const probe = ({ colourTokens, fixed, ranges, WEIGHT_MAX }) => {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -66,6 +69,7 @@ const probe = ({ colourTokens, fixed, ranges }) => {
   // palette: render a probe element per token, read back the computed colour
   const el = document.createElement('i');
   document.body.appendChild(el);
+  el.style.transition = 'none'; // read each token's value, not a transition frame
   const palette = {};
   for (const t of colourTokens) {
     el.style.color = `var(${t})`;
@@ -132,7 +136,7 @@ const probe = ({ colourTokens, fixed, ranges }) => {
       const size = parseFloat(cs.fontSize);
       if (!sizeOk(size)) add('size', size.toFixed(2).replace(/\.?0+$/, '') + 'px', sel);
       const wt = parseInt(cs.fontWeight, 10);
-      if (wt > 500) add('weight', String(wt), sel);
+      if (wt > WEIGHT_MAX) add('weight', String(wt), sel);
       const tc = norm(cs.color);
       if (tc[3] > 0 && !tokenFor(tc)) add('colour', 'text ' + hex(tc), sel);
     }
@@ -160,14 +164,14 @@ const bump = (cat, key, sel, n, page) => {
 };
 
 for (const vp of VIEWPORTS) {
-  const ctx = await browser.newContext({ viewport: vp });
+  const ctx = await browser.newContext({ viewport: vp, reducedMotion: 'reduce' }); // settled page, not mid-animation frames
   for (const p of PAGES) {
     const page = await ctx.newPage();
     try {
       await page.goto(BASE + p, { waitUntil: 'load' });
       await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
       await page.evaluate(() => document.fonts && document.fonts.ready);
-      const res = await page.evaluate(probe, { colourTokens, fixed: [...fixedSizes], ranges: sizeRanges });
+      const res = await page.evaluate(probe, { colourTokens, fixed: [...fixedSizes], ranges: sizeRanges, WEIGHT_MAX });
       palette = res.palette;
       for (const r of res.records) bump(r.cat, r.key, r.sel, r.n, `${p}@${vp.width}`);
     } catch (err) {
@@ -214,7 +218,7 @@ const show = (title, rs, level, limit = 12) => {
 };
 console.log(`tokens-audit  ${BASE}  ${PAGES.length} pages x ${VIEWPORTS.map((v) => v.width).join('/')}`);
 show('(a) font-size not in token set', report.a_fontSizesOffScale, 'WARN');
-show('(b) font-weight > 500', report.b_fontWeightOver500, 'FAIL');
+show('(b) font-weight > WEIGHT_MAX (heaviest --wght-* token)', report.b_fontWeightOver500, 'FAIL');
 show('(c) colour not in palette', report.c_offPaletteColours, 'FAIL');
 show('(d) line combo not {1px ink, 1px rule, 2px red}', report.d_lineExceptions, 'WARN');
 show('(e) border-radius != 0', report.e_nonZeroRadius, 'WARN');

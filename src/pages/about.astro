@@ -165,6 +165,22 @@ const insteadFig = {
     </ul>
   </Section>
 
+  <Section mark={S.site.mark} label={S.site.label} anchorId={S.site.anchorId}>
+    <p class="site-line">{about.siteLine}</p>
+    <ul class="links-list">
+      {
+        about.siteLinks.map((l) => (
+          <li>
+            <a href={l.href}>
+              <span class="link-label">{l.label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
   <CTASlab
     marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
     body={home.ctaSlabBody}
@@ -296,6 +312,12 @@ const insteadFig = {
     min-height: var(--hit-touch);
     font-family: var(--font-data);
     font-size: var(--t-label);
+  }
+
+  .site-line {
+    max-width: var(--measure);
+    margin-bottom: var(--s-4);
+    color: var(--color-text-body);
   }
 
   .links-list {
