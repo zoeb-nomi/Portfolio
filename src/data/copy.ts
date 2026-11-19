@@ -2514,7 +2514,7 @@ export const work = {
     caption: 'Fig. 2. Run time of the multi-step tax workflow',
     fromLabel: '10–15 min',
     toLabel: '<1 min',
-    note: 'Instead, production.',
+    note: 'Instead, production. Scoped edits re-run only the steps whose inputs changed.',
   },
 
   instead: {
@@ -2523,10 +2523,6 @@ export const work = {
     dateRange: 'Sep 2025–present',
     descriptor:
       'AI-native tax research & planning platform; first new entrant to clear IRS e-filing approval alongside incumbents.',
-    /** v4: the one-paragraph version shown before "What I did at Instead". */
-    standfirst:
-      'I own output quality for the tax-research LLM and work on a multi-step tax workflow, whose run time I cut from 10 to 15 minutes to under a minute.',
-    more: 'What I did at Instead',
     achievements: [
       {
         kicker: 'Workflow',
@@ -2604,7 +2600,6 @@ export const work = {
     role: 'Product Manager',
     dateRange: 'Mar 2025–Sep 2025',
     descriptor: 'Global employment platform enabling compliant hiring across 150+ countries.',
-    more: 'Public record',
     achievements: [
       {
         kicker: null as string | null,
@@ -2651,8 +2646,7 @@ export const work = {
     dateRange: 'Dec 2022–Mar 2025',
     descriptor: "India's leading HR technology platform; $25M+ ARR CoreHR suite.",
     standfirst:
-      "Built Background Verification zero to one on the Checkr API, Keka's first US-market product: 28 US enterprise clients and $2.7M MRR.",
-    more: 'More from Keka',
+      "Built the Background Verification module zero to one on the Checkr API, Keka's first US-market product. It went from nothing to 28 US enterprise clients and $2.7M MRR and anchored the company's US expansion. It was a full course in integration edge cases, compliance constraints and enterprise onboarding.",
     achievements: [
       {
         kicker: 'Integrations',

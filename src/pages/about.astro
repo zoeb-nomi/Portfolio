@@ -38,6 +38,9 @@ const insteadFig = {
     <blockquote class="belief">
       <p>{about.beliefPre}<strong>{about.beliefStrong}</strong>{about.beliefPost}</p>
     </blockquote>
+    <p class="profile">
+      {about.profileLink.pre} <a href={sources.kekaProfile.href} target="_blank" rel="noopener noreferrer">{about.profileLink.label}</a>
+    </p>
     <CareerTimeline items={about.timeline} />
     <p class="facts">{about.factsRow.join(' · ')}</p>
   </Section>
@@ -51,11 +54,9 @@ const insteadFig = {
     role={work.instead.role}
     dateRange={work.instead.dateRange}
     descriptor={work.instead.descriptor}
-    standfirst={work.instead.standfirst}
     achievements={work.instead.achievements}
+    note={work.insteadNote}
     headingLevel="h3"
-    lead={0}
-    moreLabel={work.instead.more}
     primary
   >
     <figure slot="margin" class="m-fig">
@@ -78,8 +79,6 @@ const insteadFig = {
     descriptor={work.multiplier.descriptor}
     achievements={work.multiplier.achievements}
     headingLevel="h3"
-    lead={1}
-    moreLabel={work.multiplier.more}
   >
     <RecordList
       slot="record"
@@ -98,8 +97,6 @@ const insteadFig = {
     standfirst={work.keka.standfirst}
     achievements={work.keka.achievements}
     headingLevel="h3"
-    lead={0}
-    moreLabel={work.keka.more}
   >
     <div slot="margin" class="m-video">
       <VideoEmbed
@@ -132,8 +129,9 @@ const insteadFig = {
   </section>
 
   <Section mark={S.builds.mark} label={S.builds.label} anchorId={S.builds.anchorId}>
-    <p class="builds-line">{work.openWork.note}</p>
+    <RecordList kicker={work.openWork.kicker} items={work.openWork.items} note={work.openWork.note} flush />
     <p class="ledger-link"><a href={work.openWork.ledgerLink.href}>{work.openWork.ledgerLink.label}</a></p>
+    <RecordList kicker={work.contributions.kicker} items={work.contributions.items} note={work.contributions.note} context="Contributions" />
   </Section>
 
   <Section mark={S.contact.mark} label={S.contact.label} anchorId={S.contact.anchorId}>
@@ -152,7 +150,7 @@ const insteadFig = {
   </Section>
 
   <CTASlab
-    marginLines={[]}
+    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
     body={home.ctaSlabBody}
     buttonLabel={cta.bookACall.label}
     buttonHref={cta.bookACall.href}
@@ -193,12 +191,6 @@ const insteadFig = {
   }
 
   .profile a,
-  .builds-line {
-    max-width: var(--measure);
-    line-height: var(--lh-body);
-    color: var(--ink-body);
-  }
-
   .ledger-link a {
     color: var(--red-ink);
     text-decoration: underline;
