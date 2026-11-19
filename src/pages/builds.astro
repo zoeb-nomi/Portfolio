@@ -112,7 +112,17 @@ const agreement = [
   </Section>
 
   <Section mark={B.sections.contributions.mark} label={B.sections.contributions.label} sub={B.sections.contributions.note} anchorId={B.sections.contributions.anchorId}>
-    <BuildsLedger variant="full" entries={contribs} />
+    <ul class="upstream">
+      {
+        contribs.map((c) => (
+          <li>
+            <a href={c.primary.href} target="_blank" rel="noopener noreferrer">{c.name}</a>
+            <span class="up-line">{c.oneLine}</span>
+            <span class="up-m">{c.measured.headline}</span>
+          </li>
+        ))
+      }
+    </ul>
     <p class="close-line">{B.close}</p>
   </Section>
 
@@ -145,6 +155,42 @@ const agreement = [
 </Base>
 
 <style>
+  /* Red Pen 5: two open pull requests are a footnote to the builds, not a ledger. One line each. */
+  .upstream {
+    list-style: none;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .upstream li {
+    display: grid;
+    gap: var(--s-1);
+    padding-top: var(--s-3);
+    border-top: var(--line-hair);
+  }
+
+  .upstream a {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-touch);
+    font-weight: var(--wght-strong);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .up-line {
+    color: var(--ink-body);
+    max-width: var(--measure);
+  }
+
+  .up-m {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
   .summary {
     margin-top: var(--s-5);
     font-weight: 500;

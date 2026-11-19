@@ -1,0 +1,492 @@
+---
+// /design/ (Red Pen 5): how this site is built and why. The page is its own specimen: every rule it states is
+// shown working on the page (live faces, live pen marks, both surfaces, the motion verbs). Linked from the footer.
+// Copy: copy.ts `designPage`. System reference: design/README.md.
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import Section from '../components/Section.astro';
+import { meta, designPage as D } from '../data/copy';
+
+const faceClass = ['v-me', 'v-model', 'v-check'];
+const swatchVar = ['--paper', '--ink', '--red', '--red-ink', '--graphite'];
+---
+
+<Base title={meta.design.title} description={meta.design.description} path="/design/" ogImage="/og/design.png">
+  <Masthead kicker={D.kicker} h1={D.h1} standfirst={D.standfirst} />
+
+  <Section mark={D.principles.mark} label={D.principles.label}>
+    <ol class="principles">
+      {
+        D.principles.items.map((it, i) => (
+          <li>
+            <span class="p-n" aria-hidden="true">{i + 1}</span>
+            <h3 class="p-h">{it.h}</h3>
+            <p class="p-p">{it.p}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <Section mark={D.voices.mark} label={D.voices.label}>
+    <ul class="voices">
+      {
+        D.voices.items.map((v, i) => (
+          <li class="voice">
+            <p class="v-who">
+              {v.who} <span class="v-face">{v.face}</span>
+            </p>
+            <p class={`v-sample ${faceClass[i]}`}>{v.sample}</p>
+            <p class="v-note">{v.note}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="axes" data-axes>
+      <p class="axes-label">{D.voices.axesLabel}</p>
+      <p class="axes-word" data-axes-word aria-live="off">quietly.</p>
+      <div class="axes-controls">
+        <label>
+          <span>{D.voices.width} <output data-axes-out="w">106</output></span>
+          <input type="range" min="62" max="125" value="106" data-axes-in="w" />
+        </label>
+        <label>
+          <span>{D.voices.weight} <output data-axes-out="g">720</output></span>
+          <input type="range" min="100" max="900" value="720" data-axes-in="g" />
+        </label>
+      </div>
+    </div>
+  </Section>
+
+  <Section mark={D.pen.mark} label={D.pen.label}>
+    <p class="lead">{D.pen.lead}</p>
+    <ul class="marks">
+      {
+        D.pen.marks.map((m, i) => (
+          <li class="mk" data-replay>
+            <span class="mk-word" data-pen={m.mark} data-pen-heavy={m.mark === 'underline' ? '' : undefined} data-pen-delay={String(i * 220)} data-pen-key={`d-${m.mark}`}>
+              {m.word}
+            </span>
+            <span class="mk-kind">{m.mark}</span>
+            <span class="mk-means">{m.means}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="hint">{D.pen.replay}</p>
+  </Section>
+
+  <Section mark={D.surfaces.mark} label={D.surfaces.label}>
+    <p class="lead">{D.surfaces.lead}</p>
+    <div class="surfaces">
+      {
+        [D.surfaces.paper, D.surfaces.ink].map((name, i) => (
+          <div class:list={['sf', { 'surface-ink': i === 1 }]}>
+            <p class="sf-name">{name}</p>
+            <p class="sf-line">
+              The court held the citation was{' '}
+              <span data-pen="circle" data-pen-key={`sf-${i}`} data-pen-delay="300">
+                valid.
+              </span>
+            </p>
+            <p class="sf-check">citation_check: no such case</p>
+          </div>
+        ))
+      }
+    </div>
+    <ul class="swatches">
+      {
+        D.surfaces.swatches.map((s, i) => (
+          <li>
+            <span class="sw" style={`background: var(${swatchVar[i]})`} aria-hidden="true" />
+            <span class="sw-name">{s}</span>
+            <code class="sw-var">{swatchVar[i]}</code>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section mark={D.motion.mark} label={D.motion.label}>
+    <p class="lead">{D.motion.lead}</p>
+    <ol class="verbs">
+      {
+        D.motion.verbs.map((v, i) => (
+          <li class="verb">
+            <span class="vb-v">
+              {i === 1 ? (
+                <span data-pen="underline" data-pen-key="d-verb">
+                  {v.v}
+                </span>
+              ) : (
+                v.v
+              )}
+            </span>
+            <span class="vb-d">{v.d}</span>
+            <span class="vb-t">{v.t}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <Section mark={D.rules.mark} label={D.rules.label}>
+    <ul class="rules">{D.rules.items.map((r) => <li>{r}</li>)}</ul>
+    <p class="checks">{D.rules.checks}</p>
+  </Section>
+</Base>
+
+<script>
+  import { mark, layer, reducedMotion, type MarkKind } from '../scripts/pen';
+
+  // Archivo's two axes, live.
+  document.querySelectorAll<HTMLElement>('[data-axes]').forEach((box) => {
+    const word = box.querySelector<HTMLElement>('[data-axes-word]')!;
+    const inputs = box.querySelectorAll<HTMLInputElement>('[data-axes-in]');
+    const set = () => {
+      inputs.forEach((inp) => {
+        const k = inp.dataset.axesIn!;
+        box.querySelector(`[data-axes-out="${k}"]`)!.textContent = inp.value;
+        if (k === 'w') word.style.fontStretch = `${inp.value}%`;
+        else word.style.fontWeight = inp.value;
+      });
+    };
+    inputs.forEach((inp) => inp.addEventListener('input', set));
+  });
+
+  // Point at a mark's row to draw it again.
+  const still = reducedMotion();
+  document.querySelectorAll<HTMLElement>('[data-replay]').forEach((row) => {
+    const el = row.querySelector<HTMLElement>('[data-pen]')!;
+    const again = () => {
+      layer(el).replaceChildren();
+      mark(el, el, el.dataset.pen as MarkKind, { animate: !still, heavy: el.hasAttribute('data-pen-heavy'), key: el.dataset.penKey });
+    };
+    row.addEventListener('pointerenter', again);
+  });
+</script>
+
+<style>
+  .lead {
+    max-width: var(--measure);
+    font-size: var(--t-lede);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
+  }
+
+  .hint,
+  .checks {
+    margin-top: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  /* §1 */
+  .principles {
+    list-style: none;
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .principles li {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--s-1) var(--s-4);
+  }
+
+  .p-n {
+    grid-row: span 2;
+    font-family: var(--font-display);
+    font-size: var(--t-num);
+    font-weight: var(--wght-claim);
+    font-stretch: calc(var(--wdth-tight) * 1%);
+    line-height: 1;
+    color: var(--red-ink);
+  }
+
+  .p-h {
+    font-size: var(--t-h3);
+  }
+
+  .p-p {
+    max-width: var(--measure);
+    color: var(--ink-body);
+  }
+
+  /* §2 */
+  .voices {
+    list-style: none;
+    display: grid;
+  }
+
+  .voice {
+    display: grid;
+    gap: var(--s-2);
+    padding-block: var(--s-6);
+    border-top: var(--line-hair);
+  }
+
+  .v-who {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  .v-face {
+    margin-left: var(--s-2);
+    color: var(--ink);
+  }
+
+  .v-sample {
+    font-size: var(--t-h2);
+    line-height: var(--lh-tight);
+    color: var(--ink);
+  }
+
+  .v-me {
+    font-family: var(--font-display);
+    font-weight: var(--wght-claim);
+    font-stretch: calc(var(--wdth-claim) * 1%);
+    letter-spacing: var(--track-display);
+  }
+
+  .v-model {
+    font-family: var(--font-model);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .v-check {
+    font-family: var(--font-mono);
+    font-size: var(--t-h3);
+    color: var(--red-ink);
+  }
+
+  .v-note {
+    max-width: var(--measure);
+    font-size: var(--t-small);
+    color: var(--ink-body);
+  }
+
+  .axes {
+    margin-top: var(--s-6);
+    padding: var(--s-6);
+    background: var(--paper-sunk);
+  }
+
+  .axes-label {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  .axes-word {
+    margin-block: var(--s-4);
+    font-family: var(--font-display);
+    font-size: var(--t-display);
+    font-weight: var(--wght-head);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    line-height: 1;
+    letter-spacing: var(--track-display);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .axes-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-6);
+  }
+
+  .axes-controls label {
+    display: grid;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-body);
+  }
+
+  .axes-controls input {
+    inline-size: 100%;
+    min-block-size: var(--hit-touch);
+    accent-color: var(--red-ink);
+  }
+
+  /* §3 */
+  .marks {
+    list-style: none;
+    display: grid;
+    margin-top: var(--s-6);
+  }
+
+  .mk {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) 7rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--s-4);
+    padding-block: var(--s-4);
+    border-top: var(--line-hair);
+  }
+
+  .mk-word {
+    justify-self: start;
+    font-family: var(--font-model);
+    font-size: var(--t-h3);
+    color: var(--ink);
+  }
+
+  .mk-kind {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--red-ink);
+  }
+
+  .mk-means {
+    color: var(--ink-body);
+  }
+
+  /* §4 */
+  .surfaces {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: var(--s-6);
+    border: var(--line-object);
+  }
+
+  .sf {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-6);
+    background: var(--paper);
+  }
+
+  .sf.surface-ink {
+    background: var(--paper);
+  }
+
+  .sf-name {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  .sf-line {
+    font-family: var(--font-model);
+    font-size: var(--t-model);
+    color: var(--ink);
+  }
+
+  .sf-check {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--red-ink);
+  }
+
+  .swatches {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--s-4);
+    margin-top: var(--s-6);
+  }
+
+  .swatches li {
+    display: grid;
+    gap: var(--s-1);
+  }
+
+  .sw {
+    display: block;
+    block-size: var(--s-10);
+    border: var(--line-hair);
+  }
+
+  .sw-name {
+    font-size: var(--t-small);
+    color: var(--ink);
+  }
+
+  .sw-var {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  /* §5 */
+  .verbs {
+    list-style: none;
+    display: grid;
+    margin-top: var(--s-6);
+  }
+
+  .verb {
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--s-4);
+    padding-block: var(--s-4);
+    border-top: var(--line-hair);
+  }
+
+  .vb-v {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    font-weight: var(--wght-head);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    color: var(--ink);
+  }
+
+  .vb-d {
+    color: var(--ink-body);
+  }
+
+  .vb-t {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    text-align: right;
+  }
+
+  /* §6 */
+  .rules {
+    display: grid;
+    gap: var(--s-3);
+    max-width: var(--measure);
+    padding-left: var(--s-5);
+    color: var(--ink-body);
+  }
+
+  .rules li::marker {
+    color: var(--red-ink);
+  }
+
+  @media (max-width: 899px) {
+    .axes-controls,
+    .surfaces {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .swatches {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .mk {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .mk-means {
+      grid-column: 1 / -1;
+    }
+
+    .verb {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .vb-d {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+</style>

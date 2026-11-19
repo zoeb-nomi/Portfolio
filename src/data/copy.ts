@@ -40,6 +40,9 @@ export const site = {
 
 // v3 IA (DESIGN v3 §i, I-01): four items at every width. Builds owns the case
 // studies; Writing owns the notes.
+// Footer-only link to the design page (Red Pen 5): not in the header nav.
+export const designLink = { label: 'How this site is built', href: '/design/' };
+
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Builds', href: '/builds/', activePrefixes: ['/crosssource/', '/mirror-eval/', '/screener-eval/'] },
@@ -156,6 +159,10 @@ export const meta = {
     title: "OpenAI's Decisions API, quizzed by lawyers",
     description:
       "544 LegalBench questions through OpenAI's Decisions API. At 90% confidence it was 88% right. Counted, not scored, with the curve and the code.",
+  },
+  design: {
+    title: 'How this site is built · Zoeb Nomi',
+    description: 'The Red Pen design system behind zoebnomi.com: three voices, one pen, two surfaces and five kinds of motion, and why.',
   },
   about: {
     title: 'About Zoeb Nomi · AI Product Manager at Instead, Bengaluru',
@@ -848,6 +855,83 @@ export const shipping = {
     ],
     note:
       'No titles, project names or links: the work is private. Slip is days against the due date set at filing; negative is early. Late is not marked in red: red is for annotation and action.',
+  },
+};
+
+// ---------------------------------------------------------------------------
+// /design/ · how this site is built, and why (Red Pen 5, 19 Nov 2026)
+// ---------------------------------------------------------------------------
+
+export const designPage = {
+  kicker: 'Design system',
+  h1: 'How this site is built, and why',
+  standfirst:
+    'The design system is called Red Pen. This page shows its rules working: three voices, one pen, two surfaces and five kinds of motion. The rules come from one fact about my work. LLM output reads fine until something checks it.',
+  principles: {
+    mark: '§1',
+    label: 'First principles',
+    items: [
+      { h: 'The subject is the quiet failure.', p: 'So the site does not describe checking. It performs it: the home page opens on a model answer and a pen that checks it.' },
+      { h: 'There are always three parties.', p: 'I decide, the model answers, a check reads the answer. Each gets its own typeface, so you can always tell who is speaking.' },
+      { h: 'The pen is the only actor.', p: 'Red moves only to mark something, the way an editor\'s pen does. Nothing red is decoration.' },
+    ],
+  },
+  voices: {
+    mark: '§2',
+    label: 'Three voices',
+    items: [
+      { who: 'Me', face: 'Archivo', sample: 'Ship the check with the workflow.', note: 'Claims, headings, body. A variable face: width and weight carry emphasis.' },
+      { who: 'The model', face: 'Source Serif 4', sample: 'The court held the citation was valid.', note: 'Output on trial, and case names from the record, in italic.' },
+      { who: 'The check', face: 'IBM Plex Mono', sample: 'citation_check: no such case', note: 'Verdicts, check names, data and sources. Never uppercase.' },
+    ],
+    axesLabel: 'Try Archivo\'s axes',
+    width: 'Width',
+    weight: 'Weight',
+  },
+  pen: {
+    mark: '§3',
+    label: 'One pen',
+    lead: 'Every red stroke is a proofreader\'s mark with one meaning. Each is drawn by script over real text, with a seeded wobble, so it looks the same on every visit but no two marks match.',
+    marks: [
+      { mark: 'tick', word: 'found', means: 'checked, and it holds' },
+      { mark: 'strike', word: '2021', means: 'wrong; the correction goes above' },
+      { mark: 'circle', word: 'Varghese', means: 'wrong, and flagged' },
+      { mark: 'underline', word: 'quietly', means: 'stress' },
+      { mark: 'box', word: 'Trace', means: 'scope' },
+    ],
+    replay: 'Point at a word to draw its mark again.',
+  },
+  surfaces: {
+    mark: '§4',
+    label: 'Two surfaces',
+    lead: 'Paper is where output lives. Ink is where checks run: the proof, the harness, the call to action. Ink is a mode, not a second palette: the same components read the same roles and the pen glows.',
+    paper: 'Paper',
+    ink: 'Ink',
+    swatches: ['paper', 'ink', 'red pen', 'red text', 'graphite'],
+  },
+  motion: {
+    mark: '§5',
+    label: 'Five kinds of motion',
+    lead: 'Nothing moves unless it is one of these. The finished page is in the HTML; motion starts from it, and reduced motion keeps it still.',
+    verbs: [
+      { v: 'Stream', d: 'the model writes, token by token', t: '16 ms a character' },
+      { v: 'Mark', d: 'the pen draws a mark', t: '260 to 900 ms, by length' },
+      { v: 'Stamp', d: 'a verdict lands', t: '260 ms, a small overshoot' },
+      { v: 'Tally', d: 'a count settles on its number', t: '1.4 s' },
+      { v: 'Reveal', d: 'a block or a scan line arrives', t: '600 ms' },
+    ],
+  },
+  rules: {
+    mark: '§6',
+    label: 'Rules it keeps',
+    items: [
+      'Every number is a reading: value, datum, n and source.',
+      'Long text is never cut to fit a layout. It moves to the page that holds it.',
+      'Red text is always the darker red, for contrast. The bright red is only for marks.',
+      'No em dashes, no uppercase labels, no italic headings.',
+      'Every value lives in one token file, and the build fails on anything else.',
+    ],
+    checks: 'Checked on every build: tokens, line tiers, required and banned strings, accessibility at four widths, links, Lighthouse and a copy budget for home.',
   },
 };
 
@@ -2984,6 +3068,7 @@ export const llmsTxt = `# Zoeb Nomi
 - screener-eval case study: https://www.zoebnomi.com/screener-eval/
 - About (who he is, and the employment record at #record): https://www.zoebnomi.com/about/
 - Writing (essays; notes, one counted finding each, at #notes): https://www.zoebnomi.com/writing/
+- How this site is built (the Red Pen design system and why): https://www.zoebnomi.com/design/
 `;
 
 // ---------------------------------------------------------------------------
@@ -2997,6 +3082,7 @@ export const ogCards = {
     { id: 'home', title: site.name, sub: home.h1Line2, num: { value: home.readings[0].display + ' min', caption: '10–15 min before · Instead' } },
     { id: 'builds', title: 'Builds', sub: 'What I built, how it is guarded, what it was measured against.', num: { value: String(buildsLedger.length), caption: 'public builds and contributions' } },
     { id: 'about', title: 'About', sub: 'Mechanical engineer turned AI product manager, in Bengaluru.' },
+    { id: 'design', title: 'How this site is built', sub: 'Red Pen: three voices, one pen, two surfaces, five kinds of motion.' },
     { id: 'crosssource', title: 'CrossSource', sub: 'Open benchmark for legal-RAG citation accuracy.', num: { value: '0.981 → 0.994', caption: 'citation precision · n = 25' } },
     { id: 'mirror-eval', title: 'mirror-eval', sub: 'What AI search says about a person, measured twice.', num: { value: '13 → 63', caption: 'Perplexity · Claude 0 → 0' } },
     { id: 'screener-eval', title: 'screener-eval', sub: 'What LLM résumé screeners reward, counted 885 times.', num: { value: '22.3', caption: 'points: which screener read it' } },
