@@ -1,11 +1,14 @@
-# zoebnomi.com design system: The Red Pen v3
+# zoebnomi.com design system: The Red Pen v4
 
 This is the one place the design system lives. `design/tokens.css` holds every value;
 this page holds the rules; `design/components/` has one page per component;
 `design/mocks/` keeps the approved mocks and the dated before/after shots. hq and Notion
 point here and copy nothing. v3 is Hybrid 1 (12 Nov 2026): Take A's bones (DESIGN_V3
 D-01 to D-18, I-01 to I-10), Take B's story (Fig. 0, readings, back-references), and a
-motion layer on top.
+motion layer on top. v4 (19 Nov 2026) is "Red Pen, edited": the same paper, ink and pen with the
+volume and the stock tropes taken out (one claim per screen, copy budgets the build enforces, a
+semantic token layer for side-project themes, Source Serif 4 Display). The review behind it:
+`design/mocks/2026-11-19-v4/`.
 
 ## 1. Principles
 
@@ -22,6 +25,12 @@ motion layer on top.
    "Back to Fig. 0".
 5. **Motion explains, then gets out of the way.** The HTML is the final state. Motion
    never hides content from someone who has no script, a slow script or reduced motion.
+6. **One screen, one claim (v4).** A section is a heading that is the claim, one proof and
+   one link. Method, caveats, legends and full tables go one tap deeper, in a Disclosure.
+7. **The page never names its own parts (v4).** No "Fig. 0, step n", no "Next:" lines, no
+   captions that explain what a section is for. Figure numbers live inside a figure.
+8. **Mono is for numbers and labels (v4).** Never a sentence over 16 words; red text never
+   runs past 8 words. `npm run budget` checks both.
 
 ## 2. Colour tokens (meaning, not just value)
 
@@ -42,6 +51,12 @@ Values live only in `design/tokens.css`; this table says what each colour means.
 
 No dark mode in v3 (D-18). No green, blue or amber; state is never colour alone.
 
+**Semantic roles (v4).** New code reads the roles, not the primitives: `--color-surface`,
+`--color-surface-raised`, `--color-text`, `--color-text-body`, `--color-text-muted`,
+`--color-line`, `--color-accent`, `--color-accent-text`, `--color-accent-tint`,
+`--color-on-accent`. A side-project theme overrides the primitives under the roles and keeps
+every rule on this page. The DTCG JSON port (generated `tokens.css`) is the next release.
+
 ## 3. The four line tiers (horizontals only)
 
 | tier | token | spec | use | never |
@@ -59,13 +74,13 @@ border widths and vertical structural rules outside figure and object components
 
 ## 4. Type
 
-Source Serif 4 Display (display; replaced Instrument Serif in v4), IBM Plex Sans (body), IBM Plex Mono (labels and data). Weights
+Source Serif 4 Display (display, a static opsz 60 instance; replaced Instrument Serif in v4), IBM Plex Sans (body), IBM Plex Mono (labels and data). Weights
 400/500 only, self-hosted. Floor 12px everywhere.
 
 | role | token | 390 → 1440 | face |
 |---|---|---|---|
-| home H1 line 1 | `--t-display` | 56 → 136 | serif, -0.025em |
-| home H1 line 2 | `--t-answer` | 28 → 50 | serif italic |
+| home H1 | `--t-display` | 50 → 106 | serif, -0.025em |
+| home lede (v4) | `--t-lede` | 22 → 32 | sans, not italic |
 | page H1 | `--t-page` | 42 → 74 | serif |
 | tile numeral | `--t-stat` | 56 → 84 | serif |
 | H2 | `--t-h2` | 30 → 46 | serif |
@@ -77,6 +92,9 @@ Source Serif 4 Display (display; replaced Instrument Serif in v4), IBM Plex Sans
 | data | `--t-data` | 13 | mono |
 | nav, buttons | `--t-nav` | 12.5 | mono caps .12em |
 | label, caption | `--t-label` | 12 | mono caps .12em |
+
+v4 names seven type roles for new code (`--type-display`, `-page`, `-h2`, `-h3`, `-body`,
+`-small`, `-label`); the sizes above stay valid as aliases. No italic display line anywhere.
 
 Numbers inside sentences are sans 500 with tabular figures; mono is for data cells, labels
 and sources only.
@@ -122,7 +140,7 @@ Rules:
 
 | element | motion | trigger |
 |---|---|---|
-| Fig. 0 | steps wipe in, stems grow, the red cloud draws, "Released" stamps at 3.2 s; Replay | load |
+| Fig. 0 (v4: flat sheet, no tilt, no shadow, no Replay) | one red scan line sweeps the sheet (1.1 s), failed squares turn red, the proof line wipes in | load |
 | H1 underline | draws left to right | load |
 | Readings | the dimension line draws from the datum; the numeral is final from the start (numbers never tween) | 50% in view |
 | Ledger rows | settle 10px, 70 ms apart; click, tap or Enter opens the panel (native details) and draws its figure | in view / click |
@@ -133,7 +151,9 @@ Rules:
 
 ## 8. Component catalogue
 
-One page each in `design/components/` (props, variants, pages, screenshot). New in v3:
+One page each in `design/components/` (props, variants, pages, screenshot). New in v4:
+**Disclosure** (depth one tap away). Changed in v4: Readings (`compact`), BuildsLedger
+(`homeLine` on compact rows), TimelineEntry (`lead`, `moreLabel`), AuditSheet (flat). New in v3:
 **Fig0, Readings, BuildsLedger (full / compact / feature), TradeFrameFlow (full / strip),
 MiniFigure, StatTiles, Motion, Moved**. Changed: SiteHeader, SiteFooter, Section,
 Masthead (breadcrumb, case-study fold), CTASlab, Headshot, DataTable (booktabs, stacking),
@@ -161,6 +181,21 @@ MobileNav, HarnessLedger, ProofStrip, EmbedCard, EssayThumb, Figure, employer lo
 | Use a colon or comma | Use an em dash (the geo-gate fails the build) |
 | Reveal with a wipe or a draw, from the final state | Hide content until a script runs |
 | One portrait, greyscale, multiplied into the paper | Frames, shadows, employer logos |
+| Put method and caveats in a Disclosure | Explain a section in a caption above it |
+| Let the heading be the claim | Write a mono caption, then a heading, then body, then a footnote |
+
+### 9a. Copy budgets (v4)
+
+Rendered words in `<main>`, closed Disclosures not counted. Enforced by `npm run budget`.
+
+| page | budget | v3 | v4 |
+|---|---|---|---|
+| Home | 300 | 1,450 | 291 |
+| Builds | 700 | 1,355 | 699 |
+| About | 500 | 1,156 | 497 |
+| Writing | 400 | 835 | 396 |
+| Case studies | 900 | 1,140 to 1,780 | report only until the narration is rebuilt |
+| Essays | none | | essays are meant to be long |
 
 ## 10. Adding a component
 
@@ -211,4 +246,9 @@ tiers), `npm run gate` (required and banned strings, em dashes included), `npm r
 (axe on every route at 390/768/1024/1440, fails on serious or critical), `npm run links`
 (internal links, fragments, redirect targets; `-- --external` for outbound), `npm run lhci`
 (home, /builds/, a case study, /writing/; perf ≥ 90, a11y ≥ 95, SEO ≥ 95, CLS < 0.1, desktop
-and mobile), `npm run qa` and `npm run tokens` (rendered sweeps), `npm run audio:check`.
+and mobile), `npm run qa` and `npm run tokens` (rendered sweeps), `npm run audio:check`,
+`npm run budget` (v4 copy budgets and the slop audit).
+
+In a cloud container whose Chromium differs from the pinned Playwright, pass
+`CHROME=/opt/pw-browsers/chromium` to a11y, links, og and budget, and for lhci
+`CHROME_PATH=/opt/pw-browsers/chromium npx lhci autorun --config=<file> --collect.settings.chromeFlags="--no-sandbox --headless=new"`.
