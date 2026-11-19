@@ -531,14 +531,8 @@ export interface BuildEntry {
 export const builds = {
   kicker: 'Builds',
   h1: 'What I built, and how I know it works',
-  standfirst: 'Each build with the rule that guards it, the number it was measured on, and its code.',
-  /** v4 Disclosure labels on /builds/. */
-  more: {
-    legend: 'What the tags mean',
-    figNote: 'How the judges were checked',
-    table1: 'Table 1, the three harnesses side by side',
-    table2: 'Table 2, six of the items',
-  },
+  standfirst:
+    'Each row is one build. It says what the system does, the rule that stops it doing the wrong thing, the number it was measured on, and where the code is. Builds started after 10 Nov 2026 also show the date I planned to ship and the date I did.',
   /** Renders only when velocity-public.json has at least 3 closed builds (SPEC #22). */
   summary:
     '{shipped_n} builds shipped since 10 Nov 2026. {on_time_n} of {shipped_n} on or before the planned date. Median build: {median_days} days, ${median_cost} in model spend.',
@@ -565,9 +559,9 @@ export const builds = {
   },
   evalsWhy: 'Why this matters: a harness is how a step earns the right to run without a person.',
   /** Builds that shipped before ship dates were tracked (10 Nov 2026): "Shipped <when> (before ship-date tracking)". */
-  shippedUntracked: (when: string) => when,
+  shippedUntracked: (when: string) => `Shipped ${when} (before ship-date tracking)`,
   expand: { open: 'Open', close: 'Close', guard: 'Guarded', shipped: 'Shipped', result: 'Result' },
-  close: 'Nothing on this page is a demo.',
+  close: 'If a row has no number, it says why. Nothing on this page is a demo.',
   tradeframeFlow: {
     n: 'Fig. 1',
     title: 'Who decides what runs. Dashed: proposes only. Solid: decides.',

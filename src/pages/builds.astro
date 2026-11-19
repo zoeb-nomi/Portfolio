@@ -10,7 +10,6 @@ import BuildsLedger from '../components/BuildsLedger.astro';
 import DataTable from '../components/DataTable.astro';
 import PullQuote from '../components/PullQuote.astro';
 import StatTiles from '../components/StatTiles.astro';
-import Disclosure from '../components/Disclosure.astro';
 import CTASlab from '../components/CTASlab.astro';
 import { meta, home, cta, builds as B, buildsLedger, evalsLedger, shipping } from '../data/copy';
 
@@ -56,6 +55,16 @@ const agreement = [
 <Base title={meta.builds.title} description={meta.builds.description} path="/builds/" ogImage="/og/builds.png" motion>
   <Masthead kicker={B.kicker} h1={B.h1} standfirst={B.standfirst} h1Max="18ch" standfirstMax="62ch">
     {summary && <p class="summary">{summary} <span>{B.summarySource}</span></p>}
+    <dl class="legend">
+      {
+        B.legend.map((l) => (
+          <div>
+            <dt>{l.term}</dt>
+            <dd>{l.text}</dd>
+          </div>
+        ))
+      }
+    </dl>
     <nav class="jump" aria-label="On this page">
       {B.jump.map((j) => <a href={j.href}>{j.label}</a>)}
     </nav>
@@ -66,14 +75,14 @@ const agreement = [
   </Section>
 
   <Section mark={B.sections.evals.mark} label={B.sections.evals.label} sub={B.sections.evals.note} anchorId={B.sections.evals.anchorId} grid>
+    <p class="why">{B.evalsWhy}</p>
+    <p class="legend-line">{home.evals.legend}</p>
     <BuildsLedger variant="full" entries={evals} />
-    <Disclosure label={B.more.legend}>
-      <p class="legend-line">{home.evals.legend}</p>
-    </Disclosure>
   </Section>
 
   <Section mark={B.sections.method.mark} label={B.sections.method.label} anchorId={B.sections.method.anchorId}>
     <h3 class="sub-h2">{home.evals.h2}</h3>
+    <p class="dek">{home.evals.standfirst}</p>
     <PullQuote rule="ink">{home.evals.methodLine}</PullQuote>
 
     <figure class="ja" aria-labelledby="fig2-cap" data-mini-figure>
@@ -93,14 +102,13 @@ const agreement = [
         }
       </ul>
       <p class="ja-ax" aria-hidden="true"><span>0%</span><span>50%</span><span>100%</span></p>
-      <Disclosure label={B.more.figNote}>
-        <p class="note">{home.evals.figNote}</p>
-      </Disclosure>
+      <p class="note">{home.evals.figNote}</p>
     </figure>
 
-    <Disclosure label={B.more.table1} class="compare">
+    <div class="compare">
       <DataTable caption={home.evals.tableCaption} columns={home.evals.tableColumns} rows={tableRows} />
-    </Disclosure>
+    </div>
+    <p class="close-line">{home.evals.closeLine}</p>
   </Section>
 
   <Section mark={B.sections.contributions.mark} label={B.sections.contributions.label} sub={B.sections.contributions.note} anchorId={B.sections.contributions.anchorId}>
@@ -110,11 +118,13 @@ const agreement = [
 
   <Section mark={B.sections.shipping.mark} label={B.sections.shipping.label} sub={B.sections.shipping.note} anchorId={B.sections.shipping.anchorId}>
     <h3 class="sub-h2">{shipping.h2}</h3>
+    <p class="dek">{shipping.lede}</p>
     <StatTiles tiles={shipping.tiles} />
     <div class="sentences">
+      <p>{shipping.costSentence}</p>
       <p>{shipping.controlSentence} <span class="ctl-note">{shipping.controlNote}</span></p>
     </div>
-    <Disclosure label={B.more.table2} class="ship-table">
+    <div class="ship-table">
       <DataTable
         caption={`Table 2. ${shipping.table.caption}`}
         columns={shipping.table.columns}
@@ -123,11 +133,11 @@ const agreement = [
       />
       <p class="note">{shipping.table.note}</p>
       <p class="note">{shipping.asOf}</p>
-    </Disclosure>
+    </div>
   </Section>
 
   <CTASlab
-    marginLines={[]}
+    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
     body={home.ctaSlabBody}
     buttonLabel={cta.bookACall.label}
     buttonHref={cta.bookACall.href}
@@ -149,9 +159,30 @@ const agreement = [
     color: var(--ink-muted);
   }
 
+  .legend {
+    display: grid;
+    gap: var(--s-1);
+    margin-top: var(--s-6);
+    padding-top: var(--s-3);
+    border-top: var(--line-hair);
+    font-size: var(--t-small);
+    color: var(--ink-body);
+    max-width: 62ch;
+  }
 
+  .legend div {
+    display: flex;
+    gap: var(--s-2);
+  }
 
+  .legend dt {
+    font-weight: 500;
+    color: var(--ink);
+  }
 
+  .legend dt::after {
+    content: ':';
+  }
 
   .jump {
     display: flex;
@@ -173,6 +204,11 @@ const agreement = [
     text-underline-offset: var(--underline-offset);
   }
 
+  .why {
+    font-size: var(--t-small);
+    color: var(--ink-body);
+    max-width: var(--measure);
+  }
 
   .legend-line {
     margin-block: var(--s-3) var(--s-6);
@@ -190,9 +226,14 @@ const agreement = [
     letter-spacing: var(--track-tight);
     color: var(--ink);
     max-width: 22ch;
-    margin-bottom: var(--s-8);
   }
 
+  .dek {
+    margin-block: var(--s-4) var(--s-8);
+    line-height: var(--lh-body);
+    color: var(--ink-body);
+    max-width: var(--measure);
+  }
 
   .ja {
     margin-top: var(--s-11);
@@ -297,17 +338,17 @@ const agreement = [
     max-width: 80ch;
   }
 
-  :global(.compare) {
+  .compare {
     margin-top: var(--s-11);
   }
 
-  :global(.compare) :global(.data-table th),
-  :global(.compare) :global(.data-table td) {
+  .compare :global(.data-table th),
+  .compare :global(.data-table td) {
     text-align: left;
     vertical-align: top;
   }
 
-  :global(.compare) :global(.data-table td) {
+  .compare :global(.data-table td) {
     font-family: var(--font-body);
     font-size: var(--t-small);
     line-height: var(--lh-snug);
@@ -338,12 +379,12 @@ const agreement = [
     color: var(--ink-muted);
   }
 
-  :global(.ship-table) {
+  .ship-table {
     margin-top: var(--s-9);
   }
 
   @media (min-width: 600px) {
-    :global(.compare) :global(.data-table) {
+    .compare :global(.data-table) {
       min-width: 720px;
     }
   }
