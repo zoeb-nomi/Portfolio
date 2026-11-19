@@ -1,0 +1,61 @@
+---
+// Disclosure (v4): depth one tap away. A native <details> whose summary is a plain red-ink text link with a
+// "+" / "−" mark; the method, caveats, legends and full tables a page keeps but does not lead with live inside
+// it. The content stays in the HTML (crawlers, llms.txt, the geo gate and screen readers all reach it), it
+// opens without script, and `npm run budget` does not count it while closed.
+//
+// Variants: none. Motion: none (the browser's own open/close). Use it instead of a caption that explains.
+interface Props {
+  /** The link text: what opens, in a few words ("How the scores were checked"). */
+  label: string;
+  open?: boolean;
+  class?: string;
+}
+
+const { label, open = false, class: className } = Astro.props;
+---
+
+<details class:list={['disclosure', className]} open={open}>
+  <summary><span class="d-mark" aria-hidden="true"></span>{label}</summary>
+  <div class="d-body">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .disclosure {
+    margin-top: var(--s-6);
+  }
+
+  summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--hit-touch);
+    cursor: pointer;
+    list-style: none;
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .d-mark::before {
+    content: '+';
+    display: inline-block;
+    inline-size: 1ch;
+    font-family: var(--font-mono);
+    text-decoration: none;
+  }
+
+  .disclosure[open] > summary .d-mark::before {
+    content: '−';
+  }
+
+  .d-body {
+    margin-top: var(--s-4);
+  }
+</style>
