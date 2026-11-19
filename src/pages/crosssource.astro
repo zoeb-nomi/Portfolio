@@ -61,7 +61,7 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
         ]}
       />
     </EssayFigure>
-    <AudioPlayer audio={cs.audio} articleId="crosssource" />
+    {!cs.audioPaused && <AudioPlayer audio={cs.audio} articleId="crosssource" />}
   </Masthead>
 
   <Section mark={cs.s1.mark} label={cs.s1.label} narrId="s1-cue">

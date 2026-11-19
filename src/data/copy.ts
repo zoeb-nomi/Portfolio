@@ -986,6 +986,9 @@ export const crosssource = {
 
   // Narration from scripts/audio (spoken versions of the tables and lists are in scripts/audio/pages.json).
   audio: { ...audioCrosssource, cues: audioCrosssource.cues as [string, number, number][] },
+  // Narration predates the #32 rewrite of this page, so the player is hidden until it is rebuilt
+  // (scripts/audio/pages.json "paused"). Set false after npm run audio:build -- crosssource.
+  audioPaused: true,
 
   s1: {
     mark: '§1',
