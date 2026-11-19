@@ -220,7 +220,16 @@ const claims = a.answer.filter((s) => s.mark);
       requestAnimationFrame(() => drawAll(false));
     } else {
       // Start once the fonts have settled, so marks land on the final glyphs.
-      (document.fonts?.ready ?? Promise.resolve()).then(() => wait(250)).then(run);
+      // Start once the fonts have settled and the sheet is mostly on screen, so the visitor sees the pen work.
+      const io = new IntersectionObserver(
+        (es) => {
+          if (!es.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          (document.fonts?.ready ?? Promise.resolve()).then(() => wait(250)).then(run);
+        },
+        { threshold: 0.45 },
+      );
+      io.observe(fig);
     }
 
     replay.addEventListener('click', () => {

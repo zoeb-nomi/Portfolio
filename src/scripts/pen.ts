@@ -198,29 +198,117 @@ export interface DrawOpts {
   key?: string;
 }
 
-/** Draw one path into a layer. Resolves when the stroke has finished. */
-export function stroke(svg: SVGSVGElement, d: string, opts: DrawOpts = {}): Promise<SVGPathElement> {
-  const path = document.createElementNS(SVGNS, 'path');
-  path.setAttribute('d', d);
-  path.setAttribute('class', `pen-path ${opts.tone ?? 'pen'}${opts.heavy ? ' heavy' : ''}`);
-  if (opts.key) path.dataset.key = opts.key;
-  svg.appendChild(path);
-  if (!opts.animate) return Promise.resolve(path);
-  const len = path.getTotalLength();
-  const dur = Math.max(MOTION.markMin, Math.min(MOTION.markMax, len * 1.5));
-  path.style.strokeDasharray = `${len}`;
-  path.style.strokeDashoffset = `${len}`;
-  const anim = path.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], {
-    duration: dur,
-    delay: opts.delay ?? 0,
-    easing: MOTION.easePen,
-    fill: 'forwards',
+let maskSeq = 0;
+
+/** The outline of a tapered stroke along a centre line: thin at both ends, full in the middle, a little heavier
+ *  where the pen lands (a nib presses on the down-stroke). Returns a closed path for a fill. */
+function taper(centre: SVGPathElement, maxW: number): string {
+  const len = centre.getTotalLength();
+  if (len < 2) return '';
+  const n = Math.max(12, Math.min(90, Math.round(len / 4)));
+  const pts: DOMPoint[] = [];
+  for (let i = 0; i <= n; i++) pts.push(centre.getPointAtLength((len * i) / n));
+  const left: Pt[] = [];
+  const right: Pt[] = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    const a = pts[Math.max(0, i - 1)];
+    const b = pts[Math.min(n, i + 1)];
+    let nx = -(b.y - a.y);
+    let ny = b.x - a.x;
+    const m = Math.hypot(nx, ny) || 1;
+    nx /= m;
+    ny /= m;
+    const w = (maxW / 2) * (0.18 + 0.82 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.15)), 0.55)) * (1.08 - 0.16 * t);
+    left.push([pts[i].x + nx * w, pts[i].y + ny * w]);
+    right.push([pts[i].x - nx * w, pts[i].y - ny * w]);
+  }
+  const ring = left.concat(right.reverse());
+  return ring.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ') + 'Z';
+}
+
+/** Draw one mark into a layer. The pen's strokes are tapered fills (ink, not a CAD line); graphite stays a
+ *  thin even line. Animation reveals the fill through a mask whose centre line draws on. Resolves when done. */
+export function stroke(svg: SVGSVGElement, d: string, opts: DrawOpts = {}): Promise<SVGElement> {
+  const tone = opts.tone ?? 'pen';
+  const g = document.createElementNS(SVGNS, 'g');
+  g.setAttribute('class', `pen-mark ${tone}${opts.heavy ? ' heavy' : ''}`);
+  if (opts.key) g.dataset.key = opts.key;
+  svg.appendChild(g);
+
+  const subs = d.split(/(?=M)/).filter((x) => x.trim());
+  const centres = subs.map((sd) => {
+    const c = document.createElementNS(SVGNS, 'path');
+    c.setAttribute('d', sd);
+    return c;
   });
-  return anim.finished.then(() => {
-    path.style.strokeDasharray = '';
-    path.style.strokeDashoffset = '';
-    anim.cancel();
-    return path;
+
+  if (tone === 'graphite') {
+    for (const c of centres) {
+      c.setAttribute('class', 'pen-path graphite');
+      g.appendChild(c);
+    }
+  } else {
+    const maxW = opts.heavy ? 5.2 : 3.4;
+    // Measure the centre lines inside the layer (getTotalLength needs them in the document).
+    for (const c of centres) {
+      c.setAttribute('class', 'pen-centre');
+      g.appendChild(c);
+    }
+    const ink = document.createElementNS(SVGNS, 'path');
+    ink.setAttribute('class', 'pen-ink');
+    ink.setAttribute('d', centres.map((c) => taper(c, maxW)).join(' '));
+    for (const c of centres) c.remove();
+    g.appendChild(ink);
+    if (opts.animate) {
+      const id = `pen-mask-${++maskSeq}`;
+      const mask = document.createElementNS(SVGNS, 'mask');
+      mask.setAttribute('id', id);
+      mask.setAttribute('maskUnits', 'userSpaceOnUse');
+      mask.setAttribute('x', '-5000');
+      mask.setAttribute('y', '-5000');
+      mask.setAttribute('width', '20000');
+      mask.setAttribute('height', '20000');
+      for (const c of centres) {
+        c.setAttribute('class', 'pen-reveal');
+        c.style.strokeWidth = `${maxW + 6}px`;
+        mask.appendChild(c);
+      }
+      g.appendChild(mask);
+      ink.setAttribute('mask', `url(#${id})`);
+    }
+  }
+
+  if (!opts.animate) return Promise.resolve(g);
+
+  const lines = Array.from(g.querySelectorAll<SVGPathElement>(tone === 'graphite' ? '.pen-path' : '.pen-reveal'));
+  const total = lines.reduce((a, l) => a + l.getTotalLength(), 0);
+  const dur = Math.max(MOTION.markMin, Math.min(MOTION.markMax, total * 1.5));
+  let offset = opts.delay ?? 0;
+  const runs = lines.map((l) => {
+    const len = l.getTotalLength();
+    const share = (dur * len) / (total || 1);
+    l.style.strokeDasharray = `${len}`;
+    l.style.strokeDashoffset = `${len}`;
+    const a = l.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], {
+      duration: share,
+      delay: offset,
+      easing: lines.length > 1 ? 'linear' : MOTION.easePen,
+      fill: 'forwards',
+    });
+    offset += share;
+    return a.finished;
+  });
+  return Promise.all(runs).then(() => {
+    const ink = g.querySelector('.pen-ink');
+    ink?.removeAttribute('mask');
+    g.querySelector('mask')?.remove();
+    for (const l of lines) {
+      l.getAnimations().forEach((a) => a.cancel());
+      l.style.strokeDasharray = '';
+      l.style.strokeDashoffset = '';
+    }
+    return g;
   });
 }
 

@@ -34,8 +34,30 @@ svg.pen-layer {
   stroke-linejoin: round;
 }
 
-.pen-path.heavy {
-  stroke-width: 4px;
+/* The pen's mark is a tapered fill: thin at both ends, full in the middle, ink sitting in the paper. */
+.pen-ink {
+  fill: var(--red);
+  opacity: .92;
+}
+
+.pen-centre {
+  fill: none;
+  stroke: none;
+}
+
+.pen-reveal {
+  fill: none;
+  stroke: white;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+svg.pen-layer {
+  mix-blend-mode: multiply;
+}
+
+.surface-ink svg.pen-layer {
+  mix-blend-mode: normal;
 }
 
 .pen-path.graphite {
@@ -43,6 +65,7 @@ svg.pen-layer {
   stroke-width: 1.5px;
 }
 
+.surface-ink .pen-ink,
 .surface-ink .pen-path {
   filter: drop-shadow(0 0 5px var(--red-glow));
 }

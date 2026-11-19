@@ -120,7 +120,7 @@ const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:$
           </nav>
         )
       }
-      <h1 class:list={['page-h1', { 'is-long': h1.length > 40 }]} data-narr={narr ? 's0-title' : undefined} data-pen="underline" data-pen-delay="250" data-pen-key={h1}><span data-pen-target>{h1}</span></h1>
+      <h1 class:list={['page-h1', { 'is-long': h1.length > 40 }]} data-narr={narr ? 's0-title' : undefined}>{h1}</h1>
       {
         standfirst && (
           <p

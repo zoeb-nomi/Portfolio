@@ -333,9 +333,22 @@ export const home = {
       tally: '3 claims checked. 2 caught before anything was published.',
       caption: 'An example answer, marked the way my eval harnesses mark one. It reads fine until something checks it.',
     },
-    proofLink: { label: 'See all 167 outputs', href: '#fig-0' },
-    sheetH2: 'Every square is one output a check read.',
-    sheetSub: 'Red ones failed it. None of them looked wrong.',
+    harness: {
+      h2: 'My agent harness, counted as it runs.',
+      sub: 'I hand work to a system of agents. Each item is filed with an acceptance line and a due date, checked before it reaches me, and merged by me.',
+      // Runtime source (I17 tracker, decision D1): the public shipping log, refreshed nightly. Until it exists the
+      // panel shows the pilot snapshot below, labelled as such.
+      liveUrl: 'https://cdn.jsdelivr.net/gh/zoeb-nomi/shipping-log@main/shipping.json',
+      snapshotLabel: 'Pilot snapshot, 10 to 11 Nov 2026',
+      liveLabel: 'Live, updated',
+      itemsCaption: 'Recent items, agent minutes per item',
+      hint: 'Point at a bar for the item.',
+      more: { label: 'How this is measured', href: '/builds/#shipping' },
+    },
+    claim2Pre: 'I ship the workflow and ',
+    claim2Pen: 'the checks that catch it.',
+    sheetH2: 'I ran 167 model outputs through three of my eval harnesses. A check read every one.',
+    sheetSub: 'Each square is one output. Red means a check caught it failing. Read on their own, none of them looked wrong.',
     readingsH2: 'Every number here is a reading.',
     buildsH2: 'Shipped, then measured',
     buildsSub: 'Four of the systems and harnesses I built, each with the rule that guards it.',
@@ -2940,6 +2953,7 @@ export const llmsTxt = `# Zoeb Nomi
 
 ## Key facts
 
+- Positioning: LLM products fail quietly. I ship the workflow and the checks that catch it.
 - Role: Product Manager, Instead (Sep 2025 to present). Multi-step tax workflow: an end-to-end coherence eval across its steps, and latency cut ~90% by re-running only changed inputs. Output quality: a four-dimension rubric and a weekly failure-mode review; ~95% citation accuracy on the production golden set; document ID and sub-type attached to every cited source.
 - Builds page: every public build with what it does, how it is guarded, what it was measured against, and planned vs actual ship date: https://www.zoebnomi.com/builds/
 - Guarded automation: TradeFrame (https://github.com/zoeb-nomi/tradeframe), a personal trading system where the AI proposes only, a deterministic layer validates against hard rails, and a person (US book) or validated code (India book) executes. Each book has its own kill switch; every decision is scored against a do-nothing baseline.
