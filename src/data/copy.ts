@@ -351,8 +351,10 @@ export const home = {
       // Short tile labels for the home panel; the full definitions stay on /builds/#shipping.
       tileLabels: ['items shipped since 10 Nov', 'on time', 'API spend per item', 'median, ready to merged'],
       // Runtime source (I17 tracker, decision D1): the public shipping log, refreshed nightly. Until it exists the
-      // panel shows the pilot snapshot below, labelled as such.
-      liveUrl: 'https://cdn.jsdelivr.net/gh/zoeb-nomi/shipping-log@main/shipping.json',
+      // panel shows the pilot snapshot below, labelled as such. Empty = no fetch (a 404 fails CI and logs a console
+      // error for visitors). Set to 'https://cdn.jsdelivr.net/gh/zoeb-nomi/shipping-log@main/shipping.json' once
+      // that repo is public.
+      liveUrl: '',
       snapshotLabel: 'Pilot data, 10–11 Nov; live feed soon',
       liveLabel: 'Live, updated',
       itemsCaption: 'Agent minutes per item',
