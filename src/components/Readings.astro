@@ -26,7 +26,7 @@ const pos = (v: number, min: number, max: number) => Math.max(0, Math.min(1, (v 
       const towardsLeft = f.value < f.datum;
       return (
         <li class="rd" data-reading>
-          <p class="rd-k">{r.kicker}</p>
+          {!compact && <p class="rd-k">{r.kicker}</p>}
           <p class="rd-v">
             <span class="rd-num">{r.display}</span>
             {r.unit && <span class="rd-unit">{r.unit}</span>}

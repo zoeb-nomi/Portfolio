@@ -166,6 +166,6 @@ const harnessCount = families.length;
 export const summary = `${total} model outputs from ${harnessCount} eval harnesses, one square each; ${failed} failed a check and are marked red. Arrow keys read one square at a time.`;
 
 export const caption =
-  'One square per model output a check read, grouped by outcome, so a position is not an item id. Hover or arrow through the squares to see which check read each one.';
+  'One square per output a check read, grouped by outcome. Hover one for its check.';
 
 export const legend = { fail: 'failed a check', pass: 'passed' };

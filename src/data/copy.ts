@@ -314,17 +314,15 @@ export const home = {
     lede: 'I ship the workflow and the checks that catch it.',
     proofCaught: 'All of them were caught before anything was published.',
     emailLink: 'or email me',
-    measuredH2: 'Three numbers from three systems.',
-    buildsH2: 'What I built, and how it is guarded.',
     aboutLabel: 'PM who ships code',
     aboutH2: 'I work where the model meets the workflow.',
     about:
-      "I'm a PM at Instead, an AI-native tax research platform. I cut a multi-step tax workflow from 10 to 15 minutes to under a minute, and I build the checks that say when it is wrong. In tax research, a wrong citation isn't a UX bug. It's a compliance risk.",
+      "I'm a PM at Instead, an AI-native tax research platform. A wrong citation there is a compliance risk, so I build the checks into the workflow.",
     verbs: [
-      { name: 'Measure', line: 'Decide what good output means, then count it.' },
-      { name: 'Trace', line: 'Every answer leads back to its source.' },
-      { name: 'Guard', line: 'The model proposes; rules decide what runs.' },
-      { name: 'Ship', line: 'Put it in front of users, then keep measuring.' },
+      { name: 'Measure', line: 'Define good output, then count it.' },
+      { name: 'Trace', line: 'Every answer leads to its source.' },
+      { name: 'Guard', line: 'The model proposes; rules decide.' },
+      { name: 'Ship', line: 'Ship it, then keep measuring.' },
     ],
     aboutLink: { label: 'More about me →', href: '/about/' },
   },
@@ -377,7 +375,7 @@ export const home = {
       datum: '10–15 min before',
       change: 'about −90%',
       n: 'production runs, count not public',
-      label: 'run time of a multi-step tax workflow, after scoping edits to changed inputs',
+      label: 'run time of a multi-step tax workflow',
       source: 'Instead, production',
     },
     {
@@ -390,7 +388,7 @@ export const home = {
       datum: '0.981 baseline',
       change: '+0.013',
       n: 'n = 25',
-      label: 'citation precision with strict citation prompting; recall 0.760',
+      label: 'citation precision with strict prompting',
       source: 'CrossSource v0.1',
     },
     {
@@ -402,7 +400,7 @@ export const home = {
       datum: '0, from zero',
       change: '+$2.7M MRR',
       n: '28 US enterprise clients',
-      label: 'from zero, Background Verification on the Checkr API',
+      label: 'Background Verification, built on the Checkr API',
       source: 'Keka HR',
     },
   ],
@@ -509,6 +507,8 @@ export interface BuildEntry {
   id: string;
   name: string;
   oneLine: string;
+  /** v4: a shorter line for the compact ledger on home (falls back to oneLine). */
+  homeLine?: string;
   kind: BuildKind;
   group: 'systems' | 'evals' | 'contributions';
   /** Legend tag on eval rows: [judged] / [counted] / [null] (R-1 definitions). */
@@ -585,6 +585,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'tradeframe',
     name: 'TradeFrame',
     oneLine: 'A personal trading system where an AI judgment layer proposes trades and a deterministic layer decides what may run.',
+    homeLine: 'AI proposes trades; deterministic code decides what runs.',
     kind: 'guarded automation',
     group: 'systems',
     tag: '[guarded automation]',
@@ -607,6 +608,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'cheap-tier-legal-tax-hr',
     name: 'cheap-tier-legal-tax-hr',
     oneLine: 'Where a 10-cent model can sit in a tax, legal or HR workflow, and what has to back it up.',
+    homeLine: 'Where a 10-cent model is safe in tax, legal and HR work.',
     kind: 'eval harness',
     group: 'evals',
     tag: '[counted]',
@@ -632,6 +634,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'crosssource',
     name: 'CrossSource',
     oneLine: "An open harness that checks whether a legal RAG answer's citations support its claims.",
+    homeLine: 'Checks whether legal RAG citations support the claim.',
     kind: 'eval harness',
     group: 'evals',
     tag: '[judged]',
@@ -659,6 +662,7 @@ export const buildsLedger: BuildEntry[] = [
     id: 'screener-eval',
     name: 'screener-eval',
     oneLine: 'A paired, repeated test of what an LLM résumé screener actually rewards.',
+    homeLine: 'What an LLM résumé screener actually rewards.',
     kind: 'eval harness',
     group: 'evals',
     tag: '[counted]',

@@ -92,7 +92,7 @@ const C = builds.columns;
                 <span class="l-build">
                   <span class="l-name" id={`b-${variant}-${b.id}`}>{b.name}</span>
                   {b.tag && <span class="tag">{b.tag}</span>}
-                  <span class="one">{b.oneLine}</span>
+                  <span class="one">{variant === 'compact' ? (b.homeLine ?? b.oneLine) : b.oneLine}</span>
                 </span>
                 {variant === 'full' && (
                   <span class="l-cell l-guard">

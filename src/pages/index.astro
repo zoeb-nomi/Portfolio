@@ -52,12 +52,10 @@ const v = home.v4;
   </section>
 
   <Section mark="§1" label={home.measuredLabel}>
-    <h3 class="block-h2">{v.measuredH2}</h3>
     <Readings compact />
   </Section>
 
   <Section mark="§2" label={home.builds.kicker} grid>
-    <h3 class="block-h2">{v.buildsH2}</h3>
     <BuildsLedger variant="compact" />
     <p class="all-link"><a href={home.builds.allLink.href}>{home.builds.allLink.label}</a></p>
   </Section>
@@ -84,7 +82,7 @@ const v = home.v4;
   </Section>
 
   <CTASlab
-    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
+    marginLines={[]}
     body={home.ctaSlabBody}
     buttonLabel={cta.bookACall.label}
     buttonHref={cta.bookACall.href}
