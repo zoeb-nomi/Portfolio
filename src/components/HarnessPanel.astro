@@ -71,14 +71,18 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((d: { updated?: string; tiles?: { value: string; unit?: string; label: string }[] }) => {
         if (!d?.tiles?.length) return;
+        // Third-party file: accept short strings only, so a bad or hostile file cannot flood the layout.
+        const short = (v: unknown, n: number) => (typeof v === 'string' || typeof v === 'number' ? String(v).slice(0, n) : '');
         d.tiles.slice(0, 4).forEach((t, i) => {
           const dt = hp.querySelector<HTMLElement>(`[data-hp-tile="${i}"]`);
           const dd = dt?.nextElementSibling as HTMLElement | null;
-          if (!dt || !dd) return;
-          dt.querySelector('[data-tally]')!.textContent = String(t.value);
-          dd.textContent = t.label;
+          const value = short(t?.value, 12);
+          const label = short(t?.label, 60);
+          if (!dt || !dd || !value || !label) return;
+          dt.querySelector('[data-tally]')!.textContent = value;
+          dd.textContent = label;
         });
-        hp.querySelector('[data-hp-label]')!.textContent = `${hp.dataset.liveLabel} ${d.updated ?? ''}`.trim();
+        hp.querySelector('[data-hp-label]')!.textContent = `${hp.dataset.liveLabel} ${short(d.updated, 24)}`.trim();
         hp.querySelector('[data-hp-status]')!.setAttribute('data-live', '');
       })
       .catch(() => {});

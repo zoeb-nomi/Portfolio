@@ -353,10 +353,10 @@ export const home = {
       // Runtime source (I17 tracker, decision D1): the public shipping log, refreshed nightly. Until it exists the
       // panel shows the pilot snapshot below, labelled as such.
       liveUrl: 'https://cdn.jsdelivr.net/gh/zoeb-nomi/shipping-log@main/shipping.json',
-      snapshotLabel: 'Pilot snapshot, 10–11 Nov 2026',
+      snapshotLabel: 'Pilot data, 10–11 Nov; live feed soon',
       liveLabel: 'Live, updated',
       itemsCaption: 'Agent minutes per item',
-      hint: 'Point at a bar.',
+      hint: 'Select a bar.',
       more: { label: 'How this is measured', href: '/builds/#shipping' },
     },
     claim2Pre: 'I ship the workflow and ',
