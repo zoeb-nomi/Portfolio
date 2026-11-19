@@ -542,7 +542,8 @@ export const home = {
 
   ctaSlabMarginNow: 'NOW: PM AT INSTEAD',
   ctaSlabMarginBefore: 'BEFORE: $2.7M MRR FROM ZERO AT KEKA HR',
-  ctaSlabBody: "If you're hiring a PM for an agent or LLM product, I'd like to hear what it has to get right.",
+  // Red Pen 5 (Zoeb, 19 Nov 2026): open-ended but confident, so it covers hiring and future services alike.
+  ctaSlabBody: 'Facing a problem that has to be right? Talk to me.',
 };
 
 // ---------------------------------------------------------------------------

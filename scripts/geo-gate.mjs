@@ -133,7 +133,7 @@ const POSITIVES = [
   '30 min · intro call',
   'llms.txt (for AI assistants)',
   'zoebnomi.com/builds/',
-  'If you&#39;re hiring a PM for an agent or LLM product',
+  'Facing a problem that has to be right? Talk to me.',
 
   // v3.3 (I16 hero), added 2026-11-12: Fig. 0 is the audit sheet. Its counts are read from the case-study
   // copy at build time (src/data/fig0-cells.ts), so the strip's sentence is checked here as words, not numbers.
