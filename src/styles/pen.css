@@ -1,0 +1,110 @@
+/* zoebnomi.com · Red Pen 5: the pen and the two surfaces (design/README.md §2, §8).
+   Values come from design/tokens.css only. */
+
+/* ---- The ink surface ----
+   A section where checks run. It is a mode, not a palette: inside .surface-ink
+   the paper and ink roles swap and the pen glows, so every component that reads
+   roles works on it unchanged. */
+.surface-ink {
+  --paper: var(--surface-ink);
+  --paper-raised: var(--surface-ink-raised);
+  --paper-sunk: var(--surface-ink);
+  --ink: var(--on-ink);
+  --ink-body: var(--on-ink-body);
+  --ink-muted: var(--on-ink-muted);
+  --rule: var(--rule-on-ink);
+  --rule-strong: var(--on-ink);
+  --red: var(--red-glow);
+  --red-ink: var(--red-glow);
+  --on-red: var(--surface-ink);
+  --grid-ink: transparent;
+  --line-hair: 1px solid var(--rule-on-ink);
+  --line-ink: 1px solid var(--on-ink);
+  --line-heavy: 2px solid var(--on-ink);
+  --line-pen: 2px solid var(--red-glow);
+  --line-object: 1px solid var(--on-ink);
+  --line-object-muted: 1px solid var(--rule-on-ink);
+  background: var(--surface-ink);
+  color: var(--on-ink-body);
+}
+
+/* Full-bleed: a section that breaks out of the 1320px shell to the viewport edges. */
+.bleed {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: max(var(--gutter), calc(50vw - 50% + var(--gutter)));
+}
+
+/* ---- The pen ----
+   Every mark pen.ts draws is a .pen-path in an svg.pen-layer over its host. */
+svg.pen-layer {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.pen-path {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 2.6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pen-path.heavy {
+  stroke-width: 4px;
+}
+
+.pen-path.graphite {
+  stroke: var(--graphite);
+  stroke-width: 1.5px;
+}
+
+.surface-ink .pen-path {
+  filter: drop-shadow(0 0 5px var(--red-glow));
+}
+
+/* A host for scroll marks ([data-pen]) needs a box to draw over. */
+[data-pen] {
+  position: relative;
+}
+
+/* The red thread: the page's scroll progress, drawn as one line of ink down the left edge.
+   CSS scroll-driven only; browsers without it, and reduced motion, show nothing. */
+.red-thread {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .red-thread {
+      display: block;
+      position: fixed;
+      inset-block: 0;
+      inset-inline-start: 0;
+      inline-size: 3px;
+      background: var(--red);
+      transform-origin: top;
+      z-index: var(--z-top);
+      pointer-events: none;
+      animation: thread-grow linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes thread-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Full-bleed sections use 100vw; clip the scrollbar's width so it never makes a sideways scroll. */
+body {
+  overflow-x: clip;
+}

@@ -1,0 +1,525 @@
+---
+// The live audit (Red Pen 5 hero object, design/README.md §8). A model answer streams onto a sheet, then
+// the pen checks its claims one by one: a tick for a claim that holds, a strike and an insert for a wrong
+// fact, a circle for an invented citation, each with a leader line to its verdict in the margin. The final,
+// marked-up state is the HTML: without JS the marks render as CSS fallbacks, and under reduced motion the
+// pen draws them all at once. Copy: home.v5.audit in src/data/copy.ts.
+import { home } from '../data/copy';
+
+const a = home.v5.audit;
+const claims = a.answer.filter((s) => s.mark);
+---
+
+<figure class="la" data-la aria-labelledby="la-label">
+  <div class="la-bar">
+    <span class="la-label" id="la-label">{a.label}</span>
+    <span class="la-status" data-la-status data-final={a.status.done} data-stream={a.status.stream} data-check={a.status.check}
+      ><i class="la-dot" aria-hidden="true"></i><span data-la-status-text>{a.status.done}</span></span
+    >
+  </div>
+
+  <p class="la-prompt"><span class="la-who">{a.promptLabel}</span> {a.prompt}</p>
+
+  <div class="la-page" data-la-page>
+    <p class="la-answer" data-la-answer>
+      {
+        a.answer.map((s) => {
+          if (!s.mark) return <span class="la-t">{s.t}</span>;
+          const n = claims.indexOf(s) + 1;
+          return (
+            <>
+              <span class:list={['mk', `mk-${s.mark}`, s.verdict]} data-mark={s.mark} data-n={n}>{s.t}</span>{s.insert && <ins class="la-ins" data-ins={n}>{s.insert}</ins>}
+            </>
+          );
+        })
+      }
+    </p>
+
+    <ol class="la-notes" data-la-notes>
+      {
+        claims.map((s, i) => (
+          <li class:list={['la-note', s.verdict]} data-note={i + 1}>
+            <span class="la-check">
+              <span class="la-v" aria-hidden="true">
+                {s.verdict === 'pass' ? '✓' : '✕'}
+              </span>
+              {s.check}
+            </span>
+            <span class="la-note-t">{s.note}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="la-foot">
+    <p class="la-tally" data-la-tally>{a.tally}</p>
+    <button class="la-replay" type="button" data-la-replay>{a.replay}</button>
+  </div>
+  <figcaption class="la-cap">{a.caption}</figcaption>
+</figure>
+
+<script>
+  import { mark, stroke, markPath, layer, boxesOf, stamp, wait, reducedMotion, MOTION } from '../scripts/pen';
+
+  const fig = document.querySelector<HTMLElement>('[data-la]');
+  if (fig) {
+    const page = fig.querySelector<HTMLElement>('[data-la-page]')!;
+    const answer = fig.querySelector<HTMLElement>('[data-la-answer]')!;
+    const statusEl = fig.querySelector<HTMLElement>('[data-la-status]')!;
+    const statusText = fig.querySelector<HTMLElement>('[data-la-status-text]')!;
+    const tally = fig.querySelector<HTMLElement>('[data-la-tally]')!;
+    const replay = fig.querySelector<HTMLButtonElement>('[data-la-replay]')!;
+    const marks = Array.from(fig.querySelectorAll<HTMLElement>('.mk'));
+    const notes = Array.from(fig.querySelectorAll<HTMLElement>('.la-note'));
+    const inserts = Array.from(fig.querySelectorAll<HTMLElement>('.la-ins'));
+    const wide = () => window.matchMedia('(min-width: 900px)').matches;
+
+    // Split the answer into tokens once: the stream reveals them in order, the way a model emits them.
+    const tokens: HTMLElement[] = [];
+    const split = (el: Element) => {
+      for (const node of Array.from(el.childNodes)) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const parts = (node.textContent ?? '').split(/(\s+)/).filter(Boolean);
+          const frag = document.createDocumentFragment();
+          for (const p of parts) {
+            if (/^\s+$/.test(p)) {
+              frag.appendChild(document.createTextNode(p));
+              continue;
+            }
+            const sp = document.createElement('span');
+            sp.className = 'tk';
+            sp.textContent = p;
+            tokens.push(sp);
+            frag.appendChild(sp);
+          }
+          node.replaceWith(frag);
+        } else if (node instanceof HTMLElement && !node.classList.contains('la-ins')) {
+          split(node);
+        }
+      }
+    };
+    split(answer);
+
+    const caretEl = document.createElement('span');
+    caretEl.className = 'la-caret';
+    caretEl.setAttribute('aria-hidden', 'true');
+
+    const setStatus = (key: 'stream' | 'check' | 'final', tone: string) => {
+      statusText.textContent = statusEl.dataset[key] ?? '';
+      statusEl.dataset.tone = tone;
+    };
+
+    // Place each margin note level with its mark (wide screens); on phones the notes stack under the answer.
+    const placeNotes = () => {
+      if (!wide()) {
+        notes.forEach((n) => n.style.removeProperty('top'));
+        return;
+      }
+      let floor = 0;
+      notes.forEach((n, i) => {
+        const b = boxesOf(marks[i], page);
+        if (!b.length) return;
+        const top = Math.max(floor, b[0].y - 2);
+        n.style.top = `${top}px`;
+        floor = top + n.offsetHeight + 10;
+      });
+    };
+
+    // Every mark, final state, no animation: used for reduced motion, after a run, and on resize.
+    const drawAll = (animate = false) => {
+      const svg = layer(page);
+      svg.replaceChildren();
+      placeNotes();
+      marks.forEach((m, i) => {
+        const kind = m.dataset.mark as 'tick' | 'strike' | 'circle';
+        mark(page, m, kind, { animate, key: `m${i}` });
+        if (kind === 'strike') {
+          const ins = inserts.find((x) => x.dataset.ins === m.dataset.n);
+          if (ins) mark(page, m, 'caret', { animate, key: `c${i}` });
+        }
+        if (wide()) leader(i, animate);
+      });
+    };
+
+    const leader = (i: number, animate: boolean) => {
+      const m = marks[i];
+      const b = boxesOf(m, page);
+      const nb = boxesOf(notes[i], page)[0];
+      if (!b.length || !nb) return Promise.resolve();
+      // The leader leaves from the answer column's right edge, level with the mark, so it never crosses text.
+      const col = boxesOf(answer, page)[0];
+      const first = b[0];
+      const from = { x: col.x + col.w - 14 + 6, y: first.y, w: 0, h: first.h };
+      return stroke(layer(page), markPath('leader', from, 7 + i, nb), { animate, key: `l${i}`, tone: m.dataset.mark === 'tick' ? 'graphite' : 'pen' });
+    };
+
+    const reset = () => {
+      layer(page).replaceChildren();
+      fig.classList.remove('is-done');
+      fig.classList.add('is-running');
+      tokens.forEach((t) => t.classList.remove('on'));
+      notes.forEach((n) => n.classList.remove('is-on'));
+      inserts.forEach((n) => n.classList.remove('is-on'));
+      marks.forEach((m) => m.classList.remove('is-hit'));
+      tally.classList.remove('is-on');
+    };
+
+    let running = false;
+    const run = async () => {
+      if (running) return;
+      running = true;
+      reset();
+      placeNotes();
+      setStatus('stream', 'stream');
+
+      // 1. stream: tokens arrive in small, uneven bursts.
+      answer.appendChild(caretEl);
+      for (let i = 0; i < tokens.length; i++) {
+        tokens[i].classList.add('on');
+        tokens[i].after(caretEl);
+        await wait(28 + ((i * 37) % 5) * 9);
+      }
+      await wait(420);
+      caretEl.remove();
+
+      // 2. check: the pen takes each claim in turn.
+      setStatus('check', 'check');
+      for (let i = 0; i < marks.length; i++) {
+        const m = marks[i];
+        const kind = m.dataset.mark as 'tick' | 'strike' | 'circle';
+        m.classList.add('is-hit');
+        await mark(page, m, kind, { animate: true, key: `m${i}` });
+        if (kind === 'strike') {
+          const ins = inserts.find((x) => x.dataset.ins === m.dataset.n);
+          await mark(page, m, 'caret', { animate: true, key: `c${i}` });
+          if (ins) await stamp(ins);
+          placeNotes();
+        }
+        if (wide()) await leader(i, true);
+        await stamp(notes[i]);
+        await wait(260);
+      }
+
+      // 3. verdict.
+      setStatus('final', 'done');
+      await stamp(tally);
+      fig.classList.remove('is-running');
+      fig.classList.add('is-done');
+      running = false;
+    };
+
+    document.documentElement.classList.add('pen-ready');
+    const still = reducedMotion();
+    if (still) {
+      notes.forEach((n) => n.classList.add('is-on'));
+      inserts.forEach((n) => n.classList.add('is-on'));
+      tally.classList.add('is-on');
+      tokens.forEach((t) => t.classList.add('on'));
+      fig.classList.add('is-done');
+      requestAnimationFrame(() => drawAll(false));
+    } else {
+      // Start once the fonts have settled, so marks land on the final glyphs.
+      (document.fonts?.ready ?? Promise.resolve()).then(() => wait(250)).then(run);
+    }
+
+    replay.addEventListener('click', () => {
+      if (still) return drawAll(false);
+      run();
+    });
+
+    let raf = 0;
+    new ResizeObserver(() => {
+      if (running) return;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => drawAll(false));
+    }).observe(page);
+    void MOTION;
+  }
+</script>
+
+<style>
+  .la {
+    position: relative;
+    background: var(--paper-raised);
+    border: var(--line-object);
+    box-shadow: 10px 10px 0 var(--ink);
+    padding: var(--s-5) var(--s-6) var(--s-5);
+  }
+
+  .la-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-4);
+    padding-bottom: var(--s-3);
+    border-bottom: var(--line-hair);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+  }
+
+  .la-label {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .la-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .la-dot {
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+
+  .la-status[data-tone='stream'] .la-dot,
+  .la-status[data-tone='check'] .la-dot {
+    background: var(--graphite);
+    animation: la-pulse 900ms var(--ease-draw) infinite alternate;
+  }
+
+  .la-status[data-tone='done'],
+  .la:not(.is-running) .la-status {
+    color: var(--red-ink);
+  }
+
+  @keyframes la-pulse {
+    to {
+      opacity: 0.25;
+    }
+  }
+
+  .la-prompt {
+    margin-top: var(--s-4);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+  }
+
+  .la-who {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--ink-muted);
+    margin-right: var(--s-2);
+  }
+
+  /* The page: answer on the left, the margin for verdicts on the right (wide screens). */
+  .la-page {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 13.5rem;
+    column-gap: var(--s-11);
+    margin-top: var(--s-5);
+    padding-top: var(--s-5);
+    border-top: var(--line-hair);
+    min-block-size: 15rem;
+  }
+
+  .la-answer {
+    font-family: var(--font-model);
+    font-size: var(--t-model);
+    line-height: 1.9;
+    font-variation-settings: 'opsz' 20;
+    color: var(--ink);
+  }
+
+  /* Stream: tokens are present in the HTML; under .motion they wait to be emitted. */
+  :global(.motion.pen-ready) .la.is-running .tk:not(.on) {
+    opacity: 0;
+  }
+
+  .la-caret {
+    display: inline-block;
+    inline-size: 0.5em;
+    block-size: 1.05em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: var(--ink);
+    animation: la-blink 700ms steps(2) infinite;
+  }
+
+  @keyframes la-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .mk {
+    position: relative;
+  }
+
+  /* On wide sheets a flagged citation never breaks across lines, so the pen circles it in one loop. */
+  @media (min-width: 900px) {
+    .mk-circle {
+      white-space: nowrap;
+    }
+  }
+
+  .mk.fail.is-hit,
+  :global(html:not(.motion)) .mk.fail,
+  .la.is-done .mk.fail {
+    color: var(--red-ink);
+  }
+
+  /* No-JS fallbacks for each mark: the SVG pen replaces them once pen.ts is ready. */
+  :global(html:not(.pen-ready)) .mk-circle {
+    outline: var(--line-pen);
+    outline-offset: 4px;
+    border-radius: 999px;
+  }
+
+  :global(html:not(.pen-ready)) .mk-strike {
+    text-decoration: line-through;
+    text-decoration-color: var(--red);
+    text-decoration-thickness: 2px;
+  }
+
+  :global(html:not(.pen-ready)) .mk-tick::before {
+    content: '✓ ';
+    color: var(--red-ink);
+  }
+
+  /* The insert sits above the struck word, in the pen's hand: red, mono, small. */
+  .la-ins {
+    position: relative;
+    display: inline-block;
+    inline-size: 0;
+    text-decoration: none;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: var(--t-small);
+    font-weight: 500;
+    color: var(--red-ink);
+    transform: translate(-1.1em, -1.25em);
+    opacity: 0;
+  }
+
+  .la-ins:global(.is-on),
+  :global(html:not(.motion)) .la-ins {
+    opacity: 1;
+  }
+
+  .la-notes {
+    position: relative;
+    list-style: none;
+  }
+
+  .la-note {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink-body);
+    opacity: 0;
+  }
+
+  .la-note:global(.is-on),
+  :global(html:not(.motion)) .la-note {
+    opacity: 1;
+  }
+
+  .la-check {
+    display: block;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .la-note.fail .la-check {
+    color: var(--red-ink);
+  }
+
+  .la-v {
+    margin-right: var(--s-1);
+  }
+
+  @media (min-width: 900px) {
+    .la-note {
+      position: absolute;
+      inset-inline: 0;
+    }
+
+    /* Before pen.ts has placed them, notes stack (no-JS and first paint). */
+    :global(html:not(.pen-ready)) .la-note {
+      position: static;
+      margin-bottom: var(--s-4);
+    }
+  }
+
+  .la-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-2) var(--s-6);
+    margin-top: var(--s-5);
+    padding-top: var(--s-3);
+    border-top: var(--line-ink);
+  }
+
+  .la-tally {
+    font-weight: var(--wght-strong);
+    color: var(--ink);
+    opacity: 0;
+  }
+
+  .la-tally:global(.is-on),
+  :global(html:not(.motion)) .la-tally {
+    opacity: 1;
+  }
+
+  .la-replay {
+    display: none;
+    min-block-size: var(--hit-touch);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    color: var(--red-ink);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  :global(.motion) .la.is-done .la-replay {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .la-cap {
+    margin-top: var(--s-2);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--ink-muted);
+  }
+
+  /* The pen layer, shared by every mark on this sheet. */
+  .la-page :global(svg.pen-layer) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  @media (max-width: 899px) {
+    .la {
+      box-shadow: 6px 6px 0 var(--ink);
+      padding: var(--s-4);
+    }
+
+    .la-page {
+      grid-template-columns: 1fr;
+      row-gap: var(--s-5);
+      min-block-size: 0;
+    }
+
+    .la-notes {
+      display: grid;
+      gap: var(--s-3);
+      padding-top: var(--s-4);
+      border-top: var(--line-hair);
+    }
+  }
+</style>

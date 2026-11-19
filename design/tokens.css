@@ -1,88 +1,120 @@
-/* zoebnomi.com design tokens · The Red Pen v3 (Hybrid 1, 12 Nov 2026)
+/* zoebnomi.com design tokens · Red Pen 5, "Live Ink" (19 Nov 2026)
 
    THE single source of every design value on the site. src/styles/base.css
    imports this file; nothing else declares a token, and no other file may
    contain a raw palette hex (scripts/design-check.mjs fails the build).
    Rules for using these values: design/README.md.
-   Tokens only. No selectors beyond :root. Components own their own CSS. */
+   Tokens only. No selectors beyond :root. Components own their own CSS.
+
+   Red Pen 5 starts from what an editor's red pen does: it catches. The site is
+   a live audit, so the system has three voices and one actor:
+     Zoeb    claims, headings, interface      Archivo (variable: width + weight)
+     Model   the output being checked         Source Serif 4 (variable: optical size)
+     Check   verdicts, numbers, harness names IBM Plex Mono
+     Pen     the only thing that moves on its own, and the only red */
 
 :root {
-  /* Typefaces: three faces, self-hosted (public/fonts). */
-  --font-display: 'Source Serif 4 Display', 'Display Fallback', Georgia, 'Times New Roman', serif;
-  --font-body: 'IBM Plex Sans', 'Body Fallback', -apple-system, 'Segoe UI', Helvetica, sans-serif;
+  /* ---------------------------------------------------------------- voices */
+  --font-display: 'Archivo', 'Display Fallback', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-body: 'Archivo', 'Body Fallback', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-model: 'Source Serif 4', 'Model Fallback', Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', 'Mono Fallback', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* Colour. Paper, ink and one red. Red marks only what an editor would mark:
-     verdicts, § and Fig. numbers, links and the action. */
+  /* Archivo's width axis is part of the voice: claims are set wide, reading
+     text normal, dense data a touch narrow. Weight carries emphasis. */
+  --wdth-claim: 112;
+  --wdth-head: 106;
+  --wdth-text: 100;
+  --wdth-tight: 88;
+  --wght-claim: 820;
+  --wght-head: 720;
+  --wght-strong: 620;
+  --wght-text: 400;
+  --wght-quiet: 250;
+
+  /* ---------------------------------------------------------------- colour
+     Paper, ink, one red pen, and graphite for what is only proposed.
+     Two surfaces: paper (where output lives) and ink (where checks run).
+     Each oklch() token has an sRGB hex fallback declared first. */
   --paper: #f4f1ea;
-  --paper-raised: #faf8f3;
-  --ink: #191713;
-  --ink-body: #3b362e;
-  --ink-muted: #6d675e;
-  /* --rule: 1.89:1 on --paper. Same hue as paper, so it reads warm-neutral. */
-  --rule: #b8b1a0;
-  /* Each oklch() token has an sRGB hex fallback declared first; the second
-     declaration wins where oklch is supported. */
-  --red: #be241f;
-  --red: oklch(0.52 0.19 28);
-  --red-ink: #a91515;
-  --red-ink: oklch(0.47 0.18 28);
-  --red-tint: #be241f2e;
-  --red-tint: oklch(0.52 0.19 28 / .18);
-  --on-red: #f4f1ea;
-  --on-red-muted: #fceeec;
-  --on-red-muted: oklch(0.96 0.015 30);
-  /* The drafting grid (Take B), drawn only behind the hero and the Builds
-     ledger. Ink at 5%: a texture, never a line. */
-  --grid-ink: #1917130d;
+  --paper-raised: #fbf9f4;
+  --paper-sunk: #ebe6dc;
+  --ink: #15130f;
+  --ink-body: #37322b;
+  --ink-muted: #6b655b;
+  --rule: #c4bdad;
+  --graphite: #8d877b;
+
+  /* The pen. --red draws marks (lines, circles, fills); --red-ink is red
+     text on paper (AA 4.5:1); --red-glow is the pen on the ink surface. */
+  --red: #e0371f;
+  --red: oklch(0.6 0.205 33);
+  --red-ink: #b3200f;
+  --red-ink: oklch(0.5 0.19 32);
+  --red-tint: #e0371f24;
+  --red-tint: oklch(0.6 0.205 33 / .14);
+  --red-glow: #ff5a3c;
+  --red-glow: oklch(0.68 0.21 35);
+  --on-red: #fff8f0;
+  --on-red-muted: #ffe6df;
+
+  /* The ink surface: the dark sections where checks run. */
+  --surface-ink: #15130f;
+  --surface-ink-raised: #201d18;
+  --on-ink: #efe9dd;
+  --on-ink-body: #cfc8ba;
+  --on-ink-muted: #9b9486;
+  --rule-on-ink: #3a352d;
+
+  /* The drafting grid, behind the hero only. Ink at 5%. */
+  --grid-ink: #15130f0d;
   --grid-step: 24px;
 
-  /* Lines. Four tiers, horizontals only (DESIGN v3 §b). Nothing else draws a
-     line; scripts/lint-source.mjs rejects any other border shorthand.
-       hair   rows inside a block (ledger, table, notes, method)
-       ink    block boundaries: header, section, table-head underline
-       heavy  opens and closes a table, ledger or list of record; top bar of
-              each tile, step and figure
-       pen    margin note, pull quote; the H1 underline at display scale */
+  /* ---------------------------------------------------------------- lines */
   --rule-strong: var(--ink);
   --rule-accent: var(--red);
   --line-hair: 1px solid var(--rule);
   --line-ink: 1px solid var(--ink);
   --line-heavy: 2px solid var(--ink);
   --line-pen: 2px solid var(--red);
-  /* Object outlines (buttons, audio player, diagram nodes): a box only around
-     an object, never around text. Dashed = proposes only (figure grammar). */
   --line-object: 1px solid var(--ink);
   --line-object-muted: 1px solid var(--rule);
-  --line-propose: 1px dashed var(--ink);
+  --line-propose: 1px dashed var(--graphite);
   --line-pen-dashed: 2px dashed var(--red);
+  --line-on-ink: 1px solid var(--rule-on-ink);
 
-  /* Type scale (DESIGN v3 §c). Floor is 12px everywhere. */
-  --t-display: clamp(50px, 7.4vw, 106px);   /* home H1 (v4: Source Serif 4 Display sets wider than Instrument Serif) */
-  --t-answer: clamp(28px, 3.4vw, 50px);     /* v3 home H1 line 2; retired on home in v4, kept for one release */
-  --t-lede: clamp(22px, 2.3vw, 32px);       /* v4: the plain sans line under the home H1 */
+  /* Pen marks (src/scripts/pen.ts): stroke widths in px at 1x. */
+  --pen-stroke: 2.6;
+  --pen-stroke-heavy: 4;
+
+  /* ---------------------------------------------------------------- type scale
+     Floor is 12px everywhere. */
+  --t-mega: clamp(88px, 15vw, 232px);       /* one number per page, on the ink surface */
+  --t-display: clamp(56px, 8.6vw, 140px);   /* home claim */
   --t-hero: var(--t-display);
-  --t-page: clamp(42px, 5.4vw, 74px);       /* page H1 */
-  --t-stat: clamp(56px, 5.8vw, 84px);       /* tile numeral */
-  --t-h2: clamp(30px, 3.3vw, 46px);
-  --t-num: clamp(30px, 2.6vw, 38px);        /* ledger numeral */
-  --t-h3: clamp(24px, 2.2vw, 30px);         /* row name */
-  --t-quote: clamp(22px, 2.2vw, 28px);
-  --t-slab: clamp(28px, 3.2vw, 40px);       /* CTA slab */
-  --t-display-xl: clamp(44px, 5.8vw, 60px);
-  --t-body: clamp(16px, 1.2vw, 17.5px);
+  --t-page: clamp(44px, 6.2vw, 92px);       /* page H1 */
+  --t-h2: clamp(32px, 4.2vw, 62px);
+  --t-h3: clamp(21px, 1.9vw, 27px);
+  --t-lede: clamp(20px, 1.8vw, 26px);
+  --t-model: clamp(18px, 1.45vw, 21px);     /* model output on a sheet */
+  --t-stat: clamp(56px, 6.4vw, 96px);
+  --t-num: clamp(34px, 3.2vw, 48px);
+  --t-quote: clamp(22px, 2.2vw, 30px);
+  --t-slab: clamp(30px, 4vw, 58px);
+  --t-display-xl: clamp(44px, 5.8vw, 72px);
+  --t-answer: clamp(28px, 3.4vw, 50px);     /* retired; kept for one release */
+  --t-body: clamp(16px, 1.15vw, 17.5px);
   --t-small: 15px;
   --t-data: 13px;
-  --t-nav: 12.5px;
+  --t-nav: 13px;
   --t-label-lg: 12.5px;
   --t-label: 12px;
   --t-note: 12px;
-  --t-micro: 12px;                          /* the floor */
+  --t-micro: 12px;
 
-  /* Reading measure. */
-  --measure: 60ch;
+  --measure: 62ch;
 
-  /* Space: 4px scale. */
+  /* ---------------------------------------------------------------- space: 4px scale */
   --s-1: 4px;
   --s-2: 8px;
   --s-3: 12px;
@@ -96,51 +128,62 @@
   --s-11: 56px;
   --s-12: 72px;
   --s-13: 96px;
+  --s-14: 136px;
+  --s-15: 184px;
 
   /* Grid. */
-  --shell-max: 1200px;
+  --shell-max: 1320px;
   --margin-col: 240px;
-  --gutter: 44px;
+  --gutter: 48px;
   --body-inset: 40px;
   --header-h: 64px;
 
   /* Letter-spacing. */
-  --track-display: -.025em;
-  --track-tight: -.015em;
+  --track-display: -.035em;
+  --track-tight: -.02em;
   --track-normal: 0;
-  --track-caps: .12em;
+  --track-caps: .1em;
   --track-wide: .04em;
 
   /* Line-height. */
   --lh-tight: 1.05;
-  --lh-display: 1.02;
+  --lh-display: .92;
   --lh-title: 1.1;
-  --lh-heading: 1.15;
+  --lh-heading: 1.12;
   --lh-snug: 1.5;
   --lh-base: 1.55;
   --lh-body: 1.6;
   --lh-prose: 1.62;
   --lh-label: 1.7;
 
-  /* Links and hit areas (WCAG 2.5.8). */
   --underline-offset: 3px;
   --hit-min: 24px;
   --hit-touch: 44px;
 
-  /* Shape: square, no shadows. */
   --radius: 0;
 
-  /* Motion. Durations shared by CSS transitions and the motion layer
-     (src/scripts/motion.ts reads none of these at runtime; keep the two in
-     step by hand: fast 120, base 200, slow 600, story 3200). */
+  /* ---------------------------------------------------------------- motion
+     Five verbs, and nothing moves that is not one of them (design/README.md §8):
+       stream   the model writes            --dur-char per character
+       mark     the pen draws a mark        --dur-mark, --ease-pen
+       stamp    a verdict lands             --dur-stamp, --ease-stamp
+       tally    a count settles             --dur-tally
+       reveal   a block enters on scroll    --dur-slow, --ease-draw
+     src/scripts/pen.ts and live-audit.ts mirror these numbers in MOTION. */
   --ease-draw: cubic-bezier(.2, .7, .2, 1);
+  --ease-pen: cubic-bezier(.55, .05, .25, 1);
+  --ease-stamp: cubic-bezier(.3, 1.5, .5, 1);
   --dur-fast: 120ms;
   --dur-base: 200ms;
   --dur-slow: 600ms;
+  --dur-char: 16ms;
+  --dur-mark: 560ms;
+  --dur-stamp: 260ms;
+  --dur-tally: 1400ms;
 
-  /* v4 semantic roles (19 Nov 2026). Components written from v4 on read these, not the primitives above,
-     so a side-project theme can swap paper, ink and accent and keep every role. Values alias the primitives;
-     the v3 names stay valid. The DTCG JSON port (follow-up release) generates this block. */
+  /* ---------------------------------------------------------------- semantic roles
+     Components written from v4 on read these. A side-project theme swaps the
+     primitives above; every role follows. */
   --color-surface: var(--paper);
   --color-surface-raised: var(--paper-raised);
   --color-text: var(--ink);
@@ -151,8 +194,8 @@
   --color-accent-text: var(--red-ink);
   --color-accent-tint: var(--red-tint);
   --color-on-accent: var(--on-red);
+  --color-pending: var(--graphite);
 
-  /* v4 type steps: seven roles. The v3 size names map onto them; new code uses these. */
   --type-display: var(--t-display);
   --type-page: var(--t-page);
   --type-h2: var(--t-h2);
@@ -166,8 +209,7 @@
   --z-sheet: 200;
   --z-top: 1000;
 
-  /* Contribution heatmap: monochrome, derived from ink. heat-0 is lighter than
-     --rule so the empty to first step stays visible. */
+  /* Contribution heatmap: monochrome, derived from ink. */
   --heat-0: #d5cfc2;
   --heat-1: #a6a39d;
   --heat-2: #797671;

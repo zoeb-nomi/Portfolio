@@ -310,6 +310,37 @@ export const screenerEvalJsonLd = {
 export const home = {
   // v4 (Red Pen, edited; 19 Nov 2026): one claim per screen, the page never names its own parts.
   // Home budget 300 rendered words (scripts/copy-budget.mjs).
+  // Red Pen 5 (19 Nov 2026): the home page is a live audit. The answer below is an example, written for the
+  // hero; its three claims are checked against public record (Mata v. Avianca, No. 22-cv-1461, S.D.N.Y.;
+  // sanctions order 22 June 2023; the brief's Varghese cite does not exist). Marks: tick = checked and fine,
+  // strike + insert = wrong and corrected, circle = wrong and flagged.
+  v5: {
+    audit: {
+      label: 'Model answer',
+      status: { stream: 'Generating', check: 'Checking 3 claims', done: '2 caught · 1 passed' },
+      replay: 'Run it again',
+      promptLabel: 'Prompt',
+      prompt: 'Has a court sanctioned lawyers for citing cases a chatbot made up?',
+      answer: [
+        { t: 'Yes. In ' },
+        { t: 'Mata v. Avianca', mark: 'tick', check: 'citation_check', note: 'case found, S.D.N.Y.', verdict: 'pass' },
+        { t: ', a federal court in New York sanctioned two lawyers in ' },
+        { t: '2021', mark: 'strike', insert: '2023', check: 'date_check', note: 'order dated 22 June 2023', verdict: 'fail' },
+        { t: '. Their brief relied on ' },
+        { t: 'Varghese v. China Southern Airlines, 925 F.3d 1339', mark: 'circle', check: 'citation_check', note: 'no such case. The answer calls an invented cite real.', verdict: 'fail' },
+        { t: ', a real Eleventh Circuit ruling.' },
+      ] as { t: string; mark?: 'tick' | 'strike' | 'circle'; insert?: string; check?: string; note?: string; verdict?: 'pass' | 'fail' }[],
+      tally: '3 claims checked. 2 caught before anything was published.',
+      caption: 'An example answer, marked the way my eval harnesses mark one. It reads fine until something checks it.',
+    },
+    proofLink: { label: 'See all 167 outputs', href: '#fig-0' },
+    sheetH2: 'Every square is one output a check read.',
+    sheetSub: 'Red ones failed it. None of them looked wrong.',
+    readingsH2: 'Every number here is a reading.',
+    buildsH2: 'Shipped, then measured',
+    buildsSub: 'Four of the systems and harnesses I built, each with the rule that guards it.',
+    open: 'Open',
+  },
   v4: {
     lede: 'I ship the workflow and the checks that catch it.',
     proofCaught: 'All of them were caught before anything was published.',

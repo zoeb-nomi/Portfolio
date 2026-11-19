@@ -6,6 +6,7 @@ import '../styles/layout.css';
 import '../styles/reading.css';
 import '../styles/figures.css';
 import '../styles/motion.css';
+import '../styles/pen.css';
 import Motion from '../components/Motion.astro';
 // theme-color must be a literal in <meta>; read it from the token file so the
 // palette is still declared in one place (design/tokens.css).
@@ -106,14 +107,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <!-- Fonts: self-hosted, preload the three above-the-fold files only (display, body, mono) -->
     <link
       rel="preload"
-      href="/fonts/source-serif-4-display-latin-400-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/ibm-plex-sans-latin-400-normal.woff2"
+      href="/fonts/archivo-latin-wdth-normal.woff2"
       as="font"
       type="font/woff2"
       crossorigin

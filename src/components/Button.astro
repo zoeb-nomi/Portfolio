@@ -26,31 +26,39 @@ const external = isExternal(href);
     align-items: center;
     justify-content: center;
     min-height: var(--hit-touch);
-    padding: 13px 22px;
-    font-family: var(--font-mono);
-    font-size: var(--t-label-lg);
-    letter-spacing: var(--track-wide);
-    text-transform: uppercase;
+    padding: 14px 24px;
+    font-family: var(--font-body);
+    font-weight: var(--wght-strong);
+    font-stretch: calc(var(--wdth-head) * 1%);
+    font-size: 16px;
     text-decoration: none;
     border-radius: var(--radius);
     border: 1px solid transparent;
     transition: background-color var(--dur-fast) var(--ease-draw), color var(--dur-fast) var(--ease-draw),
-      border-color var(--dur-fast) var(--ease-draw), transform var(--dur-fast) var(--ease-draw);
+      border-color var(--dur-fast) var(--ease-draw), transform var(--dur-fast) var(--ease-draw),
+      box-shadow var(--dur-fast) var(--ease-draw);
+  }
+
+  /* Red Pen 5: a button is an object on the desk. Hover lifts it off the paper; press sets it down. */
+  .rp-button:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 3px 3px 0 var(--ink);
   }
 
   .rp-button:active {
-    transform: translateY(1px);
+    transform: none;
+    box-shadow: none;
   }
 
   .rp-button--primary {
-    background: var(--red);
+    background: var(--red-ink);
     color: var(--on-red);
-    border-color: var(--red);
+    border-color: var(--red-ink);
   }
 
   .rp-button--primary:hover {
     background: var(--red-ink);
-    border-color: var(--red-ink);
+    border-color: var(--ink);
   }
 
   .rp-button--secondary {

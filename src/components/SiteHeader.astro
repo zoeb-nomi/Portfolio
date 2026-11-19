@@ -75,11 +75,11 @@ const { currentPath } = Astro.props;
   }
 
   .wm-name {
-    font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+    font-family: var(--font-display);
+    font-weight: var(--wght-claim);
+    font-stretch: calc(var(--wdth-claim) * 1%);
+    font-size: 17px;
+    letter-spacing: var(--track-tight);
     white-space: nowrap;
   }
 
@@ -102,10 +102,9 @@ const { currentPath } = Astro.props;
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-weight: 520;
+    font-size: var(--t-small);
     text-decoration: none;
     color: var(--ink);
     white-space: nowrap;
@@ -117,8 +116,8 @@ const { currentPath } = Astro.props;
     position: absolute;
     left: 0;
     /* The caps tracking adds space after the last letter; end the bar on the glyph. */
-    right: var(--track-caps);
-    bottom: 8px;
+    right: 0;
+    bottom: 9px;
     border-top: var(--line-pen);
     transform: scaleX(0);
     transform-origin: left;
@@ -138,11 +137,9 @@ const { currentPath } = Astro.props;
     display: inline-flex;
     align-items: center;
     min-height: var(--hit-touch);
-    font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: var(--t-nav);
-    letter-spacing: var(--track-caps);
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-weight: var(--wght-strong);
+    font-size: var(--t-small);
     color: var(--red-ink);
     text-decoration: underline;
     text-underline-offset: 5px;

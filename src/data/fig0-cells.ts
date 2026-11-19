@@ -140,7 +140,7 @@ export const failed = groups.reduce((a, g) => a + g.failed, 0);
 
 /** Columns on the sheet: ten, so every group reads as a tally in tens (15 is a row and a half, 30 three rows,
  *  40 four, 21 two and one) and a square is at least 24px wide on a 390px phone (350px of column, ten across). */
-export const cols = 15; // v4: flat sheet, wider than tall
+export const cols = 22; // Red Pen 5: the sheet sits wide on the ink surface
 
 /** The ledger strip under the H1, and the one-sentence summary for screen readers. True numbers only. */
 export const strip = {
