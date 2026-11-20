@@ -355,25 +355,33 @@ export const home = {
       ledgerUrl: 'https://agent-ledger.zoeb-nomi5699.workers.dev',
       liveLabel: 'Live, last event',
       staleLabel: 'Last updated',
-      // Home's copy budget gives the panel about 60 visible words (scripts/copy-budget.mjs); the definitions sit in
+      // Home's copy budget gives the panel about 75 visible words (scripts/copy-budget.mjs); the definitions sit in
       // the closed "how these count" disclosure, which the budget does not count.
       groups: { live: 'Today', outcomes: 'Outcomes' },
+      // Said where the number is: for harness work a task closes when its pull request opens, before merge.
+      closedMeans: 'Closed: done, or PR opened.',
       liveTiles: ['agent runs', 'subagent runs'],
       outcomeTiles: ['closed, 7 days', 'caught, 7 days', 'all-in per task', 'review wait'],
       since: '{n} since 10 Nov',
+      apiOnly: 'API only {api}',
+      // Review wait and on time are harness records up to 19 Nov, not live: the sub-line says so.
+      waitSub: '{x}/{y} on time, to 19 Nov',
       waitUnit: 'min',
-      // The readout line: this text until a day is selected, then that day's counts.
-      readout: 'API only {api}. On time {x} of {y}.',
-      gridCaption: '{from} to {to}: a square per closed task, red if caught',
-      legend: { closed: 'closed', caught: 'caught' },
+      // The readout line: the 14-day totals until a day is selected, then that day's counts.
+      readout: '{s} closed, {c} caught',
+      gridCaption: '14 days, last 7 shaded; red if caught',
+      fromTick: 'from {date}',
+      todayTick: 'today',
       dayDetail: '{date}: {s} closed, {c} caught',
+      beforeDetail: '{date}: before the ledger starts',
       how: {
         summary: 'How these count',
         items: [
           'Every place an agent of mine runs sends a signed event the moment the work finishes. Nothing is polled and nothing on this page is typed in by hand.',
           'Work I do with Claude in the app counts only when its task closes.',
           'Closed: the task reached Done. For work my agent harness runs, that is when its pull request opens for my review, before I merge it.',
-          'Caught before merge: dropped after work started, or sent back after it was done.',
+          'Caught before merge: a task dropped, or sent back after it was done.',
+          'The 14-day grid starts on 10 Nov, the day the ledger begins; earlier days show a short line instead of squares.',
           'All-in cost per task: API spend plus my $100 Claude plan and $13.50 server, prorated by day, divided by tasks closed since 10 Nov. API only is the API spend alone.',
           'Agent and subagent runs: Claude Code turns and the subagents they start, counted today in India time.',
           'On time and the wait for my review (ready to merged, median) are from the harness records up to 19 Nov; no live source carries them yet.',

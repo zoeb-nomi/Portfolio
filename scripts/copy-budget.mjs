@@ -14,9 +14,9 @@ import { serveDist } from './lib/serve-dist.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const BUDGETS = [
-  // Red Pen 5: the live audit's example answer (about 90 words) and the harness panel's data labels (about 60) are
-  // artifacts on the page, not prose, so home's budget is 520.
-  { route: '/', words: 520, enforce: true },
+  // Red Pen 5: the live audit's example answer (about 90 words) and the harness panel's data labels (about 75) are
+  // artifacts on the page, not prose, so home's budget is 530 (520 until the live ledger panel, 20 Nov 2026).
+  { route: '/', words: 530, enforce: true },
   { route: '/builds/', words: 700 },
   { route: '/about/', words: 500 },
   { route: '/writing/', words: 400 },
@@ -30,6 +30,8 @@ const RED_MAX_WORDS = 8;
 const { server, origin } = await serveDist(ROOT);
 const browser = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+// Count the committed HTML, not whatever the live agent ledger says this minute: its labels change word counts.
+await page.route(/agent-ledger\.[^/]*workers\.dev/, (r) => r.abort());
 
 let failed = false;
 for (const b of BUDGETS) {

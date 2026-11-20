@@ -1,19 +1,18 @@
 ---
 // The harness panel (Red Pen 5, home): Zoeb's agent harness, counted as it runs, on the ink surface.
-// Two groups kept apart: live activity (agent and subagent runs today) and outcomes (tasks closed and caught
-// before merge in the last 7 days, all-in cost per closed task, median wait for review), then a 14-day unit
-// grid: one square per task, closed in the text colour, caught in the pen (annotation only). Select a day for
-// its counts. Data: the committed ledger snapshot (src/data/ledger-snapshot.json) is the HTML; on load the
-// panel reads the agent ledger's public summary and holds its WebSocket, so numbers move while a visitor
-// watches. Any error leaves the snapshot. Status: "Live, last event <time>" or "Last updated <date>" in
-// graphite when the newest event is old. No count-up motion: a live number must never be rewound to the
-// snapshot. Motion: the live dot pulses; a day column marks on hover or focus.
+// Two groups kept apart: today (agent and subagent runs) and outcomes (closed and caught in the last 7 days, all-in
+// cost per task with API only, review wait with on-time), then a 14-day unit grid: one square per closed task in
+// the text colour, caught in the pen (annotation only), the last 7 days shaded, days before the ledger starts shown
+// as a short line. One tab stop for the grid; arrow keys move between days and the readout gives that day's counts.
+// Data: the snapshot (src/data/ledger-snapshot.json, refreshed by scripts/fetch-ledger.mjs at build) is the HTML;
+// on load the panel reads the agent ledger's public summary and holds its WebSocket, so numbers move while a
+// visitor watches. Any error leaves what is on screen. Status: "Live, last event <time>" or "Last updated <date>"
+// in graphite. No motion: no count-up (a live number must never be rewound) and no pulse (red is the pen's).
 import { home } from '../data/copy';
 import snapshot from '../data/ledger-snapshot.json';
 
 const h = home.v5.harness;
-type Summary = typeof snapshot;
-const s: Summary = snapshot;
+const s = snapshot;
 
 const fill = (t: string, v: Record<string, string | number>) => t.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
 const money = (n: number | null | undefined) => (typeof n === 'number' ? `$${n.toFixed(2)}` : 'n/a');
@@ -21,18 +20,28 @@ const dayLabel = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 const o = s.outcomes;
 const ro = o.readout as { on_time?: { x: number; y: number }; median_wait_for_review_min?: { value: number } };
+const start = o.since;
 const outcomeValues = [
   { v: String(o.shipped_7d), sub: fill(h.since, { n: o.shipped_total }) },
   { v: String(o.caught_7d), sub: fill(h.since, { n: o.caught_total }) },
-  { v: money(o.cost.all_in_per_shipped_usd), sub: '' },
-  { v: String(ro.median_wait_for_review_min?.value ?? 'n/a'), unit: h.waitUnit, sub: '' },
+  { v: money(o.cost.all_in_per_shipped_usd), sub: fill(h.apiOnly, { api: money(o.cost.api_per_shipped_usd) }) },
+  {
+    v: String(ro.median_wait_for_review_min?.value ?? 'n/a'),
+    unit: h.waitUnit,
+    sub: fill(h.waitSub, { x: ro.on_time?.x ?? '?', y: ro.on_time?.y ?? '?' }),
+  },
 ];
 const liveValues = [s.live.agent_runs_today, s.live.subagent_runs_today];
-const readout = fill(h.readout, { api: money(o.cost.api_per_shipped_usd), x: ro.on_time?.x ?? '?', y: ro.on_time?.y ?? '?' });
-const detail = (d: { date: string; shipped: number; caught: number }) =>
-  fill(h.dayDetail, { date: dayLabel(d.date), s: d.shipped, c: d.caught });
+const days = s.days.map((d, i) => ({ ...d, before: d.date < start, week: i >= s.days.length - 7 }));
+const detail = (d: (typeof days)[number]) =>
+  d.before ? fill(h.beforeDetail, { date: dayLabel(d.date) }) : fill(h.dayDetail, { date: dayLabel(d.date), s: d.shipped, c: d.caught });
+const totals = days.reduce((a, d) => ({ s: a.s + d.shipped, c: a.c + d.caught }), { s: 0, c: 0 });
+const readout = fill(h.readout, totals);
+const startIdx = days.findIndex((d) => d.date === start);
 const staleText = `${h.staleLabel} ${dayLabel(s.generated_at.slice(0, 10))}`;
-const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLabel(s.days[s.days.length - 1].date) });
+// Reserve the grid's height from the snapshot's busiest day, so live data rarely moves the page.
+const maxSq = Math.max(1, ...days.map((d) => d.shipped + d.caught));
+const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
 ---
 
 <div
@@ -42,9 +51,14 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
   data-live-label={h.liveLabel}
   data-stale-label={h.staleLabel}
   data-since={h.since}
+  data-api-only={h.apiOnly}
+  data-wait-sub={h.waitSub}
   data-readout={h.readout}
   data-day-detail={h.dayDetail}
-  data-caption={h.gridCaption}
+  data-before-detail={h.beforeDetail}
+  data-from-tick={h.fromTick}
+  data-today-tick={h.todayTick}
+  data-start={start}
 >
   <div class="hp-bar">
     <span class="hp-status" data-hp-status><i class="hp-dot" aria-hidden="true"></i><span data-hp-label>{staleText}</span></span>
@@ -52,12 +66,12 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
 
   <section class="hp-group hp-live" aria-labelledby="hp-g-live">
     <h3 class="hp-gh" id="hp-g-live">{h.groups.live}</h3>
-    <dl class="hp-tiles hp-tiles-2">
+    <dl class="hp-tiles">
       {
         liveValues.map((v, i) => (
           <div class="hp-tile">
             <dt class="hp-l">{h.liveTiles[i]}</dt>
-            <dd class="hp-v" data-hp-live={i}>{v}</dd>
+            <dd class="hp-v hp-v-today" data-hp-live={i}>{v}</dd>
           </div>
         ))
       }
@@ -66,6 +80,7 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
 
   <section class="hp-group" aria-labelledby="hp-g-out">
     <h3 class="hp-gh" id="hp-g-out">{h.groups.outcomes}</h3>
+    <p class="hp-s hp-means">{h.closedMeans}</p>
     <dl class="hp-tiles">
       {
         outcomeValues.map((t, i) => (
@@ -75,19 +90,25 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
               <span data-hp-out={i}>{t.v}</span>
               {t.unit && <span class="hp-u">{t.unit}</span>}
             </dd>
-            {t.sub && <dd class="hp-s" data-hp-sub={i}>{t.sub}</dd>}
+            <dd class="hp-s" data-hp-sub={i}>{t.sub}</dd>
           </div>
         ))
       }
     </dl>
   </section>
 
-  <figure class="hp-grid">
-    <figcaption class="hp-cap" data-hp-cap>{caption}</figcaption>
-    <ol class="hp-days" data-hp-days>
+  <figure class="hp-grid" style={`--rows-d:${rows.d};--rows-m:${rows.m}`}>
+    <figcaption class="hp-cap">{h.gridCaption}</figcaption>
+    <ol class="hp-days" data-hp-days aria-label={h.gridCaption}>
       {
-        s.days.map((d) => (
-          <li class="hp-day" tabindex="0" aria-label={detail(d)} data-date={d.date} data-detail={detail(d)}>
+        days.map((d, i) => (
+          <li
+            class:list={['hp-day', { 'is-week': d.week, 'is-before': d.before }]}
+            tabindex={i === days.length - 1 ? 0 : -1}
+            aria-label={detail(d)}
+            data-date={d.date}
+            data-detail={detail(d)}
+          >
             <span class="hp-stack" aria-hidden="true">
               {Array.from({ length: d.caught }, () => <i class="hp-sq is-caught" />)}
               {Array.from({ length: d.shipped }, () => <i class="hp-sq" />)}
@@ -96,6 +117,10 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
         ))
       }
     </ol>
+    <p class="hp-ticks" aria-hidden="true" data-hp-ticks>
+      {startIdx > 0 && <span style={`grid-column:${startIdx + 1}`}>{fill(h.fromTick, { date: dayLabel(start) })}</span>}
+      <span class="hp-tick-end">{h.todayTick}</span>
+    </p>
     <p class="hp-readout" aria-live="polite" data-hp-readout data-default={readout}>{readout}</p>
   </figure>
 
@@ -111,6 +136,7 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     last_event_at: string | null;
     live: { agent_runs_today: number; subagent_runs_today: number };
     outcomes: {
+      since?: string;
       shipped_7d: number; shipped_total: number; caught_7d: number; caught_total: number;
       cost: { all_in_per_shipped_usd: number | null; api_per_shipped_usd: number | null };
       readout: { on_time?: { x: number; y: number }; median_wait_for_review_min?: { value: number } };
@@ -119,6 +145,9 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
   };
   const STALE_MS = 3 * 3600 * 1000;
   const POLL_MS = 60 * 1000;
+  const MAX_POLLS = 30; // a fallback poll stops after half an hour
+  const BACKOFF_MS = 10 * 60 * 1000; // after a refusal (rate limit, quota), wait before asking again
+  const REFOCUS_MS = 30 * 1000; // at most one refetch per 30 s when the tab comes back
 
   // The ledger is a third party to this page: accept only finite non-negative numbers and ISO dates.
   const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null);
@@ -132,21 +161,35 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
 
   document.querySelectorAll<HTMLElement>('[data-hp]').forEach((hp) => {
     const $ = <T extends HTMLElement>(sel: string) => hp.querySelector<T>(sel);
-    const readout = $('[data-hp-readout]')!;
     const ds = hp.dataset;
-    let active: HTMLElement | null = null;
+    const readout = $('[data-hp-readout]')!;
+    const ol = $('[data-hp-days]')!;
+    let showing: string | null = null; // the date whose detail is in the readout
 
-    const wireDays = () => {
-      hp.querySelectorAll<HTMLElement>('.hp-day').forEach((day) => {
-        const on = () => { active = day; readout.textContent = day.dataset.detail ?? ''; };
-        const off = () => { active = null; readout.textContent = readout.dataset.default ?? ''; };
-        day.addEventListener('pointerenter', on);
-        day.addEventListener('focus', on);
-        day.addEventListener('pointerleave', off);
-        day.addEventListener('blur', off);
-      });
+    const show = (li: HTMLElement | null) => {
+      showing = li?.dataset.date ?? null;
+      readout.textContent = li ? li.dataset.detail ?? '' : readout.dataset.default ?? '';
     };
-    wireDays();
+    // One tab stop for the grid (roving tabindex); arrows, Home and End move between days.
+    const cols = () => [...ol.querySelectorAll<HTMLElement>('.hp-day')];
+    const focusDay = (li: HTMLElement) => {
+      cols().forEach((c) => (c.tabIndex = c === li ? 0 : -1));
+      li.focus();
+    };
+    ol.addEventListener('keydown', (e) => {
+      const list = cols();
+      const i = list.indexOf(document.activeElement as HTMLElement);
+      if (i < 0) return;
+      const moves: Record<string, number> = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: list.length - 1 };
+      const to = moves[e.key];
+      if (to === undefined) return;
+      e.preventDefault();
+      focusDay(list[Math.max(0, Math.min(list.length - 1, to))]);
+    });
+    ol.addEventListener('focusin', (e) => show((e.target as HTMLElement).closest('.hp-day')));
+    ol.addEventListener('focusout', () => show(null));
+    ol.addEventListener('pointerover', (e) => show((e.target as HTMLElement).closest('.hp-day')));
+    ol.addEventListener('pointerleave', () => show(ol.contains(document.activeElement) ? (document.activeElement as HTMLElement) : null));
 
     const setText = (sel: string, text: string) => {
       const el = $(sel);
@@ -167,38 +210,52 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
       if (wait !== null) setText('[data-hp-out="3"]', String(wait));
       if (st !== null) setText('[data-hp-sub="0"]', fill(ds.since ?? '', { n: st }));
       if (ct !== null) setText('[data-hp-sub="1"]', fill(ds.since ?? '', { n: ct }));
+      setText('[data-hp-sub="2"]', fill(ds.apiOnly ?? '', { api: money(num(o.cost?.api_per_shipped_usd)) }));
       const ot = o.readout?.on_time;
-      readout.dataset.default = fill(ds.readout ?? '', {
-        api: money(num(o.cost?.api_per_shipped_usd)), x: num(ot?.x) ?? '?', y: num(ot?.y) ?? '?',
-      });
-      if (!active) readout.textContent = readout.dataset.default;
+      setText('[data-hp-sub="3"]', fill(ds.waitSub ?? '', { x: num(ot?.x) ?? '?', y: num(ot?.y) ?? '?' }));
 
       // Rebuild the 14 day columns from validated numbers only (createElement, never innerHTML).
-      const days = d.days.slice(-14).map((x) => ({ date: isoDay(x?.date), s: Math.min(num(x?.shipped) ?? 0, 99), c: Math.min(num(x?.caught) ?? 0, 99) }));
+      const start = isoDay(o.since) ?? ds.start ?? '';
+      const days = d.days.slice(-14).map((x) => ({
+        date: isoDay(x?.date), s: Math.min(num(x?.shipped) ?? 0, 99), c: Math.min(num(x?.caught) ?? 0, 99),
+      }));
       if (days.length === 14 && days.every((x) => x.date)) {
-        const ol = $('[data-hp-days]')!;
-        const focused = (document.activeElement as HTMLElement | null)?.dataset?.date;
-        const cols = days.map((x) => {
-          const text = fill(ds.dayDetail ?? '', { date: dayLabel(x.date!), s: x.s, c: x.c });
+        const focusedDate = ol.contains(document.activeElement) ? (document.activeElement as HTMLElement).dataset.date : null;
+        const tabDate = ol.querySelector<HTMLElement>('.hp-day[tabindex="0"]')?.dataset.date;
+        const items = days.map((x, i) => {
+          const before = x.date! < start;
+          const text = before
+            ? fill(ds.beforeDetail ?? '', { date: dayLabel(x.date!) })
+            : fill(ds.dayDetail ?? '', { date: dayLabel(x.date!), s: x.s, c: x.c });
           const li = document.createElement('li');
-          li.className = 'hp-day';
-          li.tabIndex = 0;
+          li.className = 'hp-day' + (i >= 7 ? ' is-week' : '') + (before ? ' is-before' : '');
           li.dataset.date = x.date!;
           li.dataset.detail = text;
           li.setAttribute('aria-label', text);
           const stack = document.createElement('span');
           stack.className = 'hp-stack';
           stack.setAttribute('aria-hidden', 'true');
-          for (let i = 0; i < x.c; i++) { const q = document.createElement('i'); q.className = 'hp-sq is-caught'; stack.append(q); }
-          for (let i = 0; i < x.s; i++) { const q = document.createElement('i'); q.className = 'hp-sq'; stack.append(q); }
+          for (let k = 0; k < x.c; k++) stack.append(Object.assign(document.createElement('i'), { className: 'hp-sq is-caught' }));
+          for (let k = 0; k < x.s; k++) stack.append(Object.assign(document.createElement('i'), { className: 'hp-sq' }));
           li.append(stack);
           return li;
         });
-        ol.replaceChildren(...cols);
-        wireDays();
-        if (focused) ol.querySelector<HTMLElement>(`[data-date="${focused}"]`)?.focus();
-        active = null;
-        setText('[data-hp-cap]', fill(ds.caption ?? '', { from: dayLabel(days[0].date!), to: dayLabel(days[13].date!) }));
+        const keep = items.find((li) => li.dataset.date === tabDate) ?? items[13];
+        items.forEach((li) => (li.tabIndex = li === keep ? 0 : -1));
+        ol.replaceChildren(...items);
+        const tot = days.reduce((acc, x) => (x.date! < start ? acc : { s: acc.s + x.s, c: acc.c + x.c }), { s: 0, c: 0 });
+        readout.dataset.default = fill(ds.readout ?? '', tot);
+        if (focusedDate) items.find((li) => li.dataset.date === focusedDate)?.focus();
+        const restore = items.find((li) => li.dataset.date === showing);
+        show(restore ?? null);
+        const ticks = $('[data-hp-ticks]');
+        const si = days.findIndex((x) => x.date === start);
+        if (ticks) {
+          const parts: HTMLElement[] = [];
+          if (si > 0) parts.push(Object.assign(document.createElement('span'), { textContent: fill(ds.fromTick ?? '', { date: dayLabel(start) }), style: `grid-column:${si + 1}` }));
+          parts.push(Object.assign(document.createElement('span'), { className: 'hp-tick-end', textContent: ds.todayTick ?? '' }));
+          ticks.replaceChildren(...parts);
+        }
       }
 
       // Status: live while the newest event is recent; otherwise the date, in graphite.
@@ -216,35 +273,51 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
 
     const base = ds.ledger;
     if (!base || !/^https:\/\//.test(base)) return;
-    const pull = () =>
-      fetch(`${base}/v1/summary`, { cache: 'no-store' })
-        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-        .then(render)
-        .catch(() => {});
 
-    // Live: one WebSocket (the ledger pushes the summary on connect and on every event). If it cannot open or
-    // drops, poll the summary once a minute while the tab is visible.
-    let timer = 0;
-    const poll = () => {
-      if (timer) return;
-      timer = window.setInterval(() => document.visibilityState === 'visible' && pull(), POLL_MS);
+    // Be gentle with the ledger (Workers Free, shared with ingest): one summary read, one socket; a capped,
+    // visible-only poll if the socket fails; back off after a refusal; debounce refetch on tab return.
+    let pausedUntil = 0, lastPull = 0, timer = 0, polls = 0;
+    const pull = () => {
+      if (Date.now() < pausedUntil) return Promise.resolve(false);
+      lastPull = Date.now();
+      return fetch(`${base}/v1/summary`, { cache: 'no-store' })
+        .then((r) => {
+          if (r.status === 429 || r.status >= 500) pausedUntil = Date.now() + BACKOFF_MS;
+          return r.ok ? r.json().then((d) => (render(d), true)) : false;
+        })
+        .catch(() => ((pausedUntil = Date.now() + BACKOFF_MS), false));
     };
-    const connect = () => {
+    const stopPoll = () => { if (timer) { clearInterval(timer); timer = 0; } };
+    const poll = () => {
+      if (timer || polls >= MAX_POLLS) return;
+      timer = window.setInterval(() => {
+        if (document.visibilityState !== 'visible') return;
+        if (++polls >= MAX_POLLS) stopPoll();
+        pull();
+      }, POLL_MS);
+    };
+    // Off the production site (previews, local) the ledger refuses the socket by origin: poll instead.
+    const socketAllowed = /(^|\.)zoebnomi\.com$/.test(location.hostname);
+    const connect = (ok: boolean) => {
+      if (!ok) return; // the ledger refused or is down: keep what is on screen, try again on tab return
+      if (!socketAllowed) return poll();
       try {
         const ws = new WebSocket(base.replace(/^https:/, 'wss:') + '/v1/live');
         ws.addEventListener('message', (e) => {
+          stopPoll();
           if (typeof e.data !== 'string' || e.data.length > 20000) return;
           try { render(JSON.parse(e.data)); } catch { /* ignore a bad frame */ }
         });
         ws.addEventListener('close', poll);
-        ws.addEventListener('error', poll);
       } catch {
         poll();
       }
     };
     pull().then(connect);
-    // A new IST day while the page stays open: refetch so "today" and the grid roll over.
-    document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && pull());
+    // Back on the tab (also rolls "today" over a new IST day), at most once per 30 s.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && Date.now() - lastPull > REFOCUS_MS) pull();
+    });
   });
 </script>
 
@@ -256,11 +329,6 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
   }
 
   .hp-bar {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--s-2) var(--s-6);
     padding-bottom: var(--s-3);
     border-bottom: var(--line-hair);
     font-family: var(--font-data);
@@ -271,6 +339,7 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     display: inline-flex;
     align-items: center;
     gap: var(--s-2);
+    min-block-size: var(--hit-min);
     color: var(--color-pending);
   }
 
@@ -278,22 +347,19 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     inline-size: 8px;
     block-size: 8px;
     border-radius: 50%;
-    background: var(--color-pending);
+    border: var(--line-object);
+    border-color: currentColor;
   }
 
+  /* Live: a solid dot in the text colour. Never red (red is the pen) and never pulsing (red is the only thing
+     that moves on its own). */
   .hp-status[data-live] {
     color: var(--color-text-muted);
   }
 
   .hp-status[data-live] .hp-dot {
-    background: var(--color-accent);
-    animation: hp-pulse 1200ms var(--ease-draw) infinite alternate;
-  }
-
-  @keyframes hp-pulse {
-    to {
-      opacity: 0.3;
-    }
+    background: var(--color-text);
+    border-color: var(--color-text);
   }
 
   .hp-group {
@@ -312,15 +378,15 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     color: var(--color-text-muted);
   }
 
+  .hp-means {
+    margin-top: var(--s-1);
+  }
+
   .hp-tiles {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--s-6);
     margin-top: var(--s-3);
-  }
-
-  .hp-tiles-2 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .hp-tile {
@@ -340,6 +406,11 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     color: var(--color-text);
   }
 
+  /* Today is context; the outcomes carry the meaning, so today's numerals are a step smaller. */
+  .hp-v-today {
+    font-size: var(--t-h3);
+  }
+
   .hp-u {
     margin-left: 2px;
     font-size: 0.5em;
@@ -354,6 +425,7 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
 
   .hp-s,
   .hp-cap,
+  .hp-ticks,
   .hp-readout,
   .hp-how {
     font-family: var(--font-data);
@@ -377,9 +449,9 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     display: grid;
     grid-template-columns: repeat(14, minmax(0, 1fr));
     align-items: end;
-    gap: var(--s-1);
+    gap: 2px;
     margin-top: var(--s-3);
-    min-block-size: var(--s-13);
+    min-block-size: max(var(--s-13), calc(var(--rows-d) * 8px + var(--s-2)));
     border-bottom: var(--line-hair);
   }
 
@@ -389,8 +461,14 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     display: flex;
     justify-content: center;
     align-items: flex-end;
+    align-self: stretch;
     min-block-size: var(--s-13);
     padding-bottom: var(--s-1);
+    cursor: default;
+  }
+
+  .hp-days :global(.hp-day.is-week) {
+    background: var(--color-surface-raised);
   }
 
   .hp-days :global(.hp-day:focus-visible) {
@@ -404,6 +482,12 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     align-content: flex-start;
     gap: 2px;
     inline-size: calc(3 * 6px + 2 * 2px);
+  }
+
+  /* Before the ledger starts: a short line on the baseline, not an empty column. */
+  .hp-days :global(.hp-day.is-before .hp-stack) {
+    block-size: 2px;
+    background: var(--color-pending);
   }
 
   .hp-days :global(.hp-sq) {
@@ -420,6 +504,19 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
   .hp-days :global(.hp-day:hover .hp-sq:not(.is-caught)),
   .hp-days :global(.hp-day:focus-visible .hp-sq:not(.is-caught)) {
     background: var(--color-text);
+  }
+
+  .hp-ticks {
+    display: grid;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    gap: 2px;
+    margin-top: var(--s-1);
+    white-space: nowrap;
+  }
+
+  .hp-ticks :global(.hp-tick-end) {
+    grid-column: 14;
+    justify-self: end;
   }
 
   .hp-readout {
@@ -452,20 +549,37 @@ const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLab
     color: var(--color-text-body);
   }
 
+  @media (min-width: 1100px) {
+    .hp-days {
+      min-block-size: max(var(--s-13), calc(var(--rows-d) * 10px + var(--s-2)));
+    }
+
+    .hp-days :global(.hp-stack) {
+      inline-size: calc(3 * 8px + 2 * 2px);
+    }
+
+    .hp-days :global(.hp-sq) {
+      inline-size: 8px;
+      block-size: 8px;
+    }
+  }
+
   @media (max-width: 899px) {
     .hp {
       padding: var(--s-4);
       box-shadow: 6px 6px 0 var(--color-pending);
     }
 
-    .hp-tiles,
-    .hp-tiles-2 {
+    .hp-tiles {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hp-days {
+      min-block-size: max(var(--s-13), calc(var(--rows-m) * 7px + var(--s-2)));
     }
 
     .hp-days :global(.hp-stack) {
       inline-size: calc(2 * 5px + 2px);
-      gap: 2px;
     }
 
     .hp-days :global(.hp-sq) {

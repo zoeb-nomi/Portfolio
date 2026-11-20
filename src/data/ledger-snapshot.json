@@ -1,44 +1,44 @@
 {
   "v": 1,
-  "generated_at": "2026-11-20T10:35:50.605Z",
-  "last_event_at": "2026-11-20T10:35:00.000Z",
+  "generated_at": "2026-11-20T11:00:00.000Z",
+  "last_event_at": "2026-11-20T11:00:00.000Z",
   "live": {
     "day": "2026-11-20",
     "tz": "Asia/Kolkata",
-    "agent_runs_today": 7,
-    "subagent_runs_today": 2,
+    "agent_runs_today": 15,
+    "subagent_runs_today": 4,
     "sessions_ended_today": 0,
     "claude_tokens_today": {
-      "main": 0,
-      "subagent": 0
+      "main": 63135,
+      "subagent": 203266
     },
     "claude_list_price_usd_today": {
-      "main": 0,
-      "subagent": 0
+      "main": 3.73,
+      "subagent": 6.46
     }
   },
   "outcomes": {
     "since": "2026-11-10",
     "shipped_7d": 74,
     "shipped_total": 138,
-    "caught_7d": 16,
-    "caught_total": 26,
+    "caught_7d": 27,
+    "caught_total": 37,
     "caught_breakdown": {
-      "dropped": 3,
+      "dropped": 14,
       "sent_back": 0,
       "seeded": 23
     },
     "cost": {
       "api_usd_total": 47.76,
-      "fixed_usd_prorated": 40.37,
+      "fixed_usd_prorated": 40.46,
       "all_in_per_shipped_usd": 0.64,
       "api_per_shipped_usd": 0.35,
       "generations_without_cost": 0,
       "claude_list_price_usd": {
-        "main": 0,
-        "subagent": 0,
-        "tokens_main": 0,
-        "tokens_subagent": 0,
+        "main": 3.73,
+        "subagent": 6.46,
+        "tokens_main": 63135,
+        "tokens_subagent": 203266,
         "note": "Claude Code on the Max plan: list-price equivalent, not money spent"
       }
     },
@@ -127,7 +127,7 @@
     {
       "date": "2026-11-20",
       "shipped": 4,
-      "caught": 3
+      "caught": 14
     }
   ],
   "seed": {
