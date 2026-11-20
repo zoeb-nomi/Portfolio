@@ -1,37 +1,33 @@
 ---
 import Base from '../layouts/Base.astro';
 import '../styles/case-study.css';
-import Masthead from '../components/Masthead.astro';
-import Section from '../components/Section.astro';
-import DataTable from '../components/DataTable.astro';
-import PullQuote from '../components/PullQuote.astro';
-import CTASlab from '../components/CTASlab.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
-import EssayFigure from '../components/EssayFigure.astro';
-import EvidenceStack from '../components/EvidenceStack.astro';
-import Dumbbell from '../components/Dumbbell.astro';
-import UnitChart from '../components/UnitChart.astro';
-import { meta, mirrorEval as me, mirrorEvalJsonLd, cta, home, caseStudy } from '../data/copy';
+import CaseTabs from '../components/CaseTabs.astro';
+import CsHead from '../components/CsHead.astro';
+import CsSection from '../components/CsSection.astro';
+import CsStrip from '../components/CsStrip.astro';
+import CsSpecList from '../components/CsSpecList.astro';
+import CsFig from '../components/CsFig.astro';
+import CsLegend from '../components/CsLegend.astro';
+import CsTable from '../components/CsTable.astro';
+import CsCall from '../components/CsCall.astro';
+import CsList from '../components/CsList.astro';
+import CsLinks from '../components/CsLinks.astro';
+import CsContact from '../components/CsContact.astro';
+import CsParts from '../components/CsParts.astro';
+import { meta, mirrorEval as me, mirrorEvalJsonLd, pipelineCaseStudies as P } from '../data/copy';
 import { jsonLdString } from '../lib/jsonLdString';
-import { waveData, vacuumData, judgeData } from '../lib/figureData';
+import { mirrorFig, rich, rowParts } from '../lib/caseStudy';
 
-const waves = waveData();
-const vacuum = vacuumData();
-const judge = judgeData();
-
-const table1Rows = me.s3.table1.rows.map((r) => ({
-  label: r.engine,
-  cells: [
-    { text: r.site, win: r.bold },
-    { text: r.repo, win: r.bold },
-    { text: r.owned, win: r.bold },
-  ],
-}));
-
-const table2Rows = me.s3.table2.rows.map((r) => ({
-  label: r.surface,
-  cells: [{ text: r.engine }, { text: r.count }],
-}));
+const x = P.mirrorEval;
+const m = mirrorFig();
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+const range = (n: number) => Array.from({ length: n }, (_, i) => i);
+const tile = (i: number, from: number, to: number) => (i < from ? 'f' : i < to ? 'r' : '');
+const predTiles = x.predictions.list.flatMap((p) => range(Number(p.n)).map(() => p.k));
+const j = x.judge.fig;
+const first = m.judges[0];
+const ladder = j.ladder;
 ---
 
 <Base
@@ -39,126 +35,181 @@ const table2Rows = me.s3.table2.rows.map((r) => ({
   description={meta.mirrorEval.description}
   path="/mirror-eval/"
   ogImage="/og/mirror-eval.png"
-  motion
+  page="builds"
 >
   <script type="application/ld+json" set:html={jsonLdString(mirrorEvalJsonLd)} is:inline />
 
-  <Masthead
-    label="Case study specification"
-    kicker={me.kicker}
-    crumbs={[...caseStudy.crumbs, { label: 'mirror-eval' }]}
-    h1={me.title}
-    standfirst={me.standfirst}
-    h1Max="26ch"
-    spec={me.specBlock}
-    switcher="mirror-eval"
-    repo={{ href: me.repoHref, label: me.repoLabel }}
-    narr
-  >
-    <EssayFigure n={1} replay title="Every engine, every search probe" source="Source: Table 1 below, the owned (site or repo) column. Squares are grouped by outcome, so a square's position is not a probe id.">
-      <EvidenceStack engines={waves.rows} of={waves.of} fromLabel={waves.fromLabel} toLabel={waves.toLabel} />
-    </EssayFigure>
+  <CaseTabs current={1} repoHref={me.repoHref} repoLabel={me.repoLabel} />
+
+  <CsHead kick={x.kick} h1={x.h1} find={rich(me.standfirst, x.findMarks)} stats={x.stats} hud={x.hud}>
     {me.audio && <AudioPlayer audio={me.audio} articleId="mirror-eval" />}
-  </Masthead>
+  </CsHead>
 
-  <Section mark={me.s1.mark} label={me.s1.label} narrId="s1-cue">
-    <p class="prose" data-narr="s1-p0">{me.s1.body}</p>
-  </Section>
+  <CsSection id="why" kick={x.why.kick} h2={x.why.h2} wide>
+    <Fragment slot="dek">{me.s1.body}</Fragment>
+  </CsSection>
 
-  <Section mark={me.s2.mark} label={me.s2.label} narrId="s2-cue">
-    <dl class="method-list" data-narr="s2-list">
-      {me.s2.rows.map((row) => (
-        <div class="method-row">
-          <dt>{row.term}</dt>
-          <dd>
-            {row.kind === 'plain' && row.body}
-            {row.kind === 'code' && (
-              <>
-                {row.bodyPre}
-                <code>{row.code}</code>
-                {row.bodyPost}
-              </>
-            )}
-          </dd>
+  <CsSection id="method" kick={x.method.kick} h2={x.method.h2}>
+    <Fragment slot="dek"><CsParts parts={rich(x.method.dek, x.method.dekMarks)} /></Fragment>
+    <CsStrip steps={x.method.steps} />
+    <CsSpecList label={P.shared.methodDetail} items={me.s2.rows.map((r) => ({ dt: r.term, parts: rowParts(r) }))} />
+  </CsSection>
+
+  <CsSection id="findings" kick={x.findings.kick} h2={x.findings.h2}>
+    <Fragment slot="dek"><CsParts parts={rich(x.findings.dek, x.findings.dekMarks)} /></Fragment>
+
+    <figure class="cs-fig" id="me-waves">
+      <div class="cs-fig-top">
+        <p class="cs-fig-t"><span class="fno">{P.shared.figNo} 1</span>{x.findings.fig1.title}</p>
+        <div class="cs-seg" role="group" aria-label={x.findings.fig1.toggleLabel}>
+          <button type="button" data-v="w1" aria-pressed="false">{x.findings.fig1.w1}</button>
+          <button type="button" data-v="w2" aria-pressed="true">{x.findings.fig1.w2}</button>
         </div>
-      ))}
-    </dl>
-  </Section>
+      </div>
+      <div class="cs-fig-body">
+        <div class="me-eng" id="me-eng">
+          {m.engines.map((e) => (
+            <div class="me-row" data-w1={e.from} data-w2={e.to}>
+              <p class="me-n">{e.label}</p>
+              <div class="cs-tiles me-tl" aria-hidden="true">
+                {range(m.of).map((i) => <span class={`cs-t ${tile(i, e.from, e.to)}`}></span>)}
+              </div>
+              <p class:list={['me-v', e.to === 0 && 'r']}><b>{e.to}</b> / {m.of}</p>
+            </div>
+          ))}
+        </div>
+        <CsLegend items={x.findings.fig1.legend} below />
+      </div>
+      <figcaption class="cs-fig-foot">{x.findings.fig1.foot.map((t) => <span>{t}</span>)}</figcaption>
+    </figure>
 
-  <Section mark={me.s3.mark} label={me.s3.label} narrId="s3-cue">
-    <p class="prose intro" data-narr="s3-p0">{me.s3.intro}</p>
-    <EssayFigure n={2} replay title="Probes citing my site or repo, by engine" source="Source: Table 1 below, the owned (site or repo) column.">
-      <Dumbbell rows={waves.rows} max={waves.max} ticks={waves.ticks} fromLabel={waves.fromLabel} toLabel={waves.toLabel} unit={`of ${waves.of}`} />
-    </EssayFigure>
-    <div class="table-scroll" data-narr="s3-table1">
-      <DataTable nowrap caption={me.s3.table1.caption} columns={me.s3.table1.columns} rows={table1Rows} />
-    </div>
-    <p class="prose table-intro" data-narr="s3-p1">{me.s3.table2Intro}</p>
-    <EssayFigure n={3} replay title="What filled the gap" source="Source: Table 2 below. Each group has its own scale.">
-      {vacuum.groups.map((g, gi) => (
-        <Dumbbell showKey={gi === 0} heading={g.heading} rows={g.rows} max={g.max} ticks={g.ticks} fromLabel={vacuum.fromLabel} toLabel={vacuum.toLabel} />
-      ))}
-    </EssayFigure>
-    <div class="table-scroll" data-narr="s3-table2">
-      <DataTable nowrap caption={me.s3.table2.caption} columns={me.s3.table2.columns} rows={table2Rows} />
-    </div>
-    <p class="prose finding" data-narr="s3-p2">
-      <strong>{me.s3.findingLeadIn}</strong>{me.s3.findingBody}
-    </p>
-  </Section>
+    <p class="cs-lead">{me.s3.intro}</p>
+    <CsTable
+      caption={me.s3.table1.caption}
+      columns={me.s3.table1.columns}
+      rows={me.s3.table1.rows.map((r) => ({ cells: [r.engine, r.site, r.repo, r.owned], win: [false, false, false, r.bold] }))}
+    />
 
-  <Section mark={me.s4.mark} label={me.s4.label} narrId="s4-cue">
-    <p class="prose" data-narr="s4-p0">{me.s4.para1}</p>
-    <EssayFigure n={4} replay title="The judges against a blind human" source="Source: this section and the CrossSource blind check. A filled square is a judge output that agreed with the human label: the exact tag set in mirror-eval, the citation-precision verdict in CrossSource.">
-      <UnitChart rows={judge.rows} cols={judge.cols} filledMeans="matched the human" emptyMeans="did not match" />
-    </EssayFigure>
-    <p class="prose" data-narr="s4-p1">
-      {me.s4.para2Pre}<code>{me.s4.para2Code}</code>{me.s4.para2Post}
-    </p>
-    <div class="lesson" data-narr="s4-quote">
-      <PullQuote rule="red">{me.s4.lessonQuote}</PullQuote>
-    </div>
-  </Section>
-
-  <Section mark={me.s5.mark} label={me.s5.label} narrId="s5-cue">
-    <p class="prose" data-narr="s5-p0">{me.s5.body}</p>
-  </Section>
-
-  <Section mark={me.s6.mark} label={me.s6.label} narrId="s6-cue">
-    <p class="prose" data-narr="s6-p0">{me.s6.body}</p>
-  </Section>
-
-  <Section mark={me.s7.mark} label={me.s7.label} narrId="s7-cue">
-    <p class="prose" data-narr="s7-p0">{me.s7.body}</p>
-  </Section>
-
-  <Section mark={me.s8.mark} label={me.s8.label} narrId="s8-cue">
-    <p class="prose" data-narr="s8-p0">{me.s8.body}</p>
-    <p class="prose repo-cta">
-      {me.repoCta.map((link, i) => (
+    <p class="cs-lead">{me.s3.table2Intro}</p>
+    <CsFig no={`${P.shared.figNo} 2`} title={x.findings.fig2.title} foot={x.findings.fig2.foot}>
+      <CsLegend slot="top" items={x.findings.fig2.legend} />
+      {m.gaps.map((g) => (
         <>
-          {i > 0 && <span class="sep" aria-hidden="true"> · </span>}
-          <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
+          <p class="lab cs-glab">{g.heading.replace(', ', ' · ')} · {x.findings.fig2.scale} {g.max}</p>
+          <div class="cs-bars me-gap">
+            {g.rows.map((r) => (
+              <div class="cs-br">
+                <p class="bl">{r.label}<small>{r.sub}</small></p>
+                <div class="bt">
+                  <i class="ghost" data-a={r.from} data-m={g.max} style={`--k:${(r.from / g.max).toFixed(4)}`}></i>
+                  <i class={r.to > r.from ? 'r' : undefined} data-b={r.to} data-m={g.max} style={`--k:${(r.to / g.max).toFixed(4)}`}></i>
+                </div>
+                <p class="bv2"><s>{r.from}</s> {P.shared.arrow} {r.to}</p>
+              </div>
+            ))}
+          </div>
         </>
       ))}
-    </p>
-  </Section>
+    </CsFig>
+    <CsTable
+      caption={me.s3.table2.caption}
+      columns={me.s3.table2.columns}
+      textCols={2}
+      rows={me.s3.table2.rows.map((r) => ({ cells: [r.surface, r.engine, r.count] }))}
+    />
 
-  <Section mark={me.relatedWriting.mark} label="Related writing">
-    <p class="prose related-writing">
-      <a href={me.relatedWriting.href}>{me.relatedWriting.text}</a>
-    </p>
-    <p class="prose related-writing">
-      <a href={me.relatedScreenerEval.href}>{me.relatedScreenerEval.text}</a>
-    </p>
-  </Section>
+    <CsCall label={me.s3.findingLeadIn.replace(/:$/, '')} long>{cap(me.s3.findingBody.trimStart())}</CsCall>
+  </CsSection>
 
-  <CTASlab
-    marginLines={[home.eyebrow.toUpperCase()]}
-    body={me.ctaSlabBody}
-    buttonLabel="View the repo →"
-    buttonHref={me.repoHref}
-    secondaryLabel={cta.bookACall.label}
-    secondaryHref={cta.bookACall.href}
-  />
+  <CsSection id="judge" kick={x.judge.kick} h2={x.judge.h2} wide>
+    <Fragment slot="dek">{me.s4.para1}</Fragment>
+
+    <figure class="cs-fig" id="me-judge">
+      <div class="cs-fig-top">
+        <p class="cs-fig-t"><span class="fno">{P.shared.figNo} 3</span>{j.title}</p>
+        <CsLegend items={j.legend} />
+      </div>
+      <div class="cs-fig-body">
+        <div class="me-jg">
+          <div class="me-mx" id="me-mx">
+            {m.judges.map((r) => (
+              <button
+                type="button"
+                class:list={['me-jr', r.j === 'pair' && 'me-jj']}
+                data-j={r.j}
+                data-n={r.of}
+                data-k={r.filled}
+                data-info={JSON.stringify({ t: r.name, c: r.compared, r: r.result, v: r.verdict, bad: r.bad, lad: r.lad })}
+              >
+                <span class="me-jn">{r.name}{r.sub && <small>{r.sub}</small>}</span>
+                <span class="cs-tiles me-jt" aria-hidden="true">
+                  {range(r.of).map((i) => <span class={`cs-t ${i < r.filled ? 'f' : ''}`}></span>)}
+                </span>
+                <span class="me-jv"><b>{r.filled}</b> of {r.of} · {r.pct}%</span>
+              </button>
+            ))}
+          </div>
+          <aside class="me-read" aria-live="polite">
+            <p class="lab">{j.readout}</p>
+            <p class="me-rt" id="me-rt">{first.name}</p>
+            <dl class="me-rd">
+              <div><dt>{j.dts[0]}</dt><dd id="me-rc">{first.compared}</dd></div>
+              <div><dt>{j.dts[1]}</dt><dd id="me-rr">{first.result}</dd></div>
+              <div><dt>{j.dts[2]}</dt><dd id="me-rv" class={first.bad ? 'r' : undefined}>{first.verdict}</dd></div>
+            </dl>
+            <ol class="me-ladder" id="me-ladder">
+              {ladder.map((l) => (
+                <li data-k={l.k} class={l.k === first.lad ? 'lit' : undefined}><b>{l.b}</b><span>{l.t}</span></li>
+              ))}
+            </ol>
+          </aside>
+        </div>
+      </div>
+      <figcaption class="cs-fig-foot">{j.foot.map((t) => <span>{t}</span>)}</figcaption>
+    </figure>
+    <p class="cs-note">{x.judge.hint}</p>
+
+    <p class="cs-body">{me.s4.para2Pre}<code>{me.s4.para2Code}</code>{me.s4.para2Post}</p>
+
+    <CsCall label={x.judge.calloutLabel}><code>{me.s4.para2Code}</code> {me.s4.lessonQuote.replace(/^It /, '')}</CsCall>
+  </CsSection>
+
+  <CsSection id="predictions" kick={x.predictions.kick} h2={x.predictions.h2} wide>
+    <Fragment slot="dek"><CsParts parts={rich(me.s7.body, x.predictions.bodyMarks)} /></Fragment>
+    <div class="me-pred" id="me-pred">
+      <div class="cs-tiles me-pt" aria-hidden="true">
+        {predTiles.map((k) => <span class={`cs-t ${k}`}></span>)}
+      </div>
+      <ul class="me-pl">
+        {x.predictions.list.map((p) => (
+          <li><i class={p.k || undefined}></i><b>{p.n}</b><span>{p.t}{p.small && <small>{p.small}</small>}</span></li>
+        ))}
+      </ul>
+    </div>
+  </CsSection>
+
+  <CsSection id="limits" kick={x.limits.kick} h2={x.limits.h2}>
+    <CsList kind="lim" items={m.limits.map((s, i) => rich(s, [x.limits.marks[i]]))} />
+  </CsSection>
+
+  <CsSection id="any-agent" kick={x.rules.kick} h2={x.rules.h2} wide>
+    <Fragment slot="dek">{me.s5.body}</Fragment>
+    <CsList kind="rules" items={x.rules.items.map((t) => [{ text: t }])} />
+    <p class="cs-note cs-next">{me.s8.label}: {me.s8.body}</p>
+  </CsSection>
+
+  <CsSection id="code" kick={x.code.kick} h2={me.ctaSlabBody}>
+    <CsLinks links={x.code.links.map((l, i) => ({ ...l, href: me.repoCta[i].href }))} />
+    <div class="cs-related">
+      <p class="lab">{P.shared.related}</p>
+      <CsLinks sub links={x.code.related} />
+    </div>
+  </CsSection>
+
+  <CsContact />
 </Base>
+
+<script>
+  import { initMirrorEval } from '../scripts/case-study';
+  initMirrorEval();
+</script>

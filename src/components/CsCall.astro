@@ -1,0 +1,14 @@
+---
+// The finding callout: a red rule, a red label and the finding in the page's voice.
+interface Props {
+  label: string;
+  long?: boolean;
+}
+
+const { label, long = false } = Astro.props;
+---
+
+<div class:list={['cs-call', long && 'long']} data-reveal>
+  <span class="lab red">{label}</span>
+  <p><slot /></p>
+</div>

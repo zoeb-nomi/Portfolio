@@ -1,0 +1,23 @@
+---
+// A booktabs table in the kit's .tbl. `textCols` leading columns are text; the rest are numeric.
+interface Props {
+  caption: string;
+  columns: string[];
+  rows: { cells: string[]; win?: boolean[] }[];
+  textCols?: number;
+}
+
+const { caption, columns, rows, textCols = 1 } = Astro.props;
+---
+
+<div class="tbl-wrap">
+  <table class="tbl">
+    <caption>{caption}</caption>
+    <thead><tr>{columns.map((c, i) => <th class={i >= textCols ? 'n' : undefined}>{c}</th>)}</tr></thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>{r.cells.map((c, i) => <td class={i >= textCols ? (r.win?.[i] ? 'n win' : 'n') : undefined}>{c}</td>)}</tr>
+      ))}
+    </tbody>
+  </table>
+</div>

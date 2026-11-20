@@ -1,16 +1,15 @@
 ---
-// The page masthead: a kicker in the margin column, an h1 + standfirst in the
-// body column, closed by a strong rule. One component for every interior page.
+// The page head (kit `.page-head`): kicker, h1, standfirst, a byline, then whatever the page puts in the default
+// slot (the AudioPlayer, a finding line), then optional readouts (`stats`) and, for a case study, the spec strip.
 //
-//   default   kicker in the margin column (Writing, Evals, posts, case studies)
-//            : add `spec` / `switcher` / `repo` for the case-study margin
-//   plain     empty margin column, hidden on phones (Work)
-//   photo     pass `thumbnail`: a 120px headshot in the margin column, no kicker,
-//             stacked above the title on phones (About)
+//   default   kicker (or `crumbs`), h1, standfirst; `spec` becomes the HUD strip, `switcher` and `repo` a link row
+//   plain     no kicker (Work)
+//   photo     pass `thumbnail` or `portrait`: the headshot sits beside the title (About)
 //
-// Slots: `byline` (a dated line under the standfirst) and the default slot
-// (anything under that, the read-along AudioPlayer). The AudioPlayer finds its
-// float anchor via `.masthead-inner > .margin-col`; keep both class names.
+// Slots: `byline` (the dated line under the standfirst) and the default slot (anything under that).
+// An essay or note head (it has a byline and no case-study props) is marked `data-article`: that switches on the
+// red reading spine and in-place footnotes (scripts/reading.ts) for the sections below it. Pass `article` to
+// force it on or off.
 import Headshot from './Headshot.astro';
 import EvalsSwitcher from './EvalsSwitcher.astro';
 
@@ -19,11 +18,17 @@ interface SpecRow {
   value: string;
 }
 
+interface Stat {
+  v: string;
+  u: string;
+  s?: string;
+}
+
 interface Props {
   h1: string;
   kicker?: string;
   standfirst?: string;
-  /** Accessible name for the margin-column aside (used only when it carries a spec, switcher or repo link). */
+  /** Accessible name for the case-study details (spec, switcher, repo link). */
   label?: string;
   variant?: 'default' | 'plain';
   thumbnail?: { alt: string };
@@ -35,10 +40,14 @@ interface Props {
   spec?: SpecRow[];
   switcher?: 'CrossSource' | 'mirror-eval' | 'screener-eval';
   repo?: { href: string; label: string };
-  /** Breadcrumb under Builds/Writing (DESIGN v3 §e). Replaces the margin kicker. */
+  /** Breadcrumb under Builds/Writing. Replaces the kicker. */
   crumbs?: { label: string; href?: string }[];
-  /** About: one borderless greyscale portrait, 200px (D-12). */
+  /** About: the portrait beside the title. */
   portrait?: { alt: string };
+  /** Readouts under the head (`.stats > .ro`): value, unit, source. Rendered after the default slot. */
+  stats?: Stat[];
+  /** Mark this head as an article (spine and footnotes below it). Default: a byline and no case-study props. */
+  article?: boolean;
 }
 
 const {
@@ -56,300 +65,180 @@ const {
   repo,
   crumbs,
   portrait,
+  stats,
+  article,
 } = Astro.props;
 
 const photo = Boolean(thumbnail) || Boolean(portrait);
 const plain = variant === 'plain';
 const hasByline = Astro.slots.has('byline');
-const hasMarginExtras = Boolean(spec || switcher || repo);
-// A kicker alone is just text. Only a margin column that carries a spec block, the evals
-// switcher or a repo link is a real complementary region and gets a name.
-const Margin = hasMarginExtras ? 'aside' : 'div';
-const isCase = Boolean(crumbs) && hasMarginExtras;
-
-const vars = [h1Max && `--h1-max:${h1Max}`, standfirstMax && `--standfirst-max:${standfirstMax}`]
-  .filter(Boolean)
-  .join(';');
+const hasExtras = Boolean(spec || switcher || repo);
+const isArticle = article ?? (hasByline && !hasExtras && !crumbs && !photo && !plain);
 ---
 
-<section class="masthead">
-  <div
-    class:list={['masthead-inner', 'grid-margin', { 'is-photo': photo, 'is-plain': plain, 'is-case': isCase, 'has-crumbs': Boolean(crumbs) }]}
-    style={vars || undefined}
-  >
-    {
-      photo ? (
-        <div class="margin-col">
-          <Headshot size={portrait ? 'about' : 'thumb'} alt={(portrait ?? thumbnail)!.alt} loading="eager" />
-        </div>
-      ) : plain ? (
-        <div class="margin-col" aria-hidden="true" />
-      ) : (
-        <Margin class="margin-col" aria-label={hasMarginExtras ? label : undefined}>
-          {!crumbs && <p class:list={['kicker', { 'kicker--stacked': hasMarginExtras }]}>{kicker}</p>}
-          {spec && (
-            <dl class="spec-block" data-narr={narr ? 's0-stats' : undefined}>
-              {spec.map((s) => (
-                <div class="spec-row">
-                  <dt>{s.label}</dt>
-                  <dd class="tabular">{s.value}</dd>
+<section class:list={['page-head', 'gut', { 'is-photo': photo }]} data-article={isArticle ? '' : undefined}>
+  <div class="in">
+    <div class:list={['mh', { 'mh--photo': photo }]}>
+      {
+        photo && (
+          <div class="mh-photo">
+            <Headshot size={portrait ? 'about' : 'thumb'} alt={(portrait ?? thumbnail)!.alt} loading="eager" />
+          </div>
+        )
+      }
+      <div class="mh-body">
+        {
+          crumbs ? (
+            <nav class="kick crumbs" aria-label="Breadcrumb">
+              <ol>
+                {crumbs.map((c, i) => (
+                  <li>
+                    {c.href ? <a href={c.href}>{c.label}</a> : <span aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.label}</span>}
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          ) : (
+            kicker && !photo && !plain && <p class="kick">{kicker}</p>
+          )
+        }
+        {crumbs && kicker && <p class="mh-kicker lab">{kicker}</p>}
+        <h1 class="display split" style={h1Max ? `max-width:${h1Max}` : undefined} data-narr={narr ? 's0-title' : undefined}>{h1}</h1>
+        {
+          standfirst && (
+            <p class="dek" style={standfirstMax ? `max-width:${standfirstMax}` : undefined} data-narr={narr ? 's0-dek' : undefined}>
+              {standfirst}
+            </p>
+          )
+        }
+        {
+          hasByline && (
+            <div class="byline meta">
+              <slot name="byline" />
+            </div>
+          )
+        }
+        <slot />
+        {
+          stats && stats.length > 0 && (
+            <div class="stats">
+              {stats.map((s) => (
+                <div class="ro">
+                  <p class="v" data-num>{s.v}</p>
+                  <p class="u">{s.u}</p>
+                  {s.s && <p class="s">{s.s}</p>}
                 </div>
               ))}
-            </dl>
-          )}
-          {switcher && <EvalsSwitcher current={switcher} />}
-          {repo && (
-            <a class="repo-link" href={repo.href} target="_blank" rel="noopener noreferrer">
-              {repo.label}
-            </a>
-          )}
-        </Margin>
-      )
-    }
-    <div class="body-col">
-      {
-        crumbs && (
-          <nav class="crumbs" aria-label="Breadcrumb">
-            <ol>
-              {crumbs.map((c, i) => (
-                <li>
-                  {c.href ? <a href={c.href}>{c.label}</a> : <span aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.label}</span>}
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )
-      }
-      <h1 class:list={['page-h1', { 'is-long': h1.length > 40 }]} data-narr={narr ? 's0-title' : undefined}>{h1}</h1>
-      {
-        standfirst && (
-          <p
-            class:list={['standfirst', { 'standfirst--above-byline': hasByline }]}
-            data-narr={narr ? 's0-dek' : undefined}
-          >
-            {standfirst}
-          </p>
-        )
-      }
-      {
-        hasByline && (
-          <p class="byline tabular">
-            <slot name="byline" />
-          </p>
-        )
-      }
-      <slot />
+            </div>
+          )
+        }
+        {
+          spec && (
+            <div class="hud mh-spec" role="group" aria-label={label} data-narr={narr ? 's0-stats' : undefined}>
+              <dl class="hud-in">
+                {spec.map((s) => (
+                  <div class="hud-c">
+                    <dt>{s.label}</dt>
+                    <dd><b>{s.value}</b></dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )
+        }
+        {
+          (switcher || repo) && (
+            <div class="mh-links">
+              {switcher && <EvalsSwitcher current={switcher} />}
+              {repo && (
+                <a class="tl" href={repo.href} target="_blank" rel="noopener noreferrer">
+                  {repo.label}
+                </a>
+              )}
+            </div>
+          )
+        }
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  import { reading } from '../scripts/reading';
+  reading();
+</script>
 
 <style>
   .crumbs ol {
     display: flex;
     flex-wrap: wrap;
     list-style: none;
-    margin-bottom: var(--s-5);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
+    margin: 0;
+    padding: 0;
   }
 
   .crumbs li:not(:last-child)::after {
     content: '/';
     padding-inline: var(--s-2);
-    color: var(--color-line);
+    color: var(--color-text-muted);
   }
 
   .crumbs a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-min);
-    color: var(--color-text);
-    text-decoration: underline;
-    text-decoration-color: var(--color-link);
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .crumbs a:hover {
-    color: var(--color-link);
-  }
-
-  /* Case studies on phones and tablets: result first. Breadcrumb, H1, the
-     result standfirst, Fig. 1 and the audio come before the spec and the
-     switcher (D-10), reordered with CSS, never by duplicating DOM. */
-  @media (max-width: 899px) {
-    .is-case {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .is-case > .body-col {
-      order: 1;
-      padding-bottom: var(--s-4);
-    }
-
-    .is-case > .margin-col {
-      order: 2;
-      padding: 0 var(--gutter) var(--s-9);
-    }
-
-    .has-crumbs:not(.is-case) > .margin-col {
-      display: none;
-    }
-  }
-
-  .masthead-inner {
-    border-bottom: var(--line-ink);
-    --body-pad-end: var(--s-11);
-  }
-
-  .kicker {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .kicker--stacked {
-    margin-bottom: var(--s-7);
-  }
-
-  .page-h1 {
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-page);
-    line-height: var(--lh-display);
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-    margin-bottom: var(--s-6);
-    max-width: var(--h1-max, none);
-  }
-
-  /* A long title (a case study's full claim) steps down a size so it stays a headline, not a wall. */
-  .page-h1.is-long {
-    font-size: clamp(34px, 4.4vw, 62px);
-    line-height: var(--lh-title);
-  }
-
-  .standfirst {
-    font-family: var(--font-text);
-    font-size: var(--t-body);
-    line-height: var(--lh-prose);
     color: var(--color-text-body);
-    max-width: var(--standfirst-max, 62ch);
+    text-decoration: none;
   }
 
-  .standfirst--above-byline {
-    margin-bottom: var(--s-4);
-  }
-
-  .byline {
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  /* Case-study margin column: the spec block, the evals switcher, the repo link. */
-  .spec-block {
-    margin-bottom: var(--s-6);
-  }
-
-  .spec-row {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--s-3);
-    padding-block: var(--s-2);
-    border-top: var(--line-hair);
-    font-family: var(--font-data);
-    font-size: var(--t-data);
-  }
-
-  .spec-row:first-child {
-    border-top: 0;
-  }
-
-  .spec-row dt {
-    color: var(--color-text-muted);
-  }
-
-  .spec-row dd {
+  .crumbs a:hover,
+  .crumbs a:focus-visible {
     color: var(--color-text);
   }
 
-  /* In the 200px margin column (900-1099px) label and value no longer fit on one line:
-     stack them instead of letting each wrap independently ("Probes 332 per / wave"). */
-  @media (min-width: 900px) and (max-width: 1099px) {
-    .spec-row {
-      flex-direction: column;
-      gap: var(--s-1);
-    }
+  .mh-kicker {
+    margin-top: var(--s-3);
   }
 
-  .repo-link {
-    display: inline-block;
-    /* Hit area >= 24px tall (WCAG 2.5.8): padding added, margin-top reduced by
-       the same amount so the layout does not move. */
-    padding-block: var(--s-1);
-    min-height: var(--hit-min);
-    margin-top: calc(var(--s-6) - var(--s-1));
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-    overflow-wrap: anywhere;
-  }
-
-  /* plain: the margin column is only the rule; it has no content to stack. */
-  .is-plain .page-h1 {
-    margin-bottom: var(--s-4);
-  }
-
-  @media (max-width: 899px) {
-    .is-plain > .margin-col {
-      display: none;
-    }
-  }
-
-  /* photo: no margin-column rule. The photo sits in the margin column's
-     footprint and the title is bottom-aligned with it, starting at the same
-     body x as every other page. Stacked (photo above title) below 900px. */
-  .is-photo {
-    align-items: end;
-  }
-
-  .is-photo > .margin-col {
-    border-right: 0;
-    padding: var(--s-9) 0 var(--s-11) var(--gutter);
-  }
-
-  .is-photo > .body-col {
+  /* The portrait sits beside the title and shares its bottom edge. */
+  .mh--photo {
     display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
+    align-items: flex-end;
+    gap: clamp(var(--s-5), 3vw, var(--s-9));
   }
 
-  .is-photo .page-h1 {
-    margin-bottom: 0;
+  .mh-photo {
+    flex: none;
+    width: 120px;
   }
 
-  .is-photo .standfirst {
-    /* About's dek was never balanced: keep its rag. */
-    text-wrap: pretty;
+  .mh--photo .mh-body {
+    min-width: 0;
   }
 
-  @media (max-width: 899px) {
-    .is-photo {
-      align-items: start;
+  @media (max-width: 599px) {
+    .mh--photo {
+      flex-direction: column;
+      align-items: flex-start;
     }
+  }
 
-    .is-photo > .margin-col {
-      border-bottom: 0;
-      padding: var(--s-7) var(--gutter) 0;
-    }
+  /* The spec strip and the switcher row sit under the readouts. */
+  .mh-spec {
+    margin-top: var(--s-6);
+  }
 
-    .is-photo > .body-col {
-      padding: var(--s-6) var(--gutter) var(--s-7);
-    }
+  .mh-spec dl,
+  .mh-spec dd {
+    margin: 0;
+  }
+
+  .mh-spec dt {
+    font: inherit;
+  }
+
+  .mh-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-7);
+    margin-top: var(--s-5);
   }
 </style>

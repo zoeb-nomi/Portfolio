@@ -1,4 +1,4 @@
-// Tokens audit — does the rendered site stay inside The Red Pen's token set?
+// Tokens audit: does the rendered site stay inside The Pipeline's token set?
 // (Pages come from the built sitemap; widths are 1440 / 1024 / 390.)
 // Run against a live site:  npx astro preview --host 127.0.0.1 --port 4321 &  npm run tokens
 // Env: BASE_URL (default http://127.0.0.1:4321). Report: .astro/tokens-report.json
@@ -47,7 +47,7 @@ const sizeOk = (px) =>
   sizeRanges.some(([lo, hi]) => px >= lo - 0.05 && px <= hi + 0.05);
 
 const colourTokens = [
-  ...new Set([...css.matchAll(/(--(?:paper|ink|rule|red|on-red|heat|surface-ink|on-ink|graphite)[\w-]*):/g)].map((m) => m[1])),
+  ...new Set([...css.matchAll(/(--(?:bg|raise|panel|ink|rule|red|on-red|heat|glass|chip-bg|code-bg)[\w-]*):/g)].map((m) => m[1])),
 ];
 
 // --- in-page probe ----------------------------------------------------------

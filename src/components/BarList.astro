@@ -1,12 +1,14 @@
 ---
 // Horizontal bars for a short list of values on one scale. Each row is
 // "label, bar, value" in a real list, so the numbers are text first; the bar is
-// decoration. An optional note is a reviewer's annotation (red) on that row.
+// decoration. A row can carry a `tone` of red when its bar is a failure or the series under test.
 interface Row {
   label: string;
   value: number;
   text: string;
   note?: string;
+  /** Fill colour of this row's bar: ink (default) or red for a failure. */
+  tone?: 'ink' | 'red';
 }
 
 interface Props {
@@ -24,7 +26,7 @@ const { rows, max, heading } = Astro.props;
   <ul class="bl-list">
     {
       rows.map((r) => (
-        <li class="bl-row">
+        <li class:list={['bl-row', { 'is-red': r.tone === 'red' }]}>
           <span class="bl-label">{r.label}</span>
           <span class="bl-track" aria-hidden="true">
             <span class="bl-fill" style={`inline-size:${Math.min(100, (r.value / max) * 100)}%`} />
@@ -45,7 +47,9 @@ const { rows, max, heading } = Astro.props;
   .bl-heading {
     margin-bottom: var(--s-3);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
     color: var(--color-text-muted);
   }
 
@@ -57,13 +61,18 @@ const { rows, max, heading } = Astro.props;
 
   .bl-row {
     display: grid;
-    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 3.5rem;
     align-items: center;
     column-gap: var(--s-4);
     row-gap: var(--s-1);
     font-family: var(--font-data);
     font-size: var(--t-data);
+    color: var(--color-text-body);
+  }
+
+  .bl-value {
     color: var(--color-text);
+    text-align: right;
   }
 
   .bl-row + .bl-row {
@@ -73,19 +82,24 @@ const { rows, max, heading } = Astro.props;
   .bl-track {
     display: block;
     block-size: var(--s-3);
-    border: var(--line-object);
+    border: var(--line-strong);
+    background: var(--color-surface-sunk);
   }
 
   .bl-fill {
     display: block;
     block-size: 100%;
-    background: var(--color-text);
+    background: var(--color-text-body);
+  }
+
+  .bl-row.is-red .bl-fill {
+    background: var(--color-accent);
   }
 
   .bl-note {
     grid-column: 2 / -1;
-    font-size: var(--t-micro);
-    color: var(--color-accent-text);
+    font-size: var(--t-label);
+    color: var(--color-text-muted);
   }
 
   @media (max-width: 599px) {

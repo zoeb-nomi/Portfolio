@@ -1,29 +1,34 @@
 # EssayFigure
 
 ## Purpose
-The frame for any figure in an essay or case study: a caption with "Fig. N" and a title above, the body in a slot, a source line below.
+The captioned figure for essays and notes (kit `.fig`). The body sits in `.fig-frame` on the sunk surface; the caption below opens with a red "Fig. N", then the title, then a mono source line. The body is a slot, so charts, diagrams, images and tables share one frame.
 
 ## Anatomy
-`<figure>` with a `<figcaption>` (number in red text, title, optional Replay button), `.ef-body` slot, and an optional `.ef-source` line with an optional link.
+`figure.fig.ef`: `div.fig-frame.ef-body` (the slot, plus an optional Replay chip), then `figcaption` with `span.fno`, the title and an optional `span.fsrc` (source text and an optional link).
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `n` | `number` | figure number |
-| `title` | `string` | |
+| `n` | `number` | the figure number, printed "Fig. N" |
+| `title` | `string` | caption text |
 | `source` | `string?` | where the numbers come from, in words |
-| `href`, `hrefLabel` | `string?` | link after the source |
-| `replay` | `boolean?` | show a Replay button when the figure animates (revealed by `figure-motion.ts` only when motion is allowed). Default false |
+| `href`, `hrefLabel` | `string?` | a link appended to the source line |
+| `replay` | `boolean` | show the Replay chip; set it when the figure animates; default `false` |
 
-## Tokens it reads
-- Colour roles: `--color-text-muted`, `--color-accent-text` ("Fig. N"), `--color-link` (source link).
-- Type and space: `--font-text`, `--font-data`, `--t-note`, `--t-label`, `--lh-snug`, `--lh-label`, `--measure`, `--s-1` to `--s-8`, `--hit-min`, `--underline-offset`, `--line-hair`.
+## Variants
+With or without `replay`.
 
-## States and motion
-The frame is static. The Replay button is `hidden` until the script shows it; reduced motion keeps it hidden. Ink surface: roles re-point.
+## Kit classes
+`.fig`, `.fig-frame`, `.fno`, `.fsrc`, `.chip` (the Replay control). The figure grammar: sunk ground, red number, hairlines, mono labels.
+
+## Motion
+None of its own. The Replay chip is `hidden` in the HTML and `scripts/figure-motion.ts` reveals and wires it only when motion is allowed, for the animated figures inside (`Dumbbell`, `ForestPlot`, `UnitChart`, `ParserCompare`).
 
 ## Accessibility
-Semantic `<figure>`/`<figcaption>`. Replay is a real button with a `--hit-min` target.
+A real `<figure>` with `<figcaption>`. The Replay control is a native button. The Replay label is typed in the component, not in `copy.ts` (a small exception to the copy rule).
+
+## Light and dark
+Roles only (`--color-surface-sunk` frame, `--line-hair` border, accent number). Both themes work unchanged.
 
 ## Used on
-Pages: `/crosssource/`, `/mirror-eval/`, `/notes/[slug]/`, `/screener-eval/`, `/writing/decisions-api-legal-quiz/`, `/writing/eval-harness-at-my-own-reflection/`, `/writing/nobody-reports-the-misses/`, `/writing/the-judge-caught-a-bug/`, `/writing/two-levers-that-did-not-move/`.
+All essays and `/notes/[slug]/`: `the-bus-stop-nobody-notices`, `eval-harness-at-my-own-reflection`, `two-levers-that-did-not-move`, `nobody-reports-the-misses`, `the-judge-caught-a-bug`, `decisions-api-legal-quiz`.

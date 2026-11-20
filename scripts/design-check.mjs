@@ -57,10 +57,10 @@ for (const file of SCAN.flatMap(walk)) {
       if (/^#\d{1,3}$/.test(m[0])) continue; // "#360", "#1": issue numbers, not colours
       if (palette.has(norm(m[0]))) problems.push(`${rel}:${i + 1}  palette hex ${m[0]} outside design/tokens.css; use var(--token)`);
     }
-    // Red Pen 5 contract: components read colour roles (--color-*), never the primitives, so a derived theme or
-    // the ink surface can re-point every colour by overriding roles alone. pen.css paints the ink surface itself.
-    if (/^src\/.*\.(css|astro|ts)$/.test(rel) && rel !== 'src/styles/pen.css') {
-      for (const m of line.matchAll(/var\(--(paper|paper-raised|paper-sunk|ink|ink-body|ink-muted|rule|rule-strong|graphite|red|red-ink|red-tint|on-red|on-red-muted|font-display|font-body|font-mono)\)/g)) {
+    // The Pipeline contract: components read colour roles (--color-*), never the primitives, so the light theme
+    // (and any derived theme) re-points every colour by overriding primitives once in design/tokens.css.
+    if (/^src\/.*\.(css|astro|ts)$/.test(rel)) {
+      for (const m of line.matchAll(/var\(--(bg|bg-2|raise|panel|ink|ink-2|ink-3|rule|rule-2|red|red-tint|on-red|glass|glass-2|chip-bg|code-bg|font-display|font-body|font-mono)\)/g)) {
         problems.push(`${rel}:${i + 1}  reads primitive ${m[0]}; read a --color-* or --font-heading/text/data role instead`);
       }
     }

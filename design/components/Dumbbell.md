@@ -1,34 +1,36 @@
 # Dumbbell
 
 ## Purpose
-Before and after for several items on one scale: a hollow marker where it started, a filled marker where it ended, joined by a line. Values are text first; the drawing is decoration.
+One row per item: a hollow marker where it started and a red marker where it ended, joined by a line. The before and after values are printed as text ("19 → 27 of 63"), and the drawing is `aria-hidden`.
 
 ## Anatomy
-Optional heading and a hollow/filled key; then one row per item: label (with optional `sub`), track (aria-hidden: line, hollow marker, filled marker), value text "from → to unit", optional note; a tick axis below. Shared figure styles live in `src/styles/figures.css`.
+`.db[data-fig="dumbbell"]`: optional `.db-heading`, an optional key (hollow = from, red = to), then one `.fg-row` per item (`.fg-lab`, `.fg-trk` with `.db-link`, `.db-from`, `.db-to`, `.fg-val`, optional `.fg-note`), then a tick axis `.fg-axis`.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
 | `rows` | `Row[]` | `label`, `sub?`, `from`, `to`, `note?` |
-| `max` | `number` | scale end |
-| `ticks` | `number[]` | axis labels |
-| `fromLabel`, `toLabel` | `string` | key text |
-| `unit` | `string?` | appended to each value, for example "of 63" |
-| `heading` | `string?` | |
-| `showKey` | `boolean?` | default true; turn off for later groups in one figure |
+| `max` | `number` | the axis maximum |
+| `ticks` | `number[]` | axis tick values |
+| `fromLabel`, `toLabel` | `string` | the key text |
+| `unit` | `string?` | appended to each value, e.g. "of 63" |
+| `heading` | `string?` | label above the figure |
+| `showKey` | `boolean` | show the key; default `true` (leave off for later groups in one figure) |
 
-## Tokens it reads
-- Colour roles: `--color-text-muted` here; markers and line read `--color-surface` and `--color-text` through `figures.css`.
-- Type and space: `--font-data`, `--t-micro`, `--track-wide`, `--s-1` to `--s-6`. Motion: `--ease-draw`.
-- Hollow = before, filled = after (README section 6).
+## Variants
+None. Several `Dumbbell`s in a row stack with spacing.
 
-## States and motion
-- Reveal: when motion is allowed the figure starts at `data-state="pre"` (filled marker on the hollow one, line collapsed) and plays once at 35% in view; the filled marker slides to its value. The `EssayFigure` Replay link plays it again.
-- Without script or with reduced motion, the final state is the HTML.
-- Ink surface: roles re-point, unchanged.
+## Kit classes
+The shared `.fg-*` pieces in `src/styles/figures.css` (`.fg-row`, `.fg-pt`, `.fg-line`, `.fg-axis`), sitting inside an `EssayFigure` (`.fig-frame`). Hollow means before, filled red means after.
+
+## Motion
+Plays once as the figure scrolls into view: the red marker and the line fade in, staggered by row (`scripts/figure-motion.ts`, start frame `data-state="pre"`). Without the script or with reduced motion the final state is what is in the HTML. The figure's Replay chip comes from `EssayFigure`.
 
 ## Accessibility
-Numbers are text in every row ("from → to"); the track and axis are `aria-hidden`.
+Values are text first; the drawing is hidden from assistive tech. Nothing relies on colour alone: the key and the "from → to" text carry the meaning.
+
+## Light and dark
+Roles only (muted text, accent marker, `--line-strong` outlines). Works on both grounds.
 
 ## Used on
-Pages: `/design/components/`, `/mirror-eval/`, `/writing/eval-harness-at-my-own-reflection/`.
+`/writing/eval-harness-at-my-own-reflection/`.

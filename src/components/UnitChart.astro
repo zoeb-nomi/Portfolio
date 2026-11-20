@@ -9,6 +9,8 @@ interface Row {
   of: number;
   /** Visible value, e.g. "3 of 40 · 8%". */
   text: string;
+  /** Colour of this row's filled squares: ink (default) or red when the count is a failure or the series under test. */
+  tone?: 'ink' | 'red';
 }
 
 interface Props {
@@ -18,15 +20,18 @@ interface Props {
   /** What a filled square means, shown as the key. */
   filledMeans: string;
   emptyMeans: string;
+  /** Draw the empty squares in red outline: the thing being counted is the ones that stayed empty (a failure). */
+  emptyTone?: 'ink' | 'red';
 }
 
-const { rows, cols, filledMeans, emptyMeans } = Astro.props;
+const { rows, cols, filledMeans, emptyMeans, emptyTone = 'ink' } = Astro.props;
+const keyRed = rows.length > 0 && rows.every((r) => r.tone === 'red');
 ---
 
-<div class="uc" data-fig="units" style={`--cols:${cols}`}>
+<div class:list={['uc', { 'uc--empty-red': emptyTone === 'red' }]} data-fig="units" style={`--cols:${cols}`}>
   {
     rows.map((r, row) => (
-      <div class="uc-row" style={`--row:${row}`}>
+      <div class:list={['uc-row', { 'is-red': r.tone === 'red' }]} style={`--row:${row}`}>
         <p class="uc-head">
           <span class="uc-label">{r.label}</span>
           <span class="uc-value tabular">{r.text}</span>
@@ -40,7 +45,7 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
     ))
   }
   <p class="uc-key">
-    <span class="uc-key-item"><span class="uc-cell on uc-key-cell" aria-hidden="true"></span>{filledMeans}</span>
+    <span class:list={['uc-key-item', { 'is-red': keyRed }]}><span class="uc-cell on uc-key-cell" aria-hidden="true"></span>{filledMeans}</span>
     <span class="uc-key-item"><span class="uc-cell uc-key-cell" aria-hidden="true"></span>{emptyMeans}</span>
   </p>
 </div>
@@ -63,6 +68,10 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
     margin-bottom: var(--s-2);
     font-family: var(--font-data);
     font-size: var(--t-data);
+    color: var(--color-text-body);
+  }
+
+  .uc-value {
     color: var(--color-text);
   }
 
@@ -75,19 +84,30 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
 
   .uc-cell {
     aspect-ratio: 1;
-    border: var(--line-object);
+    border: var(--line-strong);
     background: transparent;
+  }
+
+  .uc--empty-red .uc-cell:not(.on) {
+    border-color: var(--color-accent);
   }
 
   .uc-cell.on {
+    border-color: var(--color-text);
     background: var(--color-text);
-    transition: background var(--dur-base) ease;
+    transition: opacity var(--dur-base) ease;
     transition-delay: calc(var(--row, 0) * 160ms + var(--i, 0) * 14ms);
   }
 
-  /* Start frame: the counted squares are empty, then fill in one by one. */
+  .uc-row.is-red .uc-cell.on,
+  .uc-key-item.is-red .uc-cell.on {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+
+  /* Start frame: the counted squares are held back, then fade in once. */
   .uc[data-state='pre'] .uc-cells .uc-cell.on {
-    background: transparent;
+    opacity: 0;
     transition: none;
   }
 
@@ -95,15 +115,11 @@ const { rows, cols, filledMeans, emptyMeans } = Astro.props;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--s-2) var(--s-2);
+    gap: var(--s-2) var(--s-5);
     margin-top: var(--s-5);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
-  }
-
-  .uc-key {
-    column-gap: var(--s-5);
   }
 
   .uc-key-item {

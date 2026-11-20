@@ -1,0 +1,12 @@
+---
+// Inline text runs for the case-study pages: plain, bold, code.
+import type { Part } from '../lib/caseStudy';
+
+interface Props {
+  parts: Part[];
+}
+
+const { parts } = Astro.props;
+---
+
+{parts.map((p) => (p.code !== undefined ? <code>{p.code}</code> : p.b !== undefined ? <b>{p.b}</b> : p.text))}

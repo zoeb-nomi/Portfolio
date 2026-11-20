@@ -1,8 +1,9 @@
 ---
-// The one headshot <picture>. Three presets, each a different rendered size:
-//   hero  ~240px plate (home hero, Figure)     : fills its container, square
-//   thumb  120px (About masthead)
-//   card   300px (EmbedCard)                   , the parent shrinks it on phones
+// The one headshot <picture> for components (Masthead's optional portrait). Presets, each a different rendered size:
+//   hero  ~240px plate                         : fills its container, square
+//   thumb  120px
+//   card   300px                               , the parent shrinks it on phones
+// Home and About render their own <picture> of the same files (cropped 4:5, greyscale, The Pipeline).
 // avif -> webp -> jpg, from the same 480w/960w files everywhere. The parent
 // owns placement (margins, grid areas) via the `class` it passes in; this
 // component owns the picture's own box and crop.

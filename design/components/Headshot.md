@@ -1,28 +1,33 @@
 # Headshot
 
 ## Purpose
-The one headshot `<picture>`. It owns the image's box, crop and format ladder; the parent owns placement.
+The one headshot `<picture>`, in a few presets, served avif then webp then jpg from the same 480w and 960w files everywhere. The parent owns placement; this component owns the picture's box and crop.
 
 ## Anatomy
-`<picture>` with AVIF, WebP and JPG sources (480w and 960w files in `/img/`), then an `<img>` with width and height set for CLS. The photo is grayscale with `mix-blend-mode: multiply`, cropped to centre 12%.
+`picture.headshot.headshot--<size>` with two `<source>` elements and an `<img>` with intrinsic `width` and `height`, `srcset`, `sizes`, and `decoding` (`sync` when eager, else `async`).
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `size` | `'hero' \| 'thumb' \| 'card' \| 'about'` | default `hero`: fills its container, square; `thumb` 120px; `card` 300px; `about` 200px (132px at 599px and below) |
+| `size` | `'hero' \| 'thumb' \| 'card' \| 'about'` | default `hero` |
 | `alt` | `string` | required |
-| `loading` | `'eager' \| 'lazy'` | default `lazy`; eager also sets `decoding="sync"` |
-| `class` | `string?` | placement from the parent |
+| `loading` | `'eager' \| 'lazy'` | default `lazy` |
+| `class` | `string?` | placement classes from the parent |
 
-## Tokens it reads
-None. Sizes are fixed per preset in the component; the only breakpoint is 599px. It reads no colour role: the photograph is neutral grayscale.
+## Variants
+`hero` (about 240px, square), `thumb` (120px), `card` (300px, parent shrinks it on phones), `about` (132px under 600px, else 200px).
 
-## States and motion
-Static; no hover and no animation. Reduced motion and the ink surface change nothing (the multiply blend assumes a light backdrop, so keep it on paper).
+## Kit classes
+None of its own beyond `.headshot` and `.headshot--<size>` (scoped crop and sizing).
+
+## Motion
+None.
 
 ## Accessibility
-`alt` is required by the type. Intrinsic width and height reserve space.
+`alt` is required; pass the real description, or an empty string only if the image is decorative next to a name that already says who it is. Width and height are set so nothing shifts.
+
+## Light and dark
+No colour of its own; the photograph is the same in both themes.
 
 ## Used on
-Pages: `/`.
-Also via: `Masthead`.
+`Masthead` (the `thumbnail` and `portrait` props). No page passes those props at the time of writing, so the component is not rendered on the live site. The header comment mentions an `EmbedCard` and a hero Figure that no longer exist.

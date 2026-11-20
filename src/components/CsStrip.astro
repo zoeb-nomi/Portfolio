@@ -1,0 +1,26 @@
+---
+// The method strip: numbered stages joined by arrows, with one packet running along the rail.
+import CsParts from './CsParts.astro';
+import { rich } from '../lib/caseStudy';
+import { pipelineCaseStudies as P } from '../data/copy';
+
+interface Props {
+  steps: { h: string; t: string; m: string[] }[];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="cs-strip-wrap" data-reveal>
+  <ol class="cs-strip">
+    {steps.map((s, i) => (
+      <li class="cs-st" tabindex="0">
+        <span class="cs-sn">{String(i + 1).padStart(2, '0')}</span>
+        <h3>{s.h}</h3>
+        <p><CsParts parts={rich(s.t, s.m)} /></p>
+        <span class="cs-arr" aria-hidden="true">{P.shared.arrow}</span>
+      </li>
+    ))}
+  </ol>
+  <div class="cs-track" aria-hidden="true"><i class="cs-pk"></i></div>
+</div>

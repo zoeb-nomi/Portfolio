@@ -1,34 +1,34 @@
 ---
 import Base from '../layouts/Base.astro';
-import Masthead from '../components/Masthead.astro';
-import Section from '../components/Section.astro';
-import DataTable from '../components/DataTable.astro';
-import PullQuote from '../components/PullQuote.astro';
-import CTASlab from '../components/CTASlab.astro';
+import '../styles/case-study.css';
 import AudioPlayer from '../components/AudioPlayer.astro';
-import EssayFigure from '../components/EssayFigure.astro';
-import FailureOwners from '../components/FailureOwners.astro';
-import PlayerStepper from '../components/PlayerStepper.astro';
-import MiniFigure from '../components/MiniFigure.astro';
-import { meta, crosssource as cs, writingJudgeBug as wj, cta, home, caseStudy } from '../data/copy';
-import { failureData } from '../lib/figureData';
+import CaseTabs from '../components/CaseTabs.astro';
+import CsHead from '../components/CsHead.astro';
+import CsSection from '../components/CsSection.astro';
+import CsStrip from '../components/CsStrip.astro';
+import CsSpecList from '../components/CsSpecList.astro';
+import CsFig from '../components/CsFig.astro';
+import CsLegend from '../components/CsLegend.astro';
+import CsTable from '../components/CsTable.astro';
+import CsCall from '../components/CsCall.astro';
+import CsList from '../components/CsList.astro';
+import CsLinks from '../components/CsLinks.astro';
+import CsContact from '../components/CsContact.astro';
+import CsParts from '../components/CsParts.astro';
+import { meta, crosssource as cs, writingJudgeBug as wj, pipelineCaseStudies as P } from '../data/copy';
+import { crosssourceFig, rich, rowParts, arrowSplit } from '../lib/caseStudy';
 
-const failures = failureData();
-
-const sanityRows = cs.s3.sanity.rows.map((r) => ({
-  label: r.model,
-  cells: [{ text: r.precision }, { text: r.recall }, { text: r.accuracy }],
-}));
-
-const table1Rows = cs.s3.table1.rows.map((r) => ({
-  label: r.dimension,
-  cells: [{ text: r.baseline }, { text: r.strict, win: r.strictWins }],
-}));
-
-const table2Rows = cs.s3.table2.rows.map((r) => ({
-  label: r.type,
-  cells: [{ text: r.baseline }, { text: r.strict, win: r.strictWins }],
-}));
+const x = P.crosssource;
+const f = x.findings.fig;
+const g = crosssourceFig();
+const t1 = cs.s3.table1.rows;
+const t2 = cs.s3.table2.rows;
+const [wpFrom, wpTo] = arrowSplit(g.wpPair);
+const stages = wj.player.stages;
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+const tileClass = (i: number) => (i < 3 ? (i < g.strict.wp ? 'r' : 'h dim') : 'f');
+const maxFails = 6;
+const barK = [g.strict.wp / maxFails, g.strict.ma / maxFails, 0, 0];
 ---
 
 <Base
@@ -37,293 +37,167 @@ const table2Rows = cs.s3.table2.rows.map((r) => ({
   path="/crosssource/"
   ogImage="/og/crosssource.png"
   includeSoftwareSourceCode
-  motion
+  page="builds"
 >
-  <Masthead
-    label="Case study specification"
-    kicker={cs.kicker}
-    crumbs={[...caseStudy.crumbs, { label: 'CrossSource' }]}
-    h1={cs.title}
-    standfirst={cs.standfirst}
-    h1Max="22ch"
-    spec={cs.specBlock}
-    switcher="CrossSource"
-    repo={{ href: cs.repoHref, label: cs.repoLabel }}
-    narr
-  >
-    <EssayFigure n={1} title={caseStudy.crosssourceFig1.title} source={caseStudy.crosssourceFig1.source}>
-      <MiniFigure
-        size="wide"
-        label="Citation precision 0.981 to 0.994; citation recall 0.760 to 0.760."
-        rows={[
-          { label: 'Citation precision', fig: { kind: 'dumbbell', min: 0.7, max: 1, from: 0.981, to: 0.994, fromLabel: '0.981', toLabel: '0.994', minLabel: '0.70', maxLabel: '1.00' } },
-          { label: 'Citation recall', fig: { kind: 'dumbbell', min: 0.7, max: 1, from: 0.76, to: 0.76, fromLabel: '0.760', toLabel: '0.760', minLabel: '0.70', maxLabel: '1.00' } },
-        ]}
-      />
-    </EssayFigure>
-    {!cs.audioPaused && <AudioPlayer audio={cs.audio} articleId="crosssource" />}
-  </Masthead>
+  <CaseTabs current={0} repoHref={cs.repoHref} repoLabel={cs.repoLabel} />
 
-  <Section mark={cs.s1.mark} label={cs.s1.label} narrId="s1-cue">
-    <p class="prose" data-narr="s1-p0">
-      {cs.s1.paraPre}<em>{cs.s1.caseName}</em>{cs.s1.paraMid}<span class="highlight">{cs.s1.highlight}</span>{cs.s1.paraPost}
-    </p>
-  </Section>
+  <CsHead kick={x.kick} h1={x.h1} find={rich(cs.standfirst, x.findMarks)} stats={x.stats} hud={x.hud}>
+    {cs.audio && !cs.audioPaused && <AudioPlayer audio={cs.audio} articleId="crosssource" />}
+  </CsHead>
 
-  <Section mark={cs.s2.mark} label={cs.s2.label} narrId="s2-cue">
-    <dl class="method-list" data-narr="s2-list">
-      {cs.s2.rows.map((row) => (
-        <div class="method-row">
-          <dt>{row.term}</dt>
-          <dd>
-            {row.kind === 'plain' && row.body}
-            {row.kind === 'code' && (
-              <>
-                {row.bodyPre}
-                <code>{row.code}</code>
-                {row.bodyPost}
-              </>
-            )}
-            {row.kind === 'configs' && (
-              <>
-                <em>{row.italic1}</em>
-                {row.mid}
-                <em>{row.italic2}</em>
-                {row.bodyPost}
-              </>
-            )}
-          </dd>
+  <CsSection id="why" kick={x.why.kick} h2={x.why.h2} wide>
+    <Fragment slot="dek">{cs.s1.paraPre}<b>{cs.s1.caseName}</b>{cs.s1.paraMid}{cs.s1.highlight}{cs.s1.paraPost}</Fragment>
+  </CsSection>
+
+  <CsSection id="method" kick={x.method.kick} h2={x.method.h2}>
+    <Fragment slot="dek"><CsParts parts={rich(x.method.dek, x.method.dekMarks)} /></Fragment>
+    <CsStrip steps={x.method.steps} />
+    <CsSpecList label={P.shared.methodDetail} items={cs.s2.rows.map((r) => ({ dt: r.term, parts: rowParts(r) }))} />
+  </CsSection>
+
+  <CsSection id="findings" kick={x.findings.kick} h2={x.findings.h2}>
+    <Fragment slot="dek"><CsParts parts={rich(x.findings.dek, x.findings.dekMarks)} /></Fragment>
+
+    <figure class="cs-fig" id="xs-fig" data-cfg={JSON.stringify(g.data)}>
+      <div class="cs-fig-top">
+        <p class="cs-fig-t"><span class="fno">{P.shared.figNo} 1</span>{f.title}</p>
+        <div class="cs-seg" role="group" aria-label={f.toggleLabel}>
+          <button type="button" data-v="base" aria-pressed="false">{f.base}</button>
+          <button type="button" data-v="strict" aria-pressed="true">{f.strict}</button>
         </div>
-      ))}
-    </dl>
-  </Section>
+      </div>
+      <div class="cs-fig-body">
+        <div class="xs-grid">
+          <div class="xs-gauge">
+            <svg viewBox="0 0 340 200" role="img" aria-label={f.gaugeAria}>
+              <g class="xs-ticks">
+                {g.ticks.map((t) => <line class={t.major ? 'mj' : undefined} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} />)}
+              </g>
+              <path class="xs-arc" d="M 30 170 A 140 140 0 0 1 310 170" />
+              <path class="xs-arc-lit" d="M 30 170 A 140 140 0 0 1 310 170" pathLength="1" style={`--off:${g.offStrict}`} />
+              <g class="xs-mark xs-mark-b" transform={`translate(170 170) rotate(${g.angBase})`}>
+                <line x1="0" y1="-150" x2="0" y2="-128" />
+                <text x="0" y="-170" transform={`rotate(${-Number(g.angBase)} 0 -170)`}>{g.base.prec}</text>
+              </g>
+              <g class="xs-mark xs-mark-s" transform={`translate(170 170) rotate(${g.angStrict})`}>
+                <line x1="0" y1="-150" x2="0" y2="-128" />
+                <text x="0" y="-170" transform={`rotate(${-Number(g.angStrict)} 0 -170)`}>{g.strict.prec}</text>
+              </g>
+              <g class="xs-needle" transform="translate(170 170)">
+                <g class="xs-needle-in" style={`transform:rotate(${g.angStrict}deg)`}>
+                  <line x1="0" y1="0" x2="0" y2="-118" />
+                  <circle r="5" />
+                </g>
+              </g>
+              <text class="xs-axl" x="30" y="192">{f.axisLo}</text>
+              <text class="xs-axl" x="310" y="192" text-anchor="end">{f.axisHi}</text>
+            </svg>
+            <div class="xs-gv">
+              <p class="lab">{f.gaugeLabel}</p>
+              <p class="xs-big"><span id="xs-prec">{g.strict.prec}</span></p>
+              <p class="xs-sub">{f.axisNote}</p>
+            </div>
+          </div>
+          <div class="xs-right">
+            <div class="xs-strip-h">
+              <p class="lab">{f.stripLabel}</p>
+              <p class="xs-tot"><b id="xs-fails">{g.strict.fails}</b> <span id="xs-cfg">{f.totals.strict}</span></p>
+            </div>
+            <div class="cs-tiles xs-fails" id="xs-tiles" aria-hidden="true">
+              {Array.from({ length: g.base.fails }, (_, i) => <span class={`cs-t ${tileClass(i)}`}></span>)}
+            </div>
+            <CsLegend items={f.legend} below />
+            <div class="cs-bars xs-bars">
+              {t2.map((r, i) => (
+                <div class="cs-br">
+                  <p class="bl">{r.type}{f.bars[i]?.sub && <small>{f.bars[i].sub}</small>}</p>
+                  <div class="bt"><i class={f.bars[i]?.red ? 'r' : undefined} data-tax={i} style={`--k:${barK[i].toFixed(4)}`}></i></div>
+                  <p class="bv2" id={i < 2 ? `xs-t${i}` : undefined}>{r.strict}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div class="cs-ro-row xs-ro">
+          <div class="ro"><p class="v">{g.rec}</p><p class="u">{f.ro[0].u}</p><p class="s">{f.ro[0].s}</p></div>
+          <div class="ro"><p class="v">{g.faith}</p><p class="u">{f.ro[1].u}</p><p class="s">{f.ro[1].s}</p></div>
+          <div class="ro"><p class="v"><span id="xs-rel">{g.strict.rel}</span></p><p class="u">{f.ro[2].u}</p><p class="s">{f.ro[2].s} {g.base.rel}</p></div>
+          <div class="ro"><p class="v r">{wpFrom} <span class="ar2">{P.shared.arrow}</span> {wpTo}</p><p class="u">{f.ro[3].u}</p><p class="s">{f.ro[3].s}</p></div>
+        </div>
+      </div>
+      <figcaption class="cs-fig-foot">{f.foot.map((t) => <span>{t}</span>)}</figcaption>
+    </figure>
 
-  <Section mark={cs.s3.mark} label={cs.s3.label} narrId="s3-cue">
-    <div data-narr="s3-sanity">
-      <DataTable nowrap caption={cs.s3.sanity.caption} columns={cs.s3.sanity.columns} rows={sanityRows} />
+    <div class="cs-two">
+      <CsTable
+        caption={cs.s3.table1.caption}
+        columns={cs.s3.table1.columns}
+        rows={t1.map((r) => ({ cells: [r.dimension, r.baseline, r.strict], win: [false, false, r.strictWins] }))}
+      />
+      <CsTable
+        caption={cs.s3.table2.caption}
+        columns={cs.s3.table2.columns}
+        rows={t2.map((r) => ({ cells: [r.type, r.baseline, r.strict], win: [false, false, r.strictWins] }))}
+      />
     </div>
-    <EssayFigure n={1} replay title="Which layer owns the failure" source="Source: Tables 2 and 3 below (v0.1, n = 25). Wrong-passage failures fell under the strict prompt; missing-authority failures trace to retrieval.">
-      <FailureOwners {...failures} />
-    </EssayFigure>
-    <div data-narr="s3-table1">
-      <DataTable nowrap caption={cs.s3.table1.caption} columns={cs.s3.table1.columns} rows={table1Rows} />
+    <CsTable
+      caption={cs.s3.sanity.caption}
+      columns={cs.s3.sanity.columns}
+      rows={cs.s3.sanity.rows.map((r) => ({ cells: [r.model, r.precision, r.recall, r.accuracy] }))}
+    />
+
+    <CsCall label={cs.s3.findingLeadIn.replace(/:$/, '')} long>
+      {cap(cs.s3.findingPre.trimStart())}<em>{cs.s3.findingItalic}</em>{cs.s3.findingPost}
+    </CsCall>
+  </CsSection>
+
+  <CsSection id="judge" kick={x.judge.kick} h2={x.judge.h2} wide>
+    <Fragment slot="dek">{cs.s4.statPre}<b>{cs.s4.statQuote}</b>{cs.s4.statPost}{' '}{cs.s4.bugPara}</Fragment>
+
+    <CsFig no={`${P.shared.figNo} 2`} title={wj.player.title}>
+      <p slot="top" class="lab">{x.judge.hint}</p>
+      <div class="cs-steps">
+        <ol id="xs-steps" aria-label={x.judge.stepsAria}>
+          {stages.map((s, i) => (
+            <li><button type="button" aria-pressed={i === 0 ? 'true' : 'false'}><span>{String(i + 1).padStart(2, '0')}</span><b>{s.title}</b></button></li>
+          ))}
+        </ol>
+        <div class="cs-stage" aria-live="polite">
+          <div class="xs-spans" id="xs-spans" aria-hidden="true" data-step="0" data-failure={x.judge.failure} data-agreed={stages[4].chips[0].text}>
+            <span class="xs-sp">{x.judge.spanWords.claim}</span><span class="xs-cite">{x.judge.spanWords.cite}</span><span class="xs-sp">{x.judge.spanWords.claim}</span><span class="xs-cite">{x.judge.spanWords.cite}</span><span class="xs-cite">{x.judge.spanWords.cite}</span><span class="xs-sp xs-punct">{x.judge.spanWords.punct}</span>
+          </div>
+          <p class="cs-say" id="xs-say" data-say={JSON.stringify(stages.map((s) => s.text))}>{stages[0].text}</p>
+          <p class="cs-note">{P.shared.placeholderNote}</p>
+        </div>
+      </div>
+    </CsFig>
+    <p class="cs-note">{cs.s4.marginNote}</p>
+
+    <CsCall label={x.judge.calloutLabel} long>{cs.s4.lessonQuote}</CsCall>
+  </CsSection>
+
+  <CsSection id="limits" kick={x.limits.kick} h2={x.limits.h2}>
+    <CsList kind="lim" items={x.limits.items.map((i) => [{ b: i.b }, { text: ` ${i.t}` }])} />
+  </CsSection>
+
+  <CsSection id="any-agent" kick={x.rules.kick} h2={x.rules.h2}>
+    <Fragment slot="dek">{cs.s5.intro}</Fragment>
+    <CsList kind="rules" items={cs.s5.items.map((i) => [{ text: i }])} />
+  </CsSection>
+
+  <CsSection id="code" kick={x.code.kick} h2={cs.ctaSlabBody}>
+    <p class="lab cs-status">{cs.s6.status}</p>
+    <CsLinks links={x.code.links.map((l, i) => ({ ...l, href: i === 0 ? cs.repoHref : cs.s6.items[i - 1].href }))} />
+    <div class="cs-related">
+      <p class="lab">{P.shared.related}</p>
+      <CsLinks sub links={x.code.related} />
     </div>
-    <div class="table-gap" data-narr="s3-table2">
-      <DataTable nowrap caption={cs.s3.table2.caption} columns={cs.s3.table2.columns} rows={table2Rows} />
-    </div>
-    <p class="prose finding" data-narr="s3-p0">
-      <strong>{cs.s3.findingLeadIn}</strong>{cs.s3.findingPre}<em>{cs.s3.findingItalic}</em>{cs.s3.findingPost}
-    </p>
-  </Section>
+  </CsSection>
 
-  <Section mark={cs.s4.mark} label={cs.s4.label} note={cs.s4.marginNote} narrId="s4-cue">
-    <p class="stat-lead" data-narr="s4-p0">{cs.s4.statPre}</p>
-    <p class="stat-figure tabular" data-narr="s4-p1">{cs.s4.statQuote}{cs.s4.statPost}</p>
-    <p class="prose" data-narr="s4-p2">{cs.s4.bugPara}</p>
-    <EssayFigure n={2} title={wj.player.title} source="Source: this section and the judge essay. The spans drawn are placeholders, not real answer text." href="/writing/the-judge-caught-a-bug/" hrefLabel="Read the essay →">
-      <PlayerStepper stages={wj.player.stages} />
-    </EssayFigure>
-    <div class="lesson" data-narr="s4-quote">
-      <PullQuote rule="red">{cs.s4.lessonQuote}</PullQuote>
-    </div>
-  </Section>
-
-  <Section mark={cs.s5.mark} label={cs.s5.label} narrId="s5-cue">
-    <p class="prose intro" data-narr="s5-p0">{cs.s5.intro}</p>
-    <ul class="rule-list" data-narr="s5-list">
-      {cs.s5.items.map((item) => <li>{item}</li>)}
-    </ul>
-  </Section>
-
-  <Section mark={cs.s6.mark} label={cs.s6.label} narrId="s6-cue">
-    <p class="status-line" data-narr="s6-p0">{cs.s6.status}</p>
-    <ul class="mono-list" data-narr="s6-list">
-      {cs.s6.items.map((item) => <li><a href={item.href} target="_blank" rel="noopener noreferrer">{item.text}</a></li>)}
-    </ul>
-  </Section>
-
-  <Section mark="§7" label="Related writing" narrId="s7-cue">
-    <p class="prose related-writing" data-narr="s7-p0">
-      <a href="/writing/the-judge-caught-a-bug/">The judge caught a bug I didn't</a>, on validating the LLM judge behind these numbers.
-    </p>
-    <p class="prose related-writing" data-narr="s7-p1">
-      <a href="/mirror-eval/">mirror-eval</a>, the same method pointed at what AI search engines say about me.
-    </p>
-    <p class="prose related-writing" data-narr="s7-p2">
-      <a href="/screener-eval/">screener-eval</a>, the same counting discipline pointed at LLM résumé screeners, no judge at all.
-    </p>
-  </Section>
-
-  <CTASlab
-    marginLines={[home.eyebrow.toUpperCase()]}
-    body={cs.ctaSlabBody}
-    buttonLabel="View the repo →"
-    buttonHref={cs.repoHref}
-    secondaryLabel={cta.bookACall.label}
-    secondaryHref={cta.bookACall.href}
-  />
+  <CsContact />
 </Base>
 
-<style>
-  .prose em {
-    font-family: var(--font-model);
-    font-weight: 400;
-    font-style: italic;
-  }
-
-  .related-writing a {
-    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-min);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .related-writing + .related-writing {
-    margin-top: var(--s-3);
-  }
-
-  .highlight {
-    background-image: linear-gradient(transparent 62%, var(--color-accent-tint) 62%);
-  }
-
-  .method-list {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .method-row {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: var(--s-6);
-    padding-block: var(--s-6);
-    border-top: var(--line-hair);
-  }
-
-  .method-row:first-child {
-    border-top: 0;
-  }
-
-  .method-row dt {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .method-row dd {
-    font-family: var(--font-text);
-    font-size: var(--t-body);
-    line-height: var(--lh-body);
-    color: var(--color-text-body);
-    max-width: 60ch;
-  }
-
-  .method-row dd em {
-    font-family: var(--font-model);
-    font-weight: 400;
-    font-style: italic;
-  }
-
-  .method-row code {
-    font-family: var(--font-data);
-    font-size: var(--t-data);
-    background: var(--color-surface-raised);
-    padding: 2px 4px;
-  }
-
-  .table-gap {
-    margin-top: var(--s-9);
-  }
-
-  .finding {
-    margin-top: var(--s-8);
-  }
-
-  .stat-lead {
-    font-family: var(--font-text);
-    font-size: var(--t-body);
-    line-height: var(--lh-prose);
-    color: var(--color-text-body);
-    max-width: 60ch;
-    margin-bottom: var(--s-5);
-  }
-
-  /* The figure is the point of the section, it gets its own line rather than
-     sitting 51px tall inside a 17px paragraph. */
-  .stat-figure {
-    display: block;
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-h2);
-    line-height: 1;
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-    margin-bottom: var(--s-7);
-  }
-
-  .lesson {
-    margin-top: var(--s-8);
-  }
-
-  .rule-list {
-    list-style: none;
-    margin-top: var(--s-5);
-  }
-
-  .rule-list li {
-    padding-block: var(--s-5);
-    border-top: var(--line-hair);
-    font-family: var(--font-text);
-    font-size: var(--t-body);
-    color: var(--color-text-body);
-    max-width: 60ch;
-  }
-
-  .rule-list li:first-child {
-    border-top: 0;
-  }
-
-  .status-line {
-    display: inline-block;
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    margin-bottom: var(--s-5);
-  }
-
-  .mono-list {
-    list-style: none;
-  }
-
-  .mono-list li {
-    font-family: var(--font-data);
-    font-size: var(--t-data);
-    color: var(--color-text-muted);
-    padding-block: var(--s-3);
-    border-top: var(--line-hair);
-  }
-
-  .mono-list a {
-    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-min);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .mono-list li:first-child {
-    border-top: 0;
-  }
-
-  @media (max-width: 899px) {
-    .method-row {
-      grid-template-columns: 1fr;
-      gap: var(--s-2);
-    }
-  }
-</style>
+<script>
+  import { initCrossSource } from '../scripts/case-study';
+  initCrossSource();
+</script>

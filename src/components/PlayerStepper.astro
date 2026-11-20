@@ -181,7 +181,7 @@ const deci = stages.length * seconds * 10;
     min-block-size: 11rem;
     padding: var(--s-6);
     border: var(--line-object);
-    background: var(--color-surface-raised);
+    background: var(--color-surface-sunk);
   }
 
   .ps-strip {
@@ -214,8 +214,8 @@ const deci = stages.length * seconds * 10;
   }
 
   .ps :global(.ps-chip.is-fail) {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
+    border-color: var(--color-accent-fill);
+    background: var(--color-accent-fill);
     color: var(--color-on-accent);
   }
 
@@ -275,8 +275,8 @@ const deci = stages.length * seconds * 10;
   }
 
   .ps-chap.is-now[data-tone='bad'] {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
+    border-color: var(--color-accent-fill);
+    background: var(--color-accent-fill);
     color: var(--color-on-accent);
   }
 
@@ -305,10 +305,17 @@ const deci = stages.length * seconds * 10;
     cursor: pointer;
   }
 
+  /* The one red control in the figure, like the kit's .btn: still, no lift. */
   .ps-play {
     min-inline-size: 5.5rem;
-    background: var(--color-text);
-    color: var(--color-surface);
+    border-color: var(--color-accent-fill);
+    background: var(--color-accent-fill);
+    color: var(--color-on-accent);
+  }
+
+  .ps-play:hover,
+  .ps-play:focus-visible {
+    background: var(--color-accent-hover);
   }
 
   .ps-nav:disabled {
@@ -320,7 +327,7 @@ const deci = stages.length * seconds * 10;
     background: transparent;
     flex: 1 1 10rem;
     min-inline-size: 0;
-    accent-color: var(--color-text);
+    accent-color: var(--color-accent);
   }
 
   .ps-time {

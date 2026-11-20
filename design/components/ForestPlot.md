@@ -1,33 +1,36 @@
 # ForestPlot
 
 ## Purpose
-Each lever as a mean marker with its 95% interval on one shared axis, then the screener gap drawn on the same scale. Values are text first; the drawing is decoration.
+A forest plot: each lever drawn as a mean marker with its 95% interval on one shared axis, then the screener gap drawn on the same scale. The values are printed as text; the drawing is `aria-hidden`.
 
 ## Anatomy
-- Groups: a title, then one row per lever (label, track, "mean (lo to hi)" text) and a computed verdict line ("Both intervals include zero..." or "At least one interval stays on one side of zero.").
-- Gap group ("The screener that read the résumé"): zero line, bar to the mean, marker at the largest value, value text and a note.
-- A shared tick axis with an axis label. Track and axis are `aria-hidden`. Shared figure styles are in `src/styles/figures.css`.
+`.fp[data-fig="forest"]`: one `.fp-group` per lever group (a title, `.fg-row` rows with `.fg-trk` holding the zero line, the interval `.fp-wh` and the mean `.fg-pt.is-fill`, a printed value "+0.07 (-0.02 to +0.16)", and a verdict line), then `.fp-gap` (the gap bar and the largest mark), then the tick axis and its label.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `groups` | `Group[]` | `title`, `rows` (`label`, `sub?`, `mean`, `lo`, `hi`) |
+| `groups` | `Group[]` | `title` and `rows` (`label`, `sub?`, `mean`, `lo`, `hi`) |
 | `gap` | `Gap` | `label`, `sub`, `mean`, `max`, `note` |
-| `min`, `max` | `number` | axis range |
-| `ticks` | `number[]` | axis labels |
-| `axisLabel` | `string` | |
+| `min`, `max` | `number` | the axis range |
+| `ticks` | `number[]` | tick values |
+| `axisLabel` | `string` | axis caption |
 
-## Tokens it reads
-- Colour roles: `--color-text-muted`, `--color-accent` (gap bar and marker), `--color-accent-text`; intervals and markers use `--color-text` and `--color-surface` through `figures.css`.
-- Type and space: `--font-data`, `--t-micro`, `--track-wide`, `--s-1`, `--s-3`, `--s-6`.
-- Lines: `--line-pen`, `--line-ink`. Motion: `--dur-base`, `--dur-slow`, `--ease-draw`.
+The verdict ("Both intervals include zero: ...") is computed from the data, not typed.
 
-## States and motion
-- Reveal: plays once at 35% in view (zero line, the intervals, then the screener bar and marker) from `data-state="pre"`; no controls of its own. Without script or with reduced motion the final state is the HTML.
-- Ink surface: roles re-point.
+## Variants
+None.
+
+## Kit classes
+The shared `.fg-*` pieces in `src/styles/figures.css` plus `.fp-*`; sits inside an `EssayFigure`. Red is the series under test; ink is the data.
+
+## Motion
+Plays once as it scrolls into view: the lever intervals, then the screener bar, fade in (`scripts/figure-motion.ts`). It has no controls of its own; the Replay chip is the figure's. Without the script or with reduced motion the final state shows.
 
 ## Accessibility
-Every mean and interval is printed as text; verdicts are sentences, not colour. The drawing is `aria-hidden`.
+Every value and interval is text; the verdict line says what the intervals mean in words. The drawing carries no information the text lacks.
+
+## Light and dark
+Roles only (accent, muted text, `--line-strong`). Works on both grounds.
 
 ## Used on
-Pages: `/screener-eval/`, `/writing/two-levers-that-did-not-move/`.
+`/writing/two-levers-that-did-not-move/`.

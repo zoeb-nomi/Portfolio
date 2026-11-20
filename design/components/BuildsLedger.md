@@ -1,40 +1,33 @@
 # BuildsLedger
 
 ## Purpose
-One row per build, set as a booktabs table: Heavy rule above and below, Ink under the head, Hair
-between rows. Red text only on the tag, links, the replay control and the hovered/open row name.
+The Builds page list: one row per build, each a button that opens its panel in place. A row is the kit's `.build` (name, kind, headline value, a plus that turns to a cross). The panel holds a one-line description, the guard / measure / ship chain, a small figure and the links.
 
 ## Anatomy
-- `full` (/builds/): index, build (name, tag, one line), Guarded, Measured, Shipped at 1100px and up; below that each row stacks into label/value pairs.
-- `compact`: index, build, Measured; shows entries with `compact: true` and prefers `homeLine`.
-- `feature`: an `<article>` per entry: head, the `TradeFrameFlow` decision path, then a Guarded / Measured / Shipped `<dl>`.
-- Rows are native `<details>`: the summary is the row, the panel holds the result figure, guard, ship date and case-study action.
-- A `strip` TradeFrameFlow stands in as the Measured cell for entries with `figure.kind === 'flow'`.
+`ol.bd-list[data-ledger] > li.bd-item#b-<id>`: `button.build.bd-row` (`aria-expanded`, `aria-controls`) and `div.bd-detail[role=region]`. Detail: `.bd-what`, optionally `TradeFrameFlow` (when `figure.kind === 'flow'`), `.bd-chain` (three `.bd-node`: guard, measured, shipped), a `figure.bd-fig` (bars or dumbbells) and `.bd-links` of `.tl` links.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `variant` | `'full' \| 'compact' \| 'feature'` | default `full` |
-| `entries` | `BuildEntry[]?` | default: `buildsLedger` (compact: only `compact: true` rows) |
-| `start` | `number?` | number shown for the first row, default 1 |
+| `entries` | `BuildEntry[]` | default `buildsLedger` from `copy.ts` |
+| `openFirst` | `boolean` | open the first row on load; default `false` |
 
-## Tokens it reads
-- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-accent`, `-accent-text`, `--color-link` (links).
-- Type: `--font-heading`, `--font-data`, `--wght-head`, `--wdth-head`, `--track-tight`, `--t-label`, `--t-small`, `--t-body`, `--t-num`, `--t-h2`, `--t-h3`, `--lh-*`.
-- Lines and space: `--line-heavy`, `--line-ink`, `--line-hair`, `--line-object`, `--line-object-muted`, `--s-1` to `--s-8`, `--hit-touch`, `--hit-min`.
-- Motion: `--dur-fast`, `--dur-base`, `--ease-draw`.
+Headline values and figures come from `pipelineBuilds.rows[id]`. A `kind: 'agent'` row needs `guarded`, `measured.scorerCheck`, a repo and a case study.
 
-## States and motion
-- Hover or open row: name turns `--color-accent-text`, the plus toggle gets an `--color-accent` border and rotates when open.
-- Reveal: rows under `[data-ledger]` fade in as the ledger enters view (`.motion` pre-state in `src/styles/motion.css`, `motion.ts`). The panel height animates on click or tap only (no hover-open).
-- Reduced motion or no script: all rows visible, panels open and close natively.
-- Ink surface: roles re-point, no change needed.
+## Variants
+Open or closed per row (`.open`). The `eval harness` kind prints its tag next to the label.
+
+## Kit classes
+`.build` (`.bn`, `.bk2`, `.bv`, `.ba`), `.blist` grammar, `.lab.red`, `.tl`, `.fno`-style figure caption. Own `bd-*` classes for the panel.
+
+## Motion
+All panels are in the HTML: without script every panel is open and the page is complete. The open and close motion and the plus-to-cross sit in the page script (`src/pages/builds.astro`), not here. Hover and focus widen the name (variable font) and nudge the arrow, as on every `.build`.
 
 ## Accessibility
-- `<details>/<summary>` gives keyboard and screen-reader behaviour with no script; summary has a visible `:focus-visible` style.
-- Row links use `aria-describedby` to the build name; external links open with `rel="noopener noreferrer"`.
-- The replay button is `hidden` until script runs and has `aria-controls`.
+Each row is a real button with `aria-expanded`/`aria-controls`; the panel is a labelled region. Every figure value is text. External links open in a new tab with `rel="noopener noreferrer"` and show a small arrow.
+
+## Light and dark
+Roles only; the chain nodes use `--line-pen` rules and the accent for the "after" marks. Both themes work unchanged.
 
 ## Used on
-Pages: `/builds/`.
-Only the `feature` and `full` variants are used; `compact` has no caller.
+`/builds/`. Renders `TradeFrameFlow`.

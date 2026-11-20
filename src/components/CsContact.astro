@@ -1,0 +1,17 @@
+---
+// The closing contact block every page ends with.
+import { home, cta, pipelineCaseStudies as P } from '../data/copy';
+
+const links = [cta.bookACall, cta.linkedin, cta.github, cta.x];
+---
+
+<section class="sec gut">
+  <div class="in">
+    <p class="kick">{P.shared.contactKick}</p>
+    <h2 class="h2">{home.ctaSlabBody}</h2>
+    <div class="ctas cs-ctas">
+      <a class="btn" href={cta.email.href}><span class="mi">{P.shared.emailMe}</span><span class="ar" aria-hidden="true">{P.shared.arrow}</span></a>
+      {links.map((l) => <a class="tl" href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>)}
+    </div>
+  </div>
+</section>

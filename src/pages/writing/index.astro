@@ -1,14 +1,15 @@
 ---
-// /writing/ (DESIGN v3 D-11, I-06..I-08): essays lead with their number; notes
-// are grouped by build in compact rows (#notes, absorbing /notes/); the
-// off-topic essay sits on the Other writing shelf (#other).
+// /writing/ (The Pipeline): the page head with three readouts, a sticky shelf bar that filters, the essays as numbered
+// rows, the notes as a ledger (#notes, which /notes/ redirects to), and the off-topic essay on its own shelf (#other).
+// Every list is read from copy.ts and src/data/notes.ts; nothing is typed here.
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
-import Section from '../../components/Section.astro';
+import CTASlab from '../../components/CTASlab.astro';
 import {
   meta,
   notesPage,
   writingIndex as W,
+  pipelineWriting as P,
   writingDecisions,
   writingMisses,
   writingBusStop,
@@ -16,22 +17,28 @@ import {
   writingReflection,
   writingJudgeBug,
   writingJudgeBugAudio,
+  cta,
+  home,
 } from '../../data/copy';
 import { notes } from '../../data/notes';
 import { formatDate, formatClock } from '../../lib/formatDate';
 
-// Order is the IA call (SPEC #42): Decisions API, Misses, Judge, Two levers, Reflection.
-const essays = [
+const PI = P.index;
+
+// Order is the IA call (SPEC #42): Decisions API, Misses, Judge, Two levers, Reflection. The off-topic essay is last.
+const raw = [
   { slug: 'decisions-api-legal-quiz', e: writingDecisions, audio: writingDecisions.audio.duration },
   { slug: 'nobody-reports-the-misses', e: writingMisses, audio: writingMisses.audio.duration },
   { slug: 'the-judge-caught-a-bug', e: writingJudgeBug, audio: writingJudgeBugAudio.duration },
   { slug: 'two-levers-that-did-not-move', e: writingTwoLevers, audio: writingTwoLevers.audio?.duration },
   { slug: 'eval-harness-at-my-own-reflection', e: writingReflection, audio: writingReflection.audio?.duration },
-].map(({ slug, e, audio }) => ({ slug, href: `/writing/${slug}/`, title: e.title, kicker: e.kicker, dek: e.dek, date: e.date, readingTime: e.readingTime, audio, num: W.numbers[slug] }));
-
-const other = [{ slug: 'the-bus-stop-nobody-notices', e: writingBusStop, audio: writingBusStop.audio?.duration }].map(({ slug, e, audio }) => ({
+  { slug: 'the-bus-stop-nobody-notices', e: writingBusStop, audio: writingBusStop.audio?.duration },
+];
+const all = raw.map(({ slug, e, audio }, i) => ({
   slug,
   href: `/writing/${slug}/`,
+  no: String(i + 1).padStart(2, '0'),
+  shelf: PI.essayShelf[slug],
   title: e.title,
   kicker: e.kicker,
   dek: e.dek,
@@ -40,321 +47,641 @@ const other = [{ slug: 'the-bus-stop-nobody-notices', e: writingBusStop, audio: 
   audio,
   num: W.numbers[slug],
 }));
+const essays = all.filter((p) => p.shelf !== 'offtopic');
+const other = all.filter((p) => p.shelf === 'offtopic');
 
-// Notes grouped by build, newest first inside each group.
-const groups = notesPage.groups
-  .map((g) => ({ ...g, notes: notes.filter((n) => n.group === g.id).sort((a, b) => b.date.localeCompare(a.date)) }))
-  .filter((g) => g.notes.length > 0);
+const sorted = [...notes].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+const shelfLabel: Record<string, string> = { ...Object.fromEntries(notesPage.groups.map((g) => [g.id, g.label])), offtopic: PI.offTopicLabel };
+
+// Chips: one per shelf that has anything on it, in the prototype's order. The count covers essays and notes.
+const count = (id: string) => all.filter((p) => p.shelf === id).length + notes.filter((n) => n.group === id).length;
+const total = all.length + notes.length;
+const chips = [{ id: 'all', label: PI.filter.all, n: total }, ...PI.shelfOrder.filter((id) => count(id) > 0).map((id) => ({ id, label: shelfLabel[id], n: count(id) }))];
+
+const stats = PI.stats.map((s) => ({ v: W.numbers[s.slug].display, u: s.u, s: s.s }));
 ---
 
-<Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/writing.png" motion>
-  <Masthead kicker={W.kicker} h1={W.h1} standfirst={W.lead} h1Max="22ch" standfirstMax="60ch" />
+<Base title={meta.writingIndex.title} description={meta.writingIndex.description} path="/writing/" ogImage="/og/writing.png" page="writing">
+  <Masthead kicker={PI.kicker} h1={PI.h1} stats={stats} article={false}>
+    <Fragment slot="byline">
+      <span><b>{essays.length}</b> {PI.byline.essays}</span>
+      <span><b>{notes.length}</b> {PI.byline.notes}</span>
+      <span><b>{other.length}</b> {PI.byline.offTopic}</span>
+      <span>{PI.byline.each}</span>
+    </Fragment>
+  </Masthead>
 
-  <Section mark={W.essaysLabel.mark} label={W.essaysLabel.label} anchorId={W.essaysLabel.anchorId}>
-    <ol class="essays" role="list">
-      {
-        essays.map((p) => (
-          <li class="essay">
-            <div class="essay-link">
-              <span class="e-num" aria-hidden="true">
-                {p.num?.display}
-                {p.num && <span class="e-unit">{p.num.unit}</span>}
-              </span>
-              <span class="e-main">
-                <span class="e-kicker">{p.kicker}</span>
-                <a class="e-title" href={p.href} aria-describedby={`d-${p.slug}`}>{p.title}</a>
-                <span class="e-dek" id={`d-${p.slug}`}>{p.dek}</span>
-                <span class="e-meta">
-                  <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read
-                  {p.audio && (
-                    <a class="e-listen" href={`${p.href}#listen`} aria-label={`${W.listen} ${formatClock(p.audio)}: ${p.title}`}>
-                      <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="M4 2.5v11l10-5.5z" fill="currentColor" /></svg>
-                      {W.listen} {formatClock(p.audio)}
-                    </a>
-                  )}
+  <div class="wr-bar gut">
+    <div class="in">
+      <div class="wr-chips" role="group" aria-label={PI.filter.label}>
+        {
+          chips.map((c) => (
+            <button class="chip" type="button" data-f={c.id} aria-pressed={c.id === 'all' ? 'true' : 'false'}>
+              {c.label} <span class="wr-cc">{c.n}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="wr-shown" aria-live="polite">{PI.filter.showing} <b>{total}</b> {PI.filter.of} {total}</p>
+    </div>
+  </div>
+
+  <section class="wr-sec gut" id={W.essaysLabel.anchorId} aria-labelledby="essays-h">
+    <div class="in">
+      <div class="wr-sh"><h2 class="h2 split" id="essays-h">{W.essaysLabel.label}</h2><p class="lab">{W.essaysLabel.mark} · {PI.sub.essays}</p></div>
+      <ol class="wr-list" id="essays-list">
+        {
+          essays.map((p) => (
+            <li class="wr-it" data-shelf={p.shelf}>
+              <a class="wr-row" href={p.href}>
+                <span class="wr-no">{p.no}</span>
+                <span class="wr-main">
+                  <span class="wr-tag">{p.kicker}</span>
+                  <span class="wr-t">{p.title}</span>
+                  <span class="wr-dk">{p.dek}</span>
                 </span>
-              </span>
-            </div>
-          </li>
-        ))
-      }
-    </ol>
-  </Section>
-
-  <Section mark={W.notesLabel.mark} label={W.notesLabel.label} anchorId={W.notesLabel.anchorId}>
-    <p class="notes-lead">{W.notesLead}</p>
-    {
-      groups.map((g) => (
-        <div class="ngroup">
-          <h3 class="ngroup-h">
-            {g.label} <span>{g.notes.length} {g.notes.length === 1 ? 'note' : 'notes'}</span>
-          </h3>
-          <ul class="notes" role="list">
-            {g.notes.map((n) => (
-              <li>
-                <a href={`/notes/${n.slug}/`}>
-                  <span class="n-title">{n.title}</span>
-                  <time class="n-date" datetime={n.date}>{formatDate(n.date)}</time>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))
-    }
-  </Section>
-
-  <Section mark={W.otherLabel.mark} label={W.otherLabel.label} anchorId={W.otherLabel.anchorId} sub={W.otherNote}>
-    <ol class="essays essays--other" role="list">
-      {
-        other.map((p) => (
-          <li class="essay">
-            <div class="essay-link">
-              <span class="e-num" aria-hidden="true">
-                {p.num?.display}
-                {p.num && <span class="e-unit">{p.num.unit}</span>}
-              </span>
-              <span class="e-main">
-                <span class="e-kicker">{p.kicker}</span>
-                <a class="e-title" href={p.href} aria-describedby={`d-${p.slug}`}>{p.title}</a>
-                <span class="e-dek" id={`d-${p.slug}`}>{p.dek}</span>
-                <span class="e-meta">
-                  <time datetime={p.date}>{formatDate(p.date)}</time> · {p.readingTime} read{p.audio ? ` · ${formatClock(p.audio)} audio` : ''}
+                <span class="wr-ro">
+                  <b>{p.num?.display}</b>
+                  <span>{p.num?.unit}</span>
                 </span>
-              </span>
-            </div>
-          </li>
-        ))
-      }
-    </ol>
-  </Section>
+                <span class="wr-dt">
+                  <time datetime={p.date}>{formatDate(p.date)}</time>
+                  <span>{p.readingTime} {P.byline.readSuffix}{p.audio ? ` · ${PI.listenGlyph} ${formatClock(p.audio)}` : ''}</span>
+                </span>
+                <span class="ba" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="wr-empty" id="wr-empty-essays" hidden>{PI.emptyEssays}</p>
+    </div>
+  </section>
+
+  <section class="wr-sec gut" id={W.notesLabel.anchorId} aria-labelledby="notes-h">
+    <div class="in">
+      <div class="wr-sh"><h2 class="h2 split" id="notes-h">{W.notesLabel.label}</h2><p class="lab">{W.notesLabel.mark} · {PI.sub.notes}</p></div>
+      <div class="wr-lhead" aria-hidden="true"><span>{PI.ledgerHead.date}</span><span>{PI.ledgerHead.shelf}</span><span>{PI.ledgerHead.finding}</span><span>{PI.ledgerHead.number}</span><span></span></div>
+      <ol class="wr-ledger" id="notes-list">
+        {
+          sorted.map((n) => (
+            <li class="wr-it" data-shelf={n.group}>
+              <a class="wr-nrow" href={`/notes/${n.slug}/`}>
+                <time class="wr-nd" datetime={n.date}>{formatDate(n.date)}</time>
+                <span class="wr-ns">{shelfLabel[n.group]}</span>
+                <span class="wr-nt">{n.title}</span>
+                <span class="wr-nr">{P.noteNumbers[n.slug]}</span>
+                <span class="ba" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="wr-empty" id="wr-empty-notes" hidden>{PI.emptyNotes}</p>
+    </div>
+  </section>
+
+  <section class="wr-sec gut" id={W.otherLabel.anchorId} aria-labelledby="other-h">
+    <div class="in">
+      <div class="wr-sh"><h2 class="h2 split" id="other-h">{W.otherLabel.label}</h2><p class="lab">{W.otherLabel.mark} · {PI.sub.other}</p></div>
+      <ol class="wr-list">
+        {
+          other.map((p) => (
+            <li class="wr-it" data-shelf={p.shelf}>
+              <a class="wr-row" href={p.href}>
+                <span class="wr-no">{p.no}</span>
+                <span class="wr-main">
+                  <span class="wr-tag">{p.kicker}</span>
+                  <span class="wr-t">{p.title}</span>
+                  <span class="wr-dk">{p.dek}</span>
+                </span>
+                <span class="wr-ro">
+                  <b>{p.num?.display}</b>
+                  <span>{p.num?.unit}</span>
+                </span>
+                <span class="wr-dt">
+                  <time datetime={p.date}>{formatDate(p.date)}</time>
+                  <span>{p.readingTime} {P.byline.readSuffix}{p.audio ? ` · ${PI.listenGlyph} ${formatClock(p.audio)}` : ''}</span>
+                </span>
+                <span class="ba" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <CTASlab
+    body={home.ctaSlabBody}
+    buttonLabel={P.contact.email}
+    buttonHref={cta.email.href}
+    secondaryLabel={cta.bookACall.label}
+    secondaryHref={cta.bookACall.href}
+    links={[cta.linkedin, cta.github, cta.x]}
+    buttonNote={null}
+  />
 </Base>
 
+<script>
+  import { gsap, $, $$, swap, motion } from '../../scripts/ds';
+
+  // The shelf bar: pick a shelf and the lists show only that shelf. Rows that go leave quickly, rows that stay slide
+  // to their new place, rows that arrive fade in. Under reduced motion the lists just change.
+  const items = $$<HTMLElement>('.wr-it');
+  const chips = $$<HTMLButtonElement>('.wr-chips .chip');
+  const shown = $<HTMLElement>('.wr-shown b');
+  const emptyEssays = $('#wr-empty-essays');
+  const emptyNotes = $('#wr-empty-notes');
+  const otherSec = $<HTMLElement>('#other');
+  const essaysList = $('#essays-list');
+  const notesList = $('#notes-list');
+  const strip = $<HTMLElement>('.wr-chips');
+  let busy = false;
+  let cur = 'all';
+  let queued: string | null = null;
+
+  const match = (el: HTMLElement, f: string) => f === 'all' || el.getAttribute('data-shelf') === f;
+  const docTop = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY;
+
+  const settle = (f: string) => {
+    let nE = 0;
+    let nN = 0;
+    items.forEach((el) => {
+      if (el.hidden) return;
+      if (notesList?.contains(el)) nN++;
+      else if (essaysList?.contains(el)) nE++;
+    });
+    if (emptyEssays) emptyEssays.hidden = nE > 0;
+    if (emptyNotes) emptyNotes.hidden = nN > 0;
+    if (otherSec) otherSec.hidden = !(f === 'all' || f === 'offtopic');
+    if (shown) swap(shown, String(items.filter((el) => match(el, f)).length));
+  };
+
+  const apply = (f: string) => {
+    if (f === cur) return;
+    if (busy) {
+      queued = f;
+      return;
+    }
+    cur = f;
+    chips.forEach((c) => c.setAttribute('aria-pressed', c.getAttribute('data-f') === f ? 'true' : 'false'));
+    const out = items.filter((el) => !el.hidden && !match(el, f));
+    const inn = items.filter((el) => el.hidden && match(el, f));
+    const stay = items.filter((el) => !el.hidden && match(el, f));
+    if (!motion()) {
+      out.forEach((el) => (el.hidden = true));
+      inn.forEach((el) => (el.hidden = false));
+      settle(f);
+      return;
+    }
+    busy = true;
+    const first = new Map<HTMLElement, number>();
+    stay.forEach((el) => first.set(el, docTop(el)));
+    const finish = () => {
+      out.forEach((el) => {
+        el.hidden = true;
+        gsap.set(el, { clearProps: 'opacity,visibility,transform' });
+      });
+      inn.forEach((el) => (el.hidden = false));
+      settle(f);
+      // Keep the list under the sticky bar if the page got shorter above the reader.
+      const anchor = $<HTMLElement>('#essays');
+      const bar = $('.wr-bar');
+      if (anchor) {
+        const lim = docTop(anchor) - (bar ? bar.getBoundingClientRect().bottom : 0) - 8;
+        if (window.scrollY > lim + 4) window.scrollTo(0, Math.max(0, lim));
+      }
+      stay.forEach((el) => {
+        const dy = (first.get(el) ?? 0) - docTop(el);
+        if (Math.abs(dy) > 0.5) gsap.fromTo(el, { y: dy }, { y: 0, duration: 0.75, ease: 'expo.out', overwrite: true });
+      });
+      if (inn.length) gsap.fromTo(inn, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: 0.025, overwrite: true, clearProps: 'transform' });
+      setTimeout(() => {
+        busy = false;
+        if (queued) {
+          const q = queued;
+          queued = null;
+          apply(q);
+        }
+      }, 140);
+    };
+    if (out.length) gsap.to(out, { autoAlpha: 0, y: -6, duration: 0.18, ease: 'power2.in', stagger: { amount: 0.06 }, onComplete: finish, overwrite: true });
+    else finish();
+  };
+
+  chips.forEach((c) => c.addEventListener('click', () => apply(c.getAttribute('data-f') ?? 'all')));
+
+  // The chip strip scrolls sideways on a phone; fade its right edge while there is more to see.
+  if (strip) {
+    const edge = () => {
+      const over = strip.scrollWidth > strip.clientWidth + 2;
+      strip.classList.toggle('fade', over);
+      strip.classList.toggle('end', !over || strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 4);
+    };
+    strip.addEventListener('scroll', edge, { passive: true });
+    window.addEventListener('resize', edge);
+    edge();
+  }
+  settle('all');
+</script>
+
 <style>
-  .essays {
-    list-style: none;
-    margin-top: var(--s-9);
-    border-top: var(--line-heavy);
-    border-bottom: var(--line-heavy);
+  /* The shelf bar: sticky under the header. */
+  .wr-bar {
+    position: sticky;
+    top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+    z-index: 40;
+    background: var(--color-glass-strong);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: var(--line-hair);
   }
 
-  .essays--other {
-    margin-top: 0;
-  }
-
-  .essay + .essay {
-    border-top: var(--line-hair);
-  }
-
-  .essay:hover + .essay {
-    border-top: var(--line-ink);
-  }
-
-  .essay {
-    position: relative;
-  }
-
-  /* The title is the link; its ::after stretches over the whole row, so the
-     row is one click target with a short, exact accessible name. */
-  .e-title::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  .essay-link {
-    display: grid;
-    grid-template-columns: 9.5em minmax(0, 1fr);
-    column-gap: var(--s-7);
-    padding-block: var(--s-6);
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .e-num {
+  .wr-bar .in {
     display: flex;
-    flex-direction: column;
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-num);
-    line-height: var(--lh-tight);
-    letter-spacing: var(--track-tight);
+    align-items: center;
+    gap: 14px;
+    min-height: 58px;
+  }
+
+  .wr-chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-block: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .wr-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .wr-chips .chip {
+    flex: none;
+    height: 32px;
+    padding: 0 11px;
+    gap: 8px;
+    letter-spacing: 0.06em;
+  }
+
+  .wr-chips.fade {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent);
+  }
+
+  .wr-chips.fade.end {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .wr-chips .chip::before {
+    transform: scale(0);
+    transition: transform 0.45s var(--ease-out);
+  }
+
+  .wr-chips .chip[aria-pressed='false']::before {
+    width: 0;
+    margin-right: -8px;
+  }
+
+  .wr-chips .chip[aria-pressed='true']::before {
+    transform: scale(1);
+  }
+
+  .wr-cc {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
+  .chip[aria-pressed='true'] .wr-cc {
+    color: var(--color-accent);
+  }
+
+  .wr-shown {
+    flex: none;
+    font: 400 var(--t-label) / 1 var(--font-data);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .wr-shown b {
+    font-weight: 500;
     color: var(--color-text);
     font-variant-numeric: tabular-nums;
   }
 
-  .e-unit {
-    margin-top: var(--s-1);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    letter-spacing: 0;
-    line-height: var(--lh-snug);
-    color: var(--color-text-muted);
-  }
-
-  .e-main {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  .e-kicker {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .e-title {
-    margin-top: var(--s-2);
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: clamp(26px, 2.4vw, 34px);
-    line-height: var(--lh-title);
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--color-accent-text);
-    text-underline-offset: 5px;
-    transition: color var(--dur-fast) var(--ease-draw);
-  }
-
-  .essay:hover .e-title {
-    color: var(--color-accent-text);
-  }
-
-  .e-dek {
-    margin-top: var(--s-3);
-    font-size: var(--t-small);
-    line-height: var(--lh-snug);
-    color: var(--color-text-body);
-    max-width: 62ch;
-  }
-
-  /* Hover reveals the dek on fine pointers (B: "hover reveals the dek"). It
-     stays in the layout (visibility only) so nothing moves; touch and keyboard
-     see it always. */
-  @media (hover: hover) and (pointer: fine) {
-    .js .e-dek {
-      opacity: 0.0001;
-      transition: opacity var(--dur-base) var(--ease-draw);
-    }
-
-    .js .essay:hover .e-dek,
-    .js .essay:focus-within .e-dek {
-      opacity: 1;
+  @media (max-width: 899px) {
+    .wr-shown {
+      display: none;
     }
   }
 
-  .e-listen {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--s-1);
-    min-height: var(--hit-touch);
-    margin-left: var(--s-3);
-    color: var(--color-accent-text);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+  .wr-it[hidden],
+  .wr-empty[hidden],
+  .wr-sec[hidden] {
+    display: none !important;
   }
 
-  .e-listen:hover {
-    text-decoration-thickness: 2px;
+  /* Section heads. */
+  .wr-sec {
+    padding-top: clamp(56px, 9vh, 104px);
   }
 
-  .e-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0 var(--s-1);
-    margin-top: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .notes-lead {
-    max-width: var(--measure);
-    color: var(--color-text-body);
-    line-height: var(--lh-body);
-    margin-bottom: var(--s-8);
-  }
-
-  .ngroup + .ngroup {
-    margin-top: var(--s-8);
-  }
-
-  .ngroup-h {
+  .wr-sh {
     display: flex;
     justify-content: space-between;
-    gap: var(--s-3);
-    padding-bottom: var(--s-2);
-    border-bottom: var(--line-ink);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text);
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
-  .ngroup-h span {
+  .wr-empty {
+    padding: 22px 0;
+    font: 400 var(--t-note) / var(--lh-label) var(--font-data);
     color: var(--color-text-muted);
-    text-transform: none;
+    border-bottom: var(--line-hair);
   }
 
-  .notes {
+  /* Essay rows. */
+  .wr-list {
     list-style: none;
-    border-bottom: var(--line-heavy);
+    border-top: var(--line-heavy);
+    margin-top: clamp(24px, 4vh, 40px);
   }
 
-  .notes li + li {
-    border-top: var(--line-hair);
+  .wr-it {
+    will-change: transform;
   }
 
-  .notes a {
+  .wr-row {
+    position: relative;
+    isolation: isolate;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: var(--s-5);
-    align-items: baseline;
-    padding-block: var(--s-3);
-    min-height: var(--hit-touch);
+    grid-template-columns: 48px minmax(0, 1fr) minmax(0, 170px) minmax(0, 160px) 26px;
+    gap: 22px;
+    align-items: center;
+    padding: 24px 0;
+    border-bottom: var(--line-hair);
     text-decoration: none;
     color: var(--color-text);
   }
 
-  .n-title {
-    font-size: var(--t-small);
-    line-height: var(--lh-snug);
-    text-decoration: underline;
-    text-decoration-color: var(--color-line);
-    text-underline-offset: var(--underline-offset);
+  .wr-row::before,
+  .wr-nrow::before {
+    content: '';
+    position: absolute;
+    inset: 0 -16px;
+    background: var(--color-surface-raised);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.6s var(--ease-out);
+    z-index: -1;
   }
 
-  .notes a:hover .n-title {
-    color: var(--color-link);
-    text-decoration-color: var(--color-link);
+  .wr-row::after,
+  .wr-nrow::after {
+    content: '';
+    position: absolute;
+    left: -16px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--color-accent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.6s var(--ease-out) 0.05s;
   }
 
-  .n-date {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
+  .wr-row:hover::before,
+  .wr-row:focus-visible::before,
+  .wr-nrow:hover::before,
+  .wr-nrow:focus-visible::before {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+
+  .wr-row:hover::after,
+  .wr-row:focus-visible::after,
+  .wr-nrow:hover::after,
+  .wr-nrow:focus-visible::after {
+    transform: scaleY(1);
+  }
+
+  .wr-no {
+    font: 500 var(--t-nav) / 1 var(--font-data);
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+  }
+
+  .wr-main {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .wr-tag {
+    font: 500 var(--t-label) / var(--lh-label) var(--font-data);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--color-text-muted);
+  }
+
+  .wr-t {
+    font-size: clamp(22px, 2.2vw, 34px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'wdth' 82, 'wght' 700;
+    transition: font-variation-settings 0.6s var(--ease-out);
+    text-wrap: balance;
+  }
+
+  .wr-dk {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 62ch;
+    font-size: 14.5px;
+    line-height: var(--lh-base);
+    color: var(--color-text-body);
+  }
+
+  .wr-ro {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: right;
+  }
+
+  .wr-ro b {
+    font-weight: normal;
+    font-size: var(--t-num);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'wdth' 90, 'wght' 780;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wr-ro span,
+  .wr-dt span {
+    font: 400 var(--t-label) / 1.35 var(--font-data);
+    color: var(--color-text-muted);
+  }
+
+  .wr-dt {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font: 500 var(--t-nav) / var(--lh-label) var(--font-data);
+    color: var(--color-text-body);
+    text-align: right;
+  }
+
+  .wr-row .ba,
+  .wr-nrow .ba {
+    text-align: right;
+  }
+
+  @media (max-width: 899px) {
+    .wr-row {
+      grid-template-columns: 34px minmax(0, 1fr) 22px;
+      gap: 8px 12px;
+      align-items: start;
+    }
+
+    .wr-row .wr-main {
+      grid-column: 2;
+    }
+
+    .wr-ro,
+    .wr-dt {
+      grid-column: 2;
+      flex-direction: row;
+      align-items: baseline;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .wr-ro b {
+      font-size: 20px;
+    }
+
+    .wr-row .ba {
+      grid-column: 3;
+      grid-row: 1;
+    }
+  }
+
+  /* Notes ledger. */
+  .wr-lhead,
+  .wr-nrow {
+    display: grid;
+    grid-template-columns: 104px 130px minmax(0, 1fr) minmax(0, 150px) 22px;
+    gap: 18px;
+    align-items: baseline;
+  }
+
+  .wr-lhead {
+    padding: 10px 0;
+    border-bottom: var(--line-ink);
+    font: 500 var(--t-label) / var(--lh-label) var(--font-data);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-top: clamp(24px, 4vh, 40px);
+    border-top: var(--line-heavy);
+  }
+
+  .wr-lhead span:nth-child(4) {
+    text-align: right;
+  }
+
+  .wr-ledger {
+    list-style: none;
+  }
+
+  .wr-nrow {
+    position: relative;
+    isolation: isolate;
+    padding: 13px 0;
+    border-bottom: var(--line-hair);
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .wr-nd {
+    font: 400 var(--t-nav) / var(--lh-label) var(--font-data);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
 
-  @media (max-width: 599px) {
-    .essay-link {
-      grid-template-columns: 1fr;
-      row-gap: var(--s-3);
+  .wr-ns {
+    font: 500 var(--t-label) / var(--lh-label) var(--font-data);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .wr-nt {
+    font-size: 17px;
+    line-height: 1.35;
+    font-variation-settings: 'wdth' 96, 'wght' 520;
+  }
+
+  .wr-nr {
+    font: 500 var(--t-data) / var(--lh-label) var(--font-data);
+    color: var(--color-text);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 899px) {
+    .wr-lhead {
+      display: none;
     }
 
-    .e-num {
-      flex-direction: row;
-      align-items: baseline;
-      gap: var(--s-3);
+    .wr-ledger {
+      border-top: var(--line-heavy);
+      margin-top: 24px;
     }
 
-    .notes a {
-      padding-block: var(--s-2);
+    .wr-nrow {
+      grid-template-columns: auto minmax(0, 1fr) 22px;
+      gap: 4px 12px;
+    }
+
+    .wr-nd {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .wr-ns {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .wr-nt {
+      grid-column: 1 / 3;
+      grid-row: 2;
+    }
+
+    .wr-nr {
+      grid-column: 1 / 3;
+      grid-row: 3;
+      text-align: left;
+      color: var(--color-text-body);
+    }
+
+    .wr-nrow .ba {
+      grid-column: 3;
+      grid-row: 1 / 3;
     }
   }
 </style>

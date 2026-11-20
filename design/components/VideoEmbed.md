@@ -1,33 +1,36 @@
 # VideoEmbed
 
 ## Purpose
-A lite YouTube embed: nothing third-party loads until the reader asks to watch. The poster is self-hosted and the iframe is created on click.
+A click-to-play video facade. Nothing third-party loads until someone asks to watch: the poster is self-hosted and the youtube-nocookie iframe is created on click, in place.
 
 ## Anatomy
-`<figure>` with a 16:9 frame holding the facade link (self-hosted poster as WebP with JPG fallback, a play glyph, an optional channel plate), a caption "Fig. n: caption", and an "Open on YouTube" link. With JS the anchor is upgraded to a `<button>` (`aria-label` "Play: title") reusing the same child nodes, which then swaps in a `youtube-nocookie` iframe. Exactly one control exists in either mode.
+`figure.vid[data-video-embed]`: `.frame` with `a.facade` (a `<picture>` poster and a red `.vplay` tab), then `figcaption` with the caption and a `.vlinks` set (the watch link and any `links`). The inline script upgrades the anchor into a real `<button>` (aria-label "Play: <title>"), reusing the same child nodes so the poster is not fetched twice.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
 | `youtubeId` | `string` | |
-| `title` | `string` | used for the play label and iframe title |
+| `title` | `string` | used for the iframe title and the play label |
 | `caption` | `string` | |
-| `figNo` | `number` | |
-| `poster` | `string` | extensionless path; `<poster>.webp` and `.jpg` must exist under `public/` |
-| `channel` | `string?` | small mono plate on the poster |
+| `poster` | `string` | extensionless path; `<poster>.webp` and `<poster>.jpg` under `public/` |
+| `play` | `string` | text on the red play tab |
+| `open` | `string` | label of the link to the watch page |
+| `links` | `{label, href}[]` | further links beside it |
 
-## Tokens it reads
-- Colour roles: `--color-text`, `-text-muted`, `-surface`, `-accent-text`, `--color-link`.
-- Primitive read: `--on-red-muted` (plate text; flagged in the report).
-- Type and space: `--font-data`, `--t-micro`, `--track-wide`, `--lh-snug`, `--s-1` to `--s-8`, `--radius`, `--hit-min`, `--underline-offset`. Motion: `--dur-fast`, `--ease-draw`.
+## Variants
+Anchor (no JS) and button (JS). A missing poster is marked `data-failed` so no broken-image marker shows.
 
-## States and motion
-- Facade, hover and focus (the glyph reacts), loading, playing, and poster-failed (`data-failed`).
-- No motion verb; the glyph transition is a short background-colour change that the global reduced-motion rule collapses.
-- Hover or focus: the play glyph's fill changes from `--color-text` to `--color-accent-text`. The channel plate text uses `--on-red-muted` (a primitive, so it does not re-point on the ink surface).
+## Kit classes
+The red play tab (`.vplay`) and the caption links are the component's own CSS; frame on `--color-surface-sunk` with `--line-hair`.
+
+## Motion
+None. Clicking swaps the facade for the iframe (autoplay) and moves focus to it.
 
 ## Accessibility
-Works as a plain link with JavaScript off. The poster `alt` is empty because the control carries the label. Touch targets use `--hit-min`; external links use `rel="noopener noreferrer"`.
+Exactly one control exists in either mode. With JS off the poster is a working link to the watch page. The iframe gets a `title` and `allow` for fullscreen. Links open in a new tab with `rel="noopener noreferrer"`.
+
+## Light and dark
+Roles only; the play tab is `--color-accent` with `--color-on-accent` text. The poster is the same image in both themes.
 
 ## Used on
-Pages: `/about/`.
+`/about/`.

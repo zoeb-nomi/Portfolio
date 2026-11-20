@@ -1,26 +1,30 @@
 # OwnershipGap
 
 ## Purpose
-An illustration (not data): the ownership chart from the KYB example. It reads as complete because nothing on it is wrong; the red node is what never made it onto the page.
+An illustration, not data: the ownership chart from the KYB example. It reads as complete because nothing on it is wrong; the red dashed node is what never made it onto the page. It is built from boxes and hairlines so the type stays on the site's scale.
 
 ## Anatomy
-An ordered list of boxed nodes joined by hairlines. Each node has a label and an optional mono mark; a `missing` node is drawn in red text with a dashed outline. Built from boxes and lines, not SVG, so type stays on the site's scale.
+`ol.og` of `li.og-node` (label, optional mono `.og-mark`); a node with `missing` is the red dashed one.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `nodes` | `{label, mark?, missing?}[]` | `missing` flags the absent node |
+| `nodes` | `{label, mark?, missing?}[]` | in reading order |
 
-## Tokens it reads
-- Colour roles: `--color-text`, `--color-text-muted`, `--color-accent-text` (missing node).
-- Type and space: `--font-data`, `--t-micro`, `--t-data`, `--track-wide`, `--s-1`, `--s-3`, `--s-4`, `--s-6`.
-- Lines: `--line-object`, `--line-ink`, `--line-pen-dashed`.
+## Variants
+`missing: true` on one node.
 
-## States and motion
-Static: no script, no animation. Reduced motion and ink surface change nothing (roles re-point).
+## Kit classes
+Own `og-*` classes only; borders are `--line-strong`, the missing node uses `--line-accent` and the accent for its text. Sits in an `EssayFigure`.
+
+## Motion
+None. No script.
 
 ## Accessibility
-A real `<ol>`; the visible text carries the meaning, so the missing node is also identified in the surrounding copy, not by colour alone.
+The visible text carries the meaning (the missing node says it is missing), so nothing depends on colour or dashes. A real ordered list.
+
+## Light and dark
+Roles only; the red dashed node reads on both grounds.
 
 ## Used on
-Pages: `/writing/nobody-reports-the-misses/`.
+`/writing/nobody-reports-the-misses/`.

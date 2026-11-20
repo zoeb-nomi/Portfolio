@@ -1,32 +1,19 @@
 ---
-// Reviewer-annotation. Never carries a fact that exists nowhere else.
-// Renders as <aside> (a real landmark) by default. When already nested inside
-// another <aside> (e.g. Section's margin column), pass as="div", a landmark
-// should never be nested inside another landmark of the same kind.
+// A margin note (kit `.margin-note`): a red hairline, mono text, beside the paragraph it annotates. Put it in the
+// `aside` of an `.article` row (`<div class="article"><p class="prose">…</p><aside><MarginNote title="…">…</MarginNote></aside></div>`)
+// and it sits in the rail at 1100px and up and under the paragraph below that. It never carries a fact that exists
+// nowhere else. Renders as <aside> (a landmark) by default; inside another aside (Section's rail) pass as="div".
 interface Props {
   label?: string;
   as?: 'aside' | 'div';
+  /** A short mono heading above the note ("The run"). */
+  title?: string;
 }
-const { label = "Reviewer's note", as: Tag = 'aside' } = Astro.props;
+const { label = 'Margin note', as: Tag = 'aside', title } = Astro.props;
 const ariaProps = Tag === 'aside' ? { 'aria-label': label } : {};
 ---
 
 <Tag class="margin-note" {...ariaProps}>
-  <p><slot /></p>
+  {title && <b>{title}</b>}
+  <slot />
 </Tag>
-
-<style>
-  .margin-note {
-    border-left: var(--line-pen);
-    padding-left: var(--s-3);
-    margin-top: var(--s-6);
-  }
-
-  .margin-note p {
-    font-family: var(--font-data);
-    font-size: var(--t-note);
-    line-height: var(--lh-body);
-    color: var(--color-accent-text);
-    max-width: 46ch;
-  }
-</style>

@@ -1,14 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Masthead from '../../components/Masthead.astro';
-import Section from '../../components/Section.astro';
+import EssayShell from '../../components/EssayShell.astro';
+import EssayHeading from '../../components/EssayHeading.astro';
+import EssayFigure from '../../components/EssayFigure.astro';
 import StatRow from '../../components/StatRow.astro';
-import DataTable from '../../components/DataTable.astro';
-import PullQuote from '../../components/PullQuote.astro';
-import AudioPlayer from '../../components/AudioPlayer.astro';
+import TextTable from '../../components/TextTable.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
-import { meta, cta, home, writingBusStop as wb, writingIndex } from '../../data/copy';
-import { formatDate } from '../../lib/formatDate';
+import { meta, writingBusStop as wb, writingIndex } from '../../data/copy';
 import { jsonLdString } from '../../lib/jsonLdString';
 
 const articleLd = articleJsonLd({
@@ -19,6 +17,16 @@ const articleLd = articleJsonLd({
   about: 'Indian intercity bus industry, Vijayanand Travels, premiumisation, hypothesis-driven investing, Vijayanand Travels video coverage',
   audio: wb.audio && { src: wb.audio.src, duration: wb.audio.duration },
 });
+
+// §6 growth rows. The scale is symmetric (min -36, max +51, range 87), so the zero axis sits at 36/87 of each track.
+const growth = [
+  { label: 'ixigo bus revenue, FY26', v: 51, text: '+51%' },
+  { label: 'Online bus journeys (redBus BusTrack), H2 FY26', v: 24, text: '+24%' },
+  { label: 'MakeMyTrip bus revenue, Q1 FY27', v: 16, text: '+16%' },
+  { label: 'Ashok Leyland M&HCV bus dispatches, Aug 2026', v: 12, text: '+12%' },
+  { label: 'Whole intercity bus market, forecast CAGR FY23 to FY26 (VIDEC)', v: 8.5, text: '+8.5%' },
+  { label: 'VECV heavy-duty buses, Q1 FY27', v: -36, text: '−36%' },
+];
 ---
 
 <Base
@@ -27,185 +35,116 @@ const articleLd = articleJsonLd({
   path="/writing/the-bus-stop-nobody-notices/"
   ogImage="/og/bus-stop.png"
   ogType="article"
+  page="writing"
 >
   <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
-  <Masthead kicker={wb.kicker} h1={wb.title} standfirst={wb.dek} h1Max="24ch" narr>
-    <Fragment slot="byline"><time datetime={wb.date}>{formatDate(wb.date)}</time> · {wb.readingTime} read</Fragment>
-    {wb.audio && <AudioPlayer audio={wb.audio} articleId="bus-stop" />}
-  </Masthead>
-
-  <Section mark={wb.s1.mark} label={wb.s1.label} narrId="s1-cue">
-    {wb.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
+  <EssayShell
+    slug="the-bus-stop-nobody-notices"
+    kicker={wb.kicker}
+    title={wb.title}
+    dek={wb.dek}
+    date={wb.date}
+    readingTime={wb.readingTime}
+    audio={wb.audio}
+    articleId="bus-stop"
+    related="link"
+  >
+    <EssayHeading mark={wb.s1.mark} label={wb.s1.label} narrId="s1-cue" />
+    {wb.s1.paras.map((p, i) => <p data-narr={`s1-p${i}`}>{p}</p>)}
     {wb.photo.enabled && (
-      <figure class="photo">
-        <img
-          src={wb.photo.src}
-          alt={wb.photo.alt}
-          loading="lazy"
-          decoding="async"
-          width="1600"
-          height="1000"
-        />
+      <figure class="fig">
+        <img class="bs-photo" src={wb.photo.src} alt={wb.photo.alt} loading="lazy" decoding="async" width="1600" height="1000" />
         <figcaption>{wb.photo.caption} · {wb.photo.credit}</figcaption>
       </figure>
     )}
-  </Section>
 
-  <Section mark={wb.s2.mark} label={wb.s2.label} narrId="s2-cue">
-    <p class="prose" data-narr="s2-p0">{wb.s2.intro}</p>
-    <div class="stats" data-narr="s2-stats">
+    <EssayHeading mark={wb.s2.mark} label={wb.s2.label} narrId="s2-cue" />
+    <p data-narr="s2-p0">{wb.s2.intro}</p>
+    <div class="bs-stats" data-narr="s2-stats">
       {wb.s2.stats.map((s) => <StatRow value={s.value} label={s.label} provenance={s.provenance} />)}
     </div>
-    {wb.s2.paras.map((p, i) => <p class="prose" data-narr={`s2-p${i + 1}`}>{p}</p>)}
-  </Section>
+    {wb.s2.paras.map((p, i) => <p data-narr={`s2-p${i + 1}`}>{p}</p>)}
 
-  <Section mark={wb.s3.mark} label={wb.s3.label} narrId="s3-cue">
-    {wb.s3.paras.map((p, i) => <p class="prose" data-narr={`s3-p${i}`}>{p}</p>)}
-    <figure class="fig" data-narr="s3-fig">
-      <svg viewBox="0 0 380 320" width="100%" role="img" aria-labelledby="fig1-title">
-        <title id="fig1-title">Vijayanand Travels after the carve-out</title>
-        <line class="fig-axis" x1="10" y1="260" x2="370" y2="260" />
+    <EssayHeading mark={wb.s3.mark} label={wb.s3.label} narrId="s3-cue" />
+    {wb.s3.paras.map((p, i) => <p data-narr={`s3-p${i}`}>{p}</p>)}
+    <div data-narr="s3-fig">
+      <EssayFigure n={1} title="Revenue, ₹ crore, and EBITDA margin" source="CARE Ratings (Mar 2025), Tracxn">
+        <svg class="bs-rev" viewBox="0 0 380 320" width="100%" role="img" aria-labelledby="fig1-title">
+          <title id="fig1-title">Vijayanand Travels after the carve-out</title>
+          <line class="rv-axis" x1="10" y1="260" x2="370" y2="260" />
 
-        <rect class="fig-bar" x="20" y="235" width="80" height="25" />
-        <text class="fig-margin" x="60" y="199" text-anchor="middle">13.2%</text>
-        <text class="fig-value" x="60" y="223" text-anchor="middle">₹75 Cr</text>
-        <text class="fig-year" x="60" y="280" text-anchor="middle">FY23</text>
-        <text class="fig-note" x="60" y="294" text-anchor="middle">(partial year)</text>
+          <rect class="rv-bar" x="20" y="235" width="80" height="25" />
+          <text class="rv-margin" x="60" y="199" text-anchor="middle">13.2%</text>
+          <text class="rv-value" x="60" y="223" text-anchor="middle">₹75 Cr</text>
+          <text class="rv-year" x="60" y="280" text-anchor="middle">FY23</text>
+          <text class="rv-note" x="60" y="294" text-anchor="middle">(partial year)</text>
 
-        <rect class="fig-bar" x="150" y="142" width="80" height="118" />
-        <text class="fig-margin" x="190" y="106" text-anchor="middle">14.9%</text>
-        <text class="fig-value" x="190" y="130" text-anchor="middle">₹351 Cr</text>
-        <text class="fig-year" x="190" y="280" text-anchor="middle">FY24</text>
+          <rect class="rv-bar" x="150" y="142" width="80" height="118" />
+          <text class="rv-margin" x="190" y="106" text-anchor="middle">14.9%</text>
+          <text class="rv-value" x="190" y="130" text-anchor="middle">₹351 Cr</text>
+          <text class="rv-year" x="190" y="280" text-anchor="middle">FY24</text>
 
-        <rect class="fig-bar fig-bar--accent" x="280" y="90" width="80" height="170" />
-        <text class="fig-margin" x="320" y="54" text-anchor="middle">19.5%</text>
-        <text class="fig-value" x="320" y="78" text-anchor="middle">₹504 Cr</text>
-        <text class="fig-year" x="320" y="280" text-anchor="middle">FY25</text>
-      </svg>
-      <figcaption>Revenue, ₹ crore, and EBITDA margin · CARE Ratings (Mar 2025), Tracxn</figcaption>
-    </figure>
-    <div class="quote-gap" data-narr="s3-quote">
-      <PullQuote rule="red">{wb.s3.quote}</PullQuote>
+          <rect class="rv-bar rv-bar--red" x="280" y="90" width="80" height="170" />
+          <text class="rv-margin" x="320" y="54" text-anchor="middle">19.5%</text>
+          <text class="rv-value" x="320" y="78" text-anchor="middle">₹504 Cr</text>
+          <text class="rv-year" x="320" y="280" text-anchor="middle">FY25</text>
+        </svg>
+      </EssayFigure>
     </div>
-  </Section>
+    <blockquote data-narr="s3-quote">{wb.s3.quote}</blockquote>
 
-  <Section mark={wb.s4.mark} label={wb.s4.label} narrId="s4-cue">
-    {wb.s4.paras.map((p, i) => <p class="prose" data-narr={`s4-p${i}`}>{p}</p>)}
-  </Section>
+    <EssayHeading mark={wb.s4.mark} label={wb.s4.label} narrId="s4-cue" />
+    {wb.s4.paras.map((p, i) => <p data-narr={`s4-p${i}`}>{p}</p>)}
 
-  <Section mark={wb.s5.mark} label={wb.s5.label} narrId="s5-cue">
-    <div
-      class="textual table-wrap"
-      data-narr="s5-table"
-    >
-      <DataTable caption={wb.s5.table.caption} columns={wb.s5.table.columns} rows={wb.s5.table.rows} />
+    <EssayHeading mark={wb.s5.mark} label={wb.s5.label} narrId="s5-cue" />
+    <div data-narr="s5-table">
+      <TextTable caption={wb.s5.table.caption} columns={wb.s5.table.columns} rows={wb.s5.table.rows} wide />
     </div>
-    {wb.s5.paras.map((p, i) => <p class="prose table-follow" data-narr={`s5-p${i}`}>{p}</p>)}
-  </Section>
+    {wb.s5.paras.map((p, i) => <p data-narr={`s5-p${i}`}>{p}</p>)}
 
-  <Section mark={wb.s6.mark} label={wb.s6.label} narrId="s6-cue">
-    <figure class="fig" data-narr="s6-fig">
-      <p id="fig2-title" class="visually-hidden">One market, four growth rates</p>
-      <div class="hbars" role="list" aria-labelledby="fig2-title">
-        <div class="hrow" role="listitem" aria-label="ixigo bus revenue, FY26: +51%">
-          <p class="hbar-cat" aria-hidden="true">ixigo bus revenue, FY26</p>
-          <div class="hbar-track">
-            <div class="hbar-bar-area" style="--v:51">
-              <span class="hbar-bar" aria-hidden="true"></span>
-              <span class="hbar-value" aria-hidden="true">+51%</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hrow" role="listitem" aria-label="Online bus journeys (redBus BusTrack), H2 FY26: +24%">
-          <p class="hbar-cat" aria-hidden="true">Online bus journeys (redBus BusTrack), H2 FY26</p>
-          <div class="hbar-track">
-            <div class="hbar-bar-area" style="--v:24">
-              <span class="hbar-bar" aria-hidden="true"></span>
-              <span class="hbar-value" aria-hidden="true">+24%</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hrow" role="listitem" aria-label="MakeMyTrip bus revenue, Q1 FY27: +16%">
-          <p class="hbar-cat" aria-hidden="true">MakeMyTrip bus revenue, Q1 FY27</p>
-          <div class="hbar-track">
-            <div class="hbar-bar-area" style="--v:16">
-              <span class="hbar-bar" aria-hidden="true"></span>
-              <span class="hbar-value" aria-hidden="true">+16%</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hrow" role="listitem" aria-label={"Ashok Leyland M&HCV bus dispatches, Aug 2026: +12%"}>
-          <p class="hbar-cat" aria-hidden="true">{"Ashok Leyland M&HCV bus dispatches, Aug 2026"}</p>
-          <div class="hbar-track">
-            <div class="hbar-bar-area" style="--v:12">
-              <span class="hbar-bar" aria-hidden="true"></span>
-              <span class="hbar-value" aria-hidden="true">+12%</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hrow" role="listitem" aria-label="Whole intercity bus market, forecast CAGR FY23–26 (VIDEC): +8.5%">
-          <p class="hbar-cat" aria-hidden="true">Whole intercity bus market, forecast CAGR FY23–26 (VIDEC)</p>
-          <div class="hbar-track">
-            <div class="hbar-bar-area" style="--v:8.5">
-              <span class="hbar-bar" aria-hidden="true"></span>
-              <span class="hbar-value" aria-hidden="true">+8.5%</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hrow" role="listitem" aria-label="VECV heavy-duty buses, Q1 FY27: −36%">
-          <p class="hbar-cat" aria-hidden="true">VECV heavy-duty buses, Q1 FY27</p>
-          <div class="hbar-track">
-            <div class="hbar-bar-area" style="--v:-36">
-              <span class="hbar-bar hbar-bar--accent" aria-hidden="true">−36%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <figcaption>Latest reported growth, year on year · company releases, redBus BusTrack, VIDEC</figcaption>
-    </figure>
-    {wb.s6.paras.map((p, i) => <p class="prose" data-narr={`s6-p${i}`}>{p}</p>)}
-  </Section>
-
-  <Section mark={wb.s7.mark} label={wb.s7.label} note={wb.disclaimer} narrId="s7-cue">
-    <p class="prose" data-narr="s7-p0">{wb.s7.intro}</p>
-    <div class="table-gap basket textual" data-narr="s7-table">
-      <div
-        class="table-wrap basket-table-wrap"
-      >
-        <DataTable caption={wb.s7.table.caption} columns={wb.s7.table.columns} rows={wb.s7.table.rows} />
-      </div>
-      <div class="basket-cards">
-        <p class="basket-cards-caption">{wb.s7.table.caption}</p>
-        <ul class="basket-cards-list">
-          {wb.s7.table.rows.map((row) => (
-            <li class="basket-card">
-              <h3 class="basket-card-heading">{row.label}</h3>
-              <dl class="basket-card-fields">
-                {row.cells.map((cell, i) => (
-                  <div class="basket-card-field">
-                    <dt>{wb.s7.table.columns.slice(1)[i]}</dt>
-                    <dd class:list={[{ win: (cell as { text: string; win?: boolean }).win }]}>{cell.text}</dd>
+    <EssayHeading mark={wb.s6.mark} label={wb.s6.label} narrId="s6-cue" />
+    <div data-narr="s6-fig">
+      <EssayFigure n={2} title="One market, four growth rates" source="Latest reported growth, year on year · company releases, redBus BusTrack, VIDEC">
+        <div class="bs-rows" role="list">
+          {
+            growth.map((g) => (
+              <div class="bs-row" role="listitem" aria-label={`${g.label}: ${g.text}`}>
+                <p class="bs-cat" aria-hidden="true">{g.label}</p>
+                <div class="bs-track">
+                  <div class="bs-area" style={`--v:${g.v}`}>
+                    {g.v < 0 ? (
+                      <span class="bs-bar bs-bar--red" aria-hidden="true">{g.text}</span>
+                    ) : (
+                      <>
+                        <span class="bs-bar" aria-hidden="true" />
+                        <span class="bs-value" aria-hidden="true">{g.text}</span>
+                      </>
+                    )}
                   </div>
-                ))}
-              </dl>
-            </li>
-          ))}
-        </ul>
-      </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </EssayFigure>
     </div>
-    {wb.s7.paras.map((p, i) => <p class="prose" data-narr={`s7-p${i + 1}`}>{p}</p>)}
-  </Section>
+    {wb.s6.paras.map((p, i) => <p data-narr={`s6-p${i}`}>{p}</p>)}
 
-  <Section mark={wb.s8.mark} label={wb.s8.label} narrId="s8-cue">
-    {wb.s8.paras.map((p, i) => <p class="prose" data-narr={`s8-p${i}`}>{p}</p>)}
-    <p class="prose disclaimer" data-narr="s8-disclaimer">{wb.disclaimer}</p>
-    <p class="prose links-line">
+    <EssayHeading mark={wb.s7.mark} label={wb.s7.label} narrId="s7-cue" />
+    <div class="wr-p">
+      <p data-narr="s7-p0">{wb.s7.intro}</p>
+      <aside class="wr-mn"><b>{wb.s7.label}</b>{wb.disclaimer}</aside>
+    </div>
+    <div data-narr="s7-table">
+      <TextTable caption={wb.s7.table.caption} columns={wb.s7.table.columns} rows={wb.s7.table.rows} wide />
+    </div>
+    {wb.s7.paras.map((p, i) => <p data-narr={`s7-p${i + 1}`}>{p}</p>)}
+
+    <EssayHeading mark={wb.s8.mark} label={wb.s8.label} narrId="s8-cue" />
+    {wb.s8.paras.map((p, i) => <p data-narr={`s8-p${i}`}>{p}</p>)}
+    <p class="bs-disclaimer" data-narr="s8-disclaimer">{wb.disclaimer}</p>
+    <p class="wr-links">
       {wb.sources.map((link, i) => (
         <>
           {i > 0 && <span class="sep" aria-hidden="true"> · </span>}
@@ -220,11 +159,10 @@ const articleLd = articleJsonLd({
         </>
       ))}
     </p>
-  </Section>
 
-  <Section mark={wb.watch.mark} label={wb.watch.label} narrId="s9-cue">
-    <p class="prose">{wb.watch.intro}</p>
-    <div class="watch-grid" data-narr="s9-gallery">
+    <EssayHeading mark={wb.watch.mark} label={wb.watch.label} narrId="s9-cue" />
+    <p>{wb.watch.intro}</p>
+    <div class="bs-watch" data-narr="s9-gallery">
       {wb.watch.items.map((item) => (
         <div
           class="watch-card"
@@ -260,7 +198,11 @@ const articleLd = articleJsonLd({
         </div>
       ))}
     </div>
-  </Section>
+
+    <div class="ctas wr-all">
+      <a class="tl" href="/writing/">{writingIndex.moreWriting}</a>
+    </div>
+  </EssayShell>
 
   <script is:inline>
     for (const card of document.querySelectorAll('[data-watch-embed]')) {
@@ -303,184 +245,105 @@ const articleLd = articleJsonLd({
       });
     }
   </script>
-
-  <p class="more-writing"><a href="/writing/">{writingIndex.moreWriting}</a></p>
 </Base>
 
 <style>
-  /* SPEC #48: an off-topic essay ends on a plain link, not the LLM CTA slab. */
-  .more-writing {
-    padding: var(--s-9) var(--gutter) var(--s-11);
-    padding-left: calc(var(--margin-col) + var(--body-inset));
-    border-bottom: var(--line-ink);
-  }
-
-  .more-writing a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    font-family: var(--font-data);
-    font-size: var(--t-nav);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  @media (max-width: 899px) {
-    .more-writing {
-      padding-left: var(--gutter);
-    }
-  }
-
-  .prose + .prose,
-  .stats + .prose,
-  .table-gap + .prose,
-  .table-follow {
-    margin-top: var(--s-6);
-  }
-
-  .stats {
-    margin-top: var(--s-6);
-    border-top: var(--line-hair);
-  }
-
-  .quote-gap,
-  .table-gap {
-    margin-top: var(--s-6);
-  }
-
-  .disclaimer {
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-    margin-top: var(--s-7);
-  }
-
-  /* Inline-SVG data figures (§3, §6): thin marks, direct value labels, no
-     axis scale required of the reader. viewBox width is set close to the
-     narrowest supported viewport so mobile renders near 1:1 and desktop
-     scales up modestly. */
-  .fig {
-    margin: 0;
-  }
-
-  .prose + .fig {
-    margin-top: var(--s-6);
-  }
-
-  .fig + .prose,
-  .fig + .quote-gap {
-    margin-top: var(--s-6);
-  }
-
-  .fig svg {
+  /* §3 revenue bars: an inline SVG on the figure frame. viewBox width is set close to the narrowest supported
+     viewport so phones render near 1:1 and desktop scales up modestly. */
+  .bs-rev {
     display: block;
     width: 100%;
     height: auto;
   }
 
-  .fig figcaption {
-    margin-top: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  .fig-axis {
-    stroke: var(--color-line);
+  .rv-axis {
+    stroke: var(--color-line-strong);
     stroke-width: 1;
   }
 
-  .fig-bar {
-    fill: var(--color-text);
+  .rv-bar {
+    fill: var(--color-text-body);
   }
 
-  .fig-bar--accent {
-    fill: var(--color-accent-text);
+  .rv-bar--red {
+    fill: var(--color-accent);
   }
 
-  .fig-value {
+  .rv-value {
     font-family: var(--font-data);
     font-weight: 500;
     fill: var(--color-text);
     font-size: 20px;
   }
 
-  .fig-margin {
+  .rv-margin {
     font-family: var(--font-data);
     font-size: var(--t-note);
     fill: var(--color-text-muted);
   }
 
-  .fig-year {
+  .rv-year {
     font-family: var(--font-data);
     font-size: var(--t-data);
     fill: var(--color-text-body);
   }
 
-  .fig-note {
+  .rv-note {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     fill: var(--color-text-muted);
   }
 
-  /* SVG text scales with the figure (viewBox 380 wide): about 0.92 at 390px and
-     0.84 at 360px, which would put the 11-13px labels under the 11px mono floor.
-     On phones the small labels step up so they still render at 11px or more. */
+  /* SVG text scales with the figure (viewBox 380 wide): about 0.92 at 390px and 0.84 at 360px, which would put the
+     11-13px labels under the 11px mono floor. On phones the small labels step up so they still render at 11px or more. */
   @media (max-width: 599px) {
-    .fig-margin,
-    .fig-year,
-    .fig-note {
+    .rv-margin,
+    .rv-year,
+    .rv-note {
       font-size: var(--t-small);
     }
 
-    /* "(partial year)" is centred on the first bar, which sits near the left edge;
-       at the larger size it would start left of the viewBox. */
-    .fig-note {
+    /* "(partial year)" is centred on the first bar, which sits near the left edge; at the larger size it would
+       start left of the viewBox. */
+    .rv-note {
       transform: translateX(var(--s-2));
     }
   }
 
-  /* §6 growth rows: HTML/CSS, not SVG, so label and value text sit at
-     fixed rem sizes and never shrink with an SVG viewBox on narrow
-     phones. Scale is symmetric (min -36, max +51, range 87); the zero
-     axis sits at 36/87 = 41.3793% from the left of each bar-area, and
-     --v (set once per row, on .hbar-bar-area, inherited by its
-     children) drives both the bar and its value via calc()/abs() so
-     the markup keeps the underlying numbers legible. The value sits
-     right at the bar's outer end (inside the accent bar for the one
-     negative row); .hbar-track keeps a 3.6em blank reserve past the
-     scale so the +51% value's overflow past the right edge is never
-     clipped. */
-  .hbars {
+  /* §6 growth rows: HTML and CSS, not SVG, so label and value text sit at fixed sizes and never shrink with a
+     viewBox on narrow phones. The scale is symmetric (min -36, max +51, range 87); the zero axis sits at
+     36/87 = 41.3793% from the left of each bar area. --v (set once per row, on .bs-area) drives the bar and its
+     value; the value sits at the bar's outer end (inside the red bar for the one negative row). .bs-track keeps a
+     3.6em blank reserve past the scale so the +51% value is never clipped. */
+  .bs-rows {
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
   }
 
-  .hrow {
+  .bs-row {
     display: flex;
     flex-direction: column;
     gap: var(--s-1);
   }
 
-  .hbar-cat {
+  .bs-cat {
     font-family: var(--font-data);
     font-size: var(--t-data);
-    line-height: 1.35;
+    line-height: var(--lh-snug);
     color: var(--color-text-body);
   }
 
-  .hbar-track {
+  .bs-track {
     padding-right: 3.6em;
   }
 
-  .hbar-bar-area {
+  .bs-area {
     position: relative;
     height: 15px;
   }
 
-  .hbar-bar-area::before {
+  .bs-area::before {
     content: '';
     position: absolute;
     left: 41.3793%;
@@ -491,179 +354,75 @@ const articleLd = articleJsonLd({
     z-index: 1;
   }
 
-  .hbar-bar {
+  .bs-bar {
     position: absolute;
     top: 0;
     height: 100%;
-    background: var(--color-text);
+    background: var(--color-text-body);
     left: calc(41.3793% + min(0%, var(--v) * (100% / 87)));
     width: calc(abs(var(--v)) * (100% / 87));
   }
 
-  .hbar-bar--accent {
+  .bs-bar--red {
     display: flex;
     align-items: center;
-    background: var(--color-accent-text);
+    background: var(--color-accent-fill);
     padding-left: 0.5em;
     font-family: var(--font-data);
-    font-size: var(--t-small);
+    font-size: var(--t-data);
     font-weight: 500;
     color: var(--color-on-accent);
     white-space: nowrap;
   }
 
-  .hbar-value {
+  .bs-value {
     position: absolute;
     top: 50%;
     left: calc(41.3793% + var(--v) * (100% / 87) + 0.5em);
     transform: translateY(-50%);
     font-family: var(--font-data);
-    font-size: var(--t-small);
+    font-size: var(--t-data);
     font-weight: 500;
     color: var(--color-text);
     white-space: nowrap;
   }
 
   @media (min-width: 900px) {
-    .hbar-bar-area {
+    .bs-area {
       height: 17px;
     }
   }
 
-  /* Left-align text cells in this page's tables, on desktop and beyond.
-     Scoped to .textual so DataTable's default (right-aligned, numeric-table)
-     behaviour is untouched everywhere else. */
-  .textual :global(.data-table td) {
-    text-align: left;
+  /* The five readouts: a hairline grid that fills the reading column, three to a row where it fits. */
+  .bs-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0 var(--s-6);
+    margin-block: var(--s-7);
+    border-top: var(--line-hair);
   }
 
-  .textual :global(.data-table th[scope='col']) {
-    text-align: left;
-  }
-
-  /* Table wrapper: lets a wide table scroll within its own box instead of
-     pushing the document wider than the viewport. */
-  /* DataTable scrolls itself; this wrapper must not add a second scroller. */
-  .table-wrap {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-  }
-
-  @media (max-width: 899px) {
-    .textual :global(.data-table th),
-    .textual :global(.data-table td) {
-      padding-block: var(--s-2);
-      padding-inline: 2px;
-    }
-  }
-
-  /* §7 basket: table on wide viewports, stacked cards below 900px. */
-  .basket-cards {
-    display: none;
-  }
-
-  @media (max-width: 899px) {
-    .basket-table-wrap {
-      display: none;
-    }
-
-    .basket-cards {
-      display: block;
-    }
-  }
-
-  .basket-cards-caption {
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-    padding-bottom: var(--s-3);
-  }
-
-  .basket-cards-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .basket-card {
+  .bs-stats :global(.ro) {
     padding-block: var(--s-4);
     border-bottom: var(--line-hair);
   }
 
-  .basket-card:first-child {
-    border-top: var(--line-hair);
-  }
-
-  .basket-card-heading {
-    font-family: var(--font-text);
-    font-size: var(--t-small);
-    font-weight: 500;
-    color: var(--color-text);
-    margin: 0 0 var(--s-3);
-  }
-
-  .basket-card-fields {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-  }
-
-  .basket-card-field {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: var(--s-2);
+  .bs-disclaimer {
     font-family: var(--font-data);
-  }
-
-  .basket-card-field dt {
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
-    flex-shrink: 0;
   }
 
-  .basket-card-field dt::after {
-    content: ':';
-  }
-
-  .basket-card-field dd {
-    font-size: var(--t-data);
-    color: var(--color-text);
-    margin: 0;
-  }
-
-  .basket-card-field dd.win {
-    color: var(--color-accent-text);
-    font-weight: 500;
-  }
-
-  /* §1 photo (behind wb.photo.enabled) */
-  .photo {
-    margin: 0;
-  }
-
-  .prose + .photo {
-    margin-top: var(--s-6);
-  }
-
-  .photo img {
+  /* §1 photo (behind wb.photo.enabled). */
+  .bs-photo {
     display: block;
     width: 100%;
     height: auto;
-    border: var(--line-object-muted);
-    border-radius: var(--radius);
+    border: var(--line-hair);
   }
 
-  .photo figcaption {
-    margin-top: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  /* §9 watch: lite-embed cards, mirroring VideoEmbed's facade pattern. */
-  .watch-grid {
+  /* §9 watch: lite-embed cards, mirroring VideoEmbed's facade pattern. The row runs past the reading column. */
+  .bs-watch {
     margin-top: var(--s-6);
     display: grid;
     grid-template-columns: 1fr;
@@ -671,8 +430,15 @@ const articleLd = articleJsonLd({
   }
 
   @media (min-width: 900px) {
-    .watch-grid {
+    .bs-watch {
       grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .bs-watch {
+      width: calc(var(--rs-w) + 306px);
+      max-width: none;
     }
   }
 
@@ -686,7 +452,8 @@ const articleLd = articleJsonLd({
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: var(--color-surface-raised);
+    background: var(--color-surface-sunk);
+    border: var(--line-hair);
     overflow: hidden;
   }
 
@@ -702,18 +469,14 @@ const articleLd = articleJsonLd({
     cursor: pointer;
   }
 
-  /* .watch-frame clips overflow for its 16:9 crop, which clips the global
-     :focus-visible ring (drawn outside, offset 3px) to invisibility. Draw
-     this one inside the frame instead, over the poster or the empty
-     poster box alike. :global() because the inline script below replaces
-     the <a class="watch-facade"> with a plain document.createElement
-     ('button') that copies the className string but not Astro's scoped
-     data-astro-cid attribute, a scoped selector here would silently
-     stop matching that swapped-in button. */
+  /* .watch-frame clips overflow for its 16:9 crop, which clips the global focus ring (drawn outside, offset 3px)
+     to invisibility. Draw this one inside the frame instead. :global() because the inline script above replaces
+     the <a class="watch-facade"> with a plain createElement('button') that copies the className string but not
+     Astro's scoped data-astro-cid attribute, so a scoped selector would stop matching the swapped-in button. */
   :global(.watch-facade:focus-visible) {
     outline: 2px solid var(--color-accent);
     outline-offset: -4px;
-    box-shadow: inset 0 0 0 6px var(--color-surface-raised);
+    box-shadow: inset 0 0 0 6px var(--color-surface-sunk);
   }
 
   .watch-poster {
@@ -733,9 +496,10 @@ const articleLd = articleJsonLd({
     left: var(--s-3);
     bottom: var(--s-3);
     padding: var(--s-1) var(--s-2);
-    background: var(--color-accent-text);
+    background: var(--color-accent-fill);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-wide);
     color: var(--color-on-accent);
   }
 
@@ -749,23 +513,22 @@ const articleLd = articleJsonLd({
   }
 
   .watch-title {
-    font-family: var(--font-text);
     font-size: var(--t-body);
-    font-weight: 500;
+    line-height: var(--lh-snug);
     color: var(--color-text);
+    font-variation-settings: 'wdth' 92, 'wght' 640;
     margin: 0;
   }
 
   .watch-channel {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
     margin: 0;
   }
 
   .watch-why {
-    font-family: var(--font-text);
-    font-size: var(--t-note); /* sans floor is 12px */
+    font-size: var(--t-data);
     line-height: var(--lh-snug);
     color: var(--color-text-body);
     margin: 0;

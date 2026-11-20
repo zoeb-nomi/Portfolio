@@ -1,9 +1,15 @@
 ---
-// Compact in-page narration player. Progressive enhancement, same pattern
-// as the §9 watch-card script: the markup starts as a working native
-// <audio controls> element, and the inline script below swaps it for the
-// custom row once it runs, so a no-JS reader still gets a full player,
-// just the browser's own chrome instead of ours.
+// The narration player (kit: `.ap`). Progressive enhancement: the markup starts as a working native <audio controls>,
+// and the script swaps it for the player once it runs. The player is a red play/pause button, a red scrubber
+// (`role="slider"`; the arrow keys seek 10 s, Home and End jump), the time, a speed button (1, 1.25, 1.5) and, when the
+// piece has a .vtt file, a CC toggle that shows the caption for the current moment (read from that file).
+//
+// Read-along, when the data file has cues: each cue is a `data-narr` anchor on the page. The paragraph being read
+// is marked (`.is-reading`), the page follows it until the reader scrolls, a click on a paragraph plays from it, and
+// a bottom bar keeps play, time and Follow in reach once the player has scrolled away. The cues are exactly what
+// `npm run audio:check` verifies against the page, so the anchors and their text must not drift.
+import { pipelineWriting } from '../data/copy';
+
 interface Chapter {
   id: string;
   title: string;
@@ -18,6 +24,8 @@ interface AudioData {
   duration: number;
   label: string;
   note: string;
+  /** Path of the .vtt captions file. */
+  captions?: string;
   chapters?: Chapter[];
   cues?: Cue[];
 }
@@ -28,1147 +36,948 @@ interface Props {
 }
 
 const { audio, articleId } = Astro.props;
+const ui = pipelineWriting.player;
 
 function formatTime(totalSeconds: number): string {
   const s = Math.max(0, Math.round(totalSeconds));
-  const m = Math.floor(s / 60);
-  const rem = s % 60;
-  return `${m}:${rem.toString().padStart(2, '0')}`;
+  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 }
 
-const totalLabel = audio.duration > 0 ? formatTime(audio.duration) : '–:––';
-const minutesLabel = audio.duration > 0 ? `${Math.max(1, Math.floor(audio.duration / 60))} min` : '';
-const captionText = minutesLabel ? `${audio.label} · ${minutesLabel}` : audio.label;
+const totalLabel = audio.duration > 0 ? formatTime(audio.duration) : '\u2013:\u2013\u2013';
+const minutes = audio.duration > 0 ? `${Math.max(1, Math.floor(audio.duration / 60))} ${ui.minutes}` : '';
+const topLabel = minutes ? `${audio.label} · ${minutes}` : audio.label;
 const storageKey = `audio:${articleId}`;
 const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues) : '';
+const uiJson = JSON.stringify({
+  play: ui.play,
+  pause: ui.pause,
+  speed: ui.speed,
+  loading: ui.loading,
+  failed: ui.failed,
+  cannotPlay: ui.cannotPlay,
+  resumes: ui.resumes,
+  playFromHere: ui.playFromHere,
+  label: audio.label,
+});
 ---
 
-<div
-  class="audio-player"
+<section
+  class="ap"
   id="listen"
+  data-ap
   data-audio-player
   data-storage-key={storageKey}
-  data-article={articleId}
+  data-article-id={articleId}
   data-duration={audio.duration}
   data-cues={cuesJson}
+  data-ui={uiJson}
+  aria-label={audio.label}
 >
-  <audio class="audio-el" data-audio-el preload="metadata" controls aria-label={audio.label}>
+  <audio class="ap-el" data-audio-el preload="metadata" controls aria-label={audio.label}>
     <source src={audio.src} type="audio/mpeg" />
+    {audio.captions && <track kind="captions" srclang="en" label={ui.captionTrack} src={audio.captions} />}
   </audio>
 
-  {/* No-JS readers get the native player; keep the synthetic-voice disclosure for them too. */}
-  <noscript><p class="audio-note">{audio.note}</p></noscript>
+  {/* No-JS readers get the browser's own player; keep the synthetic-voice disclosure and the captions file for them too. */}
+  <noscript>
+    <p class="ap-note">
+      {audio.note}
+      {audio.captions && <a href={audio.captions} download>{ui.captions}</a>}
+    </p>
+  </noscript>
 
-  <div class="audio-enhanced" data-audio-enhanced hidden>
-    <p class="audio-caption">{captionText}</p>
-
-    <div class="audio-row">
-      <button type="button" class="audio-play" data-audio-play aria-label={`Play: ${audio.label}`}>
-        <svg class="audio-icon audio-icon-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M4 2.5v11l10-5.5z" fill="currentColor" />
-        </svg>
-        <svg class="audio-icon audio-icon-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style="display:none">
-          <rect x="3.5" y="2.5" width="3" height="11" fill="currentColor" />
-          <rect x="9.5" y="2.5" width="3" height="11" fill="currentColor" />
-        </svg>
-      </button>
-
-      <div class="audio-track-wrap">
-        <div
-          class="audio-track"
-          data-audio-track
-          role="slider"
-          tabindex="0"
-          aria-label="Seek"
-          aria-valuemin="0"
-          aria-valuemax={audio.duration}
-          aria-valuenow="0"
-          aria-valuetext={`0:00 of ${totalLabel}`}
-        >
-          <span class="audio-track-fill" data-audio-fill></span>
-          <span class="audio-track-thumb" data-audio-thumb></span>
-        </div>
-        <p class="audio-time tabular" data-audio-time>
-          <span data-audio-current>0:00</span> / {totalLabel}
-          <span class="audio-resume-tag" data-audio-resume-tag hidden>· resumes at 0:00</span>
-        </p>
-      </div>
-
-      <button type="button" class="audio-speed" data-audio-speed aria-label="Playback speed: 1×. Tap to change.">1×</button>
-    </div>
-
-    <p class="audio-status" data-audio-status role="status" aria-live="polite"></p>
-
-    <p class="audio-note">{audio.note}</p>
-
-    {audio.chapters && audio.chapters.length > 0 && (
-      <ul class="audio-chapters" data-audio-chapters aria-label="Chapters">
-        {audio.chapters.map((c) => (
-          <li>
-            <button
-              type="button"
-              class="audio-chip"
-              data-audio-chapter
-              data-start={c.start}
-              data-chapter-id={c.id}
-            >
-              {c.title}
-            </button>
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-
-  <div class="audio-float" data-audio-float hidden>
-    <button type="button" class="audio-float-play" data-audio-float-play aria-label="Play">
-      <svg class="audio-icon audio-icon-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M4 2.5v11l10-5.5z" fill="currentColor" />
-      </svg>
-      <svg class="audio-icon audio-icon-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style="display:none">
-        <rect x="3.5" y="2.5" width="3" height="11" fill="currentColor" />
-        <rect x="9.5" y="2.5" width="3" height="11" fill="currentColor" />
-      </svg>
+  <div class="ap-ui" data-audio-enhanced hidden>
+    <button type="button" class="ap-play" data-audio-play aria-label={ui.play}>
+      <svg class="pl" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2.5v11l9-5.5z" fill="currentColor"></path></svg>
+      <svg class="pa" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"></path></svg>
     </button>
-    <span class="audio-float-time tabular" data-audio-float-time>0:00</span>
-    <div class="audio-float-actions">
-      <button type="button" class="audio-float-follow" data-audio-float-follow aria-pressed="true">
-        <span class="audio-float-dot" aria-hidden="true"></span>Follow
-      </button>
-      <button type="button" class="audio-float-up" data-audio-float-up aria-label="Back to player" title="Back to player">↑<span class="audio-float-up-label"> Player</span></button>
-      <button type="button" class="audio-float-close" data-audio-float-close aria-label="Hide these controls until I press play again" title="Hide">×</button>
+    <div class="ap-main">
+      <div class="ap-top">
+        <span class="lab">{topLabel}</span>
+        <span class="ap-time tnum" data-audio-time>
+          <b class="ap-cur" data-audio-current>0:00</b> / <span class="ap-dur">{totalLabel}</span>
+          <span class="ap-resume" data-audio-resume-tag hidden></span>
+        </span>
+      </div>
+      <div
+        class="ap-bar"
+        data-audio-track
+        role="slider"
+        tabindex="0"
+        aria-label="Seek"
+        aria-valuemin="0"
+        aria-valuemax={Math.round(audio.duration)}
+        aria-valuenow="0"
+        aria-valuetext={`0:00 of ${totalLabel}`}
+      >
+        <div class="ap-rail"><i class="ap-buf"></i><i class="ap-fill" data-audio-fill></i><i class="ap-knob" data-audio-thumb></i></div>
+      </div>
+      <div class="ap-foot">
+        <span>{audio.note}</span>
+        {audio.captions && <a href={audio.captions} download>{ui.captions}</a>}
+        {audio.captions && <button type="button" class="ap-cc" data-audio-cc aria-pressed="false" hidden>CC</button>}
+        <button type="button" class="ap-rate" data-audio-speed aria-label={`${ui.speed} 1×`}>1×</button>
+      </div>
+      {audio.captions && <p class="ap-capline" data-audio-capline hidden></p>}
+      <p class="ap-status" data-audio-status role="status" aria-live="polite"></p>
     </div>
   </div>
-</div>
+
+  <div class="ap-float" data-audio-float hidden>
+    <div class="ap-float-in">
+      <button type="button" class="ap-play ap-play--s" data-audio-float-play aria-label={ui.play}>
+        <svg class="pl" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2.5v11l9-5.5z" fill="currentColor"></path></svg>
+        <svg class="pa" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"></path></svg>
+      </button>
+      <span class="ap-float-time tnum" data-audio-float-time>0:00</span>
+      <button type="button" class="ap-fbtn" data-audio-float-follow aria-pressed="true">{ui.follow}</button>
+      <button type="button" class="ap-fbtn" data-audio-float-up aria-label={ui.toPlayerLabel}>↑ {ui.toPlayer}</button>
+      <button type="button" class="ap-fbtn ap-fclose" data-audio-float-close aria-label={ui.hide} title={ui.hide}>×</button>
+    </div>
+  </div>
+</section>
 
 <script is:inline>
   (function () {
-    function formatTime(totalSeconds) {
-      const s = Math.max(0, Math.round(totalSeconds || 0));
-      const m = Math.floor(s / 60);
-      const rem = s % 60;
-      return `${m}:${rem < 10 ? '0' : ''}${rem}`;
-    }
+    var fmt = function (s) {
+      s = Math.max(0, Math.round(s || 0));
+      return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+    };
+    var track_ = function (name, data) {
+      try {
+        window.umami && window.umami.track(name, data);
+      } catch (e) {}
+    };
 
-    for (const root of document.querySelectorAll('[data-audio-player]')) {
-      const audioEl = root.querySelector('[data-audio-el]');
-      const enhanced = root.querySelector('[data-audio-enhanced]');
-      if (!audioEl || !enhanced) continue;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-audio-player]'), function (root) {
+      var a = root.querySelector('[data-audio-el]');
+      var enhanced = root.querySelector('[data-audio-enhanced]');
+      if (!a || !enhanced) return;
+      var UI = {};
+      try {
+        UI = JSON.parse(root.dataset.ui || '{}');
+      } catch (e) {}
+      var key = root.dataset.storageKey || 'audio:article';
+      var articleId = root.dataset.articleId || '';
+      var declared = parseFloat(root.dataset.duration || '0') || 0;
+      var btn = root.querySelector('[data-audio-play]');
+      var bar = root.querySelector('[data-audio-track]');
+      var fill = root.querySelector('[data-audio-fill]');
+      var knob = root.querySelector('[data-audio-thumb]');
+      var cur = root.querySelector('[data-audio-current]');
+      var resumeTag = root.querySelector('[data-audio-resume-tag]');
+      var rate = root.querySelector('[data-audio-speed]');
+      var statusEl = root.querySelector('[data-audio-status]');
+      var ccBtn = root.querySelector('[data-audio-cc]');
+      var capLine = root.querySelector('[data-audio-capline]');
+      var setStatus = function (m) {
+        if (statusEl) statusEl.textContent = m;
+      };
 
-      const storageKey = root.dataset.storageKey || 'audio:article';
-      const articleId = root.dataset.article || '';
-      const declaredDuration = parseFloat(root.dataset.duration || '0') || 0;
-
-      const playButton = root.querySelector('[data-audio-play]');
-      const iconPlay = root.querySelector('.audio-icon-play');
-      const iconPause = root.querySelector('.audio-icon-pause');
-      const track = root.querySelector('[data-audio-track]');
-      const fill = root.querySelector('[data-audio-fill]');
-      const thumb = root.querySelector('[data-audio-thumb]');
-      const currentEl = root.querySelector('[data-audio-current]');
-      const resumeTag = root.querySelector('[data-audio-resume-tag]');
-      const speedButton = root.querySelector('[data-audio-speed]');
-      const chapterButtons = Array.from(root.querySelectorAll('[data-audio-chapter]'));
-
-      const statusEl = root.querySelector('[data-audio-status]');
-      function setStatus(msg) {
-        if (statusEl) statusEl.textContent = msg;
-      }
-
-      // One name for the play button in every state: "Play: <title>" / "Pause: <title>".
-      const baseName = (playButton.getAttribute('aria-label') || 'Play').replace(/^Play:?\s*/, '');
-      const labelFor = (verb) => (baseName ? `${verb}: ${baseName}` : verb);
-
-      function tryPlay() {
-        audioEl.play().catch((e) => {
-          // AbortError (a new load interrupted it) and NotAllowedError (no user gesture) are not failures.
-          if (e && e.name !== 'AbortError' && e.name !== 'NotAllowedError') setStatus('This audio could not be played.');
-        });
-      }
-
-      // Swap native controls for the custom row now that JS is running.
-      audioEl.removeAttribute('controls');
-      audioEl.classList.add('audio-el--hidden');
+      // Native controls give way to the player now that JS is running.
+      a.removeAttribute('controls');
+      a.hidden = true;
       enhanced.hidden = false;
 
-      const speeds = [1, 1.25, 1.5];
-      let speedIndex = 0;
-
-      const firedProgress = { 25: false, 50: false, 75: false };
-      let firedPlay = false;
-      let firedComplete = false;
-
-      // SVG elements don't support the HTML `hidden` attribute/IDL property
-      // (it's defined on HTMLElement only, and Astro's SVGAttributes type
-      // rejects it), so the play/pause icon swap toggles inline display. The
-      // pause icons ship with style="display:none" as their initial state.
-      function setHidden(el, isHidden) {
-        el.style.display = isHidden ? 'none' : '';
-      }
-
-      function track_(name, data) {
+      var total = function () {
+        return isFinite(a.duration) && a.duration > 0 ? a.duration : declared;
+      };
+      var paint = function (t) {
+        var T = total();
+        var p = T ? Math.min(1, Math.max(0, t / T)) : 0;
+        fill.style.width = (p * 100).toFixed(3) + '%';
+        knob.style.left = (p * 100).toFixed(3) + '%';
+        cur.textContent = fmt(t);
+        bar.setAttribute('aria-valuenow', Math.round(t));
+        bar.setAttribute('aria-valuemax', Math.round(T));
+        bar.setAttribute('aria-valuetext', fmt(t) + ' of ' + fmt(T));
+      };
+      var setT = function (t) {
+        var T = total();
+        t = Math.max(0, Math.min(T || t, t));
         try {
-          window.umami?.track(name, data);
-        } catch {}
-      }
+          a.currentTime = t;
+        } catch (e) {}
+        paint(t);
+      };
+      var tryPlay = function () {
+        var p = a.play();
+        if (p && p.catch)
+          p.catch(function (e) {
+            if (e && e.name !== 'AbortError' && e.name !== 'NotAllowedError') setStatus(UI.cannotPlay || '');
+          });
+      };
 
-      function readStoredTime() {
+      // Resume where the reader left off (a few seconds in, not at the very end).
+      var stored = function () {
         try {
-          const raw = window.localStorage.getItem(storageKey);
-          const v = raw ? parseFloat(raw) : NaN;
-          return Number.isFinite(v) ? v : 0;
-        } catch {
+          var v = parseFloat(window.localStorage.getItem(key));
+          return isFinite(v) ? v : 0;
+        } catch (e) {
           return 0;
         }
-      }
-
-      function storeTime(t) {
+      };
+      var store = function (t) {
         try {
-          window.localStorage.setItem(storageKey, String(t));
-        } catch {}
-      }
-
-      function clearStoredTime() {
+          window.localStorage.setItem(key, String(t));
+        } catch (e) {}
+      };
+      var unstore = function () {
         try {
-          window.localStorage.removeItem(storageKey);
-        } catch {}
-      }
+          window.localStorage.removeItem(key);
+        } catch (e) {}
+      };
 
-      function duration() {
-        return Number.isFinite(audioEl.duration) && audioEl.duration > 0 ? audioEl.duration : declaredDuration;
-      }
+      var fired = { 25: false, 50: false, 75: false, play: false, done: false };
 
-      let lastActiveChapterId = null;
-
-      function updateChapterState(current) {
-        let activeId = null;
-        for (const btn of chapterButtons) {
-          const start = parseFloat(btn.dataset.start || '0');
-          if (current >= start) activeId = btn.dataset.chapterId;
-        }
-        for (const btn of chapterButtons) {
-          const isActive = btn.dataset.chapterId === activeId;
-          btn.setAttribute('aria-current', isActive ? 'true' : 'false');
-        }
-        if (activeId !== null && activeId !== lastActiveChapterId) {
-          lastActiveChapterId = activeId;
-          const activeBtn = chapterButtons.find((b) => b.dataset.chapterId === activeId);
-          const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          // Centre the chip inside its own scrolling rail. scrollIntoView would also scroll the
-          // PAGE back up to the rail whenever the chapter changed while the reader was elsewhere.
-          const rail = activeBtn ? activeBtn.closest('[data-audio-chapters]') : null;
-          if (rail && activeBtn) {
-            const rr = rail.getBoundingClientRect();
-            const br = activeBtn.getBoundingClientRect();
-            rail.scrollTo({ left: rail.scrollLeft + (br.left - rr.left) - (rr.width - br.width) / 2, behavior: reduced ? 'auto' : 'smooth' });
-          }
-        }
-      }
-
-      function updateUI(current) {
-        const dur = duration();
-        const ratio = dur > 0 ? Math.min(1, Math.max(0, current / dur)) : 0;
-        fill.style.width = `${ratio * 100}%`;
-        thumb.style.left = `${ratio * 100}%`;
-        track.setAttribute('aria-valuenow', String(Math.round(current)));
-        track.setAttribute('aria-valuemax', String(Math.round(dur)));
-        track.setAttribute('aria-valuetext', `${formatTime(current)} of ${formatTime(dur)}`);
-        currentEl.textContent = formatTime(current);
-        updateChapterState(current);
-      }
-
-      function seekTo(t) {
-        const dur = duration();
-        const clamped = Math.min(Math.max(0, t), dur || t);
-        audioEl.currentTime = clamped;
-        updateUI(clamped);
-      }
-
-      // Resume position, once metadata (and so a real duration) is known.
-      audioEl.addEventListener('loadedmetadata', () => {
-        const saved = readStoredTime();
-        const dur = duration();
-        if (saved > 5 && dur > 0 && saved < dur - 5) {
-          audioEl.currentTime = saved;
-          updateUI(saved);
+      a.addEventListener('loadedmetadata', function () {
+        var saved = stored();
+        var T = total();
+        if (saved > 5 && T > 0 && saved < T - 5) {
+          a.currentTime = saved;
+          paint(saved);
           if (resumeTag) {
-            resumeTag.textContent = `· resumes at ${formatTime(saved)}`;
+            resumeTag.textContent = '· ' + (UI.resumes || 'resumes at') + ' ' + fmt(saved);
             resumeTag.hidden = false;
           }
-        } else {
-          updateUI(0);
-        }
+        } else paint(0);
       });
-
-      playButton.addEventListener('click', () => {
-        if (audioEl.paused) {
-          tryPlay();
-        } else {
-          audioEl.pause();
-        }
+      a.addEventListener('progress', function () {
+        try {
+          var b = root.querySelector('.ap-buf');
+          if (a.buffered.length && b) b.style.width = ((a.buffered.end(a.buffered.length - 1) / total()) * 100).toFixed(2) + '%';
+        } catch (e) {}
       });
-
-      // A missing or blocked file must not look like a dead button.
-      audioEl.addEventListener('waiting', () => setStatus('Loading audio…'));
-      audioEl.addEventListener('playing', () => setStatus(''));
-      audioEl.addEventListener('canplay', () => setStatus(''));
-      audioEl.addEventListener('error', () => {
-        setStatus('This audio could not be loaded. Please try again later.');
-        playButton.disabled = true;
+      a.addEventListener('waiting', function () {
+        setStatus(UI.loading || '');
+      });
+      a.addEventListener('playing', function () {
+        setStatus('');
+      });
+      a.addEventListener('canplay', function () {
+        setStatus('');
+      });
+      a.addEventListener('error', function () {
+        setStatus(UI.failed || '');
+        btn.disabled = true;
         root.dataset.state = 'error';
       });
-
-      audioEl.addEventListener('play', () => {
-        setHidden(iconPlay, true);
-        setHidden(iconPause, false);
-        playButton.setAttribute('aria-label', labelFor('Pause'));
+      a.addEventListener('play', function () {
+        root.classList.add('is-playing');
+        btn.setAttribute('aria-label', UI.pause || 'Pause');
         if (resumeTag) resumeTag.hidden = true;
-        if (!firedPlay) {
-          firedPlay = true;
+        if (!fired.play) {
+          fired.play = true;
           track_('audio-play', { article: articleId });
         }
       });
-
-      audioEl.addEventListener('pause', () => {
-        setHidden(iconPlay, false);
-        setHidden(iconPause, true);
-        playButton.setAttribute('aria-label', labelFor('Play'));
+      a.addEventListener('pause', function () {
+        root.classList.remove('is-playing');
+        btn.setAttribute('aria-label', UI.play || 'Play');
       });
-
-      audioEl.addEventListener('timeupdate', () => {
-        const current = audioEl.currentTime;
-        updateUI(current);
-        storeTime(current);
-
-        const dur = duration();
-        if (dur > 0) {
-          const pct = (current / dur) * 100;
-          for (const mark of [25, 50, 75]) {
-            if (!firedProgress[mark] && pct >= mark) {
-              firedProgress[mark] = true;
-              track_('audio-progress', { article: articleId, percent: mark });
+      a.addEventListener('timeupdate', function () {
+        var t = a.currentTime;
+        if (!seeking) paint(t);
+        store(t);
+        var T = total();
+        if (T > 0) {
+          var pct = (t / T) * 100;
+          [25, 50, 75].forEach(function (m) {
+            if (!fired[m] && pct >= m) {
+              fired[m] = true;
+              track_('audio-progress', { article: articleId, percent: m });
             }
-          }
-          if (!firedComplete && pct >= 98) {
-            firedComplete = true;
+          });
+          if (!fired.done && pct >= 98) {
+            fired.done = true;
             track_('audio-complete', { article: articleId });
           }
         }
+        caption(t);
       });
-
-      audioEl.addEventListener('ended', () => {
-        if (!firedComplete) {
-          firedComplete = true;
+      a.addEventListener('ended', function () {
+        root.classList.remove('is-playing');
+        btn.setAttribute('aria-label', UI.play || 'Play');
+        if (!fired.done) {
+          fired.done = true;
           track_('audio-complete', { article: articleId });
         }
-        clearStoredTime();
-        updateUI(0);
-        audioEl.currentTime = 0;
+        unstore();
+        a.currentTime = 0;
+        paint(0);
+      });
+      btn.addEventListener('click', function () {
+        if (a.paused) tryPlay();
+        else a.pause();
       });
 
-      // Track: click/drag to seek.
-      let dragging = false;
-
-      function ratioFromEvent(evt) {
-        const rect = track.getBoundingClientRect();
-        const x = Math.min(Math.max(evt.clientX - rect.left, 0), rect.width);
-        return rect.width > 0 ? x / rect.width : 0;
-      }
-
-      track.addEventListener('pointerdown', (evt) => {
-        dragging = true;
-        track.setPointerCapture(evt.pointerId);
-        seekTo(ratioFromEvent(evt) * duration());
-      });
-
-      track.addEventListener('pointermove', (evt) => {
-        if (!dragging) return;
-        seekTo(ratioFromEvent(evt) * duration());
-      });
-
-      const stopDrag = (evt) => {
-        if (!dragging) return;
-        dragging = false;
-        try {
-          track.releasePointerCapture(evt.pointerId);
-        } catch {}
+      // The scrubber: pointer (click and drag) and keyboard.
+      var seeking = false;
+      var at = function (e) {
+        var r = bar.getBoundingClientRect();
+        return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * total();
       };
-      track.addEventListener('pointerup', stopDrag);
-      track.addEventListener('pointercancel', stopDrag);
-
-      track.addEventListener('keydown', (evt) => {
-        const dur = duration();
-        if (evt.key === 'ArrowRight' || evt.key === 'ArrowUp') {
-          evt.preventDefault();
-          seekTo(Math.min(dur, audioEl.currentTime + 5));
-        } else if (evt.key === 'ArrowLeft' || evt.key === 'ArrowDown') {
-          evt.preventDefault();
-          seekTo(Math.max(0, audioEl.currentTime - 5));
-        } else if (evt.key === 'Home') {
-          evt.preventDefault();
-          seekTo(0);
-        } else if (evt.key === 'End') {
-          evt.preventDefault();
-          seekTo(dur);
+      bar.addEventListener('pointerdown', function (e) {
+        seeking = true;
+        root.classList.add('is-seeking');
+        if (bar.setPointerCapture) bar.setPointerCapture(e.pointerId);
+        paint(at(e));
+      });
+      bar.addEventListener('pointermove', function (e) {
+        if (seeking) paint(at(e));
+      });
+      bar.addEventListener('pointerup', function (e) {
+        if (!seeking) return;
+        seeking = false;
+        root.classList.remove('is-seeking');
+        setT(at(e));
+      });
+      bar.addEventListener('pointercancel', function () {
+        seeking = false;
+        root.classList.remove('is-seeking');
+      });
+      bar.addEventListener('keydown', function (e) {
+        var k = e.key;
+        var t = a.currentTime;
+        if (k === 'ArrowRight' || k === 'ArrowUp') {
+          e.preventDefault();
+          setT(t + 10);
+        } else if (k === 'ArrowLeft' || k === 'ArrowDown') {
+          e.preventDefault();
+          setT(t - 10);
+        } else if (k === 'Home') {
+          e.preventDefault();
+          setT(0);
+        } else if (k === 'End') {
+          e.preventDefault();
+          setT(total());
+        } else if (k === ' ' || k === 'Enter') {
+          e.preventDefault();
+          btn.click();
         }
       });
 
-      // Speed cycle: 1x -> 1.25x -> 1.5x -> 1x.
-      speedButton.addEventListener('click', () => {
-        speedIndex = (speedIndex + 1) % speeds.length;
-        const rate = speeds[speedIndex];
-        audioEl.playbackRate = rate;
-        const label = `${rate}×`;
-        speedButton.textContent = label;
-        speedButton.setAttribute('aria-label', `Playback speed: ${label}`);
-        track_('audio-speed', { article: articleId, rate });
+      // Speed: 1, 1.25, 1.5, then round.
+      var rates = [1, 1.25, 1.5];
+      var ri = 0;
+      rate.addEventListener('click', function () {
+        ri = (ri + 1) % rates.length;
+        a.playbackRate = rates[ri];
+        rate.textContent = rates[ri] + '×';
+        rate.setAttribute('aria-label', (UI.speed || 'Playback speed') + ' ' + rates[ri] + '×');
+        track_('audio-speed', { article: articleId, rate: rates[ri] });
       });
 
-      // Chapters: seek only, no autoplay, no page scroll.
-      for (const btn of chapterButtons) {
-        btn.addEventListener('click', () => {
-          const start = parseFloat(btn.dataset.start || '0');
-          seekTo(start);
-          track_('audio-chapter', { article: articleId, chapter: btn.dataset.chapterId || '' });
-        });
-      }
-
-      // ---------------------------------------------------------------
-      // Read-along: active-paragraph highlight, follow-scroll, click-to-
-      // seek, and the floating control that travels with the highlight
-      // once the main player scrolls out of view.
-      //
-      // This whole section is deferred to DOMContentLoaded: this script
-      // is inline (not `defer`/`module`), so it runs the instant the HTML
-      // parser reaches it, which is up in the masthead, well before the
-      // rest of the article (every §-section's [data-narr] anchor) has
-      // been parsed into the DOM. Querying for them here, synchronously,
-      // would only ever find the masthead's own two (title, dek).
-      // ---------------------------------------------------------------
-      function setupReadAlong() {
-      const cuesRaw = root.dataset.cues || '';
-      let cues = [];
-      try {
-        cues = cuesRaw ? JSON.parse(cuesRaw) : [];
-      } catch {
-        cues = [];
-      }
-      if (cues.length === 0) return;
-
-      const floatEl = root.querySelector('[data-audio-float]');
-      const floatPlayButton = root.querySelector('[data-audio-float-play]');
-      const floatIconPlay = floatPlayButton ? floatPlayButton.querySelector('.audio-icon-play') : null;
-      const floatIconPause = floatPlayButton ? floatPlayButton.querySelector('.audio-icon-pause') : null;
-      const floatTimeEl = root.querySelector('[data-audio-float-time]');
-      const floatFollowButton = root.querySelector('[data-audio-float-follow]');
-      const floatUpButton = root.querySelector('[data-audio-float-up]');
-
-      // One player per page in practice, so a document-wide id lookup for
-      // narrated anchors is safe.
-      const narrEls = new Map();
-      if (cues.length > 0) {
-        for (const el of document.querySelectorAll('[data-narr]')) {
-          const id = el.dataset.narr;
-          if (id) narrEls.set(id, el);
-        }
-      }
-
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const desktopQuery = window.matchMedia('(min-width: 900px)');
-
-      let activeCueId = null;
-      let activeEl = null;
-      let highlightStarted = false; // resume never highlights until real playback starts
-      let followMode = true;
-      let playerInView = true;
-      let floatDismissed = false; // the reader closed the controls; they return on the next play
-      let nearEnd = false; // the CTA slab or footer is on screen: nothing should cover it
-      let lastCueCheck = 0;
-      let lastSeekAt = 0;
-      let programmaticScrollUntil = 0;
-
-      // Cues are start-ordered and non-overlapping; the active one is the
-      // last whose start has been reached, so a short silent gap between
-      // paragraphs keeps the previous highlight instead of flickering off.
-      function findActiveCue(t) {
-        let result = null;
-        for (const c of cues) {
-          if (c[1] <= t) result = c;
-          else break;
-        }
-        return result;
-      }
-
-      function updateFollowButton() {
-        if (floatFollowButton) floatFollowButton.setAttribute('aria-pressed', followMode ? 'true' : 'false');
-      }
-
-      function scrollToActive(el) {
-        if (!followMode || !el) return;
-        const rect = el.getBoundingClientRect();
-        const targetY = window.innerHeight * 0.35;
-        const delta = rect.top - targetY;
-        if (Math.abs(delta) < 4) return;
-        // Mark this scroll as ours so the generic scroll listener below
-        // doesn't mistake it for reader-initiated scrolling and switch
-        // Follow off. Smooth scrolling can take a few hundred ms to
-        // settle, so the window is generous.
-        programmaticScrollUntil = performance.now() + 900;
-        window.scrollBy({ top: delta, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-      }
-
-      function isMidway() {
-        const dur = duration();
-        const t = audioEl.currentTime;
-        return t > 0.5 && (dur <= 0 || t < dur - 0.5);
-      }
-
-      function rectsIntersect(a, b) {
-        return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
-      }
-
-      function positionFloatDesktop() {
-        if (!floatEl) return;
-        floatEl.classList.remove('audio-float--bar-fallback');
-        const referenceEl = activeEl || root;
-        const container = referenceEl.closest('.section-inner, .masthead-inner');
-        const marginCol = container ? container.querySelector(':scope > .margin-col') : null;
-        const elRect = referenceEl.getBoundingClientRect();
-        const floatH = floatEl.offsetHeight || 150;
-        const floatW = floatEl.offsetWidth || 220;
-        const header = document.querySelector('.site-header');
-        const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
-        const minTop = headerBottom + 12;
-        const maxTop = window.innerHeight - floatH - 12;
-
-        // Section headings live in the margin column, the same column the float sits in.
-        // Park the float just below the heading it is following instead of on top of it.
-        const inMarginCol = !!(activeEl && activeEl.closest('.margin-col'));
-        let top = inMarginCol ? elRect.bottom + 12 : elRect.top;
-        top = Math.max(top, minTop);
-        top = Math.min(top, maxTop);
-
-        // Right-aligned to the margin column's inner edge (~20px gap before
-        // the text column starts), not spanning its width, a compact
-        // cluster, not a box.
-        let right = 20;
-        if (marginCol) {
-          const mcRect = marginCol.getBoundingClientRect();
-          right = Math.max(8, Math.round(window.innerWidth - (mcRect.right - 20)));
-        }
-
-        // The float must never sit on top of a margin note, disclaimer or
-        // caption living in the same margin column: try above the note,
-        // then below it, and only fall back to the fixed bottom-bar style
-        // (for this cue only: re-decided every time the highlight moves)
-        // if neither clear spot fits in the viewport.
-        if (marginCol) {
-          // Every section's margin column sits at the same x, so a heading or note from a neighbouring
-          // section can be under the float too (the reader scrolled away from the active paragraph).
-          // Check them all, not just the active section's.
-          const noteEls = Array.from(document.querySelectorAll('.margin-col .margin-note, .margin-col figcaption, .margin-col .mark-label'));
-          const floatLeft = window.innerWidth - right - floatW;
-          const rectAt = (t) => ({ top: t, bottom: t + floatH, left: floatLeft, right: floatLeft + floatW });
-          const collidesAt = (t) => noteEls.some((n) => rectsIntersect(rectAt(t), n.getBoundingClientRect()));
-          const collided = noteEls.find((n) => rectsIntersect(rectAt(top), n.getBoundingClientRect()));
-          if (collided) {
-            const noteRect = collided.getBoundingClientRect();
-            const above = noteRect.top - floatH - 12;
-            const below = noteRect.bottom + 12;
-            // A heading is followed, so park below it first; a note is parked above first.
-            const spots = collided.matches('.mark-label') ? [below, above] : [above, below];
-            const spot = spots.find((t) => t >= minTop && t <= maxTop && !collidesAt(t));
-            if (spot !== undefined) {
-              top = spot;
-            } else {
-              floatEl.classList.add('audio-float--bar-fallback');
-              floatEl.style.top = '';
-              floatEl.style.right = '';
-              return;
-            }
-          }
-        }
-
-        if (inMarginCol) {
-          // Near the bottom of the viewport there may be no room below the heading: use the bar.
-          const floatLeft = window.innerWidth - right - floatW;
-          const r = { top, bottom: top + floatH, left: floatLeft, right: floatLeft + floatW };
-          if (rectsIntersect(r, elRect)) {
-            floatEl.classList.add('audio-float--bar-fallback');
-            floatEl.style.top = '';
-            floatEl.style.right = '';
-            return;
-          }
-        }
-
-        floatEl.style.top = `${Math.round(top)}px`;
-        floatEl.style.right = `${right}px`;
-      }
-
-      function positionFloat() {
-        if (!floatEl || floatEl.hidden) return;
-        if (desktopQuery.matches) {
-          positionFloatDesktop();
-        } else {
-          // Mobile is a plain fixed bottom bar (CSS only): clear any
-          // inline top/right (and the desktop collision fallback) left
-          // over from a desktop-width position.
-          floatEl.classList.remove('audio-float--bar-fallback');
-          floatEl.style.top = '';
-          floatEl.style.right = '';
-        }
-      }
-
-      function updateFloatVisibility() {
-        if (!floatEl || cues.length === 0) return;
-        const active = !audioEl.paused || isMidway();
-        // Keyboard focus currently inside the float (e.g. Tab landed on
-        // Follow or ↑ Player) keeps it visible even if the player has just
-        // scrolled into view: otherwise it can disappear out from under
-        // focus mid-Tab and flicker back.
-        const focusInFloat = document.activeElement instanceof Node && floatEl.contains(document.activeElement);
-        const shouldShow = !floatDismissed && !nearEnd && (focusInFloat || (active && !playerInView));
-        if (shouldShow === !floatEl.hidden) {
-          if (shouldShow) positionFloat();
-          return;
-        }
-        floatEl.hidden = !shouldShow;
-        if (shouldShow) positionFloat();
-      }
-
-      function setHighlight(cue) {
-        if (!cue) return;
-        const id = cue[0];
-        if (id === activeCueId) return;
-        if (activeEl) activeEl.classList.remove('is-reading');
-        const el = narrEls.get(id) || null;
-        activeCueId = id;
-        activeEl = el;
-        if (activeEl) {
-          activeEl.classList.add('is-reading');
-          scrollToActive(activeEl);
-        }
-        positionFloat();
-      }
-
-      if (floatEl && cues.length > 0) {
-        const io = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) playerInView = entry.isIntersecting;
-            updateFloatVisibility();
-          },
-          { threshold: 0 }
-        );
-        io.observe(root);
-
-        // Tab landing on/leaving a float control changes whether it
-        // should stay visible; re-check immediately rather than waiting
-        // for the next scroll/timeupdate tick.
-        const endEls = Array.from(document.querySelectorAll('.cta-slab, .site-footer'));
-        if (endEls.length) {
-          const seen = new Map();
-          const eio = new IntersectionObserver((entries) => {
-            for (const en of entries) seen.set(en.target, en.isIntersecting);
-            nearEnd = Array.from(seen.values()).some(Boolean);
-            updateFloatVisibility();
+      // Captions: the .vtt file, parsed once, shown as one line for the current moment.
+      var vtt = null;
+      var ccOn = false;
+      var capIdx = -1;
+      var toSec = function (s) {
+        var p = s.trim().replace(',', '.').split(':').map(parseFloat);
+        return p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p[0] * 60 + p[1];
+      };
+      var parseVtt = function (txt) {
+        var out = [];
+        txt.replace(/\r/g, '').split(/\n\n+/).forEach(function (blk) {
+          var lines = blk.split('\n');
+          var i = lines.findIndex(function (l) {
+            return l.indexOf('-->') > -1;
           });
-          endEls.forEach((el) => eio.observe(el));
-        }
-        root.querySelector('[data-audio-float-close]')?.addEventListener('click', () => {
-          floatDismissed = true;
-          updateFloatVisibility();
+          if (i < 0) return;
+          var m = lines[i].split('-->');
+          out.push([toSec(m[0]), toSec(m[1].split(' ')[0] || m[1]), lines.slice(i + 1).join(' ')]);
         });
-        audioEl.addEventListener('play', () => {
-          floatDismissed = false;
-          updateFloatVisibility();
+        return out;
+      };
+      var caption = function (t) {
+        if (!ccOn || !vtt || !capLine) return;
+        var idx = -1;
+        for (var i = 0; i < vtt.length; i++) if (vtt[i][0] <= t && t < vtt[i][1]) idx = i;
+        if (idx === capIdx) return;
+        capIdx = idx;
+        capLine.textContent = idx < 0 ? '' : vtt[idx][2];
+      };
+      if (ccBtn && root.querySelector('track')) {
+        ccBtn.hidden = false;
+        ccBtn.addEventListener('click', function () {
+          ccOn = !ccOn;
+          ccBtn.setAttribute('aria-pressed', ccOn ? 'true' : 'false');
+          capLine.hidden = !ccOn;
+          capIdx = -1;
+          if (ccOn && !vtt) {
+            vtt = [];
+            fetch(root.querySelector('track').getAttribute('src'))
+              .then(function (r) {
+                return r.text();
+              })
+              .then(function (txt) {
+                vtt = parseVtt(txt);
+                caption(a.currentTime);
+              })
+              .catch(function () {
+                vtt = null;
+              });
+          } else caption(a.currentTime);
         });
+      }
 
-        floatEl.addEventListener('focusin', updateFloatVisibility);
-        floatEl.addEventListener('focusout', updateFloatVisibility);
+      // ---- Read-along. Deferred to DOMContentLoaded: this script runs in the head of the page, before the
+      // sections that hold the [data-narr] anchors have been parsed. ----
+      var setupReadAlong = function () {
+        var cues = [];
+        try {
+          cues = root.dataset.cues ? JSON.parse(root.dataset.cues) : [];
+        } catch (e) {}
+        if (!cues.length) return;
 
-        floatPlayButton?.addEventListener('click', () => {
-          if (audioEl.paused) tryPlay();
-          else audioEl.pause();
+        var floatEl = root.querySelector('[data-audio-float]');
+        var fPlay = root.querySelector('[data-audio-float-play]');
+        var fTime = root.querySelector('[data-audio-float-time]');
+        var fFollow = root.querySelector('[data-audio-float-follow]');
+        var narr = {};
+        Array.prototype.forEach.call(document.querySelectorAll('[data-narr]'), function (el) {
+          narr[el.dataset.narr] = el;
         });
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        floatFollowButton?.addEventListener('click', () => {
-          followMode = !followMode;
-          updateFollowButton();
-          if (followMode) scrollToActive(activeEl);
-        });
+        var activeId = null;
+        var activeEl = null;
+        var started = false;
+        var follow = true;
+        var playerInView = true;
+        var dismissed = false;
+        var nearEnd = false;
+        var lastCue = 0;
+        var lastSeekAt = 0;
+        var ownScrollUntil = 0;
 
-        floatUpButton?.addEventListener('click', () => {
-          root.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
-        });
-
-        // Any user scroll intent switches follow off, it never fights the
-        // reader. Keys/wheel/touch that originate inside the player or the
-        // float itself (seeking, the Follow toggle, arrow-key seek) don't
-        // count as "the reader wants to scroll".
-        const disableFollow = () => {
-          if (!followMode) return;
-          followMode = false;
-          updateFollowButton();
+        // The active cue is the last whose start has been reached, so a short silent gap keeps the highlight.
+        var findCue = function (t) {
+          var r = null;
+          for (var i = 0; i < cues.length; i++) {
+            if (cues[i][1] <= t) r = cues[i];
+            else break;
+          }
+          return r;
         };
-        window.addEventListener('wheel', disableFollow, { passive: true });
-        window.addEventListener('touchmove', disableFollow, { passive: true });
-        window.addEventListener('keydown', (evt) => {
-          const keys = ['PageUp', 'PageDown', ' ', 'ArrowUp', 'ArrowDown'];
-          if (!keys.includes(evt.key)) return;
-          const target = evt.target;
-          if (target instanceof Node && (root.contains(target) || floatEl.contains(target))) return;
-          disableFollow();
-        });
+        var syncFollow = function () {
+          if (fFollow) fFollow.setAttribute('aria-pressed', follow ? 'true' : 'false');
+        };
+        var scrollToActive = function (el) {
+          if (!follow || !el) return;
+          var delta = el.getBoundingClientRect().top - window.innerHeight * 0.35;
+          if (Math.abs(delta) < 4) return;
+          ownScrollUntil = performance.now() + 900;
+          window.scrollBy({ top: delta, behavior: reduced ? 'auto' : 'smooth' });
+        };
+        var midway = function () {
+          var T = total();
+          var t = a.currentTime;
+          return t > 0.5 && (T <= 0 || t < T - 0.5);
+        };
+        var floatVisibility = function () {
+          if (!floatEl) return;
+          var focusIn = document.activeElement instanceof Node && floatEl.contains(document.activeElement);
+          var show = !dismissed && !nearEnd && (focusIn || ((!a.paused || midway()) && !playerInView));
+          floatEl.hidden = !show;
+        };
+        var setHighlight = function (cue) {
+          if (!cue || cue[0] === activeId) return;
+          if (activeEl) activeEl.classList.remove('is-reading');
+          activeId = cue[0];
+          activeEl = narr[activeId] || null;
+          if (activeEl) {
+            activeEl.classList.add('is-reading');
+            scrollToActive(activeEl);
+          }
+        };
 
-        // Belt-and-braces: ANY scroll that isn't the one we just issued
-        // ourselves (scrollbar drag, keyboard scroll, another script)
-        // switches Follow off, same as wheel/touchmove/keydown above.
+        if (floatEl) {
+          new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (en) {
+                playerInView = en.isIntersecting;
+              });
+              floatVisibility();
+            },
+            { threshold: 0 },
+          ).observe(root);
+          // Nothing should cover the closing call to action or the footer.
+          var endEls = Array.prototype.slice.call(document.querySelectorAll('[data-cta], .foot'));
+          if (endEls.length) {
+            var seen = new Map();
+            var eio = new IntersectionObserver(function (entries) {
+              entries.forEach(function (en) {
+                seen.set(en.target, en.isIntersecting);
+              });
+              nearEnd = Array.from(seen.values()).some(Boolean);
+              floatVisibility();
+            });
+            endEls.forEach(function (el) {
+              eio.observe(el);
+            });
+          }
+          root.querySelector('[data-audio-float-close]').addEventListener('click', function () {
+            dismissed = true;
+            floatVisibility();
+          });
+          a.addEventListener('play', function () {
+            dismissed = false;
+            floatVisibility();
+          });
+          floatEl.addEventListener('focusin', floatVisibility);
+          floatEl.addEventListener('focusout', floatVisibility);
+          fPlay.addEventListener('click', function () {
+            if (a.paused) tryPlay();
+            else a.pause();
+          });
+          fFollow.addEventListener('click', function () {
+            follow = !follow;
+            syncFollow();
+            if (follow) scrollToActive(activeEl);
+          });
+          root.querySelector('[data-audio-float-up]').addEventListener('click', function () {
+            root.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+          });
+        }
+
+        // Any scroll the reader starts switches Follow off; it never fights them.
+        var unfollow = function () {
+          if (!follow) return;
+          follow = false;
+          syncFollow();
+        };
+        window.addEventListener('wheel', unfollow, { passive: true });
+        window.addEventListener('touchmove', unfollow, { passive: true });
+        window.addEventListener('keydown', function (e) {
+          if (['PageUp', 'PageDown', ' ', 'ArrowUp', 'ArrowDown'].indexOf(e.key) < 0) return;
+          var t = e.target;
+          if (t instanceof Node && (root.contains(t) || (floatEl && floatEl.contains(t)))) return;
+          unfollow();
+        });
         window.addEventListener(
           'scroll',
-          () => {
-            if (performance.now() > programmaticScrollUntil) disableFollow();
-            positionFloat();
+          function () {
+            if (performance.now() > ownScrollUntil) unfollow();
           },
-          { passive: true }
+          { passive: true },
         );
-        window.addEventListener('resize', () => positionFloat());
-        if (desktopQuery.addEventListener) desktopQuery.addEventListener('change', () => positionFloat());
 
-        // Click-to-seek: any narrated anchor jumps playback to its cue
-        // start (and plays, if paused). Clicks on a real link/button/embed
-        // inside the anchor (e.g. the §9 watch cards) are left alone.
+        // Click a narrated paragraph to play from it. A drag, a selection, a link or a keyboard click never seeks.
         document.body.classList.add('audio-narr-ready');
-        // A click that's really the end of a text-selection drag (or a
-        // link/button/iframe/input inside the anchor, or a keyboard-
-        // triggered click) must never seek. This guard is scoped to the
-        // single gesture it belongs to (pointerdown -> click), not to
-        // whatever selection happens to exist elsewhere on the page: a
-        // leftover selection from an earlier, unrelated drag must never
-        // block a later plain click.
-        let downX = 0;
-        let downY = 0;
-        let downAt = 0; // 0 = no pointerdown currently on record
-        let downSelection = ''; // selection string as of that pointerdown
-        const PD_WINDOW_MS = 1500;
-        const currentSelectionText = () => {
+        var downX = 0;
+        var downY = 0;
+        var downAt = 0;
+        var downSel = '';
+        var selText = function () {
           try {
             return window.getSelection ? window.getSelection().toString() : '';
-          } catch {
+          } catch (e) {
             return '';
           }
         };
-        const onPointerDown = (evt) => {
-          downX = evt.clientX;
-          downY = evt.clientY;
-          downAt = performance.now();
-          downSelection = currentSelectionText();
-        };
-        for (const [id] of cues) {
-          const el = narrEls.get(id);
-          if (!el) continue;
-          el.setAttribute('title', 'Play from here');
-          el.addEventListener('pointerdown', onPointerDown);
-          el.addEventListener('click', (evt) => {
-            const target = evt.target;
-            if (target instanceof Element && target.closest('a, button, iframe, input')) return;
-
-            const now = performance.now();
-            const hadPointerdown = downAt > 0 && now - downAt < PD_WINDOW_MS;
-            const dx = evt.clientX - downX;
-            const dy = evt.clientY - downY;
-            const drifted = hadPointerdown && Math.sqrt(dx * dx + dy * dy) > 6;
-            const selectionAtDown = downSelection;
-            // This click has consumed the recorded gesture: clear it so a
-            // later, unrelated click never reuses a stale pointerdown.
-            downAt = 0;
-            downSelection = '';
-
-            if (drifted) return; // (a) pointer moved during a recent pointerdown: a drag, not a click
-            const curSelection = currentSelectionText();
-            if (curSelection.length > 0 && curSelection !== selectionAtDown) return; // (b) a selection was made during THIS gesture
-            if (evt.detail === 0 && !hadPointerdown) return; // (c) keyboard/synthetic click, no real gesture behind it
-
-            if (now - lastSeekAt < 80) return; // guard: once per click
-            lastSeekAt = now;
-            const cue = cues.find((c) => c[0] === id);
-            if (!cue) return;
-            const wasActive = el === activeEl;
-            seekTo(cue[1]);
-            if (audioEl.paused) tryPlay();
-            if (wasActive) {
-              followMode = true;
-              updateFollowButton();
-            }
-            track_('audio-seek', { article: articleId, id });
+        cues.forEach(function (c) {
+          var el = narr[c[0]];
+          if (!el) return;
+          el.setAttribute('title', UI.playFromHere || '');
+          el.addEventListener('pointerdown', function (e) {
+            downX = e.clientX;
+            downY = e.clientY;
+            downAt = performance.now();
+            downSel = selText();
           });
-        }
-      }
-
-      // Extend play/pause/timeupdate to drive the read-along, on top of
-      // the existing icon/progress/resume behaviour above.
-      if (cues.length > 0) {
-        audioEl.addEventListener('play', () => {
-          highlightStarted = true;
-          setHidden(floatIconPlay, true);
-          setHidden(floatIconPause, false);
-          floatPlayButton?.setAttribute('aria-label', 'Pause');
-          updateFloatVisibility();
+          el.addEventListener('click', function (e) {
+            if (e.target instanceof Element && e.target.closest('a, button, iframe, input')) return;
+            var now = performance.now();
+            var had = downAt > 0 && now - downAt < 1500;
+            var drifted = had && Math.hypot(e.clientX - downX, e.clientY - downY) > 6;
+            var selAtDown = downSel;
+            downAt = 0;
+            downSel = '';
+            if (drifted) return;
+            var s = selText();
+            if (s.length > 0 && s !== selAtDown) return;
+            if (e.detail === 0 && !had) return;
+            if (now - lastSeekAt < 80) return;
+            lastSeekAt = now;
+            var wasActive = el === activeEl;
+            setT(c[1]);
+            if (a.paused) tryPlay();
+            if (wasActive) {
+              follow = true;
+              syncFollow();
+            }
+            track_('audio-seek', { article: articleId, id: c[0] });
+          });
         });
 
-        audioEl.addEventListener('pause', () => {
-          setHidden(floatIconPlay, false);
-          setHidden(floatIconPause, true);
-          floatPlayButton?.setAttribute('aria-label', 'Play');
-          updateFloatVisibility();
+        a.addEventListener('play', function () {
+          started = true;
+          root.classList.add('is-playing');
+          floatVisibility();
         });
-
-        audioEl.addEventListener('timeupdate', () => {
-          if (floatTimeEl) floatTimeEl.textContent = formatTime(audioEl.currentTime);
-
-          const now = performance.now();
-          if (now - lastCueCheck < 240) return; // ~4/s
-          lastCueCheck = now;
-
-          if (highlightStarted) {
-            const cue = findActiveCue(audioEl.currentTime);
-            if (cue) setHighlight(cue);
-          }
-          updateFloatVisibility();
+        a.addEventListener('pause', function () {
+          floatVisibility();
         });
-
-        audioEl.addEventListener('ended', () => {
+        a.addEventListener('timeupdate', function () {
+          if (fTime) fTime.textContent = fmt(a.currentTime);
+          var now = performance.now();
+          if (now - lastCue < 240) return;
+          lastCue = now;
+          if (started) setHighlight(findCue(a.currentTime));
+          floatVisibility();
+        });
+        a.addEventListener('ended', function () {
           if (activeEl) activeEl.classList.remove('is-reading');
           activeEl = null;
-          activeCueId = null;
-          highlightStarted = false;
+          activeId = null;
+          started = false;
           if (floatEl) floatEl.hidden = true;
         });
-      }
-      } // setupReadAlong
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupReadAlong);
+      else setupReadAlong();
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupReadAlong);
-      } else {
-        setupReadAlong();
-      }
-
-      updateUI(0);
-    }
+      paint(0);
+    });
   })();
 </script>
 
 <style>
-  .audio-player {
-    margin-top: var(--s-6);
-    padding-top: var(--s-5);
-    border-top: var(--line-hair);
+  .ap {
+    display: block;
+    max-width: 640px;
+    margin-top: clamp(24px, 4vh, 36px);
   }
 
-  .audio-el--hidden {
+  .ap-el[hidden] {
     display: none;
   }
 
-  .audio-caption {
-    margin-bottom: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
+  .ap-el {
+    width: 100%;
+  }
+
+  .ap-note {
+    margin-top: var(--s-2);
+    font: 400 var(--t-label) / var(--lh-snug) var(--font-data);
     color: var(--color-text-muted);
   }
 
-  .audio-row {
-    display: flex;
+  .ap-ui {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 16px;
     align-items: center;
-    gap: var(--s-3);
+    padding: 16px 18px;
+    border: var(--line-hair);
+    background: var(--color-surface-sunk);
   }
 
-  /* Hit area is 44px square (touch-target minimum); the visible square is
-     drawn smaller, via ::before, so the button reads as ~34px. */
-  .audio-play {
-    position: relative;
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: var(--radius);
+  .ap-ui[hidden] {
+    display: none;
+  }
+
+  /* Play and pause: a red square. Hover darkens a little; nothing moves. */
+  .ap-play {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    padding: 0;
     border: 0;
-    background: transparent;
-    color: var(--color-surface);
+    background: var(--color-accent-fill);
+    color: var(--color-on-accent);
     cursor: pointer;
+    transition: background-color 0.25s ease;
   }
 
-  .audio-play::before {
-    content: '';
-    position: absolute;
-    inset: 5px;
-    border-radius: var(--radius);
-    background: var(--color-text);
+  .ap-play:hover,
+  .ap-play:focus-visible {
+    background: var(--color-accent-hover);
   }
 
-  .audio-icon {
-    position: relative;
-    z-index: 1;
-    width: 15px;
-    height: 15px;
+  .ap-play:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 
-  .audio-icon-play {
-    margin-left: 1px;
+  .ap-play svg {
+    width: 16px;
+    height: 16px;
   }
 
-  .audio-track-wrap {
-    flex: 1 1 auto;
-    min-width: 0;
+  .ap-play .pa {
+    display: none;
+  }
+
+  .ap.is-playing .ap-play .pl {
+    display: none;
+  }
+
+  .ap.is-playing .ap-play .pa {
+    display: block;
+  }
+
+  .ap-top {
     display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
-  /* Hit height is 24px; the visual hairline (::before) stays 1px, centered. */
-  .audio-track {
+  .ap-time {
+    font: 500 var(--t-nav) / 1 var(--font-data);
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .ap-time b {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .ap-bar {
     position: relative;
-    height: 24px;
-    display: flex;
-    align-items: center;
+    height: 22px;
+    margin: 6px 0 4px;
     cursor: pointer;
     touch-action: none;
+    outline-offset: 4px;
   }
 
-  .audio-track::before {
-    content: '';
+  .ap-rail {
     position: absolute;
     left: 0;
     right: 0;
     top: 50%;
-    height: 1px;
-    background: var(--color-line);
-    transform: translateY(-50%);
+    height: 2px;
+    margin-top: -1px;
+    background: var(--color-line-strong);
   }
 
-  .audio-track-fill {
+  .ap-buf,
+  .ap-fill {
     position: absolute;
     left: 0;
-    top: 50%;
-    height: 2px;
-    width: 0%;
-    background: var(--color-accent);
-    transform: translateY(-50%);
-    transition: width 80ms linear;
+    top: 0;
+    bottom: 0;
+    width: 0;
   }
 
-  .audio-track-thumb {
+  .ap-buf {
+    background: var(--color-text-muted);
+    opacity: 0.35;
+  }
+
+  .ap-fill {
+    background: var(--color-accent);
+  }
+
+  .ap-knob {
     position: absolute;
     top: 50%;
-    left: 0%;
-    width: 9px;
-    height: 9px;
-    border-radius: var(--radius);
-    background: var(--color-text);
-    transform: translate(-50%, -50%);
-    transition: left 80ms linear;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    background: var(--color-accent);
+    transform: scale(0);
+    transition: transform 0.2s ease;
   }
 
-  .audio-time {
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-    white-space: nowrap;
+  .ap-bar:hover .ap-knob,
+  .ap-bar:focus-visible .ap-knob,
+  .ap.is-playing .ap-knob,
+  .ap.is-seeking .ap-knob {
+    transform: scale(1);
   }
 
-  .audio-resume-tag {
-    color: var(--color-text-muted);
-  }
-
-  /* Plain mono text, deliberately un-pill-like so it never reads as a
-     chapter chip: underline is the only affordance, on hover/focus. */
-  .audio-speed {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    min-width: 24px; /* WCAG 2.5.8 minimum target width: was 18px wide */
-    justify-content: center;
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-body);
-    background: transparent;
-    border: 0;
-    padding: 0 var(--s-2);
-    text-decoration: none;
-    text-underline-offset: var(--underline-offset);
-    cursor: pointer;
-  }
-
-  @media (hover: hover) {
-    .audio-speed:hover {
-      text-decoration: underline;
-      text-decoration-color: var(--color-accent);
-    }
-  }
-
-  .audio-speed:focus-visible {
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
-  }
-
-  .audio-status {
-    margin-top: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-body);
-  }
-
-  .audio-status:empty {
-    display: none;
-  }
-
-  .audio-play:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  .audio-note {
-    margin-top: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  /* Below 600px: one horizontal-scroll row (no wrap), scrollbar hidden, a
-     right-edge fade so the row visibly continues off-screen. The active
-     chip is scrolled into view by the script above as playback advances.
-     At 600px+ it reverts to the original wrapping pill row. */
-  .audio-chapters {
-    margin: 0;
-    margin-top: var(--s-3);
-    padding: 0;
-    list-style: none;
+  .ap-foot {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: var(--s-2);
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
-    mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+    align-items: center;
+    gap: 8px 18px;
+    flex-wrap: wrap;
+    font: 400 var(--t-label) / var(--lh-snug) var(--font-data);
+    color: var(--color-text-muted);
   }
 
-  .audio-chapters::-webkit-scrollbar {
+  .ap-foot a {
+    color: var(--color-text-body);
+  }
+
+  .ap-rate,
+  .ap-cc {
+    min-width: 52px;
+    height: 26px;
+    padding: 0 8px;
+    border: var(--line-strong);
+    background: transparent;
+    color: var(--color-text-body);
+    font: 500 var(--t-label) / 1 var(--font-data);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+
+  .ap-rate {
+    margin-left: auto;
+  }
+
+  .ap-cc {
+    min-width: 36px;
+  }
+
+  .ap-rate:hover,
+  .ap-rate:focus-visible,
+  .ap-cc:hover,
+  .ap-cc:focus-visible,
+  .ap-cc[aria-pressed='true'] {
+    border-color: var(--color-text-muted);
+    color: var(--color-text);
+  }
+
+  .ap-cc[aria-pressed='true'] {
+    border-color: var(--color-accent);
+  }
+
+  .ap-cc[hidden] {
     display: none;
   }
 
-  .audio-chapters li {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
+  .ap-capline {
+    margin-top: var(--s-3);
+    min-height: 3em;
+    padding-left: var(--s-3);
+    border-left: var(--line-accent);
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--color-text);
   }
 
-  /* Red Pen 5: chapters are one quiet row at every width, not a wall of boxes. */
+  .ap-capline[hidden] {
+    display: none;
+  }
 
-  .audio-chip {
+  .ap-status {
+    font: 400 var(--t-label) / var(--lh-snug) var(--font-data);
+    color: var(--color-text-muted);
+  }
+
+  .ap-status:empty {
+    display: none;
+  }
+
+  .ap-resume {
+    margin-left: 6px;
+  }
+
+  @media (max-width: 599px) {
+    .ap-ui {
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .ap-play {
+      width: 40px;
+      height: 40px;
+    }
+
+    .ap-rate {
+      margin-left: 0;
+    }
+  }
+
+  /* The bottom bar: play, time and Follow, once the player has scrolled out of view mid-narration. */
+  .ap-float {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: calc(var(--z-nav) + 1);
+    padding: var(--s-2) var(--gutter-r) calc(var(--s-2) + env(safe-area-inset-bottom, 0px)) var(--gutter-l);
+    background: var(--color-glass-strong);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-top: var(--line-hair);
+  }
+
+  .ap-float[hidden] {
+    display: none;
+  }
+
+  .ap-float-in {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    max-width: var(--shell-max);
+    margin: 0 auto;
+  }
+
+  .ap-play--s {
+    width: 36px;
+    height: 36px;
+    flex: none;
+  }
+
+  .ap-float-time {
+    flex: 1 1 auto;
+    font: 500 var(--t-nav) / 1 var(--font-data);
+    color: var(--color-text-body);
+  }
+
+  .ap-fbtn {
     display: inline-flex;
     align-items: center;
-    min-height: var(--hit-touch);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-    background: transparent;
+    min-height: var(--hit-min);
+    padding: 0 var(--s-1);
     border: 0;
-    padding: var(--s-1) var(--s-2);
-    white-space: nowrap;
+    background: none;
+    font: 400 var(--t-label-lg) / 1 var(--font-data);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
     cursor: pointer;
   }
 
-  @media (hover: hover) {
-    .audio-chip:hover {
-      color: var(--color-accent-text);
-    }
-  }
-
-  .audio-chip[aria-current='true'] {
+  .ap-fbtn:hover,
+  .ap-fbtn:focus-visible,
+  .ap-fbtn[aria-pressed='true'] {
     color: var(--color-text);
-    font-weight: 500;
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
-    text-decoration-thickness: 2px;
-    text-underline-offset: var(--underline-offset);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .audio-track-fill,
-    .audio-track-thumb {
-      transition: none;
-    }
+  .ap-fbtn[aria-pressed='true']::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+    background: var(--color-accent);
   }
 
-  @media (max-width: 899px) {
-    .audio-player {
-      margin-top: var(--s-5);
-    }
-  }
-
-  /* ---- Read-along ----------------------------------------------------
-     The highlighted-paragraph and floating-control styles below reach
-     outside this component (the §-anchors live in the page templates,
-     the float is positioned against the sticky header and each
-     section's own .margin-col), so they're written as :global(). */
-
-  /* Once JS has wired up cues, narrated anchors become click-to-seek
-     targets: cursor only, no visual change, so unread paragraphs don't
-     look different from read ones until they're actually read. */
+  /* The narrated paragraph being read. The box is drawn around the block: the negative margin cancels the padding,
+     so no character moves when the mark appears. */
   :global(body.audio-narr-ready [data-narr]) {
     cursor: pointer;
   }
 
-  /* Active-paragraph highlight: a padded box drawn AROUND the block, not
-     on it: negative margin pulls the box out into the gutter by exactly
-     the amount the matching padding adds back inside it, so the box's
-     total footprint (and every character's on-screen position) is
-     unchanged; a browser sanity check confirms zero shift on the first
-     text node's getBoundingClientRect(). The red rule is an inset
-     box-shadow at the box's own (now-expanded) left edge, so it lands
-     14px (10px on phones) clear of the first glyph: box-shadow, not a
-     real border, so it still never takes layout space. Text colour is
-     untouched; the tint alone stays well clear of WCAG's 7:1 body-text
-     contrast floor (measured, not just intended: see stage5/MANIFEST.md).
-     One rule for every kind of narrated block: paragraphs, headings,
-     figures, tables, stat strips, the watch gallery, so there's exactly
-     one highlight treatment on the page, not a paragraph one and a
-     "wide block" one. --paper-raised is the fallback for browsers
-     without color-mix().
-
-     The four box-model properties are !important: the zero-shift trick
-     only cancels out exactly when margin and padding both apply in full,
-     and several narrated elements (e.g. .standfirst) carry their own
-     page-scoped margin-bottom whose Astro-scoped selector ties this
-     rule's specificity, without !important that page rule wins the
-     cascade tie and silently keeps the old margin-bottom, breaking the
-     cancellation on that one edge (caught by a real getBoundingClientRect
-     check, not assumed: the dek shifted -6px vertically until this was
-     added). */
   :global([data-narr].is-reading) {
     margin-inline: -14px !important;
     padding-inline: 14px !important;
-    /* The accent bar is a real 2px border-left (tier: accent). Its width is
-       taken out of the start padding so the box still nets to zero shift. */
     padding-inline-start: 12px !important;
     margin-block: -6px !important;
     padding-block: 6px !important;
-    border-radius: var(--radius);
-    background-color: var(--color-surface-raised);
-    background-color: color-mix(in oklab, var(--color-accent) 7%, var(--color-surface));
+    background-color: var(--color-accent-tint);
     border-left: var(--line-pen);
-    transition: background-color var(--dur-fast) var(--ease-draw);
+    transition: background-color var(--dur-fast) var(--ease-out);
   }
 
-  @media (max-width: 899px) {
+  @media (max-width: 599px) {
     :global([data-narr].is-reading) {
-      /* Phone gutter is 16px: 10px keeps the box's outer edge inside the
-         viewport instead of at it, so it never forces horizontal scroll. */
       margin-inline: -10px !important;
       padding-inline: 10px !important;
-      padding-inline-start: 8px !important; /* 2px border-left + 8px = 10px */
+      padding-inline-start: 8px !important;
     }
   }
 
@@ -1176,242 +985,9 @@ const cuesJson = audio.cues && audio.cues.length > 0 ? JSON.stringify(audio.cues
     :global([data-narr].is-reading) {
       transition: none;
     }
-  }
 
-  /* Floating control: play/pause + time + Follow + back-to-player. Built
-     once per player and shown only while narration is playing (or
-     paused mid-way) and the main player has scrolled out of view. Reads
-     as the site's own language, no boxed chrome, just the same square
-     ink play button the main player uses and plain mono caption text. */
-  .audio-float {
-    position: fixed;
-    z-index: calc(var(--z-nav) + 1); /* above the sticky header, below the mobile sheet */
-    display: flex;
-    align-items: center;
-  }
-
-  .audio-float[hidden] {
-    display: none;
-  }
-
-  /* Only the bar layouts (phones, and the desktop fallback) can be dismissed. */
-  .audio-float-close {
-    display: none;
-    flex: 0 0 auto;
-    min-width: 44px;
-    min-height: var(--hit-touch);
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-data);
-    font-size: var(--t-small);
-    color: var(--color-text-muted);
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-  }
-
-  /* Same visual proportions as the main player's play button: 44px hit
-     area, 34px ink square (inset: 5px). */
-  .audio-float-play {
-    position: relative;
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: var(--radius);
-    border: 0;
-    background: transparent;
-    color: var(--color-surface);
-    cursor: pointer;
-  }
-
-  .audio-float-play::before {
-    content: '';
-    position: absolute;
-    inset: 5px;
-    border-radius: var(--radius);
-    background: var(--color-text);
-  }
-
-  .audio-float-play .audio-icon {
-    position: relative;
-    z-index: 1;
-    width: 14px;
-    height: 14px;
-  }
-
-  .audio-float-time {
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-    white-space: nowrap;
-  }
-
-  /* Follow / ↑ Player: tiny mono text buttons, uppercase caption style:
-     the same voice as a figcaption or the audio note above, not a UI
-     control. No border, no background; underline is the only affordance. */
-  .audio-float-follow,
-  .audio-float-up {
-    flex: 0 0 auto;
-    min-height: var(--hit-touch);
-    min-width: 44px;
-    justify-content: center;
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-    background: transparent;
-    border: 0;
-    padding: 0;
-    text-decoration: none;
-    text-underline-offset: var(--underline-offset);
-    cursor: pointer;
-  }
-
-  .audio-float-follow {
-    color: var(--color-text-body);
-  }
-
-  .audio-float-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-right: 6px;
-    border-radius: var(--radius);
-    background: var(--color-accent);
-    visibility: hidden;
-  }
-
-  .audio-float-follow[aria-pressed='true'] {
-    color: var(--color-text);
-    font-weight: 500;
-  }
-
-  .audio-float-follow[aria-pressed='true'] .audio-float-dot {
-    visibility: visible;
-  }
-
-  @media (hover: hover) {
-    .audio-float-follow:hover,
-    .audio-float-up:hover {
-      text-decoration: underline;
-      text-decoration-color: var(--color-accent);
-    }
-  }
-
-  .audio-float-follow:focus-visible,
-  .audio-float-up:focus-visible {
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
-  }
-
-  /* Mobile: hairline top border + paper background only, no boxed
-     buttons. Play left, time centre, Follow/↑ grouped right. Safe-area
-     aware. JS never sets inline top/right at this breakpoint. */
-  @media (max-width: 899px) {
-    .audio-float {
-      left: 0;
-      right: 0;
-      bottom: 0;
-      gap: var(--s-3);
-      padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
-      background: var(--color-surface);
-      border-top: var(--line-hair);
-    }
-
-    .audio-float-close {
-      display: inline-flex;
-    }
-
-    .audio-float-time {
-      flex: 1 1 auto;
-      text-align: center;
-    }
-
-    .audio-float-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--s-4);
-      padding-right: var(--s-1);
-    }
-
-    .audio-float-up-label {
-      display: none;
-    }
-  }
-
-  /* Desktop: JS sets top/right so the control sits right-aligned to the
-     current section's margin column (~20px before the text column),
-     level with the highlighted paragraph, and visibly travels with it as
-     the highlight moves. A compact vertical cluster, right-aligned. */
-  @media (min-width: 900px) {
-    .audio-float {
-      flex-direction: column;
-      align-items: flex-end;
-      gap: var(--s-2);
-      transition: top var(--dur-base) var(--ease-draw);
-    }
-
-    .audio-float-time {
-      order: -1;
-    }
-
-    .audio-float-actions {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: var(--s-2);
-    }
-  }
-
-  @media (min-width: 900px) and (prefers-reduced-motion: reduce) {
-    .audio-float {
+    .ap-knob {
       transition: none;
-    }
-  }
-
-  /* Desktop collision fallback: when the float would overlap a margin
-     note/disclaimer/caption in the same column and neither "above" nor
-     "below" clears it, JS drops back to the same fixed bottom-bar layout
-     mobile uses, just for that cue: never guessing an overlap. */
-  @media (min-width: 900px) {
-    .audio-float.audio-float--bar-fallback {
-      position: fixed;
-      top: auto !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0;
-      flex-direction: row;
-      align-items: center;
-      gap: var(--s-3);
-      padding: var(--s-2) 16px calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
-      background: var(--color-surface);
-      border-top: var(--line-hair);
-    }
-
-    .audio-float.audio-float--bar-fallback .audio-float-close {
-      display: inline-flex;
-    }
-
-    .audio-float.audio-float--bar-fallback .audio-float-time {
-      order: 0;
-      flex: 1 1 auto;
-      text-align: center;
-    }
-
-    .audio-float.audio-float--bar-fallback .audio-float-actions {
-      flex-direction: row;
-      align-items: center;
-      gap: var(--s-4);
-      padding-right: var(--s-1);
-    }
-
-    .audio-float.audio-float--bar-fallback .audio-float-up-label {
-      display: none;
     }
   }
 </style>

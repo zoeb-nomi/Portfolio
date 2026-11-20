@@ -1,15 +1,18 @@
 ---
+// One note (The Pipeline): the shared essay template with a counted-finding head. Every note in src/data/notes.ts
+// renders through this one file, so the head, figure, body, number pointers, limit line and previous/next all read
+// from the note and from pipelineWriting (copy.ts); nothing here is specific to one note.
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import EssayFigure from '../../components/EssayFigure.astro';
-import Button from '../../components/Button.astro';
+import CTASlab from '../../components/CTASlab.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
 import { formatDate } from '../../lib/formatDate';
 import { jsonLdString } from '../../lib/jsonLdString';
 import { isExternal } from '../../lib/isExternal';
 import { notes } from '../../data/notes';
-import { notesPage as np } from '../../data/copy';
+import { notesPage as np, pipelineWriting as P, home, cta } from '../../data/copy';
 
 export function getStaticPaths() {
   return notes.map((note) => ({ params: { slug: note.slug }, props: { note } }));
@@ -17,6 +20,7 @@ export function getStaticPaths() {
 
 const { note } = Astro.props;
 const { figure: fig } = note;
+const N = P.note;
 
 // Meta limits from DESIGN.md section 3: title 60 characters or fewer, description 155 or fewer.
 // The author suffix is dropped when the title alone would push the tag past the limit.
@@ -25,32 +29,33 @@ if (metaTitle.length > 60) throw new Error(`notes/${note.slug}: meta title is ${
 if (note.dek.length > 155) throw new Error(`notes/${note.slug}: dek is ${note.dek.length} characters (max 155)`);
 
 const path = `/notes/${note.slug}/`;
-const articleLd = articleJsonLd({
-  slug: note.slug,
-  headline: note.title,
-  description: note.dek,
-  date: note.date,
-  about: note.kicker,
-  path,
-});
+const articleLd = articleJsonLd({ slug: note.slug, headline: note.title, description: note.dek, date: note.date, about: note.kicker, path });
 
-// The same play / pause pattern as the essays' mp4 figures (DESIGN.md section 4).
-const videoScript = `// The figure plays muted on a loop while at least 35% of it is on screen. Reduced motion: the poster
-// only, and nothing downloads. The button holds the video paused until it is pressed again.
-for (const v of document.querySelectorAll('video[data-note-video]')) {
-  const b = v.closest('figure').querySelector('[data-note-toggle]'); let held = false;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.querySelector('source')?.remove(); v.load(); continue; }
-  new IntersectionObserver(([e]) => { if (e.intersectionRatio >= 0.35 && !held) v.play().catch(() => {}); else v.pause(); }, { threshold: [0, 0.35] }).observe(v.closest('figure'));
-  v.onplay = v.onpause = () => { b.textContent = v.paused ? 'Play' : 'Pause'; };
-  b.hidden = false; b.onclick = () => { held = !v.paused; if (held) v.pause(); else v.play().catch(() => {}); };
-}`;
+const group = np.groups.find((g) => g.id === note.group);
+const groupHref = N.groupHref[note.group] ?? null;
+const number = P.noteNumbers[note.slug];
+const stats = N.stats[note.slug] ?? (number ? [{ v: number, u: N.numberLabel, s: group?.label }] : []);
+
+// Oldest first, so "previous" is the note before this one in time.
+const chron = [...notes].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+const at = chron.findIndex((n) => n.slug === note.slug);
+const prev = at > 0 ? chron[at - 1] : null;
+const next = at < chron.length - 1 ? chron[at + 1] : null;
+const groupOf = (g: string) => np.groups.find((x) => x.id === g)?.label ?? g;
+
+const lead = note.body.slice(0, -1);
+const closing = note.body[note.body.length - 1];
 ---
 
-<Base title={metaTitle} description={note.dek} path={path} ogImage="/og/notes.png" ogType="article">
+<Base title={metaTitle} description={note.dek} path={path} ogImage="/og/notes.png" ogType="article" page="writing">
   <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
-  <Masthead kicker={note.kicker} h1={note.title} standfirst={note.dek} h1Max="24ch">
-    <Fragment slot="byline"><time datetime={note.date}>{formatDate(note.date)}</time></Fragment>
+  <Masthead kicker={note.kicker} h1={note.title} stats={stats} article>
+    <Fragment slot="byline">
+      <span><b>{P.byline.note}</b></span>
+      <time datetime={note.date}>{formatDate(note.date)}</time>
+      {group && (groupHref ? <a href={groupHref}>{group.label}</a> : <span>{group.label}</span>)}
+    </Fragment>
   </Masthead>
 
   <Section mark={np.section.mark} label={np.section.label} anchorId={np.section.anchorId}>
@@ -71,9 +76,7 @@ for (const v of document.querySelectorAll('video[data-note-video]')) {
             >
               <source src={fig.video.src} type="video/mp4" />
             </video>
-            <div class="fig-controls">
-              <button type="button" class="fig-toggle" data-note-toggle hidden>{np.videoPause}</button>
-            </div>
+            <button type="button" class="chip fig-toggle" data-note-toggle data-pause={np.videoPause} data-play={N.play} hidden>{np.videoPause}</button>
           </>
         ) : (
           <img src={fig.src} alt={fig.alt} width={fig.width} height={fig.height} loading="eager" decoding="async" />
@@ -81,10 +84,11 @@ for (const v of document.querySelectorAll('video[data-note-video]')) {
       }
     </EssayFigure>
 
-    {note.body.map((p) => <p class="prose">{p}</p>)}
+    {lead.map((p) => <p class="prose">{p}</p>)}
+    <p class="prose"><strong>{closing}</strong></p>
 
-    <h3 class="where-h">{np.pointersLabel}</h3>
-    <ul class="where">
+    <h3 class="rs-h3">{np.pointersLabel}</h3>
+    <ul class="files">
       {
         note.pointers.map((p) => (
           <li>
@@ -98,17 +102,87 @@ for (const v of document.querySelectorAll('video[data-note-video]')) {
 
     {
       note.deep && (
-        <p class="deep">
-          <Button href={note.deep.href} variant="secondary">{note.deep.label}</Button>
+        <p class="prose">
+          <a href={note.deep.href}>{note.deep.label}</a>
         </p>
       )
     }
 
-    <p class="limit">{note.limit}</p>
+    <p class="src-line">{note.limit}</p>
   </Section>
+
+  <section class="sec gut more">
+    <div class="in">
+      <p class="kick">{N.more.kick}</p>
+      <nav class="pn" aria-label={N.more.nav}>
+        {
+          prev && (
+            <a href={`/notes/${prev.slug}/`}>
+              <span class="lab"><span class="ar2">←</span>{N.more.prev}</span>
+              <b>{prev.title}</b>
+              <span class="d">{formatDate(prev.date)} · {groupOf(prev.group)}</span>
+            </a>
+          )
+        }
+        {
+          next && (
+            <a href={`/notes/${next.slug}/`}>
+              <span class="lab">{N.more.next}<span class="ar2">→</span></span>
+              <b>{next.title}</b>
+              <span class="d">{formatDate(next.date)} · {groupOf(next.group)}</span>
+            </a>
+          )
+        }
+      </nav>
+      <div class="ctas more-ctas">
+        <a class="tl" href="/writing/#notes">{N.more.all.replace('{n}', String(notes.length))}</a>
+        {note.deep && <a class="tl" href={note.deep.href}>{note.deep.label}</a>}
+      </div>
+    </div>
+  </section>
+
+  <CTASlab
+    body={home.ctaSlabBody}
+    buttonLabel={P.contact.email}
+    buttonHref={cta.email.href}
+    secondaryLabel={cta.bookACall.label}
+    secondaryHref={cta.bookACall.href}
+    links={[cta.linkedin, cta.github, cta.x]}
+    buttonNote={null}
+  />
 </Base>
 
-{fig.video && <script is:inline set:html={videoScript} />}
+<script>
+  // The figure plays muted on a loop while at least 35% of it is on screen. Reduced motion: the poster only, and
+  // nothing downloads. The button holds the video paused until it is pressed again.
+  for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-note-video]')) {
+    const b = v.closest('figure')?.querySelector<HTMLButtonElement>('[data-note-toggle]');
+    if (!b) continue;
+    let held = false;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay');
+      v.querySelector('source')?.remove();
+      v.load();
+      continue;
+    }
+    new IntersectionObserver(
+      ([e]) => {
+        if (e.intersectionRatio >= 0.35 && !held) v.play().catch(() => {});
+        else v.pause();
+      },
+      { threshold: [0, 0.35] },
+    ).observe(v.closest('figure')!);
+    v.onplay = v.onpause = () => {
+      b.textContent = v.paused ? (b.dataset.play ?? '') : (b.dataset.pause ?? '');
+    };
+    b.hidden = false;
+    b.onclick = () => {
+      held = !v.paused;
+      if (held) v.pause();
+      else v.play().catch(() => {});
+    };
+  }
+</script>
 
 <style>
   /* The note's figure fills its frame; width and height attributes reserve the 4:5 box. */
@@ -119,78 +193,147 @@ for (const v of document.querySelectorAll('video[data-note-video]')) {
     height: auto;
   }
 
-  .fig-controls {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: var(--s-3);
-  }
-
   .fig-toggle {
-    min-block-size: var(--hit-min);
-    padding: var(--s-1) var(--s-3);
-    border: var(--line-object-muted);
-    border-radius: var(--radius);
-    background: none;
-    font-family: var(--font-data);
-    font-size: var(--t-note);
-    line-height: var(--lh-label);
-    color: var(--color-text);
-    cursor: pointer;
+    margin-top: var(--s-3);
   }
 
   .fig-toggle[hidden] {
     display: none;
   }
 
-  .where-h {
-    margin-top: var(--s-8);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    font-weight: 400;
-    color: var(--color-text-muted);
-    line-height: var(--lh-label);
+  .rs-h3 {
+    margin-top: 1.6em;
+    font-size: clamp(20px, 1.6vw, 24px);
+    line-height: var(--lh-heading);
+    color: var(--color-text);
+    font-variation-settings: 'wdth' 92, 'wght' 700;
   }
 
-  .where {
+  /* Where the numbers live: a file per row, each with a red arrow out. */
+  .files {
     list-style: none;
-    margin: var(--s-3) 0 0;
     padding: 0;
-    max-width: var(--measure);
-    font-family: var(--font-data);
-    font-size: var(--t-data);
-    line-height: var(--lh-snug);
-  }
-
-  .where li {
-    padding-block: var(--s-2);
     border-top: var(--line-hair);
   }
 
-  .where li:last-child {
+  .files li {
+    margin: 0;
     border-bottom: var(--line-hair);
   }
 
-  .where a {
-    display: inline-block;
-    min-block-size: var(--hit-min);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+  .files a {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    font: 400 var(--t-data) / 1.4 var(--font-data);
+    color: var(--color-text-body);
+    text-decoration: none;
     overflow-wrap: anywhere;
   }
 
-  .deep {
-    margin-top: var(--s-7);
+  .files a::after {
+    content: '↗';
+    color: var(--color-accent);
   }
 
-  /* The limit line is set like EssayFigure's source line. */
-  .limit {
-    margin-top: var(--s-7);
-    max-width: var(--measure);
-    padding-bottom: var(--s-4);
-    font-family: var(--font-text);
-    font-size: var(--t-note);
-    line-height: var(--lh-snug);
+  .files a:hover,
+  .files a:focus-visible {
+    color: var(--color-text);
+  }
+
+  .prose a {
+    overflow-wrap: anywhere;
+  }
+
+  /* Previous and next note. */
+  .more {
+    padding-top: clamp(56px, 9vh, 96px);
+  }
+
+  .pn {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: var(--line-heavy);
+    margin-top: clamp(28px, 5vh, 48px);
+  }
+
+  .pn a {
+    position: relative;
+    isolation: isolate;
+    display: block;
+    padding: 20px 20px 22px 0;
+    text-decoration: none;
+    border-bottom: var(--line-hair);
+    color: var(--color-text);
+  }
+
+  .pn a + a {
+    padding-left: 20px;
+    border-left: var(--line-hair);
+    text-align: right;
+  }
+
+  .pn a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-surface-raised);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.6s var(--ease-out);
+    z-index: -1;
+  }
+
+  .pn a:hover::before,
+  .pn a:focus-visible::before {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+
+  .pn .lab {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .pn .lab .ar2 {
+    margin: 0 4px;
+  }
+
+  .pn b {
+    display: block;
+    font-weight: normal;
+    font-size: clamp(18px, 1.6vw, 23px);
+    line-height: var(--lh-heading);
+    letter-spacing: -0.015em;
+    font-variation-settings: 'wdth' 88, 'wght' 680;
+  }
+
+  .pn a:hover b,
+  .pn a:focus-visible b {
+    color: var(--color-accent);
+  }
+
+  .pn .d {
+    display: block;
+    margin-top: 8px;
+    font: 400 var(--t-label) / var(--lh-label) var(--font-data);
     color: var(--color-text-muted);
+  }
+
+  .more-ctas {
+    margin-top: 28px;
+  }
+
+  @media (max-width: 599px) {
+    .pn {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pn a + a {
+      padding-left: 0;
+      border-left: 0;
+      text-align: left;
+    }
   }
 </style>

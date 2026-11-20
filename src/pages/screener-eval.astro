@@ -1,39 +1,55 @@
 ---
 import Base from '../layouts/Base.astro';
 import '../styles/case-study.css';
-import Masthead from '../components/Masthead.astro';
-import Section from '../components/Section.astro';
-import DataTable from '../components/DataTable.astro';
-import PullQuote from '../components/PullQuote.astro';
-import CTASlab from '../components/CTASlab.astro';
 import AudioPlayer from '../components/AudioPlayer.astro';
-import EssayFigure from '../components/EssayFigure.astro';
-import ForestPlot from '../components/ForestPlot.astro';
-import ParserCompare from '../components/ParserCompare.astro';
-import UnitChart from '../components/UnitChart.astro';
-import MiniFigure from '../components/MiniFigure.astro';
-import { meta, screenerEval as se, screenerEvalJsonLd, cta, home, caseStudy } from '../data/copy';
+import CaseTabs from '../components/CaseTabs.astro';
+import CsHead from '../components/CsHead.astro';
+import CsSection from '../components/CsSection.astro';
+import CsStrip from '../components/CsStrip.astro';
+import CsSpecList from '../components/CsSpecList.astro';
+import CsLegend from '../components/CsLegend.astro';
+import CsTable from '../components/CsTable.astro';
+import CsCall from '../components/CsCall.astro';
+import CsList from '../components/CsList.astro';
+import CsLinks from '../components/CsLinks.astro';
+import CsContact from '../components/CsContact.astro';
+import CsParts from '../components/CsParts.astro';
+import { meta, screenerEval as se, screenerEvalJsonLd, pipelineCaseStudies as P } from '../data/copy';
 import { jsonLdString } from '../lib/jsonLdString';
-import { forestData, flipData, parserData } from '../lib/figureData';
+import { screenerFig, rich, screenerParts } from '../lib/caseStudy';
 
-const forest = forestData();
-const flips = flipData();
-const parsers = parserData();
-
-const table1Rows = se.s3.table1.rows.map((r) => ({
-  label: r.lever,
-  cells: [{ text: r.screener }, { text: r.delta }, { text: r.ci }, { text: r.p }],
-}));
-
-const table2Rows = se.s3.table2.rows.map((r) => ({
-  label: r.measure,
-  cells: [{ text: r.haiku }, { text: r.gpt }],
-}));
-
-const table3Rows = se.s5.table.rows.map((r) => ({
-  label: r.parser,
-  cells: [{ text: r.v41 }, { text: r.v42 }],
-}));
+const x = P.screenerEval;
+const s = screenerFig();
+const v = x.variable;
+const vf = v.fig;
+const pf = x.parser.fig;
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+const range = (n: number) => Array.from({ length: n }, (_, i) => i);
+const pc = (n: number) => `${Number(n.toFixed(3))}%`;
+const total = s.parsers.total;
+const CLS = ['f', '', 'r', 'g'];
+const parserTile = (counts: number[], i: number) => {
+  const edges = [counts[0], counts[0] + counts[1], counts[0] + counts[1] + counts[2], total];
+  const k = edges.findIndex((e) => i < e);
+  return k < 0 ? '' : CLS[k];
+};
+const bands = [
+  { key: 'haiku', cls: 'se-b-h', stat: s.haiku },
+  { key: 'gpt', cls: 'se-b-g', stat: s.gpt },
+];
+const flipRows = [
+  { key: 'haiku', name: s.haiku.name, sub: vf.flipSub, r: s.flips.rows[0], ink: false },
+  { key: 'gpt', name: s.gpt.name, sub: vf.flipSub, r: s.flips.rows[1], ink: false },
+  { key: 'both', name: vf.both, sub: vf.bothSub, r: s.flips.rows[2], ink: true },
+];
+const readouts = {
+  haiku: { t: s.haiku.name, r: s.haiku.readout, lab: vf.labels },
+  gpt: { t: s.gpt.name, r: s.gpt.readout, lab: vf.labels },
+  both: { t: vf.between, r: s.bothReadout, lab: vf.bothLabels },
+};
+const nullItems = x.nullSec.groups.map((g, i) => rich(g.map((n) => s.nullSentences[n]).join(' '), [x.nullSec.marks[i]]));
+const nullDek = x.nullSec.dek.map((n) => s.nullSentences[n]).join(' ');
+const t2rows = se.s3.table2.rows;
 ---
 
 <Base
@@ -41,123 +57,198 @@ const table3Rows = se.s5.table.rows.map((r) => ({
   description={meta.screenerEval.description}
   path="/screener-eval/"
   ogImage="/og/screener-eval.png"
-  motion
+  page="builds"
 >
   <script type="application/ld+json" set:html={jsonLdString(screenerEvalJsonLd)} is:inline />
 
-  <Masthead
-    label="Case study specification"
-    kicker={se.kicker}
-    crumbs={[...caseStudy.crumbs, { label: 'screener-eval' }]}
-    h1={se.title}
-    standfirst={se.standfirst}
-    h1Max="26ch"
-    spec={se.specBlock}
-    switcher="screener-eval"
-    repo={{ href: se.repoHref, label: se.repoLabel }}
-    narr
-  >
-    <EssayFigure n={1} title={caseStudy.screenerFig1.title} source={caseStudy.screenerFig1.source}>
-      <MiniFigure
-        size="wide"
-        label="Employer swap moved the score 1.14 points or less; deleting links 0.90 or less; which screener read it, 22.3 points."
-        fig={{ kind: 'bars', max: 25, unit: 'points', bars: [
-          { label: 'employer swap', value: 1.14, display: '≤1.14' },
-          { label: 'links deleted', value: 0.9, display: '≤0.90' },
-          { label: 'which screener', value: 22.3, display: '22.3', mark: true },
-        ] }}
-      />
-    </EssayFigure>
-    {se.audio && <AudioPlayer audio={se.audio} articleId="screener-eval" />}
-  </Masthead>
+  <CaseTabs current={2} repoHref={se.repoHref} repoLabel={se.repoLabel} />
 
-  <Section mark={se.s1.mark} label={se.s1.label} narrId="s1-cue">
-    <p class="prose" data-narr="s1-p0">{se.s1.body}</p>
-  </Section>
-
-  <Section mark={se.s2.mark} label={se.s2.label} narrId="s2-cue">
-    <dl class="method-list" data-narr="s2-list">
-      {se.s2.rows.map((row) => (
-        <div class="method-row">
-          <dt>{row.term}</dt>
-          <dd>
-            {row.parts.map((part) => {
-              if ('code' in part) return <code>{part.code}</code>;
-              if ('strong' in part) return <strong>{part.strong}</strong>;
-              return part.text;
-            })}
-          </dd>
+  <CsHead kick={x.kick} h1={x.h1} find={rich(se.standfirst, x.findMarks)} hud={x.hud}>
+    <div slot="find" class="se-shock" id="se-shock" role="img" aria-label={x.shock.aria}>
+      {s.shock.map((r, i) => (
+        <div class:list={['se-sr', r.red && 'se-big']}>
+          <p class="se-sl">{x.shock.labels[i]}</p>
+          <div class="se-st"><i class={r.red ? 'r' : undefined} style={`--k:${r.k}`}></i></div>
+          <p class="se-sv">{r.text}</p>
         </div>
       ))}
-    </dl>
-  </Section>
-
-  <Section mark={se.s3.mark} label={se.s3.label} narrId="s3-cue">
-    <p class="prose intro" data-narr="s3-p0">{se.s3.intro}</p>
-    <EssayFigure n={1} replay title="Two levers against one screener" source="Source: Table 1 below and the between-screeners paragraph. 21 postings, 5 reps.">
-      <ForestPlot {...forest} />
-    </EssayFigure>
-    <div class="table-scroll" data-narr="s3-table1">
-      <DataTable nowrap caption={se.s3.table1.caption} columns={se.s3.table1.columns} rows={table1Rows} />
+      <div class="se-ax" aria-hidden="true"><span>{x.shock.axis[0]}</span><span>{x.shock.axis[1]}</span></div>
     </div>
-    <p class="prose table-intro" data-narr="s3-p1">{se.s3.table2Intro}</p>
-    <div class="table-scroll" data-narr="s3-table2">
-      <DataTable nowrap caption={se.s3.table2.caption} columns={se.s3.table2.columns} rows={table2Rows} />
+    {se.audio && <AudioPlayer audio={se.audio} articleId="screener-eval" />}
+  </CsHead>
+
+  <CsSection id="why" kick={x.why.kick} h2={x.why.h2} wide>
+    <Fragment slot="dek">{se.s1.body}</Fragment>
+  </CsSection>
+
+  <CsSection id="method" kick={x.method.kick} h2={x.method.h2}>
+    <Fragment slot="dek"><CsParts parts={rich(x.method.dek, x.method.dekMarks)} /></Fragment>
+    <CsStrip steps={x.method.steps} />
+    <CsSpecList label={P.shared.methodDetail} items={se.s2.rows.map((r) => ({ dt: r.term, parts: screenerParts(r.parts) }))} />
+  </CsSection>
+
+  <CsSection id="findings" kick={x.findings.kick} h2={x.findings.h2}>
+    <Fragment slot="dek"><CsParts parts={rich(x.findings.dek, x.findings.dekMarks)} /></Fragment>
+
+    <figure class="cs-fig" id="se-forest">
+      <div class="cs-fig-top">
+        <p class="cs-fig-t"><span class="fno">{P.shared.figNo} 1</span>{x.findings.fig.title}</p>
+        <CsLegend items={x.findings.fig.legend} />
+      </div>
+      <div class="cs-fig-body">
+        <div class="se-fp">
+          {s.forest.map((grp, gi) => (
+            <>
+              <p class="lab se-grp">{x.findings.fig.groups[gi]}</p>
+              {grp.map((r) => (
+                <div class="se-row">
+                  <p class="se-rl">{r.screener}</p>
+                  <div class="se-tr"><i class="se-ci" style={`--a:${pc(r.a)};--b:${pc(r.b)}`}></i><i class="se-dot" style={`--m:${pc(r.m)}`}></i></div>
+                  <p class="se-rv">{r.delta} <small>{r.ci}</small></p>
+                </div>
+              ))}
+            </>
+          ))}
+          <div class="se-row se-axr" aria-hidden="true">
+            <p></p>
+            <div class="se-tr se-axis">{x.findings.fig.axis.map((a, i) => <span style={`left:${i * 25}%`}>{a}</span>)}</div>
+            <p></p>
+          </div>
+        </div>
+      </div>
+      <figcaption class="cs-fig-foot">{x.findings.fig.foot.map((t) => <span>{t}</span>)}</figcaption>
+    </figure>
+
+    <p class="cs-lead">{se.s3.intro}</p>
+    <CsTable
+      caption={se.s3.table1.caption}
+      columns={se.s3.table1.columns}
+      textCols={2}
+      rows={se.s3.table1.rows.map((r) => ({ cells: [r.lever, r.screener, r.delta, r.ci, r.p] }))}
+    />
+  </CsSection>
+
+  <CsSection id="screener" kick={v.kick} h2={se.s3.lessonQuote}>
+    <Fragment slot="dek"><CsParts parts={rich(v.dek, v.dekMarks)} /></Fragment>
+
+    <figure class="cs-fig" id="se-stab" data-readouts={JSON.stringify(readouts)}>
+      <div class="cs-fig-top">
+        <p class="cs-fig-t"><span class="fno">{P.shared.figNo} 2</span>{vf.title}</p>
+        <CsLegend items={vf.legend} />
+      </div>
+      <div class="cs-fig-body">
+        <div class="se-scale" aria-hidden="true">
+          {bands.map((b) => (
+            <div class={`se-band ${b.cls}`} data-s={b.key} style={`--m:${s.gapPct[b.key === 'haiku' ? 'a' : 'b']}%;--sd:${b.stat.sd}%`}>
+              <i class="se-sd"></i><i class="se-mn"></i><span>{b.stat.name} · {b.stat.mean} ± {b.stat.sd}</span>
+            </div>
+          ))}
+          <div class="se-gap" style={`--a:${s.gapPct.a}%;--b:${s.gapPct.b}%`}></div>
+          <div class="se-ticks">{vf.ticks.map((t) => <span style={`left:${t}%`}>{t}</span>)}</div>
+        </div>
+        <p class="se-gapl"><span class="se-gk" aria-hidden="true"></span>{vf.gapLead} <b>{s.gap.mean}</b> · {vf.gapLargest} <b>{s.gap.largest}</b> · {vf.gapHigher} {s.gap.higher} {vf.postings}</p>
+        <p class="cs-note se-sn">{vf.scaleNote}</p>
+        <div class="se-stab">
+          <div class="se-flips" id="se-flips">
+            {flipRows.map((f) => (
+              <button type="button" class="se-fr" data-s={f.key} data-k={f.r.filled} data-ink={f.ink ? '1' : undefined}>
+                <span class="se-fn">{f.name}<small>{f.sub}</small></span>
+                <span class="cs-tiles se-ft" aria-hidden="true">
+                  {range(f.r.of).map((i) => <span class={`cs-t ${i < f.r.filled ? (f.ink ? 'f' : 'r') : ''}`}></span>)}
+                </span>
+                <span class="se-fv"><b>{f.r.filled}</b> of {f.r.of}</span>
+              </button>
+            ))}
+          </div>
+          <aside class="se-read" aria-live="polite">
+            <p class="lab">{vf.readout}</p>
+            <p class="se-rt" id="se-rt">{s.haiku.name}</p>
+            <dl class="se-rd" id="se-rd">
+              {vf.labels.map((l, i) => <div><dt>{l}</dt><dd id={`se-r${i + 1}`}>{s.haiku.readout[i]}</dd></div>)}
+            </dl>
+          </aside>
+        </div>
+      </div>
+      <figcaption class="cs-fig-foot">{vf.foot.map((t) => <span>{t}</span>)}</figcaption>
+    </figure>
+
+    <p class="cs-lead">{se.s3.table2Intro}</p>
+    <CsTable
+      caption={se.s3.table2.caption}
+      columns={se.s3.table2.columns}
+      rows={t2rows.map((r, i) => ({ cells: [r.measure, r.haiku, r.gpt], win: [false, false, i === t2rows.length - 1] }))}
+    />
+
+    <p class="cs-body">{se.s3.betweenScreeners}</p>
+
+    <CsCall label={se.s3.findingLeadIn.replace(/:$/, '')} long>{cap(se.s3.findingBody.trimStart())}</CsCall>
+  </CsSection>
+
+  <CsSection id="null" kick={x.nullSec.kick} h2={x.nullSec.h2}>
+    <Fragment slot="dek">{nullDek}</Fragment>
+    <CsList kind="lim" items={nullItems} />
+  </CsSection>
+
+  <CsSection id="parser" kick={x.parser.kick} h2={x.parser.h2}>
+    <Fragment slot="dek">{se.s5.intro}</Fragment>
+
+    <figure class="cs-fig" id="se-parse" data-words={JSON.stringify(pf.counts)} data-total={total}>
+      <div class="cs-fig-top">
+        <p class="cs-fig-t"><span class="fno">{P.shared.figNo} 3</span>{pf.title}</p>
+        <div class="cs-seg" role="group" aria-label={pf.toggleLabel}>
+          <button type="button" data-v="v41" aria-pressed="false">{pf.v41}</button>
+          <button type="button" data-v="v42" aria-pressed="true">{pf.v42}</button>
+        </div>
+      </div>
+      <div class="cs-fig-body">
+        <div class="se-pp">
+          {s.parsers.rows.map((r, ri) => (
+            <div class="se-pr" data-v41={r.v1.join(',')} data-v42={r.v2.join(',')}>
+              <p class="se-pn">{r.label}<small>{r.sub}{ri === 0 && ` · ${pf.identical}`}</small></p>
+              <div class="cs-tiles se-pt" aria-hidden="true">
+                {range(total).map((i) => <span class={`cs-t ${parserTile(r.v2, i)}`}></span>)}
+              </div>
+              <p class="se-pv">{r.v2.map((n, i) => `${n} ${pf.counts[i]}`).join(' · ')}</p>
+            </div>
+          ))}
+        </div>
+        <CsLegend items={pf.legend} below />
+      </div>
+      <figcaption class="cs-fig-foot">{pf.foot.map((t) => <span>{t}</span>)}</figcaption>
+    </figure>
+
+    <CsTable
+      caption={se.s5.table.caption}
+      columns={se.s5.table.columns}
+      rows={se.s5.table.rows.map((r) => ({ cells: [r.parser, r.v41, r.v42] }))}
+    />
+
+    <CsCall label={x.parser.calloutLabel} long>{s.close.slice(0, 3).join(' ')}</CsCall>
+    <p class="cs-note">{s.close[3]}</p>
+  </CsSection>
+
+  <CsSection id="limits" kick={x.limits.kick} h2={x.limits.h2}>
+    <CsList kind="lim" items={s.limits.map((t, i) => rich(t, [x.limits.marks[i]]))} />
+  </CsSection>
+
+  <CsSection id="any-agent" kick={x.rules.kick} h2={x.rules.h2} wide>
+    <Fragment slot="dek">{se.s6.body}</Fragment>
+    <CsList kind="rules" items={x.rules.items.map((t) => [{ text: t }])} />
+    <p class="cs-note cs-next">{se.s8.label}: {se.s8.body}</p>
+  </CsSection>
+
+  <CsSection id="code" kick={x.code.kick} h2={se.ctaSlabBody}>
+    <CsLinks links={x.code.links.map((l) => ({ ...l, href: se.repoCta.href }))} />
+    <div class="cs-related">
+      <p class="lab">{P.shared.related}</p>
+      <CsLinks sub links={x.code.related} />
     </div>
-    <EssayFigure n={2} replay title="Same résumé, same posting, two screeners" source="Source: Table 2 and the between-screeners paragraph. 21 postings.">
-      <UnitChart rows={flips.rows} cols={flips.cols} filledMeans="postings where it happened" emptyMeans="postings where it did not" />
-    </EssayFigure>
-    <p class="prose between" data-narr="s3-p2">{se.s3.betweenScreeners}</p>
-    <p class="prose finding" data-narr="s3-p3">
-      <strong>{se.s3.findingLeadIn}</strong>{se.s3.findingBody}
-    </p>
-    <div class="lesson" data-narr="s3-quote">
-      <PullQuote rule="red">{se.s3.lessonQuote}</PullQuote>
-    </div>
-  </Section>
+  </CsSection>
 
-  <Section mark={se.s4.mark} label={se.s4.label} narrId="s4-cue">
-    <p class="prose" data-narr="s4-p0">{se.s4.body}</p>
-  </Section>
-
-  <Section mark={se.s5.mark} label={se.s5.label} narrId="s5-cue">
-    <p class="prose intro" data-narr="s5-p0">{se.s5.intro}</p>
-    <EssayFigure n={3} replay title="Fields each parser read from the résumé" source="Source: Table 3 below. Squares are grouped by outcome, not by field order. The three plain extractors had identical results.">
-      <ParserCompare rows={parsers.rows} />
-    </EssayFigure>
-    <div class="table-scroll" data-narr="s5-table">
-      <DataTable nowrap caption={se.s5.table.caption} columns={se.s5.table.columns} rows={table3Rows} />
-    </div>
-    <p class="prose close" data-narr="s5-p1">{se.s5.close}</p>
-  </Section>
-
-  <Section mark={se.s6.mark} label={se.s6.label} narrId="s6-cue">
-    <p class="prose" data-narr="s6-p0">{se.s6.body}</p>
-  </Section>
-
-  <Section mark={se.s7.mark} label={se.s7.label} narrId="s7-cue">
-    <p class="prose" data-narr="s7-p0">{se.s7.body}</p>
-  </Section>
-
-  <Section mark={se.s8.mark} label={se.s8.label} narrId="s8-cue">
-    <p class="prose" data-narr="s8-p0">{se.s8.body}</p>
-    <p class="prose repo-cta">
-      <a href={se.repoCta.href} target="_blank" rel="noopener noreferrer">{se.repoCta.label}</a>
-    </p>
-  </Section>
-
-  <Section mark={se.relatedWriting.mark} label="Related writing">
-    <p class="prose related-writing">
-      <a href={se.relatedWriting.href}>{se.relatedWriting.text}</a>
-    </p>
-  </Section>
-
-  <CTASlab
-    marginLines={[home.eyebrow.toUpperCase()]}
-    body={se.ctaSlabBody}
-    buttonLabel="View the repo →"
-    buttonHref={se.repoHref}
-    secondaryLabel={cta.bookACall.label}
-    secondaryHref={cta.bookACall.href}
-  />
+  <CsContact />
 </Base>
+
+<script>
+  import { initScreenerEval } from '../scripts/case-study';
+  initScreenerEval();
+</script>

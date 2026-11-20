@@ -1,0 +1,16 @@
+---
+// A numbered section heading inside an essay: "§1" in red mono, then the title. The id is the deep link and the
+// read-along anchor (data-narr) is the section's narration cue.
+import { sectionId } from '../lib/sectionId';
+
+interface Props {
+  mark: string;
+  label: string;
+  anchorId?: string;
+  narrId?: string;
+}
+
+const { mark, label, anchorId, narrId } = Astro.props;
+---
+
+<h2 class="rs-h" id={anchorId ?? sectionId(label)} data-narr={narrId}><span class="sec-no" aria-hidden="true">{mark}</span> <span class="label">{label}</span></h2>

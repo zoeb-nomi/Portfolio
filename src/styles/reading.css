@@ -1,21 +1,10 @@
-/* zoebnomi.com — reading text · The Red Pen v1.0
-   The paragraph and link-row styles every essay and case study shares. They used to be
-   re-declared in each page (eight copies of .prose); a change to reading type is now one edit.
-   Pages keep only what is genuinely theirs (e.g. /about/ adds a bottom margin). */
-
-/* :where() keeps the base at zero specificity, like layout.css: a page or component class
-   (.repo-cta, .table-intro, ...) overrides any single property regardless of which
-   stylesheet loads first. */
-:where(.prose) {
-  font-family: var(--font-text);
-  font-size: var(--t-body);
-  line-height: var(--lh-prose);
-  color: var(--color-text-body);
-  max-width: var(--measure);
-}
+/* zoebnomi.com reading text · The Pipeline
+   What an essay, a note or a case study adds to the kit's .prose (ds.css §12): paragraph rhythm, inline readouts,
+   footnote markers that open in place, the red reading spine, and the margin rail. One edit here changes every
+   long-form page. Pages keep only what is genuinely theirs. */
 
 .prose + .prose {
-  margin-top: var(--s-6);
+  margin-top: 1.05em;
 }
 
 /* "Case study → · Repo →": the closing row of links under an essay. */
@@ -30,11 +19,241 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--hit-min);
-  color: var(--color-link);
+  color: var(--color-text);
   text-decoration: underline;
+  text-decoration-color: var(--color-accent);
   text-underline-offset: var(--underline-offset);
 }
 
 .links-line .sep {
   color: var(--color-text-muted);
+}
+
+/* ---- Page head pieces ---- */
+
+/* The standfirst under an essay's headline. */
+.dek {
+  max-width: 640px;
+  margin-top: 20px;
+  font-size: clamp(17px, 1.3vw, 20px);
+  line-height: var(--lh-base);
+  color: var(--color-text-body);
+}
+
+.byline a {
+  color: var(--color-text-body);
+  text-decoration: none;
+  border-bottom: var(--line-strong);
+}
+
+.byline a:hover,
+.byline a:focus-visible {
+  color: var(--color-text);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ---- Inline readouts, footnote markers, source lines ---- */
+
+/* A number set as a readout inside a sentence. Same words, tabular, underlined by a hairline. */
+.prose .rn {
+  color: var(--color-text);
+  font-variation-settings: 'wdth' 92, 'wght' 640;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: inset 0 -1px 0 var(--color-line-strong);
+}
+
+/* Footnote markers carry their number in data-n, so the paragraph's own text (which the narration is built from)
+   is unchanged. */
+.prose sup {
+  line-height: 0;
+}
+
+.prose sup a::before {
+  content: attr(data-n);
+}
+
+.prose sup a[aria-expanded='true'] {
+  color: var(--color-on-accent);
+  background: var(--color-accent-fill);
+  padding: 0 3px;
+}
+
+.fnbox {
+  margin-top: 0.8em;
+  border-left: var(--line-pen);
+  background: var(--color-surface-sunk);
+  padding: 10px 14px;
+  font: 400 var(--t-data) / var(--lh-body) var(--font-data);
+  color: var(--color-text-body);
+}
+
+.fnbox b {
+  margin-right: 8px;
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
+.fnbox a {
+  color: var(--color-text);
+}
+
+/* The footnote list that ends the article (the spine stops at its bottom edge). */
+.footnotes .back {
+  margin-left: 4px;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: var(--underline-offset);
+}
+
+/* A mono source line under a table or figure. */
+.src-line {
+  margin-top: 10px;
+  font: 400 var(--t-label) / 1.6 var(--font-data);
+  color: var(--color-text-muted);
+}
+
+.src-line a {
+  color: var(--color-text-body);
+}
+
+/* ---- Margin rail ---- */
+
+/* `.article` (ds.css) is the paragraph plus its note: 64ch at body size, then the rail. Under 1100px the kit hides
+   the rail; on a reading page the note stays and sits under its paragraph. */
+.article .margin-note {
+  max-width: 250px;
+}
+
+.margin-note b {
+  display: block;
+  margin-bottom: 3px;
+  font: 500 var(--t-label) / 1.4 var(--font-data);
+  letter-spacing: var(--track-caps);
+  text-transform: uppercase;
+  color: var(--color-text-body);
+}
+
+@media (max-width: 1099px) {
+  .article .margin-note {
+    max-width: none;
+  }
+
+  .rs-in > .article > aside {
+    display: block;
+    padding-top: 0;
+    margin-top: 0.9em;
+  }
+}
+
+/* ---- The reading spine ---- */
+
+/* Drawn by scripts/reading.ts inside <main>, from the first line of the article to the end of its last section or
+   its footnotes, then a terminal square. Under 1100px it is a fixed progress bar under the header, shown only
+   while the article is on screen. */
+.rd-prog {
+  position: absolute;
+  z-index: 2;
+  width: 2px;
+  pointer-events: none;
+}
+
+.rd-prog::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: var(--line-pen);
+  background: var(--color-surface);
+  transition: background-color 0.3s ease;
+}
+
+.rd-prog.done::after {
+  background: var(--color-accent);
+}
+
+.rd-track {
+  position: absolute;
+  inset: 0;
+  background: var(--color-line);
+}
+
+.rd-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform-origin: top;
+  transform: scaleY(0);
+  will-change: transform;
+}
+
+.rd-ticks i {
+  position: absolute;
+  left: -3px;
+  width: 8px;
+  height: 1px;
+  background: var(--color-text-muted);
+}
+
+.rd-tip {
+  position: absolute;
+  left: -4px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  will-change: transform;
+}
+
+.rd-tip::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-surface);
+}
+
+.rd-tiplab {
+  position: absolute;
+  left: 16px;
+  top: -1px;
+  font: 500 var(--t-label) / 1 var(--font-data);
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+@media (max-width: 1099px) {
+  .rd-prog {
+    position: fixed;
+    z-index: 30;
+    left: 0;
+    right: 0;
+    top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+    bottom: auto;
+    width: auto;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .rd-prog.on {
+    opacity: 1;
+  }
+
+  .rd-prog::after {
+    display: none;
+  }
+
+  .rd-fill {
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  .rd-ticks,
+  .rd-tip {
+    display: none;
+  }
 }

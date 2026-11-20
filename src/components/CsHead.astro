@@ -1,0 +1,48 @@
+---
+// Case-study page head: kicker, h1, the finding sentence, readouts, then the HUD spec strip.
+// Slots: "find" (a figure that sits under the finding sentence), default (under the HUD: the audio player).
+import CsParts from './CsParts.astro';
+import { arrowSplit, type Part } from '../lib/caseStudy';
+import { pipelineCaseStudies as P } from '../data/copy';
+
+interface Props {
+  kick: string;
+  h1: string;
+  find: Part[];
+  stats?: { v: string; u: string; s: string }[];
+  hud: { label: string; v: string; small?: string; red?: boolean }[];
+}
+
+const { kick, h1, find, stats = [], hud } = Astro.props;
+---
+
+<section class="page-head cs-head gut">
+  <div class="in">
+    <p class="kick">{kick}</p>
+    <h1 class="display split">{h1}</h1>
+    <p class="cs-find"><CsParts parts={find} /></p>
+    {stats.length > 0 && (
+      <div class="stats">
+        {stats.map((s) => {
+          const [a, b] = arrowSplit(s.v);
+          return (
+            <div class="ro">
+              <p class="v" data-num>{a}{b !== null && <> <span class="ar2">{P.shared.arrow}</span> {b}</>}</p>
+              <p class="u">{s.u}</p>
+              <p class="s">{s.s}</p>
+            </div>
+          );
+        })}
+      </div>
+    )}
+    <slot name="find" />
+    <div class="hud cs-spec">
+      <div class="hud-in">
+        {hud.map((c) => (
+          <div class="hud-c"><span>{c.label}</span><b class={c.red ? 'r' : undefined}>{c.v}{c.small && <>{' '}<small>{c.small}</small></>}</b></div>
+        ))}
+      </div>
+    </div>
+    <slot />
+  </div>
+</section>

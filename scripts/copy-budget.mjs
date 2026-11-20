@@ -14,9 +14,9 @@ import { serveDist } from './lib/serve-dist.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const BUDGETS = [
-  // Red Pen 5: the live audit's example answer (about 90 words) and the harness panel's data labels (about 75) are
-  // artifacts on the page, not prose, so home's budget is 530 (520 until the live ledger panel, 20 Nov 2026).
-  { route: '/', words: 530, enforce: true },
+  // The Pipeline (20 Nov 2026): the approved home measured 740 words. The scene's five stage cards, the harness band's
+  // labels and the three Shipped panels are data on the page, not prose. Red Pen 5's limit was 530. Zoeb to confirm 750.
+  { route: '/', words: 750, enforce: true },
   { route: '/builds/', words: 700 },
   { route: '/about/', words: 500 },
   { route: '/writing/', words: 400 },
@@ -42,7 +42,7 @@ for (const b of BUDGETS) {
       const words = (s) => s.trim().split(/\s+/).filter(Boolean).length;
       const own = (e) => [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ');
       const visible = (e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';
-      const red = getComputedStyle(document.documentElement).getPropertyValue('--red-ink').trim();
+      const red = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-text').trim();
       const probe = document.createElement('span');
       probe.style.color = red;
       document.body.append(probe);

@@ -1,33 +1,28 @@
 # TradeFrameFlow
 
 ## Purpose
-"Who decides what runs": TradeFrame's decision path. A dashed node proposes only; a solid node decides.
+"Who decides what runs" (Fig. 1): TradeFrame's decision path as a diagram. A dashed node only proposes; a solid node decides. Every label is printed in the SVG, and a token moves along the path: propose, validate, confirm, execute and record.
 
 ## Anatomy
-- `full`: a `<figure>` with caption, four numbered steps (propose, validate, confirm in the two books, execute and record), the base nodes (kill switch, ledger), a step-label line (`aria-hidden`) and a Replay button.
-- `strip`: one line of the four step labels (the first is the dashed proposing step), with an optional Replay button.
-- Every label is printed in the HTML; text comes from `builds.tradeframeFlow` in `src/data/copy.ts`.
+`.bd-flow-wrap[data-tf-flow]`: an `svg.bd-flow` (`role="img"` with a label; nodes for the model, the deterministic gate, the US and India books and the log; kill-switch bars; the token), an `ol.bd-steps` of the four step labels, and `p.bd-flowcap` (the red "Fig. 1" and the title).
 
 ## Props
-| prop | type | notes |
-|---|---|---|
-| `variant` | `'full' \| 'strip'` | default `full` |
-| `id` | `string?` | element id; Replay uses it for `aria-controls`. Default `tf-flow` |
-| `replay` | `boolean?` | strip only: render its own Replay button (false inside a `<summary>`, where the row panel carries it). Default true |
+None. Copy from `pipelineBuilds.flow` and `builds.tradeframeFlow` in `copy.ts`.
 
-## Tokens it reads
-- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-surface`, `-accent-text`, `--color-accent-tint` (a lit step).
-- Type: `--font-data`, `--t-label`, `--t-small`, `--lh-snug`.
-- Space and lines: `--s-1` to `--s-5`, `--line-object`, `--line-propose` (dashed), `--line-heavy`, `--hit-touch`, `--underline-offset`. Motion: `--dur-base`, `--ease-draw`.
+## Variants
+None.
 
-## States and motion
-- Reveal: once at 60% in view, `motion.ts` lights the path step by step (propose, validate, confirm, execute and record), then clears. Replay plays it again; the button is `hidden` until script runs.
-- A lit node takes the `--color-accent-tint` wash and its index and label turn red text.
-- Without script or with reduced motion nothing is lit and all labels are readable.
-- Ink surface: roles re-point (the tint becomes the glow wash).
+## Kit classes
+`.fno` (the figure number) plus own `bd-*` and SVG classes (`.nd`, `.dash`, `.ed`, `.ks`). Dashed means proposes, solid means decides; the accent marks the lit path and the kill switch.
+
+## Motion
+The script moves one token along the path on a 4.4 second cycle, alternating the US and India book, and one run in three fires the kill switch. It runs only while the figure is on screen and the tab is visible. Reduced motion (`motion()` from `ds.ts` is false) shows the finished path with all four steps lit.
 
 ## Accessibility
-The figure is labelled by its caption; step numbers and arrows are `aria-hidden`; Replay has `aria-controls`.
+The SVG has a text label and every node label is real SVG text; the four steps are also an ordered list, so the sequence is readable without the animation. Nothing relies on colour alone (dashed versus solid).
+
+## Light and dark
+Roles only (`--color-surface`, `--line-strong`, accent for the path), so the diagram reads on graphite and on paper.
 
 ## Used on
-Also via: `BuildsLedger`.
+`/builds/`, inside the `BuildsLedger` row for TradeFrame.

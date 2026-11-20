@@ -1,0 +1,18 @@
+---
+// The method in full: every term and its sentence, in the prototype's spec grid.
+import CsParts from './CsParts.astro';
+import type { Part } from '../lib/caseStudy';
+
+interface Props {
+  items: { dt: string; parts: Part[] }[];
+  label: string;
+}
+
+const { items, label } = Astro.props;
+---
+
+<dl class="cs-spec-list full" data-stagger aria-label={label}>
+  {items.map((it) => (
+    <div><dt>{it.dt}</dt><dd><CsParts parts={it.parts} /></dd></div>
+  ))}
+</dl>

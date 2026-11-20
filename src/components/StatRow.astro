@@ -1,4 +1,6 @@
 ---
+// One readout in the kit's .ro grammar: a big whole number, what it counts, and where it comes from.
+// Place several inside a `.stats` row (or `.ros` grid). The number appears whole, never counted up.
 interface Props {
   value: string;
   verdict?: string | null;
@@ -10,83 +12,26 @@ interface Props {
 const { value, verdict = null, sub = null, label, provenance = null } = Astro.props;
 ---
 
-<div class="stat-row">
-  <p class="stat-figure tabular">
+<div class="ro stat-row">
+  <p class="v tabular" data-num>
     {value}
     {verdict && <span class="verdict" aria-hidden="true">{verdict}</span>}
     {sub && <span class="stat-sub">{sub}</span>}
   </p>
-  <p class="stat-label">
-    {label}
-    {provenance && <span class="provenance"> {provenance}</span>}
-  </p>
+  <p class="u">{label}</p>
+  {provenance && <p class="s">{provenance}</p>}
 </div>
 
 <style>
-  .stat-row {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    align-items: baseline;
-    gap: var(--s-9);
-    padding-block: var(--s-6);
-    border-top: var(--line-hair);
-    transition: border-color var(--dur-fast) var(--ease-draw);
-  }
-
-  .stat-row:first-child {
-    border-top: 0;
-  }
-
-  @media (hover: hover) {
-    .stat-row:hover {
-      border-top-color: var(--color-line-strong);
-    }
-  }
-
-  .stat-figure {
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-stat);
-    line-height: 0.9;
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-    white-space: nowrap;
-  }
-
   .verdict {
-    color: var(--color-accent-text);
-    font-size: var(--t-quote);
-    vertical-align: super;
+    color: var(--color-accent);
     margin-left: var(--s-1);
   }
 
   .stat-sub {
     font-family: var(--font-data);
-    font-size: var(--t-quote);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
     margin-left: var(--s-2);
-    letter-spacing: var(--track-normal);
-  }
-
-  .stat-label {
-    font-family: var(--font-text);
-    font-size: var(--t-small);
-    color: var(--color-text-body);
-    line-height: var(--lh-snug);
-  }
-
-  .provenance {
-    font-family: var(--font-data);
-    font-size: var(--t-label-lg);
-    color: var(--color-text-muted);
-  }
-
-  @media (max-width: 899px) {
-    .stat-row {
-      grid-template-columns: 1fr;
-      gap: var(--s-2);
-      padding-block: var(--s-3);
-    }
   }
 </style>

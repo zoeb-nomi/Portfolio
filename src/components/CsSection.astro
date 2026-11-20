@@ -1,0 +1,23 @@
+---
+// A case-study section: kicker and h2 on the left, a short dek on the right, then the body.
+interface Props {
+  id: string;
+  kick: string;
+  h2: string;
+  /** The dek carries a whole paragraph of the case study. */
+  wide?: boolean;
+}
+
+const { id, kick, h2, wide = false } = Astro.props;
+const hasDek = Astro.slots.has('dek');
+---
+
+<section class="sec gut cs-sec-tight" id={id}>
+  <div class="in">
+    <div class="cs-sh">
+      <div><p class="kick">{kick}</p><h2 class="h2 split">{h2}</h2></div>
+      {hasDek && <p class:list={['cs-dek', wide && 'long']}><slot name="dek" /></p>}
+    </div>
+    <slot />
+  </div>
+</section>
