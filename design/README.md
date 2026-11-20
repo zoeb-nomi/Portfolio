@@ -166,7 +166,9 @@ Rules:
 4. No scroll-jacking: a pinned sequence is short and has a visible Skip. Interactive inspection
    (the trace) is driven by clicks and arrow keys, not by scroll.
 5. Reduced motion: the final composed state, no movement. Without JS every word is visible.
-6. GSAP 3.12.5 + ScrollTrigger are bundled from npm; no smooth-scroll library.
+6. The kit hooks above run on IntersectionObserver and the Web Animations API, so a plain page ships no animation
+   library. Page scripts that need timelines or pinning (the home scene, Shipped, About, Builds, Design) import
+   GSAP 3.12.5 + ScrollTrigger from `src/scripts/gsap.ts` (npm, pinned). No smooth-scroll library.
 
 ## 9. Do and don't
 
@@ -243,7 +245,9 @@ declaration outside `design/tokens.css`, no primitive read in `src/`), `npm run 
 route at 390/768/1024/1440, fails on serious or critical), `npm run links` (internal links,
 fragments, redirect targets; `-- --external` for outbound), `npm run lhci` (home, /builds/, a
 case study, /writing/; perf ≥ 90, a11y ≥ 95, SEO ≥ 95, CLS < 0.1, desktop and mobile),
-`npm run qa` and `npm run tokens` (rendered sweeps), `npm run audio:check`, `npm run budget`.
+`npm run floor` (every route at 375px: no visible text under 11px, SVG labels included), `npm run qa` and `npm run tokens`
+(rendered sweeps), `npm run audio:check`, `npm run budget`. The build itself writes the Content-Security-Policy
+(`scripts/csp.mjs`, postbuild: hashes of the inline scripts plus the allowed hosts).
 
 In a cloud container whose Chromium differs from the pinned Playwright, pass
 `CHROME=/opt/pw-browsers/chromium` to a11y, links, og and budget, and for lhci

@@ -247,7 +247,8 @@ const articleLd = articleJsonLd({
 </Base>
 
 <script>
-  import { gsap, ScrollTrigger, $, $$, motion } from '../../scripts/ds';
+  import { $, $$, motion } from '../../scripts/ds';
+  import { gsap, ScrollTrigger } from '../../scripts/gsap';
 
   // Fig. 1 marks itself once, when it arrives: the rows come in, the dropped squares are outlined, then the red crosses
   // appear. A calm fade throughout. Under reduced motion the sheet is simply its final state.

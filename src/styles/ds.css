@@ -189,7 +189,7 @@ ul,ol{margin:0;padding:0}
 .prose pre code{background:none;padding:0}
 .prose hr{border:0;border-top:var(--line-hair);margin-block:2.2em}
 .prose .num,.prose td,.prose .tnum{font-variant-numeric:tabular-nums}
-.prose sup a,.fnref{font:500 .7em/1 var(--font-data);color:var(--color-accent);text-decoration:none;vertical-align:super;margin-left:1px}
+.prose sup a,.fnref{font:500 max(.7em,var(--t-label))/1 var(--font-data);color:var(--color-accent);text-decoration:none;vertical-align:super;margin-left:1px}
 .footnotes{margin-top:3em;padding-top:1.2em;border-top:var(--line-hair);font-size:14.5px;line-height:var(--lh-body);color:var(--color-text-muted)}
 .footnotes ol{padding-left:1.4em}
 .footnotes li+li{margin-top:.5em}
@@ -244,3 +244,5 @@ main:focus-visible{outline:none}
 @media (max-width:599px){.stats .ro{flex:1 1 calc(50% - 28px);margin-right:0;padding-right:14px;border-right:0}}
 /* links inside footnote text stay underlined, so they never rely on colour alone */
 .footnotes a{text-decoration:underline;text-decoration-color:var(--color-line-strong);text-underline-offset:var(--underline-offset)}
+/* touch screens: text links get a 44px tap area from an invisible box, so the underline stays put */
+@media (pointer:coarse){.tl::before{content:"";position:absolute;left:0;right:0;top:-7px;bottom:-7px}}

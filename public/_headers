@@ -1,12 +1,18 @@
-# TODO — Content-Security-Policy. When it lands, the video facade on /work/
-# needs: frame-src https://www.youtube-nocookie.com
-# Nothing else, except: posters are self-hosted, but one bus-stop Watch card hotlinks its poster from i.ytimg.com (Zoeb's decision), so a future CSP also needs img-src https://i.ytimg.com.
-# The home harness panel reads the agent ledger, so a future CSP also needs
-# connect-src https://agent-ledger.zoeb-nomi5699.workers.dev wss://agent-ledger.zoeb-nomi5699.workers.dev
+# Content-Security-Policy is not written here: scripts/csp.mjs (postbuild) hashes the inline scripts and adds it
+# to dist/_headers under /*. Its hosts are listed in that script.
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+/audio/*
+  Cache-Control: public, max-age=604800
+/og/*
+  Cache-Control: public, max-age=86400
+/fonts/*
+  Cache-Control: public, max-age=2592000
+/img/*
+  Cache-Control: public, max-age=604800

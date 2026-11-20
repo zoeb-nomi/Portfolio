@@ -42,7 +42,7 @@ const data = { audit, totals: T, stations: P.stations, scene: sc, trace: P.trace
 <section class="pipe gut" id="pipeline" data-module="pipeline" aria-labelledby="h1">
   <div class="hero">
     <div>
-      <p class="id">{P.id}</p>
+      <p class="id">{P.id.split(' · ').map((seg, i) => <>{i > 0 && <span class:list={['id-dot', i === 1 && 'first']}> · </span>}<span class="id-seg">{seg}</span></>)}</p>
       <h1 class="display" id="h1">{h1Pre}<span class="mk">{home.h1Underline}<span class="ul"></span></span></h1>
       <p class="hsub">{home.v4.lede}</p>
     </div>
@@ -164,6 +164,8 @@ const data = { audit, totals: T, stations: P.stations, scene: sc, trace: P.trace
 .pipe{position:relative;background:var(--color-surface)}
 .hero{max-width:var(--shell-max);margin:0 auto;padding-top:clamp(40px,8vh,96px);padding-bottom:28px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 48px}
 .hero .id{margin-bottom:16px}
+.hero .id-seg{white-space:nowrap}
+@media (max-width:599px){.hero .id-seg:first-of-type{display:block}.hero .id-dot.first{display:none}}
 .hero .display{max-width:none}
 .hero .hsub{margin-top:14px;font-size:clamp(19px,1.7vw,26px);line-height:1.25;letter-spacing:-.01em;color:var(--color-text-body);font-variation-settings:"wdth" 92,"wght" 460;max-width:none}
 .hero .ctas{gap:14px 20px}
@@ -182,7 +184,7 @@ const data = { audit, totals: T, stations: P.stations, scene: sc, trace: P.trace
 .pipe.vert .slabel .in2{transform:translate(0,-50%);text-align:left}
 .tblk{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--font-data);font-size:var(--t-label);letter-spacing:.06em;color:var(--color-text-muted);white-space:nowrap;text-transform:uppercase;will-change:transform}
 .tblk .tin{display:block;transform:translate(-50%,0);text-align:center;line-height:1.35}
-.pipe.vert .tblk .tin{transform:translate(-100%,-50%);text-align:right}
+.pipe.vert .tblk .tin{transform:translate(-100%,-50%);text-align:left;width:112px}
 .tblk .h{display:block;color:var(--color-text-body)}
 .tblk b{color:var(--color-accent);font-weight:500;font-variant-numeric:tabular-nums}
 .pipe .cards{list-style:none;margin:0 auto;padding:24px 0 64px;max-width:var(--shell-max);grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr))}

@@ -1,8 +1,8 @@
 /* The Pipeline runtime (design/README.md §8). Base.astro calls init() on every page.
    Everything degrades: without JS or under reduced motion the page is complete and static.
-   GSAP + ScrollTrigger are bundled from npm (no CDN). No smooth-scroll library. */
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+   The kit's own motion (reveals, spines, the verbs wave) uses IntersectionObserver and the Web Animations API,
+   so a plain page ships no animation library. Pages whose own scripts need GSAP import it from ./gsap.
+   No smooth-scroll library. */
 
 const d = document;
 const w = window;
@@ -17,7 +17,6 @@ export const cubicInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow
 
 export const reduce = w.matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const motion = () => !reduce;
-export { gsap, ScrollTrigger };
 
 /** Read a "r,g,b" scene token (canvas colours). */
 export const sceneRGB = (name: '--scene-bg' | '--scene-ink' | '--scene-red') =>
@@ -93,50 +92,104 @@ function anchors() {
   });
 }
 
-/** Reveals: .split / [data-split] headings fade up whole; [data-reveal] blocks; [data-stagger] children;
-    [data-num] numbers revealed whole once in view. */
-export function reveals(root: ParentNode = d) {
-  if (!motion()) return;
-  $$('[data-split],.h2.split,.display.split', root).forEach((h) => {
-    gsap.from(h, { autoAlpha: 0, y: 10, duration: 1.1, ease: 'power2.out', scrollTrigger: { trigger: h, start: 'top 92%', once: true } });
-  });
-  $$('[data-reveal]', root).forEach((el) => {
-    gsap.from(el, { y: 10, autoAlpha: 0, duration: 1, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 95%', once: true } });
-  });
-  $$('[data-stagger]', root).forEach((el) => {
-    gsap.from(el.children, { y: 8, autoAlpha: 0, duration: 0.9, ease: 'power2.out', stagger: 0.05, scrollTrigger: { trigger: el, start: 'top 95%', once: true } });
-  });
-  $$('[data-num]', root).forEach((el) => {
-    revealNumber(el, 0);
-    const o = { t: 0 };
-    gsap.to(o, { t: 1, duration: 0.6, ease: 'none', onUpdate: () => revealNumber(el, o.t), scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+const POWER2_OUT = 'cubic-bezier(.33,1,.68,1)';
+
+/** Run `fn` once when `el` first crosses `ratio` of the viewport height from the top (like ScrollTrigger "top N%"). */
+function onEnter(el: Element, ratio: number, fn: () => void) {
+  // Already past the trigger line (the page opened on an anchor, or was restored mid-scroll): run now, as
+  // ScrollTrigger would, so nothing above the viewport stays hidden.
+  if (el.getBoundingClientRect().top < w.innerHeight * ratio) {
+    fn();
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        io.disconnect();
+        fn();
+        return;
+      }
+    },
+    { rootMargin: `0px 0px -${Math.round((1 - ratio) * 100)}% 0px` },
+  );
+  io.observe(el);
+}
+
+/** Hide an element now and fade it up when it arrives; elements already on screen fade in at once. */
+function fadeUp(el: HTMLElement, ratio: number, y: number, duration: number, delay = 0) {
+  el.style.opacity = '0';
+  onEnter(el, ratio, () => {
+    const a = el.animate(
+      [
+        { opacity: 0, transform: `translate3d(0,${y}px,0)` },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration, delay, easing: POWER2_OUT, fill: 'backwards' },
+    );
+    el.style.opacity = '';
+    a.addEventListener('finish', () => a.cancel());
   });
 }
 
-/** Red spine: draws down its section as you scroll; latched, so it only ever grows. */
-export function spines(root: ParentNode = d) {
-  if (!motion()) return;
-  $$('.spine', root).forEach((sp) => {
-    const sec = sp.parentElement;
-    if (!sec) return;
-    let mx = 0;
-    gsap.set(sp, { scaleY: 0 });
-    ScrollTrigger.create({
-      trigger: sec,
-      start: 'top 70%',
-      end: 'bottom 60%',
-      onUpdate: (self) => {
-        if (self.progress <= mx) return;
-        mx = self.progress;
-        sp.style.transform = `scaleY(${mx.toFixed(4)})`;
-      },
+/** Reveals: .split / [data-split] headings fade up whole; [data-reveal] blocks; [data-stagger] children;
+    [data-num] numbers revealed whole once in view. */
+export function reveals(root: ParentNode = d) {
+  if (!motion() || !('IntersectionObserver' in w)) return;
+  $$('[data-split],.h2.split,.display.split', root).forEach((h) => fadeUp(h, 0.92, 10, 1100));
+  $$('[data-reveal]', root).forEach((el) => fadeUp(el, 0.95, 10, 1000));
+  $$('[data-stagger]', root).forEach((el) =>
+    Array.from(el.children).forEach((c, i) => fadeUp(c as HTMLElement, 0.95, 8, 900, i * 50)),
+  );
+  $$('[data-num]', root).forEach((el) => {
+    revealNumber(el, 0);
+    onEnter(el, 0.9, () => {
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const t = clamp((now - t0) / 600, 0, 1);
+        revealNumber(el, t);
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     });
   });
 }
 
+/** Red spine: draws down its section as you scroll, from the section's top at 70% of the viewport to its bottom
+    at 60%; latched, so it only ever grows. */
+export function spines(root: ParentNode = d) {
+  if (!motion()) return;
+  const items = $$('.spine', root)
+    .map((sp) => ({ sp, sec: sp.parentElement as HTMLElement | null, mx: 0 }))
+    .filter((x): x is { sp: HTMLElement; sec: HTMLElement; mx: number } => !!x.sec);
+  if (!items.length) return;
+  items.forEach((x) => (x.sp.style.transform = 'scaleY(0)'));
+  let queued = false;
+  const update = () => {
+    queued = false;
+    const vh = w.innerHeight;
+    for (const x of items) {
+      if (x.mx >= 1) continue;
+      const r = x.sec.getBoundingClientRect();
+      const p = clamp((0.7 * vh - r.top) / (0.1 * vh + r.height), 0, 1);
+      if (p <= x.mx) continue;
+      x.mx = p;
+      x.sp.style.transform = `scaleY(${p.toFixed(4)})`;
+    }
+  };
+  const queue = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(update);
+  };
+  w.addEventListener('scroll', queue, { passive: true });
+  w.addEventListener('resize', queue);
+  update();
+}
+
 /** Verbs row: one variable-weight wave when the row arrives (time-based, so it never rests half-weight). */
 export function verbs(root: ParentNode = d) {
-  if (!motion()) return;
+  if (!motion() || !('IntersectionObserver' in w)) return;
   $$('.verb-row', root).forEach((row) => {
     const items = $$('.verb', row);
     const heads = items.map((v) => $('h3', v)).filter((h): h is HTMLElement => !!h);
@@ -144,15 +197,13 @@ export function verbs(root: ParentNode = d) {
       h.style.setProperty('--vw', '62');
       h.style.setProperty('--vg', '200');
     });
-    const o = { t: 0 };
-    gsap.to(o, {
-      t: 1,
-      duration: 1.6,
-      ease: 'none',
-      scrollTrigger: { trigger: row, start: 'top 85%', once: true },
-      onUpdate: () => {
+    items.forEach((v, i) => fadeUp(v, 0.88, 10, 1000, i * 80));
+    onEnter(row, 0.85, () => {
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const t = clamp((now - t0) / 1600, 0, 1);
         heads.forEach((h, i) => {
-          const p = sub(o.t, i * 0.1, i * 0.1 + 0.6);
+          const p = sub(t, i * 0.1, i * 0.1 + 0.6);
           let wg: number;
           let wd: number;
           if (p < 0.55) {
@@ -166,9 +217,10 @@ export function verbs(root: ParentNode = d) {
           h.style.setProperty('--vg', wg.toFixed(0));
           h.style.setProperty('--vw', wd.toFixed(1));
         });
-      },
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     });
-    gsap.from(items, { y: 10, autoAlpha: 0, duration: 1, ease: 'power2.out', stagger: 0.08, scrollTrigger: { trigger: row, start: 'top 88%', once: true } });
   });
 }
 
@@ -223,9 +275,7 @@ export function init() {
   theme();
   anchors();
   scrollRegions();
-  if (motion()) gsap.registerPlugin(ScrollTrigger);
   reveals();
   spines();
   verbs();
-  if (motion() && d.fonts?.ready) d.fonts.ready.then(() => ScrollTrigger.refresh());
 }

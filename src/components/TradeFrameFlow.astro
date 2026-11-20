@@ -3,7 +3,9 @@
 // only; solid = decides. Every label is printed in the SVG; the script moves one token along the path
 // (propose, validate, confirm, execute and record), alternating the US and India book, and once in
 // three runs the kill switch fires. It runs only while the figure is on screen and visible, and
-// reduced motion shows the finished path with all four steps lit. Copy: pipelineBuilds.flow.
+// reduced motion shows the finished path with all four steps lit. On phones (599px and below) the SVG would
+// shrink its labels under the 11px floor, so a stacked list of the same nodes (builds.tradeframeFlow) replaces it.
+// Copy: pipelineBuilds.flow.
 import { builds, pipelineBuilds } from '../data/copy';
 
 const f = pipelineBuilds.flow;
@@ -56,6 +58,14 @@ const N = f.nodes;
     <text class="stop" id="tf-stop" x="555" y="290" text-anchor="middle">{f.stop}</text>
     <rect class="tok" id="tf-tok" x="-5" y="-5" width="10" height="10" opacity="0"></rect>
   </svg>
+  <ol class="bd-flow-list">
+    {builds.tradeframeFlow.steps.map((st) => (
+      <li class:list={['bd-fl-node', st.propose && 'is-propose']}><span class="bd-fl-n">{st.n}</span><b>{st.name}</b><span>{st.text}</span></li>
+    ))}
+    {builds.tradeframeFlow.base.map((b) => (
+      <li class="bd-fl-node is-base"><b>{b.name}</b><span>{b.text}</span></li>
+    ))}
+  </ol>
   <ol class="bd-steps" aria-label={f.stepsLabel}>
     {builds.tradeframeFlow.stepLabels.map((s, i) => <li data-tf-step={i + 1}><b>{i + 1}</b>{s}</li>)}
   </ol>
@@ -63,6 +73,11 @@ const N = f.nodes;
 </div>
 
 <style>
+  .bd-flow-list {
+    display: none;
+  }
+
+
   .bd-flow-wrap {
     overflow-x: auto;
     margin-top: 26px;
@@ -232,6 +247,52 @@ const N = f.nodes;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-right: 12px;
+  }
+  @media (max-width: 599px) {
+    .bd-flow,
+    .bd-steps {
+      display: none;
+    }
+    .bd-flow-wrap {
+      border: 0;
+      background: none;
+    }
+    .bd-flow-list {
+      display: grid;
+      gap: var(--s-2);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .bd-fl-node {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr);
+      gap: 2px var(--s-2);
+      padding: var(--s-3) var(--s-3);
+      border: var(--line-object);
+      background: var(--color-surface-sunk);
+    }
+    .bd-fl-node.is-propose {
+      border: var(--line-propose);
+    }
+    .bd-fl-node.is-base {
+      grid-template-columns: minmax(0, 1fr);
+      border: var(--line-hair);
+    }
+    .bd-fl-n {
+      grid-row: span 2;
+      font: 500 var(--t-label-lg) / var(--lh-label) var(--font-data);
+      color: var(--color-accent-text);
+    }
+    .bd-fl-node b {
+      font-size: var(--t-small);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .bd-fl-node span:last-child {
+      font: 400 var(--t-label-lg) / var(--lh-snug) var(--font-data);
+      color: var(--color-text-muted);
+    }
   }
 </style>
 

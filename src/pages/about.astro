@@ -699,7 +699,8 @@ const shotSizes = '(max-width: 599px) 132px, 208px';
 <script>
   /* Career track: the red line draws down as you read and each station lights as it reaches the
      reading line. Vertical at every width, no pin. Without motion the final state is already in the HTML. */
-  import { gsap, ScrollTrigger, $, $$, motion } from '../scripts/ds';
+  import { $, $$, motion } from '../scripts/ds';
+  import { gsap, ScrollTrigger } from '../scripts/gsap';
 
   const root = $<HTMLElement>('.ab-career');
   const wrap = root && $<HTMLElement>('.ab-track-wrap', root);

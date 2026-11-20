@@ -3,7 +3,8 @@
    put in its start state and replayed as a latched scrub: it plays forward once as the panel scrolls in and never
    reverses. Numbers appear whole (opacity and a 6px rise); the CrossSource figure is an odometer, not a count-up.
    Ambient ticks (the dial hand, the flowing dashes) run only while their panel is on screen. */
-import { gsap as G, ScrollTrigger as STg, $, $$, motion, clamp, lerp, sub, revealNumber, expoOut } from './ds';
+import { $, $$, motion, clamp, lerp, sub, revealNumber, expoOut } from './ds';
+import { gsap as G, ScrollTrigger as STg } from './gsap';
 
 type Ctl = { render: (t: number) => void; tick?: (dt: number) => void; arm?: () => void };
 const q = (s: string, r?: ParentNode) => $<HTMLElement>(s, r) as HTMLElement;

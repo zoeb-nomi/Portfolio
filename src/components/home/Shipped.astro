@@ -107,6 +107,9 @@ const nodes = [10, 390, 770];
                   <div class="v-val"><span class="v-num v-after">{KK.after.v}</span><span class="lab">{KK.after.l}</span></div>
                 </div>
                 <div class="v-cap m28"><span>{KK.cap1[0]}</span><span>{KK.cap1[1]}</span></div>
+                <ol class="vk-flow-m" aria-hidden="true">
+                  {KK.nodes.map((n, i) => <li class={i === 1 ? 'me' : undefined}>{i === 1 && <em>{KK.mine}</em>}{n}</li>)}
+                </ol>
                 <svg class="vk-flow" viewBox="0 0 1000 110" aria-hidden="true">
                   {nodes.map((x, i) => (
                     <>
@@ -271,4 +274,18 @@ const nodes = [10, 390, 770];
 
 .v-cap.m28{margin-top:28px}
 .v-cap.m26{margin-top:26px}
+
+/* phones: these SVGs scale with their column, so their labels start larger to render at or above the 11px floor;
+   the Keka flow becomes an HTML row because its labels cannot grow inside the 1000-unit drawing */
+.vk-flow-m{display:none}
+@media (max-width:599px){
+  .w-lab{font-size:16px}
+  .g-end,.g-cl{font-size:44px}
+  .vk-flow{display:none}
+  .vk-flow-m{display:flex;align-items:stretch;gap:22px;list-style:none;margin:0;padding:0}
+  .vk-flow-m li{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:10px 8px;border:var(--line-object);font:600 var(--t-small)/1.2 var(--font-text);color:var(--color-text);text-align:center}
+  .vk-flow-m li.me{border:var(--line-accent)}
+  .vk-flow-m li em{font:500 var(--t-label)/1 var(--font-data);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent)}
+  .vk-flow-m li+li::before{content:"→";position:absolute;left:-18px;top:50%;transform:translateY(-50%);font:500 var(--t-small)/1 var(--font-data);color:var(--color-accent)}
+}
 </style>

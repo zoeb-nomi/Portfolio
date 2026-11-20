@@ -423,7 +423,7 @@ const spec = (s: (typeof V.items)[number]['spec']) =>
   .dz-pad-wrap{display:flex;flex-direction:column;gap:14px}
   .dz-pad{position:relative;aspect-ratio:1/1;max-height:340px;border:var(--line-strong);background:var(--color-panel);touch-action:none;cursor:crosshair;outline-offset:4px;
     background-image:linear-gradient(var(--color-line) 1px,transparent 1px),linear-gradient(90deg,var(--color-line) 1px,transparent 1px);background-size:12.5% 12.5%}
-  .dz-pad .ax{position:absolute;font:500 10.5px/1 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--color-text-muted);pointer-events:none}
+  .dz-pad .ax{position:absolute;font:500 var(--t-label)/1 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--color-text-muted);pointer-events:none}
   .dz-pad .ax.x{left:8px;bottom:-18px}.dz-pad .ax.x2{right:8px;bottom:-18px}
   .dz-pad .ax.y{left:-4px;top:8px;transform:translateX(-100%) rotate(-90deg);transform-origin:right top}
   .dz-hx,.dz-hy{position:absolute;background:color-mix(in srgb,var(--color-accent) 45%,transparent);pointer-events:none}
@@ -519,7 +519,7 @@ const spec = (s: (typeof V.items)[number]['spec']) =>
   .dz-spc .sp-b{margin-top:8px;font-family:var(--sp-body);font-size:var(--t-data);line-height:var(--lh-snug);color:var(--sp-ink2)}
   .dz-spc .sp-sw{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;margin-top:14px}
   .dz-spc .sp-sw i{height:22px;border-width:1px;border-style:solid;border-color:var(--sp-rule)}
-  .dz-spc .sp-k{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;margin-top:6px;font:400 10.5px/1.3 "IBM Plex Mono",monospace;color:var(--sp-ink2)}
+  .dz-spc .sp-k{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;margin-top:6px;font:400 var(--t-label)/1.3 "IBM Plex Mono",monospace;color:var(--sp-ink2)}
   @media (max-width:1099px){.dz-ver{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.dz-ver .dz-spc{grid-column:1 / -1}}
   .dz-ver .dz-spc{max-width:520px}
   @media (max-width:599px){.dz-ver{grid-template-columns:minmax(0,1fr)}}
@@ -546,7 +546,8 @@ const spec = (s: (typeof V.items)[number]['spec']) =>
   /* The design page: swatches read live token values, the axis pad drives Archivo's two axes, the
      ladder reports computed sizes, the motion demos loop only while on screen, and the copy check
      lints what you type. Without script the page is complete and static. */
-  import { gsap, $, $$, motion, swap, revealNumber } from '../scripts/ds';
+  import { $, $$, motion, swap, revealNumber } from '../scripts/ds';
+  import { gsap } from '../scripts/gsap';
 
   const d = document;
   const w = window;

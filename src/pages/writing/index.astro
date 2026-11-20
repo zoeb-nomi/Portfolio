@@ -184,7 +184,8 @@ const stats = PI.stats.map((s) => ({ v: W.numbers[s.slug].display, u: s.u, s: s.
 </Base>
 
 <script>
-  import { gsap, $, $$, swap, motion } from '../../scripts/ds';
+  import { $, $$, swap, motion } from '../../scripts/ds';
+  import { gsap } from '../../scripts/gsap';
 
   // The shelf bar: pick a shelf and the lists show only that shelf. Rows that go leave quickly, rows that stay slide
   // to their new place, rows that arrive fade in. Under reduced motion the lists just change.

@@ -4,7 +4,8 @@
    Rules kept from design/README.md §8: calm fades only, no count-ups, the scene pauses off screen and with the
    tab hidden, Skip is always visible, reduced motion and no-JS show the completed run as a still.
    Every visible string comes from the page's JSON (#pipeline-data, from pipelineHome in src/data/copy.ts). */
-import { gsap as G, ScrollTrigger as STg, $, $$, swap, motion, sceneRGB, clamp, lerp, sub } from './ds';
+import { $, $$, swap, motion, sceneRGB, clamp, lerp, sub } from './ds';
+import { gsap as G, ScrollTrigger as STg } from './gsap';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Any = any;
@@ -505,10 +506,12 @@ function mount() {
       const on = i === a || i === hover;
       if (on !== LON[i]) { LON[i] = on; labels[i].classList.toggle('on', on); }
     }
+    // Vertical (phone) layout: every tray label hangs off the deepest tray, so the three share one left edge.
+    const maxRows = Math.max(TRAY[HN[0]].rows, TRAY[HN[1]].rows, TRAY[HN[2]].rows);
     for (i = 0; i < 3; i++) {
       const hn = HN[i], b = TRAY[hn], tb = tblk[hn];
       let tx, ty;
-      if (vert) { tx = X(0, TRAY_U + b.rows * SP + 2); ty = Y(b.t0 + b.w / 2, 0); }
+      if (vert) { tx = X(0, TRAY_U + maxRows * SP + 2); ty = Y(b.t0 + b.w / 2, 0); }
       else { tx = X(b.t0 + b.w / 2, 0); ty = Y(0, TRAY_U + 5 * SP + 2); }
       tx = Math.round(tx * 2) / 2; ty = Math.round(ty * 2) / 2;
       if (tx !== tb.x || ty !== tb.y) { tb.x = tx; tb.y = ty; tb.el.style.transform = `translate3d(${tx}px,${ty}px,0)`; }

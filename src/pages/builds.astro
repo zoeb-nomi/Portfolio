@@ -399,7 +399,7 @@ if (existsSync(velocityPath)) {
   .bd-ax span:nth-child(2) {
     display: flex;
     justify-content: space-between;
-    font: 400 10.5px / 1 var(--font-data);
+    font: 400 var(--t-label) / 1 var(--font-data);
     color: var(--color-text-muted);
   }
 
@@ -414,7 +414,7 @@ if (existsSync(velocityPath)) {
   }
 
   .bd-tag {
-    font: 500 10px / 1 var(--font-data);
+    font: 500 var(--t-label) / 1 var(--font-data);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-text-muted);
@@ -573,7 +573,8 @@ if (existsSync(velocityPath)) {
   /* Builds: ledger rows expand in place (siblings slide, nothing jumps), the red edge and the
      guard / measure / ship chain draw on open, Fig. 2 bars grow once in view. Calm easing only.
      Without motion the toggle is instant. Without script every panel is open. */
-  import { gsap, ScrollTrigger, $, $$, motion, revealNumber } from '../scripts/ds';
+  import { $, $$, motion, revealNumber } from '../scripts/ds';
+  import { gsap, ScrollTrigger } from '../scripts/gsap';
 
   const M = motion();
   const lists = $$<HTMLElement>('[data-ledger]');
