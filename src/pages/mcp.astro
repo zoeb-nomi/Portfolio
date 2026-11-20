@@ -1,0 +1,219 @@
+---
+// /mcp/ (The Pipeline, 21 Nov 2026): zoebnomi-mcp, the MCP server.
+// Order: page head with the HUD spec strip → one in/out panel per tool → the eval → resources → connect
+// (copyable snippets) → limits → code. Copy and every number: `mcpPage` in src/data/copy.ts, read from the
+// zoebnomi-mcp repo. Shared case-study classes come from case-study.css; this page's own from mcp.css.
+// Motion: the kit's reveals only. The copy buttons are the one script; without it every snippet is plain text.
+import Base from '../layouts/Base.astro';
+import '../styles/case-study.css';
+import '../styles/mcp.css';
+import CsHead from '../components/CsHead.astro';
+import CsSection from '../components/CsSection.astro';
+import CsLegend from '../components/CsLegend.astro';
+import CsTable from '../components/CsTable.astro';
+import CsCall from '../components/CsCall.astro';
+import CsList from '../components/CsList.astro';
+import CsLinks from '../components/CsLinks.astro';
+import CsContact from '../components/CsContact.astro';
+import CsParts from '../components/CsParts.astro';
+import { meta, mcpPage as M, mcpJsonLd, pipelineCaseStudies as P } from '../data/copy';
+import { jsonLdString } from '../lib/jsonLdString';
+import { rich } from '../lib/caseStudy';
+
+const T = M.tools;
+const E = M.evalSec;
+const F = E.fig;
+const C = M.connect;
+const pc = (n: number) => `${((n / F.max) * 100).toFixed(2)}%`;
+const ext = { target: '_blank', rel: 'noopener noreferrer' };
+---
+
+<Base title={meta.mcp.title} description={meta.mcp.description} path="/mcp/" ogImage="/og/mcp.png" page="builds">
+  <script type="application/ld+json" set:html={jsonLdString(mcpJsonLd)} is:inline />
+
+  <CsHead kick={M.kick} h1={M.h1} find={rich(M.find, M.findMarks)} stats={M.stats} hud={M.hud}>
+    <div class="ctas mc-ctas">
+      <a class="btn" href={M.ctaConnect.href}><span class="mi">{M.ctaConnect.label}</span><span class="ar" aria-hidden="true">{P.shared.arrow}</span></a>
+      <a class="tl" href={M.ctaRepo.href} {...ext}>{M.ctaRepo.label} <span aria-hidden="true">{P.shared.ext}</span></a>
+    </div>
+    <div class="mc-snip mc-end">
+      <pre tabindex="0" aria-label={M.endpointLabel}><code>{M.url}</code></pre>
+      <button class="mc-copy" type="button" data-copy={M.url} data-done={C.copied} aria-label={`${C.copyLabel} ${M.endpointLabel}`} hidden>{C.copy}</button>
+    </div>
+  </CsHead>
+
+  <CsSection id="tools" kick={T.kick} h2={T.h2}>
+    <Fragment slot="dek">{T.dek}</Fragment>
+    <div class="mc-tools">
+      {T.items.map((t) => (
+        <article class="panel mc-tool" id={t.id} aria-labelledby={`h-${t.id}`}>
+          <div class="mc-side">
+            <p class="ph"><span class="pi">{t.no}</span>{t.tags.map((g) => <span>{g}</span>)}</p>
+            <h3 class="pt mc-name" id={`h-${t.id}`}>{t.name}</h3>
+            <dl class="how">
+              {t.how.map((h) => <div><dt>{h.dt}</dt><dd>{h.dd}</dd></div>)}
+            </dl>
+            <p class="srcl">{t.src}</p>
+          </div>
+          <div class="mc-io" data-reveal>
+            <p class="mc-io-top"><span class="lab">{T.callLabel}</span><code>{t.sig}</code></p>
+            <dl class="mc-in">
+              {t.call.map((c) => (
+                <div>
+                  <dt>{c.k}</dt>
+                  <dd>{c.parts.map((p) => ('br' in p ? <br /> : 'code' in p ? <code>{p.code}</code> : p.text))}</dd>
+                </div>
+              ))}
+              {t.sources && (
+                <div>
+                  <dt>{t.sourcesLabel}</dt>
+                  <dd>
+                    <ul class="mc-srcs">
+                      {t.sources.map((s) => <li><code>{s.id}</code><span>{s.t}</span></li>)}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+            </dl>
+            <p class="mc-turn"><span class="mc-ar" aria-hidden="true">↓</span><span class="lab">{T.returnsLabel}</span></p>
+            <ul class="mc-out" data-stagger>
+              {t.returns.map((r) => (
+                <li class:list={['mc-r', { fail: r.fail }]}>
+                  <span class="mc-k">{r.k}</span>
+                  <span class="mc-v">
+                    {r.tag && <span class:list={['tag', { red: r.fail }]}>{r.tag}</span>}
+                    <span class="mc-t">{r.t}</span>
+                    {r.note && <span class="mc-note">{r.note}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p class="mc-sum">{t.summary}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </CsSection>
+
+  <CsSection id="eval" kick={E.kick} h2={E.h2} wide>
+    <Fragment slot="dek"><CsParts parts={rich(E.dek, E.dekMarks)} /></Fragment>
+
+    <figure class="cs-fig" id="mc-fig">
+      <div class="cs-fig-top">
+        <p class="cs-fig-t"><span class="fno">{F.no}</span>{F.title}</p>
+        <CsLegend items={F.legend} />
+      </div>
+      <div class="cs-fig-body">
+        <div class="cs-bars mc-bars" role="img" aria-label={F.aria}>
+          {F.rows.map((r) => (
+            <div class="cs-br">
+              <p class="bl"><code>{r.label}</code></p>
+              <div class="mc-sb" aria-hidden="true">
+                {r.caught > 0 && <i class:list={['mc-c', { r: r.red }]} style={`--w:${pc(r.caught)}`}></i>}
+                {r.deferred > 0 && <i class="mc-d" style={`--w:${pc(r.deferred)}`}></i>}
+              </div>
+              <p class:list={['bv2', { r: r.red }]}>{r.v}</p>
+            </div>
+          ))}
+        </div>
+        <div class="cs-ro-row">
+          {F.ro.map((o) => (
+            <div class="ro"><p class="v" data-num>{o.v}</p><p class="u">{o.u}</p><p class="s">{o.s}</p></div>
+          ))}
+        </div>
+      </div>
+      <figcaption class="cs-fig-foot">{F.foot.map((t) => <span>{t}</span>)}</figcaption>
+    </figure>
+
+    <CsCall label={E.call.label} long>{E.call.t}</CsCall>
+    <p class="cs-note">{E.judgeNote}</p>
+
+    <div class="cs-two mc-two">
+      <div>
+        <h3 class="h4 mc-h">{E.verify.h3}</h3>
+        <p class="mc-p">{E.verify.dek}</p>
+        <CsTable caption={E.verify.caption} columns={E.verify.columns} rows={E.verify.rows} />
+        <CsList kind="lim" items={E.verify.misses.map((m) => [{ b: m.b }, { text: m.t }])} />
+      </div>
+      <div>
+        <CsTable caption={E.gates.caption} columns={E.gates.columns} rows={E.gates.rows} />
+        <p class="cs-note">{E.gates.note}</p>
+      </div>
+    </div>
+  </CsSection>
+
+  <CsSection id="resources" kick={M.resources.kick} h2={M.resources.h2} wide>
+    <Fragment slot="dek">{M.resources.dek}</Fragment>
+    <ul class="mc-res" aria-label={M.resources.listLabel} data-stagger>
+      {M.resources.items.map((r) => <li><code>{r.uri}</code><p>{r.t}</p></li>)}
+    </ul>
+  </CsSection>
+
+  <CsSection id="connect" kick={C.kick} h2={C.h2}>
+    <Fragment slot="dek">{C.dek}</Fragment>
+    <ul class="mc-cx" data-stagger>
+      {C.items.map((c, i) => (
+        <li class:list={['card', 'mc-card', { soon: c.soon }]}>
+          <p class="card-top"><span class="no">{String(i + 1).padStart(2, '0')}</span><span>{c.soon ? C.soon : c.sub}</span></p>
+          <h3>{c.name}</h3>
+          <p class="mc-how">{c.how}</p>
+          <div class="mc-snip">
+            <pre tabindex="0" aria-label={`${c.name}: ${c.sub}`}><code>{c.code}</code></pre>
+            {!c.soon && (
+              <button class="mc-copy" type="button" data-copy={c.code} data-done={C.copied} aria-label={`${C.copyLabel} ${c.name}`} hidden>
+                {C.copy}
+              </button>
+            )}
+          </div>
+          {c.link && <a class="tl mc-link" href={c.link.href} {...ext}>{c.link.label} <span aria-hidden="true">{P.shared.ext}</span></a>}
+        </li>
+      ))}
+    </ul>
+    <div class="mc-ask">
+      <p class="lab">{C.askLabel}</p>
+      <ol>
+        {C.asks.map((a) => <li><span>{a}</span></li>)}
+      </ol>
+    </div>
+    <p class="sr" aria-live="polite" id="mc-live"></p>
+  </CsSection>
+
+  <CsSection id="limits" kick={M.limits.kick} h2={M.limits.h2}>
+    <CsList kind="lim" items={M.limits.items.map((i) => [{ b: i.b }, { text: ` ${i.t}` }])} />
+  </CsSection>
+
+  <CsSection id="code" kick={M.code.kick} h2={M.code.h2}>
+    <p class="cs-note mc-status">{M.code.status}</p>
+    <CsLinks links={M.code.links} />
+    <div class="cs-related">
+      <p class="lab">{P.shared.related}</p>
+      <CsLinks sub links={M.code.related} />
+    </div>
+  </CsSection>
+
+  <CsContact />
+</Base>
+
+<script>
+  // Copy buttons: shown only where the Clipboard API exists; the snippet text is always on the page.
+  const live = document.getElementById('mc-live');
+  document.querySelectorAll<HTMLButtonElement>('.mc-copy').forEach((b) => {
+    if (!navigator.clipboard) return;
+    b.hidden = false;
+    const label = b.textContent?.trim() ?? '';
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copy ?? '');
+        b.textContent = b.dataset.done ?? label;
+        b.classList.add('done');
+        if (live) live.textContent = b.dataset.done ?? '';
+        window.setTimeout(() => {
+          b.textContent = label;
+          b.classList.remove('done');
+        }, 1600);
+      } catch {
+        /* the snippet stays selectable */
+      }
+    });
+  });
+</script>

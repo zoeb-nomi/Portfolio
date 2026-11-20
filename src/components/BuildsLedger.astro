@@ -20,9 +20,10 @@ interface Props {
 const { entries = buildsLedger, openFirst = false } = Astro.props;
 const lead = (b: BuildEntry) => PB.rows[b.id];
 // "20 Oct 2026, v0.3" -> value "20 Oct 2026", extra "v0.3".
+// A build shipped after tracking began with no planned date (`shippedOn`) says so instead of "before tracking".
 const ship = (b: BuildEntry) => {
-  const [when, ...rest] = (b.shippedBeforeLedger ?? '').split(', ');
-  return { when, extra: rest.join(', ') };
+  const [when, ...rest] = (b.shippedOn ?? b.shippedBeforeLedger ?? '').split(', ');
+  return { when, extra: rest.join(', '), note: b.shippedOn ? PB.noPlan : PB.untracked };
 };
 const kind = (b: BuildEntry) => (b.tag ? b.tag.replace(/[[\]]/g, '') : '');
 const plain = (label: string) => label.replace(/\s*→$/, '');
@@ -74,7 +75,7 @@ const pc = (n: number) => `${n}%`;
                 <li class="bd-node">
                   <span class="lab red">{builds.expand.shipped}</span>
                   <p class="bd-v bd-n">{s.when}</p>
-                  <p class="bd-u">{s.extra ? `${s.extra} · ` : ''}{PB.untracked}</p>
+                  <p class="bd-u">{s.extra ? `${s.extra} · ` : ''}{s.note}</p>
                 </li>
               </ol>
               <div>

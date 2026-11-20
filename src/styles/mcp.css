@@ -1,0 +1,104 @@
+/* The Pipeline, /mcp/ (zoebnomi-mcp). Imported by src/pages/mcp.astro only, after case-study.css.
+   Each tool is the kit's before → after panel turned into call → returns: the left column says what the
+   tool does (.ph, .pt, dl.how, .srcl), the right is a well (.mc-io) holding the real call and what came
+   back, with red only on the arrow and on a failure verdict. Values from design/tokens.css, colour roles only. */
+
+.mc-ctas{margin-top:clamp(22px,4vh,36px)}
+.mc-status{margin:0 0 6px}
+
+/* ---------- tools: call → returns panels ---------- */
+.mc-tools{border-top:var(--line-heavy)}
+.panel.mc-tool{align-items:start;padding-block:clamp(40px,7vh,80px)}
+.mc-name{font-family:var(--font-data);font-size:clamp(24px,2.4vw,36px);letter-spacing:-.02em;font-variation-settings:normal;font-weight:500;overflow-wrap:anywhere}
+.mc-side .how dd{font-size:var(--t-small)}
+.mc-side .how div{grid-template-columns:96px minmax(0,1fr)}
+
+.mc-io{border:var(--line-hair);background:var(--color-surface-sunk);min-width:0}
+.mc-io-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:12px clamp(14px,2vw,22px);border-bottom:var(--line-hair)}
+.mc-io-top code{font:500 var(--t-data)/var(--lh-label) var(--font-data);color:var(--color-text);overflow-wrap:anywhere}
+
+.mc-in{padding:6px clamp(14px,2vw,22px) 4px}
+.mc-in div{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:var(--line-hair)}
+.mc-in div:last-child{border-bottom:0}
+.mc-in dt{font:500 var(--t-label)/1.6 var(--font-data);letter-spacing:.06em;color:var(--color-text-muted)}
+.mc-in dd{font-size:var(--t-small);line-height:var(--lh-base);color:var(--color-text-body);overflow-wrap:anywhere}
+.mc-in dd code,.mc-srcs code,.mc-r .mc-k{font-family:var(--font-data);font-size:.86em;color:var(--color-text)}
+.mc-in dd code{background:var(--color-code);padding:.08em .32em}
+.mc-srcs{list-style:none;display:grid;gap:8px}
+.mc-srcs li{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:baseline}
+.mc-srcs code{justify-self:start}
+
+.mc-turn{display:flex;align-items:center;gap:10px;padding:10px clamp(14px,2vw,22px);border-top:var(--line-hair);border-bottom:var(--line-hair);background:var(--color-surface)}
+.mc-ar{font:500 var(--t-h4)/1 var(--font-data);color:var(--color-text-muted)}
+
+.mc-out{list-style:none;padding:4px clamp(14px,2vw,22px)}
+.mc-r{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:var(--line-hair)}
+.mc-r:last-child{border-bottom:0}
+.mc-r .mc-k{font-size:var(--t-label-lg);line-height:var(--lh-label);padding-top:4px;color:var(--color-text-muted);overflow-wrap:anywhere}
+.mc-r.fail .mc-k{color:var(--color-text)}
+.mc-v{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;min-width:0}
+.mc-v .tag{text-transform:none;letter-spacing:.02em}
+.mc-t{flex:1 1 260px;min-width:0;font-size:var(--t-small);line-height:var(--lh-snug);color:var(--color-text);font-variation-settings:"wght" 500;overflow-wrap:anywhere}
+.mc-note{flex-basis:100%;font:400 var(--t-label)/var(--lh-label) var(--font-data);color:var(--color-text-muted)}
+.mc-sum{padding:11px clamp(14px,2vw,22px);border-top:var(--line-hair);font:500 var(--t-label)/var(--lh-label) var(--font-data);letter-spacing:.04em;color:var(--color-text-body)}
+
+@media (max-width:599px){
+  .mc-side .how div{grid-template-columns:minmax(0,1fr);gap:2px}
+  .mc-in div,.mc-r{grid-template-columns:minmax(0,1fr);gap:4px}
+  .mc-r .mc-k{padding-top:0}
+  .mc-srcs li{grid-template-columns:minmax(0,1fr);gap:2px}
+}
+
+/* ---------- eval figure: caught (filled) and deferred (hollow) per label ---------- */
+.mc-bars .bl code{font:500 var(--t-data)/var(--lh-label) var(--font-data);color:var(--color-text);overflow-wrap:anywhere}
+.mc-sb{display:flex;height:12px;gap:2px}
+.mc-sb i{display:block;width:var(--w);flex:none}
+.mc-sb .mc-c{background:var(--color-text)}
+.mc-sb .mc-c.r{background:var(--color-accent)}
+.mc-sb .mc-d{border:var(--line-strong);background:var(--color-wash)}
+.mc-bars .cs-br{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) 132px}
+.mc-bars .bv2.r{color:var(--color-accent)}
+@media (max-width:599px){.mc-bars .cs-br{grid-template-columns:minmax(0,1fr) auto}.mc-bars .mc-sb{grid-column:1/-1;grid-row:2}}
+.mc-two .tbl td.n,.mc-two .tbl th.n{white-space:nowrap}
+.mc-two{margin-top:clamp(40px,6vh,64px);align-items:start}
+.mc-h{margin-bottom:8px}
+.mc-p{font-size:var(--t-small);line-height:var(--lh-base);color:var(--color-text-body);max-width:52ch}
+.mc-two .tbl{min-width:0}
+.mc-two .cs-lim{margin-top:8px}
+
+/* ---------- resources ---------- */
+.mc-res{list-style:none;border-top:var(--line-heavy)}
+.mc-res li{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:10px 32px;align-items:baseline;padding:18px 0;border-bottom:var(--line-hair)}
+.mc-res code{font:500 clamp(15px,1.3vw,18px)/var(--lh-label) var(--font-data);color:var(--color-text);overflow-wrap:anywhere}
+.mc-res p{font-size:var(--t-small);line-height:var(--lh-base);color:var(--color-text-body);max-width:56ch}
+@media (max-width:599px){.mc-res li{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- connect: one card per client, snippet + copy ---------- */
+/* subgrid rows: every card's top line, name, how-to, snippet and link share a row track, so the snippet wells line up across a row */
+.mc-cx{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px}
+.mc-card{display:grid;grid-row:span 5;grid-template-rows:subgrid;grid-template-columns:minmax(0,1fr);align-content:start;min-width:0;padding:18px 20px 20px}
+.mc-card h3{margin-top:2px}
+.mc-how{font-size:var(--t-small);line-height:var(--lh-base);color:var(--color-text-body)}
+.mc-card.soon{--rl:0;background:transparent;border:var(--line-propose)}
+.mc-card.soon .card-top span:last-child{color:var(--color-text-body)}
+.mc-snip{position:relative;align-self:start;min-width:0;border:var(--line-hair);background:var(--color-surface-sunk)}
+.mc-end{max-width:440px;margin-top:20px}
+.mc-snip pre{margin:0;padding:14px 16px;padding-right:84px;overflow-x:auto;font:400 var(--t-data)/var(--lh-body) var(--font-data);color:var(--color-text);white-space:pre-wrap;overflow-wrap:anywhere}
+.mc-card.soon .mc-snip pre{color:var(--color-text-muted);padding-right:16px}
+.mc-copy{position:absolute;top:8px;right:8px;height:30px;padding:0 12px;background:var(--color-surface);border:var(--line-strong);color:var(--color-text-body);font:500 var(--t-label)/1 var(--font-data);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:border-color .25s ease,color .25s ease}
+.mc-copy:hover,.mc-copy:focus-visible{border-color:var(--color-accent);color:var(--color-text)}
+.mc-copy.done{border-color:var(--color-accent);color:var(--color-accent-text)}
+.mc-copy[hidden]{display:none}
+.mc-link{justify-self:start;align-self:start}
+@media (pointer:coarse){.mc-copy{height:44px;top:4px;right:4px}.mc-snip pre{padding-right:92px;min-height:52px}}
+/* phones: a command stays on one line (it scrolls), so no flag or URL is split; the copy button sits under it */
+@media (max-width:599px){
+  .mc-snip pre,.mc-card.soon .mc-snip pre{white-space:pre;overflow-wrap:normal;padding-right:36px;min-height:0;-webkit-mask-image:linear-gradient(to right,var(--color-text) calc(100% - 28px),transparent);mask-image:linear-gradient(to right,var(--color-text) calc(100% - 28px),transparent)}
+  .mc-copy{position:static;display:block;margin:0 12px 12px auto;height:44px}
+}
+
+.mc-ask{margin-top:clamp(28px,4vh,40px);border-top:var(--line-hair);padding-top:16px}
+.mc-ask ol{list-style:none;counter-reset:ask;display:grid;gap:10px;margin-top:12px}
+.mc-ask li{counter-increment:ask;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:baseline}
+.mc-ask li::before{content:counter(ask,decimal-leading-zero);font:500 var(--t-label)/1.6 var(--font-data);letter-spacing:.1em;color:var(--color-accent)}
+.mc-ask li span{font:400 var(--t-data)/var(--lh-base) var(--font-data);color:var(--color-text);overflow-wrap:anywhere}

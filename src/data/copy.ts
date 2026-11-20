@@ -180,6 +180,11 @@ export const meta = {
     description:
       'Mechanical engineer turned AI product manager, in Bengaluru. An AI feature is not done until you can say how often it is wrong.',
   },
+  mcp: {
+    title: 'zoebnomi-mcp: a citation check any agent can call · Zoeb Nomi',
+    description:
+      "An MCP server with three read-only tools. On CrossSource v0.3's held-out split it caught 10 of 10 wrong-document citations with no model call. Endpoint, examples, eval.",
+  },
   /** Old-URL stubs (redirect fallbacks). noindex; never in the sitemap. */
   moved: {
     title: 'Moved · Zoeb Nomi',
@@ -768,6 +773,7 @@ export const pipelineHome = {
     h2: 'Built in the open.',
     rows: [
       { id: 'tradeframe', value: 'AI proposes · code decides', href: '/builds/' },
+      { id: 'zoebnomi-mcp', value: '10 of 10 caught', href: '/mcp/' },
       { id: 'crosssource', value: '0.981 → 0.994', href: '/crosssource/' },
       { id: 'screener-eval', value: '885 calls', href: '/screener-eval/' },
       { id: 'cheap-tier-legal-tax-hr', value: '1,414 items', href: '/builds/' },
@@ -782,7 +788,7 @@ export const pipelineHome = {
 // ledger shows the rows with `compact: true`.
 // ---------------------------------------------------------------------------
 
-export type BuildKind = 'agent' | 'workflow' | 'guarded automation' | 'eval harness' | 'contribution';
+export type BuildKind = 'agent' | 'workflow' | 'guarded automation' | 'eval harness' | 'MCP server' | 'contribution';
 
 /** Mini figure on a row: before -> after (hollow = before, filled = after), a share of a whole, or a few bars. */
 export type BuildFigure =
@@ -808,6 +814,8 @@ export interface BuildEntry {
   measured: { lead?: string; headline: string; denominator?: string; comparedWith?: string; scorerCheck?: string };
   figure?: BuildFigure;
   shippedBeforeLedger?: string;
+  /** Shipped after ship-date tracking began, with no planned date recorded: the date it went live. */
+  shippedOn?: string;
   stack: string[];
   links: { label: string; href: string }[];
   /** The action a row's expand panel leads with (the case study, else the repo). */
@@ -891,6 +899,31 @@ export const buildsLedger: BuildEntry[] = [
     ],
     primary: { label: 'Read the guide →', href: 'https://zoeb-nomi.github.io/tradeframe/' },
     claims: ['P05'],
+    compact: true,
+  },
+  {
+    id: 'zoebnomi-mcp',
+    name: 'zoebnomi-mcp',
+    oneLine: "An MCP server that lets any agent call CrossSource's citation check, plus two tools that check claims against this site.",
+    homeLine: 'The CrossSource citation check, callable from any agent.',
+    kind: 'MCP server',
+    group: 'systems',
+    guarded:
+      'Every tool is read-only and deterministic: no model calls and no API keys on the server. What word overlap cannot decide goes back to the caller with a judge prompt. A failing test stops the deploy.',
+    measured: {
+      lead: '10 of 10',
+      headline:
+        'CrossSource v0.3 test split, n = 50: caught 10 of 10 wrong-document citations with no model call, right on 16 of 16 calls it made, never passed a bad citation as supported. verify_claim: 26 of 28 on a golden set written before the matcher ran.',
+      denominator: 'n = 50',
+    },
+    shippedOn: '20 Nov 2026',
+    stack: ['TypeScript', 'Cloudflare Workers'],
+    links: [
+      { label: 'Page →', href: '/mcp/' },
+      { label: 'Repo →', href: 'https://github.com/zoeb-nomi/zoebnomi-mcp' },
+    ],
+    primary: { label: 'Read the page →', href: '/mcp/' },
+    claims: [],
     compact: true,
   },
   {
@@ -1130,12 +1163,13 @@ export const pipelineBuilds = {
   h1: 'What I built, and how I know.',
   legendLabel: 'How to read each row',
   untracked: 'before ship-date tracking',
+  noPlan: 'live · no planned date recorded',
   stats: [
-    { v: '6', u: 'builds', s: '1 system · 5 eval harnesses' },
+    { v: '7', u: 'builds', s: '1 system · 1 MCP server · 5 eval harnesses' },
     { v: '2', u: 'open pull requests', s: 'TaxCalcBench · eyecite' },
     { v: '12', u: 'items shipped by my agents', s: 'since 10 Nov 2026' },
   ],
-  systems: { kicker: '§1 Systems', h2: 'Who decides what runs.', sub: 'Agents, workflows, guarded automation' },
+  systems: { kicker: '§1 Systems', h2: 'Who decides what runs.', sub: 'Guarded automation and an MCP server' },
   harnesses: {
     kicker: '§2 Eval harnesses',
     h2: 'How a step earns the right to run.',
@@ -1217,6 +1251,21 @@ export const pipelineBuilds = {
   },
   rows: {
     tradeframe: { bv: 'AI proposes · code decides' },
+    'zoebnomi-mcp': {
+      bv: '10 of 10 caught',
+      big: '10 of 10',
+      unit: 'wrong-document citations caught with no model call · CrossSource v0.3 test split, n = 50',
+      fig: {
+        cap: ['Caught with no model call', 'of each label'],
+        rows: [
+          { label: 'wrong document', x: 100, v: '10 of 10', red: true },
+          { label: 'right doc, wrong passage', x: 60, v: '6 of 10' },
+          { label: 'supported, unsupported claim', x: 0, v: 'to a judge' },
+        ],
+        axis: ['0', '10'],
+        note: 'Right on 16 of 16 calls it made. It never calls a citation supported on its own; the 34 it cannot decide go to a judge with CrossSource’s prompt.',
+      },
+    },
     'cheap-tier-legal-tax-hr': {
       bv: '99 of 100',
       big: '99 of 100',
@@ -2852,6 +2901,305 @@ export const pipelineCaseStudies = {
         { bn: 'mirror-eval', bk: 'Eval harness', bv: 'the judge that failed', href: '/mirror-eval/' },
       ],
     },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// /mcp/ · zoebnomi-mcp, the MCP server (The Pipeline, 21 Nov 2026).
+// Every number and example is read from github.com/zoeb-nomi/zoebnomi-mcp: README.md,
+// eval/RESULTS.md (npm run eval, deterministic), examples/answer.json and test/mcp.test.ts.
+// The tool outputs are the tools' own text, trimmed to the fields shown. The npm package and
+// directory listings are not live yet, so the CLI is marked as coming and listings are left out.
+// ---------------------------------------------------------------------------
+
+const MCP_URL = 'https://mcp.zoebnomi.com/mcp';
+const MCP_REPO = 'https://github.com/zoeb-nomi/zoebnomi-mcp';
+
+export const mcpJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: 'zoebnomi-mcp',
+  description:
+    "An MCP server with three read-only, deterministic tools: check_citations (CrossSource's citation check), verify_claim and fit_to_role. Endpoint: https://mcp.zoebnomi.com/mcp.",
+  codeRepository: MCP_REPO,
+  programmingLanguage: 'TypeScript',
+  license: 'https://opensource.org/licenses/MIT',
+  author: { '@type': 'Person', name: 'Zoeb Nomi', url: 'https://www.zoebnomi.com' },
+};
+
+/** One line of a tool's output on /mcp/: the field, an optional verdict tag (red when `fail`), the text. */
+export interface McpReturn {
+  k: string;
+  tag?: string;
+  fail?: boolean;
+  t: string;
+  note?: string;
+}
+
+export const mcpPage = {
+  url: MCP_URL,
+  repoHref: MCP_REPO,
+  kick: 'MCP server · zoebnomi-mcp',
+  h1: 'A free citation check any agent can call.',
+  find:
+    "Three read-only tools over MCP. On held-out CrossSource data, word overlap caught 10 of 10 citations that point at the wrong document, with no model call. The misstatements it cannot see go to a judge, with CrossSource's own prompt.",
+  findMarks: ['caught 10 of 10 citations that point at the wrong document'],
+  stats: [
+    { v: '10 of 10', u: 'wrong-document citations caught', s: 'CrossSource v0.3 test split · n = 50' },
+    { v: '16 of 16', u: 'right when it decides', s: 'decided 16 of 50 · 0 passed as supported' },
+    { v: '26 of 28', u: 'verify_claim golden set', s: 'queries written before the matcher ran' },
+  ],
+  hud: [
+    { label: 'Endpoint', v: MCP_URL },
+    { label: 'Transport', v: 'Streamable HTTP', small: 'stateless' },
+    { label: 'Tools', v: '3', small: '+ 4 resources' },
+    { label: 'Access', v: 'Read-only', small: 'no keys · no model calls' },
+    { label: 'Own eval', v: '4 of 4 gates', small: 'npm run eval' },
+  ],
+  ctaConnect: { label: 'Connect it', href: '#connect' },
+  ctaRepo: { label: 'Source on GitHub', href: MCP_REPO },
+  endpointLabel: 'MCP endpoint',
+
+  tools: {
+    kick: '01 · Tools',
+    h2: 'What goes in, what comes back.',
+    dek: "Every tool is read-only and deterministic, and costs nothing to call. Each example is the repo's own: its example file, its tests or its eval set. The output is the tool's text, trimmed to the fields shown.",
+    callLabel: 'Call',
+    returnsLabel: 'Returns',
+    items: [
+      {
+        id: 'check_citations',
+        no: '01',
+        tags: ['Lead tool', 'From CrossSource'],
+        name: 'check_citations',
+        sig: 'check_citations(answer, sources)',
+        how: [
+          { dt: 'In', dd: 'An answer with inline [id] or [doc_id:chunk_id] citations, and the sources it cites.' },
+          { dt: 'Out', dd: 'A verdict per citation, with the rule it used and the reason.' },
+          { dt: 'Decides', dd: 'Only what word overlap can: a cite to an id that is not in the sources, or one where another passage clearly covers the claim.' },
+          { dt: 'Hands back', dd: "Everything else, as needs_judgment with CrossSource's judge prompt for your model. It never says supported on its own." },
+        ],
+        src: 'Example: examples/answer.json in the repo.',
+        call: [
+          {
+            k: 'answer',
+            parts: [
+              { text: 'The warrantless search of the car violated the Fourth Amendment ' },
+              { code: '[smith:0]' },
+              { text: '. A contract signed under duress can be voided by the party who was coerced ' },
+              { code: '[smith:1]' },
+              { text: '. The defendant was sentenced to ten years ' },
+              { code: '[smith:9]' },
+              { text: '.' },
+            ],
+          },
+        ],
+        sources: [
+          { id: 'smith:0', t: 'The court held that the search of the car, made without a warrant, violated the Fourth Amendment.' },
+          { id: 'smith:1', t: 'The defendant was sentenced to five years in prison on the fraud counts.' },
+          { id: 'jones:0', t: 'Contracts signed under duress are voidable at the option of the party who was coerced.' },
+        ],
+        sourcesLabel: 'sources',
+        returns: [
+          { k: '[smith:0]', tag: 'needs_judgment', fail: false, t: 'Needs a judgment: overlap alone cannot tell support from a misstatement.', note: 'judge_prompt attached' },
+          { k: '[smith:1]', tag: 'wrong_document', fail: true, t: "The cited passage shares 0% of the claim's content words; [jones:0] in a different document shares 83%." },
+          { k: '[smith:9]', tag: 'unsupported_claim', fail: true, t: 'The cited id is not among the sources provided (fabricated or mis-copied id).' },
+        ] as McpReturn[],
+        summary: '3 citations · 2 decided · 1 needs judgment',
+      },
+      {
+        id: 'verify_claim',
+        no: '02',
+        tags: ['Reads this site'],
+        name: 'verify_claim',
+        sig: 'verify_claim(claim)',
+        how: [
+          { dt: 'In', dd: 'A claim or a number about Zoeb Nomi, in any wording.' },
+          { dt: 'Out', dd: "found, number_mismatch or not_found, with the site's quote, its source, an evidence link, and n and date where the site gives them." },
+          { dt: 'Reads', dd: 'zoebnomi.com as it is now: llms.txt and the case-study pages, cached for 15 minutes.' },
+          { dt: 'Limit', dd: "A word lookup cannot see negation, so it tells callers to repeat the site's quote, not their own wording." },
+        ],
+        src: 'Example: eval query vc-16. The live endpoint returned the same on 21 Nov 2026.',
+        call: [{ k: 'claim', parts: [{ text: 'CrossSource strict prompting lifted citation precision to 0.999' }] }],
+        returns: [
+          { k: 'status', tag: 'number_mismatch', fail: true, t: 'zoebnomi.com has a statement on this, but not with 0.999.' },
+          { k: 'quote', t: 'citation-discipline prompting lifted citation precision 0.981 (baseline) → 0.994 (strict)' },
+          { k: 'source', t: 'https://www.zoebnomi.com/llms.txt' },
+          { k: 'evidence', t: 'https://www.zoebnomi.com/crosssource/' },
+          { k: 'n', t: '25' },
+        ] as McpReturn[],
+        summary: 'number_mismatch · the site’s own wording returned',
+      },
+      {
+        id: 'fit_to_role',
+        no: '03',
+        tags: ['Reads this site'],
+        name: 'fit_to_role',
+        sig: 'fit_to_role(job_description)',
+        how: [
+          { dt: 'In', dd: 'A job description, as text.' },
+          { dt: 'Out', dd: 'Which requirement lines have public evidence, quoted with links, and which have none, stated as counts.' },
+          { dt: 'Method', dd: 'Keywords mapped to public work. A hit means related work exists, not that the requirement is fully met.' },
+          { dt: 'Set aside', dd: 'Lines outside the work are counted and never answered.' },
+        ],
+        src: 'Example: the job description in test/mcp.test.ts. Four capabilities matched; two are shown, one quote each.',
+        call: [
+          {
+            k: 'job_description',
+            parts: [{ text: '- Build evaluation datasets and LLM-as-a-judge pipelines.' }, { br: true }, { text: '- Experience with Rust systems programming.' }],
+          },
+        ],
+        returns: [
+          { k: 'match', tag: 'evidence', fail: false, t: "Evals, benchmarks and golden datasets: “two blind, independent model raters, Cohen's kappa 0.98 on citation_check and 0.84 on qa_citation”" },
+          { k: 'match', tag: 'evidence', fail: false, t: 'LLM-as-judge and validating the judge: “100% (15/15) blind human-judge agreement”' },
+          { k: 'gap', tag: 'no evidence', fail: true, t: 'Experience with Rust systems programming.' },
+        ] as McpReturn[],
+        summary: '1 of 2 requirement lines have public evidence on zoebnomi.com; 1 has none.',
+      },
+    ],
+  },
+
+  evalSec: {
+    kick: '02 · Eval',
+    h2: 'Scored on data it was not tuned on.',
+    dek: 'check_citations is scored on CrossSource v0.3 citation_check: 75 items with final adjudicated labels, each a claim, a cited chunk and 5 context chunks. The split was fixed before tuning, 25 dev and 50 test, and thresholds were tuned on dev only. npm run eval is offline and deterministic.',
+    dekMarks: ['fixed before tuning'],
+    fig: {
+      no: 'Fig. 1',
+      title: 'check_citations on the test split, by true label',
+      legend: [
+        { k: 'f', t: 'caught, no model call' },
+        { k: '', t: 'deferred to the judge' },
+      ],
+      max: 20,
+      rows: [
+        { label: 'wrong_document', caught: 10, deferred: 0, v: '10 of 10 caught', red: true },
+        { label: 'right_doc_wrong_passage', caught: 6, deferred: 4, v: '6 of 10 caught' },
+        { label: 'supported', caught: 0, deferred: 20, v: '20 deferred' },
+        { label: 'unsupported_claim', caught: 0, deferred: 10, v: '10 deferred' },
+      ],
+      aria: 'Test split, 50 items. wrong_document: 10 of 10 caught. right_doc_wrong_passage: 6 of 10 caught, 4 deferred. supported: all 20 deferred. unsupported_claim: all 10 deferred. Decided wrongly: 0 on every label.',
+      ro: [
+        { v: '16 of 50', u: 'decided without a model', s: '32% of the test split' },
+        { v: '16 of 16', u: 'correct when decided', s: 'dev split: 9 of 9' },
+        { v: '0', u: 'called supported wrongly', s: 'it never says supported on its own' },
+      ],
+      foot: ['Decided wrongly: 0 on every label.', 'Source: eval/RESULTS.md, written by npm run eval.'],
+    },
+    call: {
+      label: 'Read it as',
+      t: "Word overlap reliably catches a citation that points at the wrong place. It can't tell a faithful paraphrase from a reversed holding, so those go to a judge with CrossSource's prompt.",
+    },
+    judgeNote:
+      'For reference, the CrossSource harness reports that prompt with claude-sonnet-5-5 at citation_check accuracy 1.00 on a 30-item sanity sample, not a full run.',
+    verify: {
+      h3: 'verify_claim: 26 of 28',
+      dek: '28 queries written before the matcher ran, against the index the server builds from the site.',
+      caption: 'Table 1 · verify_claim golden set',
+      columns: ['Queries', 'Items', 'Passed'],
+      rows: [
+        { cells: ['True claims', '15', '14'] },
+        { cells: ['A wrong number', '6', '6'] },
+        { cells: ['Not on the site', '7', '6'] },
+        { cells: ['All', '28', '26'] },
+      ],
+      misses: [
+        { b: 'vc-08.', t: ' Matched the site’s own note “Claude cited my site on 0 of 63 probes. Twice.” The same fact, but the fixed pass rule expects the curated quote, so it is scored as a miss.' },
+        { b: 'vc-28.', t: ' “The eyecite pull request was merged” comes back found, quoting the site’s line about the open, not merged, pull requests. A word lookup cannot see negation.' },
+      ],
+    },
+    gates: {
+      caption: 'Table 2 · the eval’s gates',
+      columns: ['Gate', 'Result', 'Bar'],
+      rows: [
+        { cells: ['check_citations accuracy when decided', '100.0%', '≥ 85.0%'] },
+        { cells: ['check_citations false “supported”', '0', '≤ 0'] },
+        { cells: ['verify_claim accuracy', '92.9%', '≥ 90.0%'] },
+        { cells: ['verify_claim false “found”', '1', '≤ 1'] },
+      ],
+      note: 'The citation gates were set before any test-split run. The verify_claim gates were set after a dry run had shown the vc-28 miss, and allow exactly that one.',
+    },
+  },
+
+  resources: {
+    kick: '03 · Resources',
+    h2: 'Four resources, read from this site.',
+    dek: "All four are built from zoebnomi.com live, cached for 15 minutes. If the site doesn't answer, each page falls back to a snapshot bundled at build time, and every response says which one it used.",
+    items: [
+      { uri: 'zoebnomi://llms.txt', t: "This site's llms.txt, with contact, booking and location lines removed before any tool sees it." },
+      { uri: 'zoebnomi://case-studies', t: 'Every case study with its key facts.' },
+      { uri: 'zoebnomi://writing', t: 'Every essay and note with its finding.' },
+      { uri: 'zoebnomi://harness', t: 'A live, read-only summary of the public agent ledger behind the harness panel on the home page.' },
+    ],
+    listLabel: 'Resources',
+  },
+
+  connect: {
+    kick: '04 · Connect',
+    h2: 'Connect it in a minute.',
+    dek: 'The remote endpoint is live and needs no sign-in. Add it to your client, then ask for one of the tools by name.',
+    copy: 'Copy',
+    copied: 'Copied',
+    copyLabel: 'Copy the snippet for',
+    soon: 'Coming',
+    items: [
+      { name: 'Claude Code', sub: 'terminal', how: 'One command.', code: `claude mcp add --transport http zoebnomi ${MCP_URL}` },
+      { name: 'Claude', sub: 'claude.ai and desktop', how: 'Customize > Connectors > Add custom connector. Paste the endpoint and choose No sign in.', code: MCP_URL },
+      {
+        name: 'ChatGPT',
+        sub: 'custom MCP server',
+        how: "Add a custom MCP server with this endpoint and no authentication. OpenAI's docs describe the flow under Plugins; older guides call it developer mode.",
+        code: MCP_URL,
+        link: { label: "OpenAI's docs", href: 'https://developers.openai.com/apps-sdk/deploy/connect-chatgpt' },
+      },
+      { name: 'Cursor', sub: '.cursor/mcp.json', how: 'Add this to .cursor/mcp.json in a project, or ~/.cursor/mcp.json for every project.', code: `{ "mcpServers": { "zoebnomi": { "url": "${MCP_URL}" } } }` },
+      {
+        name: 'Claude Skill',
+        sub: 'evals-the-zoeb-way',
+        how: 'Golden datasets, judge calibration and the citation check. From a clone of the repo, copy the folder to your skills.',
+        code: 'cp -r skill/evals-the-zoeb-way ~/.claude/skills/',
+        link: { label: 'The skill', href: `${MCP_REPO}/tree/main/skill/evals-the-zoeb-way` },
+      },
+      {
+        name: 'npx zoebnomi',
+        sub: 'CLI and local server',
+        how: 'The CLI and the stdio server ship with the npm package, which is not published yet. Until then, use the endpoint or build from the repo.',
+        code: 'npx zoebnomi check-citations answer.json',
+        soon: true,
+      },
+    ],
+    askLabel: 'Then ask',
+    asks: [
+      `Use check_citations on the answer and sources in ${MCP_REPO}/blob/main/examples/answer.json`,
+      'verify_claim: CrossSource strict prompting lifted citation precision to 0.999',
+      'fit_to_role, with a job description pasted in',
+    ],
+  },
+
+  limits: {
+    kick: '05 · Limits',
+    h2: 'What it cannot do.',
+    items: [
+      { b: 'See negation.', t: "Word overlap and word lookup can't. check_citations never says supported on its own, and verify_claim asks callers to repeat the site's quote." },
+      { b: 'Judge fit.', t: 'A fit_to_role hit means related public work exists, not that the requirement is fully met. Read the quotes.' },
+      { b: 'Sample over HTTP.', t: 'The remote endpoint is stateless, so use_client_model, where your client’s model judges the deferred citations, works on the local stdio server only.' },
+      { b: 'Know anything private.', t: 'Facts come only from public zoebnomi.com text. Each response says whether it read the site live, from the snapshot, or both.' },
+    ],
+  },
+
+  code: {
+    kick: '06 · Code',
+    h2: 'Source, tests and eval, in the open.',
+    status: '39 tests in npm test. Cloudflare Workers Builds deploys main after npm ci and npm test pass; a failing test stops the deploy.',
+    links: [
+      { bn: 'zoebnomi-mcp', bk: 'Repo · MIT', bv: 'github.com/zoeb-nomi ↗', href: MCP_REPO },
+      { bn: 'Eval results', bk: 'eval/RESULTS.md', bv: 'npm run eval ↗', href: `${MCP_REPO}/blob/main/eval/RESULTS.md` },
+      { bn: 'Health', bk: 'JSON heartbeat', bv: 'mcp.zoebnomi.com ↗', href: 'https://mcp.zoebnomi.com/health' },
+    ],
+    related: [
+      { bn: 'CrossSource', bk: 'Eval harness', bv: 'where the check comes from', href: '/crosssource/' },
+      { bn: 'Builds', bk: 'Every public build', bv: 'guarded and measured', href: '/builds/' },
+    ],
   },
 };
 
@@ -4709,6 +5057,7 @@ export const llmsTxt = `# Zoeb Nomi
 - Flagship public eval harness: CrossSource (https://github.com/zoeb-nomi/crosssource), an open benchmark and evaluation harness for citation accuracy in legal RAG. v0.3 (released 20 Oct 2026, https://github.com/zoeb-nomi/crosssource/releases/tag/v0.3): 150 items (75 qa_citation, 75 citation_check) over 45 public US opinions from CourtListener (27 federal circuit, 18 state supreme court, 2018 or later), 15 legal topics, full provenance per item (opinion ID, URL, exact passage, cited authority). Written labelling protocol (LABELING_PROTOCOL.md v1.1); two blind, independent model raters, Cohen's kappa 0.98 on citation_check and 0.84 on qa_citation; every disagreement plus a 10% audit sample (30 items in all) adjudicated by the maintainer with a third independent model rater, 27 of 30 matched the recommended label. Items are model-drafted and model-checked; no human labelled every item. Sanity run on a 30-item sample, not a full run: claude-sonnet-5-5 citation precision 0.919 / recall 0.718, citation_check accuracy 1.00; gpt-5-mini 0.763 / 0.718, 0.93. DOI (v0.3): https://doi.org/10.5281/zenodo.23493797; DOI (all versions): https://doi.org/10.5281/zenodo.21969577.
 - CrossSource v0.1 result (n = 25): citation-discipline prompting lifted citation precision 0.981 (baseline) → 0.994 (strict); recall 0.760, capped by retrieval; faithfulness 1.000; 100% (15/15) blind human–judge agreement. Corpus: 22 public-domain US court opinions; 25-question golden set; BM25 top-5 retrieval.
 - Model routing study: cheap-tier-legal-tax-hr (https://github.com/zoeb-nomi/cheap-tier-legal-tax-hr), 5 models on 1,414 expert-labelled yes/no items, comparing a single cheap model, a confidence gate, a second reader and a frontier referee per domain.
+- MCP server: zoebnomi-mcp, the CrossSource citation check as a free MCP server (https://mcp.zoebnomi.com/mcp), with verify_claim and fit_to_role; every tool is read-only and deterministic. On the held-out half of CrossSource v0.3 it caught 10 of 10 wrong-document citations without a model call; misstatements go to a judge. Repo: https://github.com/zoeb-nomi/zoebnomi-mcp
 - Open-source contributions (open pull requests, not merged): TaxCalcBench (Column Tax) PR #157: audit of all 101 test cases against official instructions, 2 answer-key errors and 5 input conflicts found, opt-in --accept-alternatives scoring flag, AUDIT.md in the fork (https://github.com/column-tax/tax-calc-bench/pull/157). eyecite (Free Law Project) PR #360: fix for Id. resolution past explanatory parentheticals (issue #348), three review findings fixed with regression tests, extraction benchmark 0 gains / 0 losses on 15,988 citations (https://github.com/freelawproject/eyecite/pull/360); plus issue #361 (https://github.com/freelawproject/eyecite/issues/361).
 - mirror-eval (https://github.com/zoeb-nomi/mirror-eval): open evaluation harness for what AI search engines say about a person; built to the CrossSource method. Two waves (2026-08-06, 2026-09-04), 332 probes each across ChatGPT, Claude, Perplexity, Gemini. Judge-free citation trail: Perplexity 13-of-63 → 63-of-63 search probes citing zoebnomi.com; Claude 0-of-63 → 0-of-63; CrossSource repo cited by ChatGPT 0 → 25-of-63 and Gemini 0 → 32-of-63. Blind human validation of the LLM judges: 3/40 and 12/40, so the taxonomy is reported as bands only. Release v1.0.
 - screener-eval (https://github.com/zoeb-nomi/screener-eval): paired, repeated evaluation of an LLM résumé screener, tested like an agent step. One résumé, 21 open US AI PM postings, two cheap-tier screeners, 5 reps, 885 calls. Employer-name swap: +0.07 / −1.14 points (95% CIs straddle zero). Link deletion: −0.90 / +0.41. Cross-screener gap on the same input: 22.3 points mean, verdicts agree on 6 of 21 postings. Parser test: plain extractors 26/29 → 29/29 after printing URLs as text.
@@ -4731,6 +5080,7 @@ export const llmsTxt = `# Zoeb Nomi
 - CrossSource case study: https://www.zoebnomi.com/crosssource/
 - mirror-eval case study: https://www.zoebnomi.com/mirror-eval/
 - screener-eval case study: https://www.zoebnomi.com/screener-eval/
+- MCP server (zoebnomi-mcp: endpoint, tools, examples and eval): https://www.zoebnomi.com/mcp/
 - About (who he is, and the employment record at #record): https://www.zoebnomi.com/about/
 - Writing (essays; notes, one counted finding each, at #notes): https://www.zoebnomi.com/writing/
 - How this site is built (the Red Pen design system and why): https://www.zoebnomi.com/design/
@@ -4768,6 +5118,7 @@ export const ogCards = {
     { id: 'design', title: 'How this site is built', sub: 'Red Pen: three voices, one pen, two surfaces, five kinds of motion.' },
     { id: 'crosssource', title: 'CrossSource', sub: 'Open benchmark for legal-RAG citation accuracy.', num: { value: '0.981 → 0.994', caption: 'citation precision · n = 25' } },
     { id: 'mirror-eval', title: 'mirror-eval', sub: 'What AI search says about a person, measured twice.', num: { value: '13 → 63', caption: 'Perplexity · Claude 0 → 0' } },
+    { id: 'mcp', title: 'zoebnomi-mcp', sub: 'A free citation check any agent can call.', num: { value: '10 of 10', caption: 'wrong-document citations · n = 50' } },
     { id: 'screener-eval', title: 'screener-eval', sub: 'What LLM résumé screeners reward, counted 885 times.', num: { value: '22.3', caption: 'points: which screener read it' } },
     { id: 'writing', title: 'Writing', sub: 'Essays on building and checking AI systems, each with its data and code.' },
     { id: 'notes', title: 'Notes', sub: 'One counted finding per note.' },
