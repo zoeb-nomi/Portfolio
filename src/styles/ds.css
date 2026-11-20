@@ -22,7 +22,7 @@ ul,ol{margin:0;padding:0}
 .skip:focus{top:10px}
 
 /* ---------- 3. header, nav, footer ---------- */
-.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--color-glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:var(--line-hair)}
+.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--color-glass-strong);border-bottom:var(--line-hair)}
 .site .in{height:var(--header-h);display:flex;align-items:center;gap:28px}
 .brand{text-decoration:none;font-size:17px;letter-spacing:-.01em;font-variation-settings:"wdth" 82,"wght" 780;white-space:nowrap}
 .nav{display:flex;gap:26px;margin-left:auto}
@@ -143,7 +143,7 @@ ul,ol{margin:0;padding:0}
 @media (max-width:599px){.build{grid-template-columns:minmax(0,1fr) auto;gap:6px 14px}.bk2,.bv{grid-column:1;text-align:left}.ba{grid-row:1;grid-column:2}}
 
 /* ---------- 10. HUD bar (static or live readout strip) ---------- */
-.hud{border-top:var(--line-hair);border-bottom:var(--line-hair);background:var(--color-glass-strong);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hud{border-top:var(--line-hair);border-bottom:var(--line-hair);background:var(--color-glass-strong)}
 .hud-in{display:flex;flex-wrap:wrap;align-items:stretch}
 .hud-c{padding:9px 20px 10px 0;margin-right:20px;border-right:var(--line-hair);font-family:var(--font-data);font-size:var(--t-label);letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-muted);white-space:nowrap;min-width:0}
 .hud-c:last-child{border-right:0;margin-right:0}
@@ -246,3 +246,10 @@ main:focus-visible{outline:none}
 .footnotes a{text-decoration:underline;text-decoration-color:var(--color-line-strong);text-underline-offset:var(--underline-offset)}
 /* touch screens: text links get a 44px tap area from an invisible box, so the underline stays put */
 @media (pointer:coarse){.tl::before{content:"";position:absolute;left:0;right:0;top:-7px;bottom:-7px}}
+/* Lenis smooth scrolling (src/scripts/ds.ts): native height, no CSS smooth behaviour fighting it, held while stopped,
+   and embeds ignore the pointer only while a scroll is moving */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-scrolling iframe{pointer-events:none}

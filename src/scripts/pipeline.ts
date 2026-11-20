@@ -1,11 +1,12 @@
 /* The home Pipeline scene (src/components/home/PipelineScene.astro).
-   167 real audit outputs flow through five stations on a canvas; a short pinned scroll walks the stations,
-   Skip and the rail jump, and a bottom-panel inspector traces one output end to end.
-   Rules kept from design/README.md §8: calm fades only, no count-ups, the scene pauses off screen and with the
-   tab hidden, Skip is always visible, reduced motion and no-JS show the completed run as a still.
+   167 real audit outputs flow through five stations on a canvas. Nothing is pinned: the page scrolls past the
+   scene freely. The station walk opens on click (a station label or the rail; a second click or Esc returns to
+   the overview), and a bottom-panel inspector traces one output end to end.
+   Rules kept from design/README.md §8: calm fades only, no count-ups, no scroll-jacking, the scene pauses off
+   screen and with the tab hidden, reduced motion and no-JS show the completed run as a still.
    Every visible string comes from the page's JSON (#pipeline-data, from pipelineHome in src/data/copy.ts). */
-import { $, $$, swap, motion, sceneRGB, clamp, lerp, sub } from './ds';
-import { gsap as G, ScrollTrigger as STg } from './gsap';
+import { $, $$, swap, motion, sceneRGB, clamp, lerp, sub, scrollLock } from './ds';
+import { gsap as G } from './gsap';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Any = any;
@@ -156,7 +157,7 @@ function mount() {
   let cx0 = -1e4, cy0 = -1e4, mx = -1e4, my = -1e4, hoverLabel = -1, hover = -1, probeP: Any = null, traced: Any = null, traceBlend = 0;
   const lit = [0, 0, 0, 0, 0], I = { grid: 1, track: 1 }, stP = [{ v: 1 }, { v: 1 }, { v: 1 }, { v: 1 }, { v: 1 }];
   const cam = { t: 500, u: 10, z: 1, ax: 0.5, ay: 0.6 }, scam = { t: 500, u: 10, z: 1, ax: 0.5, ay: 0.6 }, fcam = { t: 500, u: 0, z: 2.1, ax: 0.56, ay: 0.5 };
-  let stTrig: Any = null, introDone = false, cardShown = -1, cardV = 0, cardLift = false, heroA = -1, heroT = 1, railShown: boolean | null = null, actShown = -2, scrimV = -1;
+  let walkTarget = 0, introDone = false, cardShown = -1, cardV = 0, cardLift = false, heroA = -1, heroT = 1, railShown: boolean | null = null, actShown = -2, scrimV = -1;
   let lastTextT = 0, frameAvg = 16, frameN = 0, budgetChecked = false;
   let insOpen = false;
 
@@ -237,7 +238,7 @@ function mount() {
     const r = (canvas as HTMLCanvasElement).getBoundingClientRect();
     W = r.width; H = r.height;
     if (!W || !H) return;
-    dpr = Math.min(lowEnd ? 1.5 : W < 720 ? 1.75 : 2, window.devicePixelRatio || 1);
+    dpr = Math.min(lowEnd ? 1.25 : 1.5, window.devicePixelRatio || 1); /* 1.5x is sharp on Retina at half the pixels of 2x */
     (canvas as HTMLCanvasElement).width = Math.round(W * dpr);
     (canvas as HTMLCanvasElement).height = Math.round(H * dpr);
     vert = W < MOBILE && H > W * 1.1;
@@ -634,6 +635,7 @@ function mount() {
     if (!insOpen) {
       insOpen = true;
       ins.classList.add('open'); ins.setAttribute('aria-hidden', 'false'); document.documentElement.classList.add('ins-open');
+      scrollLock(true);
       window.addEventListener('wheel', holdScroll, { passive: false });
       window.addEventListener('touchmove', holdScroll, { passive: false });
     }
@@ -643,6 +645,7 @@ function mount() {
     if (!insOpen) return;
     insOpen = false; insO = null;
     ins.classList.remove('open'); ins.setAttribute('aria-hidden', 'true'); document.documentElement.classList.remove('ins-open');
+    scrollLock(false);
     window.removeEventListener('wheel', holdScroll);
     window.removeEventListener('touchmove', holdScroll);
   }
@@ -708,12 +711,12 @@ function mount() {
       frameAvg = frameAvg * 0.95 + rdt * 1000 * 0.05;
       if (++frameN > 180) { budgetChecked = true; if (frameAvg > 24 && !lowEnd) { lowEnd = true; SPAWN = 0.42; resize(); } }
     }
-    const target = stTrig ? stTrig.progress : 0;
+    const target = walkTarget;
     dp += (target - dp) * Math.min(1, rdt * 10);
     if (Math.abs(target - dp) < 0.0003) dp = target;
-    if (!introDone && target > 0.03) skipIntro(); /* any scroll into the stations ends the intro */
+    if (!introDone && target > 0.03) skipIntro(); /* opening a station ends the intro */
     followTarget(rdt); camAt(dp);
-    const canvasTop = stTrig && window.scrollY > stTrig.end ? stTrig.end - window.scrollY : 0;
+    const canvasTop = root.getBoundingClientRect().top;
     if (cx0 > -9000) { mx = cx0; my = cy0 - canvasTop; } else { mx = -1e4; my = -1e4; }
     const a = activeStation();
     let prox = -1;
@@ -750,41 +753,28 @@ function mount() {
   /* =================================================================
      LIVE WIRING (native scroll, ScrollTrigger only)
      ================================================================= */
-  G.registerPlugin(STg);
   root.classList.add('is-live');
   document.documentElement.classList.add('pipe-live');
   resize(); camAt(0);
 
-  stTrig = STg.create({ trigger: root, start: 'top top', end: () => '+=' + Math.round(window.innerHeight * 2.3), pin: true, anticipatePin: 1, invalidateOnRefresh: true });
-  const scrollToY = (y: number) => window.scrollTo({ top: y, behavior: 'smooth' });
-  const scrollToStation = (i: number) => scrollToY(stTrig.start + (P0 + PS * i + PS / 2) * (stTrig.end - stTrig.start));
-  railBtns.forEach((b) => b.addEventListener('click', () => { if (traced) release(); scrollToStation(+(b.dataset.i as string)); }));
-  const skipB = q('.skipb', root);
-  skipB.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopImmediatePropagation(); /* the page-wide anchor handler would start a second, smooth scroll */
+  /* station walk on click: the same station again, or Esc, returns to the overview */
+  const setStation = (i: number) => {
     if (traced) release();
-    const hh = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h'), 10) || 60, t = q('#shipped');
-    const go = () => window.scrollTo({ top: Math.max(stTrig ? stTrig.end + 2 : 0, t.getBoundingClientRect().top + window.scrollY - hh), behavior: 'auto' });
-    go();
-    /* an early click can land before fonts settle and the pin is re-measured: aim again after the next refresh */
-    const again = () => { STg.removeEventListener('refresh', again); requestAnimationFrame(go); };
-    STg.addEventListener('refresh', again);
-    setTimeout(() => STg.removeEventListener('refresh', again), 4000);
-    const k = $('#h-shipped');
-    if (k) { k.setAttribute('tabindex', '-1'); try { k.focus({ preventScroll: true }); } catch { /* no focus */ } }
-  });
+    walkTarget = activeStation() === i ? 0 : P0 + PS * i + PS / 2;
+  };
+  railBtns.forEach((b) => b.addEventListener('click', () => setStation(+(b.dataset.i as string))));
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !traced && walkTarget > 0) walkTarget = 0; });
   labels.forEach((b) => {
     const i = +(b.dataset.i as string);
     b.addEventListener('pointerenter', (e) => { if ((e as PointerEvent).pointerType === 'mouse') hoverLabel = i; });
     b.addEventListener('pointerleave', () => { if (hoverLabel === i) hoverLabel = -1; });
     b.addEventListener('focus', () => (hoverLabel = i));
     b.addEventListener('blur', () => { if (hoverLabel === i) hoverLabel = -1; });
-    b.addEventListener('click', () => { if (traced) release(); scrollToStation(i); });
+    b.addEventListener('click', () => setStation(i));
   });
 
   /* pointer: mouse only for the probe; touch scrolls freely and taps to trace */
-  const BLOCK = '.card,.hero a,.rail,.phud,.site,.hint,.slabel,.skipb,.ins';
+  const BLOCK = '.card,.hero a,.rail,.phud,.site,.hint,.slabel,.ins';
   window.addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') { cx0 = -1e4; return; }
     if ((e.target as HTMLElement).closest && (e.target as HTMLElement).closest(BLOCK)) { cx0 = -1e4; return; }
@@ -793,7 +783,7 @@ function mount() {
   canvas.addEventListener('pointerleave', () => (cx0 = -1e4));
   document.documentElement.addEventListener('mouseleave', () => (cx0 = -1e4));
   window.addEventListener('blur', () => (cx0 = -1e4));
-  const canvasXY = (e: MouseEvent) => [e.clientX, e.clientY - (stTrig && window.scrollY > stTrig.end ? stTrig.end - window.scrollY : 0)];
+  const canvasXY = (e: MouseEvent) => [e.clientX, e.clientY - root.getBoundingClientRect().top];
   function tryTrace(e: MouseEvent, rad: number) {
     const xy = canvasXY(e), p = probeP && probeP !== traced ? probeP : pickAt(xy[0], xy[1], rad);
     if (p && p !== traced) startTrace(p);
@@ -811,15 +801,16 @@ function mount() {
   /* resize and refresh: debounced */
   let rzT = 0;
   if ('ResizeObserver' in window) new ResizeObserver(() => resize()).observe(canvas);
-  window.addEventListener('resize', () => { clearTimeout(rzT); rzT = window.setTimeout(() => STg.refresh(), 180); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { resize(); STg.refresh(); });
-  new IntersectionObserver((en) => { visible = en[0].isIntersecting; if (visible) start(); }, { threshold: 0 }).observe(root);
+  window.addEventListener('resize', () => { clearTimeout(rzT); rzT = window.setTimeout(() => resize(), 180); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => resize());
+  /* off screen: stop drawing and fold the walk back to the overview */
+  new IntersectionObserver((en) => { visible = en[0].isIntersecting; if (visible) start(); else if (!traced) walkTarget = 0; }, { threshold: 0 }).observe(root);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
 
   /* load sequence (hero readable in about 0.6 s; the scene keeps drawing behind it; skippable): track draws, stations snap in, first emission and headline, HUD last */
   I.grid = 0; I.track = 0; stP.forEach((o) => (o.v = 0));
   const hd = [q('#h1', hero), q('.hsub', hero)], ul = q('.ul', hero), idl = q('.id', hero), ctas = q('.ctas', hero);
-  G.set(hd, { autoAlpha: 0, y: 10 }); G.set(ul, { scaleX: 0 }); G.set([idl, ctas], { autoAlpha: 0, y: 8 }); G.set(skipB, { autoAlpha: 0 });
+  G.set(hd, { autoAlpha: 0, y: 10 }); G.set(ul, { scaleX: 0 }); G.set([idl, ctas], { autoAlpha: 0, y: 8 });
   phud.style.setProperty('--hy', '100%'); G.set(hint, { autoAlpha: 0 });
   function emit() {
     if (simOn) return;
@@ -835,7 +826,7 @@ function mount() {
     .to(idl, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.05)
     .to(hd, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out', stagger: 0.12 }, 0.08)
     .to(ul, { scaleX: 1, duration: 0.8, ease: 'power2.inOut' }, 0.55)
-    .to([ctas, skipB], { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.35)
+    .to(ctas, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.35)
     .to(hy, { v: 0, duration: 1, ease: 'power2.out', onUpdate: () => phud.style.setProperty('--hy', hy.v.toFixed(2) + '%') }, 2.05);
   if (!hintUsed) intro.to(hint, { autoAlpha: 1, duration: 0.6 }, 2.3);
   const SKIP_EVENTS = ['wheel', 'keydown', 'pointerdown', 'touchstart'];
