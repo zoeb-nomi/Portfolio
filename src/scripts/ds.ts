@@ -259,11 +259,13 @@ function scrollRegions() {
       }
     });
   apply();
-  let t = 0;
-  w.addEventListener('resize', () => {
-    clearTimeout(t);
-    t = w.setTimeout(apply, 150);
-  });
+  // Re-check as soon as a wrapper changes size (rotation, window resize), not after a debounce.
+  if (typeof ResizeObserver === 'function') {
+    const ro = new ResizeObserver(apply);
+    els.forEach((el) => ro.observe(el));
+  } else {
+    addEventListener('resize', apply);
+  }
 }
 
 let started = false;

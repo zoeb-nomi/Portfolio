@@ -77,6 +77,11 @@
   --color-accent-fill: var(--red-fill);
   --color-accent-hover: color-mix(in srgb, var(--red-fill) 88%, var(--ink));
   --color-link: var(--ink);
+  /* Translucent washes of ink for tracks and bands, and of red for guide lines (figures, the axis pad). */
+  --color-wash: color-mix(in srgb, var(--ink) 5%, transparent);
+  --color-wash-strong: color-mix(in srgb, var(--ink) 12%, transparent);
+  --color-ghost: color-mix(in srgb, var(--ink) 16%, transparent);
+  --color-accent-guide: color-mix(in srgb, var(--red) 45%, transparent);
   --color-pending: var(--ink-3);
 
   --color-state-pass: var(--ink);

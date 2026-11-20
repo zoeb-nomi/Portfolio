@@ -347,7 +347,7 @@ const spec = (s: (typeof V.items)[number]['spec']) =>
                   )
                 }
               </div>
-              <div class="dz-spc" style={spec(v.spec)}>
+              <div class="dz-spc" data-specimen style={spec(v.spec)}>
                 <p class="sp-h">{v.spec.head}<u>{v.spec.mark}</u>{v.spec.tail}</p>
                 <p class="sp-b">{v.spec.line}</p>
                 <div class="sp-sw">{v.spec.sw.map((c) => <i style={`background:${c}`} />)}</div>
@@ -415,18 +415,18 @@ const spec = (s: (typeof V.items)[number]['spec']) =>
   /* ---------- axis pad (signature) ---------- */
   .dz-axes{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.9fr);gap:clamp(20px,3vw,40px);margin-top:clamp(28px,5vh,48px);align-items:stretch}
   @media (max-width:899px){.dz-axes{grid-template-columns:minmax(0,1fr)}}
-  .dz-spec{position:relative;border:var(--line-hair);background:var(--color-surface-sunk);min-height:clamp(240px,34vw,420px);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:20px}
+  .dz-spec{position:relative;border:var(--line-hair);background:var(--color-surface-sunk);min-height:clamp(240px,34vw,420px);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:20px;min-width:0;overflow:hidden}
   .dz-word{font-size:clamp(44px,8vw,132px);line-height:.9;letter-spacing:-.04em;color:var(--color-text);white-space:nowrap;font-variation-settings:"wdth" var(--aw,100),"wght" var(--ag,620);will-change:font-variation-settings}
   .dz-word span{color:var(--color-accent)}
   .dz-spec .lab{position:absolute}
   .dz-spec .tl-l{left:14px;top:12px}.dz-spec .tr-l{right:14px;top:12px}.dz-spec .bl-l{left:14px;bottom:12px}.dz-spec .br-l{right:14px;bottom:12px;color:var(--color-text-body)}
   .dz-pad-wrap{display:flex;flex-direction:column;gap:14px}
-  .dz-pad{position:relative;aspect-ratio:1/1;max-height:340px;border:var(--line-strong);background:var(--color-panel);touch-action:none;cursor:crosshair;outline-offset:4px;
+  .dz-pad{position:relative;overflow:hidden;aspect-ratio:1/1;max-height:340px;border:var(--line-strong);background:var(--color-panel);touch-action:none;cursor:crosshair;outline-offset:4px;
     background-image:linear-gradient(var(--color-line) 1px,transparent 1px),linear-gradient(90deg,var(--color-line) 1px,transparent 1px);background-size:12.5% 12.5%}
   .dz-pad .ax{position:absolute;font:500 var(--t-label)/1 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--color-text-muted);pointer-events:none}
   .dz-pad .ax.x{left:8px;bottom:-18px}.dz-pad .ax.x2{right:8px;bottom:-18px}
   .dz-pad .ax.y{left:-4px;top:8px;transform:translateX(-100%) rotate(-90deg);transform-origin:right top}
-  .dz-hx,.dz-hy{position:absolute;background:color-mix(in srgb,var(--color-accent) 45%,transparent);pointer-events:none}
+  .dz-hx,.dz-hy{position:absolute;background:var(--color-accent-guide);pointer-events:none}
   .dz-hx{left:0;right:0;height:1px;top:0}
   .dz-hy{top:0;bottom:0;width:1px;left:0}
   .dz-knob{position:absolute;left:0;top:0;width:18px;height:18px;margin:-9px 0 0 -9px;background:var(--color-accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--color-accent) 20%,transparent),0 0 24px color-mix(in srgb,var(--color-accent) 55%,transparent);pointer-events:none;will-change:transform}
@@ -513,6 +513,7 @@ const spec = (s: (typeof V.items)[number]['spec']) =>
   .dz-ver .src{display:block;max-width:72ch;margin-top:10px;font:400 11px/1.5 var(--font-data);color:var(--color-text-muted)}
   .dz-ver .links{display:flex;flex-wrap:wrap;gap:4px 20px;margin-top:10px}
   .dz-ver.now .no::after{content:attr(data-now);margin-left:10px;padding:3px 6px;border:var(--line-accent);color:var(--color-accent);letter-spacing:.12em}
+  #dz-w,#dz-g{background:transparent;accent-color:var(--color-accent)}
   .dz-spc{border:var(--line-strong);background:var(--sp-bg);color:var(--sp-ink);padding:18px 18px 14px;min-width:0}
   .dz-spc .sp-h{font-family:var(--sp-face);font-size:30px;line-height:1.02;letter-spacing:-.02em;font-variation-settings:var(--sp-fvs,normal);font-weight:var(--sp-wt,400)}
   .dz-spc .sp-h u{text-decoration:none;box-shadow:inset 0 -.08em 0 var(--sp-red)}

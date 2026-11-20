@@ -165,6 +165,9 @@ const data = { audit, totals: T, stations: P.stations, scene: sc, trace: P.trace
 .hero{max-width:var(--shell-max);margin:0 auto;padding-top:clamp(40px,8vh,96px);padding-bottom:28px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 48px}
 .hero .id{margin-bottom:16px}
 .hero .id-seg{white-space:nowrap}
+/* ScrollTrigger holds the pinned scene at its old pixel width until its debounced refresh after a resize;
+   capping it keeps a rotate or window resize from flashing a sideways scroll. */
+.pin-spacer:has(> .pipe),.pipe{max-width:100%!important}
 @media (max-width:599px){.hero .id-seg:first-of-type{display:block}.hero .id-dot.first{display:none}}
 .hero .display{max-width:none}
 .hero .hsub{margin-top:14px;font-size:clamp(19px,1.7vw,26px);line-height:1.25;letter-spacing:-.01em;color:var(--color-text-body);font-variation-settings:"wdth" 92,"wght" 460;max-width:none}
