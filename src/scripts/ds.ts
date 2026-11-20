@@ -2,7 +2,9 @@
    Everything degrades: without JS or under reduced motion the page is complete and static.
    The kit's own motion (reveals, spines, the verbs wave) uses IntersectionObserver and the Web Animations API,
    so a plain page ships no animation library. Pages whose own scripts need GSAP import it from ./gsap.
-   No smooth-scroll library. */
+   Smooth wheel scrolling: Lenis (npm, pinned), only for a fine pointer and never under reduced motion; touch keeps
+   native scrolling. Anything that must hold the page (the home trace inspector) calls scrollLock(). */
+import Lenis from 'lenis';
 
 const d = document;
 const w = window;
@@ -17,6 +19,26 @@ export const cubicInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow
 
 export const reduce = w.matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const motion = () => !reduce;
+
+let lenis: Lenis | null = null;
+
+/** Hold or release the page (a modal panel); pauses smooth scrolling while held. */
+export function scrollLock(on: boolean) {
+  if (!lenis) return;
+  if (on) lenis.stop();
+  else lenis.start();
+}
+
+/** Smooth wheel scrolling for mouse and trackpad. Nested scrollers opt out with data-lenis-prevent. */
+function smoothScroll() {
+  if (reduce || !w.matchMedia('(pointer: fine)').matches) return;
+  lenis = new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 1 });
+  const loop = (t: number) => {
+    lenis?.raf(t);
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+}
 
 /** Read a "r,g,b" scene token (canvas colours). */
 export const sceneRGB = (name: '--scene-bg' | '--scene-ink' | '--scene-red') =>
@@ -86,7 +108,8 @@ function anchors() {
       if (!el) return;
       e.preventDefault();
       const hh = parseInt(getComputedStyle(d.documentElement).getPropertyValue('--header-h'), 10) || 60;
-      w.scrollTo({ top: el.getBoundingClientRect().top + w.scrollY - hh - 8, behavior: reduce ? 'auto' : 'smooth' });
+      if (lenis) lenis.scrollTo(el, { offset: -(hh + 8) });
+      else w.scrollTo({ top: el.getBoundingClientRect().top + w.scrollY - hh - 8, behavior: reduce ? 'auto' : 'smooth' });
       history.replaceState(null, '', id);
     });
   });
@@ -275,6 +298,7 @@ export function init() {
   started = true;
   markNav();
   theme();
+  smoothScroll();
   anchors();
   scrollRegions();
   reveals();

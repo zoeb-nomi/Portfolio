@@ -35,8 +35,8 @@ that catch quiet failures. Three facts shape it.
 5. **The final state is in the HTML.** No script, slow script or reduced motion loses nothing.
 6. **Your words stay whole.** Long text is not cut; it moves to the page that holds it
    (Builds, About, the case studies). Home carries one claim per screen.
-7. **No scroll-jacking.** Nothing pins the page for more than about two screens, and any pinned
-   sequence has a visible Skip. A click, not vertical scroll, drives an inspector.
+7. **No scroll-jacking.** Nothing pins the page. A scene keeps playing in place while the page scrolls past it;
+   a click, not vertical scroll, opens a station or the trace inspector.
 
 ## 2. Colour (meaning, not just value)
 
@@ -163,12 +163,17 @@ Rules:
 2. Animate transform, opacity, clip-path or font-variation only. Canvas for more than about 100
    moving things; pause loops off-screen.
 3. Numbers are revealed whole. Never count up, never show an intermediate value.
-4. No scroll-jacking: a pinned sequence is short and has a visible Skip. Interactive inspection
-   (the trace) is driven by clicks and arrow keys, not by scroll.
+4. No scroll-jacking: nothing pins the page. Interactive inspection (a station, the trace) is driven by clicks
+   and arrow keys, not by scroll.
 5. Reduced motion: the final composed state, no movement. Without JS every word is visible.
 6. The kit hooks above run on IntersectionObserver and the Web Animations API, so a plain page ships no animation
    library. Page scripts that need timelines or pinning (the home scene, Shipped, About, Builds, Design) import
-   GSAP 3.12.5 + ScrollTrigger from `src/scripts/gsap.ts` (npm, pinned). No smooth-scroll library.
+   GSAP 3.12.5 + ScrollTrigger from `src/scripts/gsap.ts` (npm, pinned).
+7. Smooth wheel scrolling: Lenis 1.1.20 (npm, pinned) in `src/scripts/ds.ts`, for a fine pointer only and never
+   under reduced motion; touch keeps native scrolling. A nested scroller carries `data-lenis-prevent`; anything
+   that holds the page calls `scrollLock()`.
+8. Performance on Retina: canvases render at most 1.5x device pixels and stop off screen; no `backdrop-filter`
+   (a solid `--color-glass-strong` tint instead, so a sticky bar never re-blurs a moving canvas).
 
 ## 9. Do and don't
 
@@ -202,7 +207,7 @@ plus 2 or 3 readouts.
 
 | page | order |
 |---|---|
-| Home | hero claim and pipeline scene (Skip, trace inspector) → Shipped before → after panels in a spined section → verbs row → harness band (live) → Builds list → About → contact |
+| Home | hero claim and pipeline scene (stations open on click, trace inspector; not pinned) → Shipped before → after panels in a spined section → verbs row → harness band (live) → Builds list → About → contact |
 | Builds | `.page-head` with `.stats` → `.blist` of all builds → a panel per featured build → method (`#method`) |
 | Writing | `.page-head` → essays `.blist` → notes `.blist` (`#notes`) |
 | Essay / note | `.page-head` with `.byline` → audio → `.article` (`.prose` + aside) → `.footnotes` → related `.blist` |
