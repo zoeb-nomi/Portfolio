@@ -1,25 +1,28 @@
 # SiteFooter
 
 ## Purpose
-The site footer on the ink surface: name, role line, contact links, then the footer nav and the design and llms.txt links.
+The one-line site footer: identity on the left; Writing, Design system, Email, LinkedIn, GitHub, X and llms.txt on the right.
 
 ## Anatomy
-`footer.site-footer.surface-ink.bleed`: an empty (aria-hidden) margin column; body column with the name (Archivo), the role line, a links row (Book a call, email, LinkedIn, GitHub; 44px targets), and a hair rule above a meta row holding a labelled `<nav aria-label="Footer">` and two small links (design system, `llms.txt`). No top rule: the CTA slab or the last section rule closes the page above it.
+`footer.foot.gut > .in`: `span.foot-id` and `nav[aria-label="Footer"]` with the links. On phones the links wrap.
 
 ## Props
-None. Content comes from `site`, `cta`, `nav` and `designLink` in `src/data/copy.ts`.
+None. Links and identity text come from `copy.ts` (`writingLink`, `designLink`, `cta`, `llmsLink`, `footerId`).
 
-## Tokens it reads
-- Colour roles: `--color-text`, `--color-text-muted`, `--color-link` (all resolved on the ink surface).
-- Type: `--font-heading`, `--font-text`, `--wght-head`, `--wdth-head`, `--track-tight`, `--t-h3`, `--t-small`, `--t-label`, `--lh-heading`.
-- Space and lines: `--s-2` to `--s-11`, `--hit-touch`, `--underline-offset`, `--line-hair`.
+## Variants
+None.
 
-## States and motion
-Static. Link hover changes colour and underline. Reduced motion changes nothing. It is the ink surface by construction (`.surface-ink`), so it re-points roles itself. Collapses at 899px.
+## Kit classes
+`.foot`, `.foot-id`, `.gut`, `.in` (styles in `ds.css`). The footer carries Email on phones, where the header drops it.
+
+## Motion
+Links change colour on hover and focus (a 300ms fade). No script.
 
 ## Accessibility
-Labelled footer nav; external links open with `rel="noopener noreferrer"`; targets are 44px.
+A `footer` landmark with a labelled `nav`. External links open in a new tab with `rel="noopener noreferrer"`.
+
+## Light and dark
+Roles only: a hairline above, muted identity, body-coloured links.
 
 ## Used on
-Also via: `layout Base`.
-Rendered by Base on every page.
+Every page, through `src/layouts/Base.astro`.

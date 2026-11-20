@@ -1,112 +1,62 @@
 ---
-// A page section: "§n LABEL" in the margin column (the § in red-ink), the body
-// in the body column, closed by an Ink rule. A short red tick sits on the
-// section's top rule at the margin column's x; the motion layer grows it when
-// the section enters view (B-24, redrawn as A's pen). Final state in CSS.
+// One prose section of a long-form page: a heading carrying the red § mark (`.sec-no`), then the body. Consecutive
+// Sections read as one article (an essay, a note, a case study): the reading spine runs down their left edge and ends
+// under the last one (scripts/reading.ts, switched on by Masthead).
 //
+//   label="" renders no heading: an unlabelled opening, before §1.
+//   `note` is a margin note beside the heading (rail at 1100px and up, under it below).
+//   `sub` is a small mono line under the heading. `wide` lets children use the full shell instead of the measure.
+//   The `margin` slot adds anything else to the rail beside the heading.
 import MarginNote from './MarginNote.astro';
 
 interface Props {
   mark: string;
   label: string;
   note?: string;
-  /** A small mono line under the label in the margin column (no MarginNote rule). */
+  /** A small mono line under the heading. */
   sub?: string;
   as?: 'section' | 'div';
   narrId?: string;
   anchorId?: string;
-  /** Draw the faint drafting grid behind this section (Builds ledger only). */
+  /** Kept for old call sites; the drafting grid is retired. */
   grid?: boolean;
+  /** Children may use the full shell width, not just the reading measure. */
+  wide?: boolean;
   class?: string;
 }
 
-const { mark, label, note, sub, as: Tag = 'section', narrId, anchorId, grid = false, class: className } = Astro.props;
+const { mark, label, note, sub, as: Tag = 'section', narrId, anchorId, wide = false, class: className } = Astro.props;
 const slug = label
   .toLowerCase()
   .replace(/['’]/g, '')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '');
 const headingId = anchorId ?? `sec-${slug}`;
+const hasRail = Boolean(note) || Astro.slots.has('margin');
 ---
 
-<Tag class:list={['rp-section', { 'has-grid': grid }, className]} data-section>
-  <span class="tick" aria-hidden="true" data-tick></span>
-  <div class="section-inner grid-margin grid-margin--compact">
-    <div class="margin-col">
-      <h2 class="mark-label" id={headingId} data-narr={narrId}>
-        <span class="mark" aria-hidden="true">{mark}</span> <span class="label">{label}</span>
-      </h2>
-      {sub && <p class="mark-sub">{sub}</p>}
-      <slot name="margin" />
-      {note && <MarginNote label={`Note: ${label}`}>{note}</MarginNote>}
-    </div>
-    <div class="body-col">
+<Tag class:list={['rs', 'gut', { 'rs--wide': wide }, className]} data-section>
+  <div class="in">
+    <div class="rs-in">
+      {
+        label && (
+          <div class:list={['rs-head', { article: hasRail }]}>
+            <div class="rs-head-col">
+              <h2 class="rs-h" id={headingId} data-narr={narrId}>
+                <span class="sec-no" aria-hidden="true">{mark}</span> <span class="label">{label}</span>
+              </h2>
+              {sub && <p class="rs-sub lab">{sub}</p>}
+            </div>
+            {hasRail && (
+              <aside aria-label={`Notes: ${label}`}>
+                {note && <MarginNote as="div" label={`Note: ${label}`}>{note}</MarginNote>}
+                <slot name="margin" />
+              </aside>
+            )}
+          </div>
+        )
+      }
       <slot />
     </div>
   </div>
 </Tag>
-
-<style>
-  .rp-section {
-    position: relative;
-    border-bottom: var(--line-ink);
-  }
-
-  /* The red tick on the top rule (it overlaps the rule above this section). */
-  .tick {
-    position: absolute;
-    top: -1px;
-    left: var(--gutter);
-    width: var(--s-11);
-    border-top: var(--line-pen);
-    transform-origin: left;
-    pointer-events: none;
-  }
-
-  .has-grid {
-    background-image:
-      linear-gradient(var(--grid-ink) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-ink) 1px, transparent 1px);
-    background-size: var(--grid-step) var(--grid-step);
-    background-position: -1px -1px;
-  }
-
-  .mark-label[id] {
-    scroll-margin-top: var(--s-6);
-  }
-
-  @media (min-width: 900px) {
-    .mark-label[id] {
-      scroll-margin-top: calc(var(--header-h) + var(--s-6));
-    }
-  }
-
-  /* Red Pen 5: the section label is a real heading in the margin, in Zoeb's voice; the § number above it is the pen's. */
-  .mark-label {
-    font-family: var(--font-heading);
-    font-size: var(--t-h3);
-    font-weight: var(--wght-head);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    letter-spacing: var(--track-tight);
-    line-height: var(--lh-heading);
-    color: var(--color-text);
-  }
-
-  .mark-label .mark {
-    display: block;
-    margin-bottom: var(--s-2);
-    font-family: var(--font-data);
-    font-size: var(--t-small);
-    font-weight: 500;
-    letter-spacing: 0;
-    color: var(--color-accent-text);
-  }
-
-  .mark-sub {
-    margin-top: var(--s-1);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    line-height: var(--lh-snug);
-    color: var(--color-text-muted);
-  }
-</style>

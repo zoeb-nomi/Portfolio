@@ -1,7 +1,7 @@
 ---
 // Two résumé versions, one row of 29 squares each, per parser. Both versions are shown at rest; the two
 // checkboxes grey a version out so the other can be read alone. v4.1 is drawn in ink and v4.2 in red (the
-// reviewer's colour for "after"). The squares are grouped by outcome, not by field order. Every count is also
+// "after" series). The squares are grouped by outcome, not by field order. Every count is also
 // written out as text, so nothing depends on colour.
 interface Row {
   label: string;
@@ -74,7 +74,7 @@ let line = 0;
 
 <style>
   .pc {
-    --pc-1: var(--color-text);
+    --pc-1: var(--color-text-body);
     --pc-2: var(--color-accent);
   }
 
@@ -88,7 +88,7 @@ let line = 0;
 
   .pc-legend {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
@@ -107,7 +107,7 @@ let line = 0;
     inline-size: var(--s-4);
     block-size: var(--s-4);
     margin: 0;
-    accent-color: var(--color-text);
+    accent-color: var(--color-accent);
   }
 
   .pc-sw {
@@ -136,7 +136,7 @@ let line = 0;
 
   .pc-name small {
     margin-inline-start: var(--s-2);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
@@ -159,13 +159,12 @@ let line = 0;
 
   .pc-ver {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--c);
   }
 
-  /* Red Pen 5: --red is the pen's mark colour (3.9:1 on paper); red text uses --red-ink. */
   .pc-line--v2 .pc-ver {
-    color: var(--color-accent-text);
+    color: var(--color-accent);
     transition: color var(--dur-base) ease;
   }
 
@@ -179,7 +178,7 @@ let line = 0;
   .pc-text {
     grid-column: 2;
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
@@ -202,18 +201,7 @@ let line = 0;
   .pc-cell.is-garbled {
     border: 0;
     background: var(--c, var(--color-text));
-    box-shadow: inset 0 0 0 3px var(--color-surface);
-  }
-
-  /* The v4.2 colour is the 2px red line tier, so its hollow squares are drawn at 2px. */
-  .pc-line--v2 .pc-cell.is-missing,
-  .pc-line--v2 .pc-cell.is-wrong {
-    border-width: 2px;
-  }
-
-  .pc-line--v2 .pc-cell.is-wrong::before,
-  .pc-line--v2 .pc-cell.is-wrong::after {
-    border-top-width: 2px;
+    box-shadow: inset 0 0 0 3px var(--color-surface-sunk);
   }
 
   .pc-cell.is-wrong::before,
@@ -235,7 +223,7 @@ let line = 0;
     gap: var(--s-1) var(--s-5);
     margin-top: var(--s-5);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 

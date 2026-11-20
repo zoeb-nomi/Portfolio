@@ -1,0 +1,18 @@
+---
+// Numbered limits (two columns of rows) or rules (large type), one item per row.
+import CsParts from './CsParts.astro';
+import type { Part } from '../lib/caseStudy';
+
+interface Props {
+  kind: 'lim' | 'rules';
+  items: Part[][];
+}
+
+const { kind, items } = Astro.props;
+---
+
+<ol class={kind === 'lim' ? 'cs-lim' : 'cs-rules'} data-stagger>
+  {items.map((parts, i) => (
+    <li><span>{String(i + 1).padStart(2, '0')}</span><p><CsParts parts={parts} /></p></li>
+  ))}
+</ol>

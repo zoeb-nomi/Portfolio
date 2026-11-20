@@ -1,0 +1,22 @@
+---
+// A list of link rows (.blist): name, kind, value, arrow. External rows open in a new tab.
+import { pipelineCaseStudies as P } from '../data/copy';
+
+interface Props {
+  links: { bn: string; bk: string; bv: string; href: string }[];
+  sub?: boolean;
+}
+
+const { links, sub = false } = Astro.props;
+const external = (h: string) => /^https?:/.test(h);
+---
+
+<ol class:list={['blist', sub && 'sub']} data-stagger>
+  {links.map((l) => (
+    <li>
+      <a class="build" href={l.href} target={external(l.href) ? '_blank' : undefined} rel={external(l.href) ? 'noopener noreferrer' : undefined}>
+        <span class="bn">{l.bn}</span><span class="bk2">{l.bk}</span><span class="bv">{l.bv}</span><span class="ba" aria-hidden="true">{P.shared.arrow}</span>
+      </a>
+    </li>
+  ))}
+</ol>

@@ -1,13 +1,11 @@
-/* zoebnomi.com — layout primitives · The Red Pen v1.0
-   The one place the `margin-col | body-col` grid is declared. Every section,
-   masthead, timeline entry, slab and page body puts `.grid-margin` on its
-   wrapper and `.margin-col` / `.body-col` on the two children; the pieces
-   below supply the canonical geometry (Section's).
-
-   All selectors are wrapped in :where() so they carry ZERO specificity: a
-   component or page overrides any single property with a plain class rule
-   (a timeline entry's tighter padding, a slab's borderless margin column)
-   without a specificity fight, and without !important. */
+/* zoebnomi.com layout primitives · The Pipeline
+   Two things live here.
+   1. The `margin-col | body-col` grid that a few older components still use (timeline entries, the case-study
+      rows). It is the one place that grid is declared. All selectors are wrapped in :where() so they carry zero
+      specificity: a component overrides any single property with a plain class rule, without !important.
+   2. The long-form page shell (essays, notes, case-study prose): `main` is the positioning root for the reading
+      spine, and `.rs` is one prose section (components/Section.astro). The kit classes (.gut, .in, .sec, .prose,
+      .article, .margin-note) are in ds.css; this file only adds how they stack on a reading page. */
 
 /* ---- The grid ---- */
 :where(.grid-margin) {
@@ -15,31 +13,21 @@
   grid-template-columns: var(--margin-col) 1fr;
 }
 
-/* The margin column: indented by --gutter on the left. v3 draws no vertical
-   rule here (horizontals only, DESIGN v3 §b rule 1). */
 :where(.grid-margin) > :where(.margin-col) {
   padding: var(--s-9) var(--s-5) var(--s-9) var(--gutter);
 }
 
-/* The body column. `--body-pad-end` lets a wrapper that closes a block (a
-   masthead, a page body) leave more room under its content than a section
-   does, without restating the whole padding shorthand. min-width: 0 lets a
-   wide child (table, heatmap, chip row) scroll inside the column instead of
-   stretching the grid track. */
+/* min-width: 0 lets a wide child (table, heatmap, chip row) scroll inside the column instead of stretching the track. */
 :where(.grid-margin) > :where(.body-col) {
   min-width: 0;
   padding: var(--s-9) var(--gutter) var(--body-pad-end, var(--s-9)) var(--body-inset);
 }
 
-/* Below 900px the two columns stack and the margin column becomes a
-   labelled band above the body. */
 @media (max-width: 899px) {
   :where(.grid-margin) {
     grid-template-columns: 1fr;
   }
 
-  /* Stacked, the margin column is a bare label with no rule under it, so
-     each section loses a line (DESIGN v3 §d). */
   :where(.grid-margin) > :where(.margin-col) {
     padding: var(--s-9) var(--gutter) 0;
   }
@@ -49,8 +37,6 @@
   }
 }
 
-/* Sections (the article rhythm) tighten one more step on phones. Opt-in so
-   mastheads, timeline entries and page bodies keep their 899px padding. */
 @media (max-width: 599px) {
   :where(.grid-margin--compact) > :where(.margin-col) {
     padding: var(--s-9) var(--gutter) 0;
@@ -61,9 +47,102 @@
   }
 }
 
-/* ---- Utilities ---- */
+/* ---- Reading pages ---- */
 
-/* Keeps h1 -> h2 -> h3 order intact where a visible label would repeat. */
+/* The reading spine (scripts/reading.ts) is placed against <main>. */
+main {
+  position: relative;
+}
+
+/* One prose section. The column is the kit's measure (64ch at body size); at 1100px and up the text is indented
+   from the spine, which runs down the left edge of the shell. */
+.rs {
+  position: relative;
+}
+
+/* The reading measure as a length, resolved once at the column's own font size (64ch of body text), so a child set in
+   a smaller face (a mono source line) still fills the same column. */
+@property --rs-w {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+.rs-in {
+  --rs-w: var(--measure);
+  position: relative;
+}
+
+@media (min-width: 1100px) {
+  .rs-in {
+    padding-left: clamp(28px, 4vw, 64px);
+  }
+}
+
+/* The first section opens below the page head with the same gap the spine starts at. */
+.page-head + .rs {
+  padding-top: clamp(40px, 7vh, 72px);
+}
+
+/* Children hold the reading measure and stack on the prose rhythm; `.article` (prose + margin rail) and `.wide` take
+   the full shell. */
+.rs-in > * {
+  max-width: var(--rs-w);
+}
+
+.rs-in > * + * {
+  margin-top: 1.05em;
+}
+
+.rs-in > .article,
+.rs-in > .wide,
+.rs--wide .rs-in > * {
+  max-width: none;
+}
+
+/* A Section heading (with its optional margin rail): the kit's .prose h2 voice, without needing a .prose wrapper.
+   The gap above it is twice the heading size, as the kit's prose sets it. */
+.rs-head {
+  --rs-h-size: clamp(26px, 2.4vw, 36px);
+}
+
+.rs-in > .rs-head {
+  margin-top: calc(var(--rs-h-size) * 2);
+}
+
+.rs-h {
+  font-size: var(--rs-h-size, clamp(26px, 2.4vw, 36px));
+  line-height: var(--lh-tight);
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+  font-variation-settings: 'wdth' 86, 'wght' 760;
+  scroll-margin-top: calc(var(--header-h) + var(--s-6));
+}
+
+.rs-h .sec-no {
+  margin-right: 10px;
+  vertical-align: 0.4em;
+  font: 500 var(--t-label-lg) / 1 var(--font-data);
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+}
+
+/* The first block of the article has nothing above it to space from. */
+.page-head + .rs .rs-in > :first-child {
+  margin-top: 0;
+}
+
+.rs-sub {
+  margin-top: var(--s-2);
+}
+
+/* The head column of a section whose heading has a margin note beside it. */
+.rs-head-col {
+  min-width: 0;
+}
+
+
+/* Utilities */
 .visually-hidden {
   position: absolute;
   width: 1px;

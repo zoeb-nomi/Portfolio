@@ -1,30 +1,32 @@
 # SiteHeader
 
 ## Purpose
-The site header on paper: wordmark and role line, the four nav items at every width (no hamburger), and a red "Book a call" action.
+The sticky glass bar: the brand, the four nav items, the theme toggle and an Email action.
 
 ## Anatomy
-`<header id="site-header">`: wordmark link (name, role line from 1100px), `<nav aria-label="Primary">` list, and the header CTA link (opens in a new tab). Sticky from 900px, named `site-header` for view transitions so it holds still between pages.
+`header.site.gut > .in`: `a.brand`, `nav.nav` (`a.nl[data-page]`, the current one has `aria-current="page"` and the red underline), `button.theme-t` (sun and moon icons, `aria-label`), `a.hcta`.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `currentPath` | `string` | marks the current nav item with `aria-current="page"` |
-Content comes from `site`, `nav`, `cta` in `src/data/copy.ts`.
+| `currentPath` | `string` | the page path, to mark the current nav item |
 
-## Tokens it reads
-- Colour roles: `--color-text`, `-text-muted`, `-surface`, `-accent-text` (CTA), `--color-link`.
-- Type: `--font-heading`, `--font-text`, `--wght-claim`, `--wdth-claim`, `--wght-strong`, `--track-tight`, `--t-small`, `--t-label`.
-- Space and lines: `--s-1` to `--s-8`, `--gutter`, `--header-h`, `--z-nav`, `--hit-touch`, `--line-ink` (bottom rule), `--line-pen` (current-item underline). Motion: `--dur-base`, `--ease-draw`.
+Nav items, brand and strings come from `copy.ts` (`site`, `nav`, `headerUi`, `cta`).
 
-## States and motion
-- Hover and current nav items draw an underline (`::after`); the CTA thickens its underline on hover.
-- The view transition keeps the header fixed across navigations; `motion.css` turns view transitions off under reduced motion.
-- Ink surface: not used there; the header stays on paper.
+## Variants
+Phones (599px and below) drop Home (the brand links home) and Email (it is in the footer), keeping the theme toggle.
+
+## Kit classes
+`.site`, `.brand`, `.nav`, `.nl`, `.theme-t`, `.hcta` (styles in `ds.css`).
+
+## Motion
+The nav underline draws in on hover and focus (500ms, once). The toggle itself is wired by `src/scripts/ds.ts`: it sets `data-theme` on `<html>`, stores `ds-theme` per viewer and fires `ds:theme`. No other motion.
 
 ## Accessibility
-Primary nav is labelled; `aria-current="page"` on the current item; the CTA and nav items are 44px targets and the external link carries `rel="noopener noreferrer"`.
+A `header` landmark and a labelled `nav`; the toggle is a real button whose label names the theme it switches to; the `.skip` link in `Base.astro` comes first.
+
+## Light and dark
+This is the theme switch: dark by default, paper on request. The bar uses `--color-glass` with a blur, so the page reads through it in both.
 
 ## Used on
-Also via: `layout Base`.
-Rendered by Base on every page.
+Every page, through `src/layouts/Base.astro`.

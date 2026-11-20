@@ -1,24 +1,22 @@
 ---
-// /builds/ (SPEC #20-22, DESIGN v3 §i): Systems (TradeFrame first), Eval
-// harnesses, Method (the old /evals/), Contributions, Shipping numbers.
+// /builds/ (The Pipeline): systems (TradeFrame first), eval harnesses, method (the old /evals/),
+// contributions, shipping numbers. Rows come from `buildsLedger` in copy.ts, never typed here.
+// Anchors that redirects and links target: #systems, #evals, #method, #contributions, #shipping.
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import Base from '../layouts/Base.astro';
-import Masthead from '../components/Masthead.astro';
-import Section from '../components/Section.astro';
 import BuildsLedger from '../components/BuildsLedger.astro';
-import DataTable from '../components/DataTable.astro';
-import PullQuote from '../components/PullQuote.astro';
-import StatTiles from '../components/StatTiles.astro';
-import CTASlab from '../components/CTASlab.astro';
-import { meta, home, cta, builds as B, buildsLedger, evalsLedger, shipping } from '../data/copy';
+import { meta, home, cta, builds as B, buildsLedger, evalsLedger, shipping, pipelineBuilds as PB, pipelineAbout } from '../data/copy';
+import { isExternal } from '../lib/isExternal';
 
 const systems = buildsLedger.filter((b) => b.group === 'systems');
 const evals = buildsLedger.filter((b) => b.group === 'evals');
 const contribs = buildsLedger.filter((b) => b.group === 'contributions');
+const E = home.evals;
+const pc = (n: number) => `${n}%`;
 
-// velocity-public.json (I17) arrives by its own PR. Until it has >= 3 closed
-// builds the summary line is absent, not softened (SPEC #22).
+// velocity-public.json (I17) arrives by its own PR. Until it has >= 3 closed builds the summary
+// line is absent, not softened (SPEC #22).
 const velocityPath = path.join(process.cwd(), 'public', 'data', 'velocity-public.json');
 let summary: string | null = null;
 if (existsSync(velocityPath)) {
@@ -36,418 +34,676 @@ if (existsSync(velocityPath)) {
     summary = null;
   }
 }
-
-const tableRows = evalsLedger.map((e) => ({
-  label: e.name,
-  cells: [{ text: e.question }, { text: e.table.judge }, { text: e.table.metric }, { text: e.table.sample }, { text: e.table.verdict }],
-}));
-
-// Fig. 2: judge verdicts that matched a blind human label. One ink bar per
-// judge; the status tag at the row end is the only red (SPEC #34).
-const agreement = [
-  { name: 'CrossSource judge', n: 15, of: 15, tag: '[judged]' },
-  { name: 'mirror-eval, judge 1', n: 3, of: 40, tag: '[null]' },
-  { name: 'mirror-eval, judge 2', n: 12, of: 40, tag: '[null]' },
-  { name: 'screener-eval', n: null, of: null, tag: '[counted]' },
-];
 ---
 
-<Base title={meta.builds.title} description={meta.builds.description} path="/builds/" ogImage="/og/builds.png" motion>
-  <Masthead kicker={B.kicker} h1={B.h1} standfirst={B.standfirst} h1Max="18ch" standfirstMax="62ch">
-    {summary && <p class="summary">{summary} <span>{B.summarySource}</span></p>}
-    <dl class="legend">
-      {
-        B.legend.map((l) => (
-          <div>
-            <dt>{l.term}</dt>
-            <dd>{l.text}</dd>
-          </div>
-        ))
-      }
-    </dl>
-    <nav class="jump" aria-label="On this page">
-      {B.jump.map((j) => <a href={j.href}>{j.label}</a>)}
-    </nav>
-  </Masthead>
-
-  <Section mark={B.sections.systems.mark} label={B.sections.systems.label} sub={B.sections.systems.note} anchorId={B.sections.systems.anchorId} grid>
-    <BuildsLedger variant="feature" entries={systems} />
-  </Section>
-
-  <Section mark={B.sections.evals.mark} label={B.sections.evals.label} sub={B.sections.evals.note} anchorId={B.sections.evals.anchorId} grid>
-    <p class="why">{B.evalsWhy}</p>
-    <p class="legend-line">{home.evals.legend}</p>
-    <BuildsLedger variant="full" entries={evals} />
-  </Section>
-
-  <Section mark={B.sections.method.mark} label={B.sections.method.label} anchorId={B.sections.method.anchorId}>
-    <h3 class="sub-h2">{home.evals.h2}</h3>
-    <p class="dek">{home.evals.standfirst}</p>
-    <PullQuote rule="ink">{home.evals.methodLine}</PullQuote>
-
-    <figure class="ja" aria-labelledby="fig2-cap" data-mini-figure>
-      <figcaption id="fig2-cap"><b>Fig. 2</b> {home.evals.figCaption}</figcaption>
-      <ul class="ja-rows" role="list">
+<Base title={meta.builds.title} description={meta.builds.description} path="/builds/" ogImage="/og/builds.png" page="builds">
+  <section class="page-head gut">
+    <div class="in">
+      <p class="kick">{PB.kicker}</p>
+      <h1 class="display split">{PB.h1}</h1>
+      <div class="bd-legend" aria-label={PB.legendLabel}>
+        {B.legend.map((l) => <div><b>{l.term}</b><span>{l.text.replace(/\.$/, '')}</span></div>)}
+      </div>
+      <div class="stats">
         {
-          agreement.map((a) => (
-            <li class="ja-row">
-              <span class="ja-name">{a.name}</span>
-              <span class="ja-trk" aria-hidden="true">
-                {a.n !== null ? <span class="ja-bar" data-draw style={`--b:${(a.n / a.of!).toFixed(4)}`} /> : <span class="ja-none">no judge in the loop</span>}
-              </span>
-              <span class="ja-v">{a.n !== null ? `${a.n} of ${a.of}` : 'no judge'}</span>
-              <span class="ja-tag">{a.tag}</span>
-            </li>
+          PB.stats.map((s) => (
+            <div class="ro">
+              <p class="v" data-num>{s.v}</p>
+              <p class="u">{s.u}</p>
+              <p class="s">{s.s}</p>
+            </div>
           ))
         }
-      </ul>
-      <p class="ja-ax" aria-hidden="true"><span>0%</span><span>50%</span><span>100%</span></p>
-      <p class="note">{home.evals.figNote}</p>
-    </figure>
-
-    <div class="compare">
-      <DataTable caption={home.evals.tableCaption} columns={home.evals.tableColumns} rows={tableRows} />
+      </div>
+      {summary && <p class="bd-note">{summary} {B.summarySource}</p>}
+      <p class="bd-note">{B.close}</p>
     </div>
-    <p class="close-line">{home.evals.closeLine}</p>
-  </Section>
+  </section>
 
-  <Section mark={B.sections.contributions.mark} label={B.sections.contributions.label} sub={B.sections.contributions.note} anchorId={B.sections.contributions.anchorId}>
-    <ul class="upstream">
-      {
-        contribs.map((c) => (
-          <li>
-            <a href={c.primary.href} target="_blank" rel="noopener noreferrer">{c.name}</a>
-            <span class="up-line">{c.oneLine}</span>
-            <span class="up-m">{c.measured.headline}</span>
-          </li>
-        ))
-      }
-    </ul>
-    <p class="close-line">{B.close}</p>
-  </Section>
-
-  <Section mark={B.sections.shipping.mark} label={B.sections.shipping.label} sub={B.sections.shipping.note} anchorId={B.sections.shipping.anchorId}>
-    <h3 class="sub-h2">{shipping.h2}</h3>
-    <p class="dek">{shipping.lede}</p>
-    <StatTiles tiles={shipping.tiles} />
-    <div class="sentences">
-      <p>{shipping.costSentence}</p>
-      <p>{shipping.controlSentence} <span class="ctl-note">{shipping.controlNote}</span></p>
+  <section class="sec gut" id="systems">
+    <div class="in">
+      <p class="kick">{PB.systems.kicker}</p>
+      <h2 class="h2 split">{PB.systems.h2}</h2>
+      <p class="lab bd-sub">{PB.systems.sub}</p>
+      <BuildsLedger entries={systems} openFirst />
     </div>
-    <div class="ship-table">
-      <DataTable
-        caption={`Table 2. ${shipping.table.caption}`}
-        columns={shipping.table.columns}
-        rows={shipping.table.rows.map(([week, ...rest]) => ({ label: week, cells: rest.map((text) => ({ text })) }))}
-        nowrap
-      />
-      <p class="note">{shipping.table.note}</p>
-      <p class="note">{shipping.asOf}</p>
-    </div>
-  </Section>
+  </section>
 
-  <CTASlab
-    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
-    body={home.ctaSlabBody}
-    buttonLabel={cta.bookACall.label}
-    buttonHref={cta.bookACall.href}
-  />
+  <section class="sec gut" id="evals">
+    <div class="in">
+      <p class="kick">{PB.harnesses.kicker}</p>
+      <h2 class="h2 split">{PB.harnesses.h2}</h2>
+      <div class="bd-legend">
+        {PB.harnesses.legend.map((l) => <div><b>{l.term}</b><span>{l.text}</span></div>)}
+      </div>
+      <BuildsLedger entries={evals} />
+    </div>
+  </section>
+
+  <section class="sec spined gut" id="method">
+    <div class="spine" aria-hidden="true"></div>
+    <div class="in">
+      <p class="kick">{PB.method.kicker}</p>
+      <h2 class="h2 split">{PB.method.h2}</h2>
+      <p class="bd-quote" data-reveal>{E.methodLine}</p>
+
+      <div class="bd-two">
+        <figure class="bd-fig" data-bd-fig2>
+          <figcaption class="bd-fcap"><span>{PB.fig2Caption}</span><b>{PB.fig2Unit}</b></figcaption>
+          {
+            PB.fig2Rows.map((r) => (
+              <div class="bd-fr">
+                <span class="bd-fl">
+                  {r.label} <span class:list={['bd-tag', { null: r.tag === 'null' }]}>{r.tag}</span>
+                </span>
+                <span class="bd-tr">{r.x !== undefined && <i class:list={['bd-b', { r: r.red }]} style={`--x:${pc(r.x)}`} />}</span>
+                <span class:list={['bd-fv', { r: r.red }]}>{r.v}</span>
+              </div>
+            ))
+          }
+          <div class="bd-ax">
+            <span />
+            <span>{PB.fig2Axis.map((a) => <i>{a}</i>)}</span>
+            <span />
+          </div>
+          <p class="bd-fn">{E.figNote}</p>
+        </figure>
+        <div data-stagger>
+          {
+            PB.methodCards.map((c, i) => (
+              <div class="card" style={i ? 'margin-top:12px' : undefined}>
+                <div class="card-top">
+                  <span>{c.name}</span>
+                  {c.red ? <span class="lab red bd-status">{c.status}</span> : <span>{c.status}</span>}
+                </div>
+                <h3>{c.title}</h3>
+                <p class="bd-fn" style="margin-top:10px">{c.note}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="tbl bd-tbl">
+          <caption>{E.tableCaption}</caption>
+          <thead>
+            <tr>{E.tableColumns.map((c) => <th>{c}</th>)}</tr>
+          </thead>
+          <tbody>
+            {
+              evalsLedger.map((e) => (
+                <tr>
+                  <td>{e.name}</td>
+                  <td>{e.question}</td>
+                  <td>{e.table.judge}</td>
+                  <td>{e.table.metric}</td>
+                  <td>{e.table.sample}</td>
+                  <td>{e.table.verdict}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="bd-close">{E.closeLine}</p>
+    </div>
+  </section>
+
+  <section class="sec gut" id="contributions">
+    <div class="in">
+      <p class="kick">{PB.contributions.kicker}</p>
+      <h2 class="h2 split">{PB.contributions.h2}</h2>
+      <ol class="bd-prs" data-stagger>
+        {
+          contribs.map((c) => {
+            const p = PB.prs[c.id];
+            return (
+              <li class="bd-pr">
+                <a class="pn" href={c.primary.href} target="_blank" rel="noopener noreferrer">
+                  {c.name}<span aria-hidden="true">↗</span>
+                </a>
+                <div>
+                  <p>{p.desc}</p>
+                  <div class="ros">
+                    {
+                      p.ros.map((r) => (
+                        <div class="ro">
+                          <p class="v">{r.v}</p>
+                          <p class="u">{r.u}</p>
+                          {r.s && <p class="s">{r.s}</p>}
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec gut" id="shipping">
+    <div class="in">
+      <p class="kick">{PB.shipping.kicker}</p>
+      <h2 class="h2 split">{PB.shipping.h2}</h2>
+      <p class="lab bd-sub">{PB.shipping.sub}</p>
+      <div class="hud bd-hud">
+        <div class="hud-in">
+          {
+            PB.shipping.hud.map((c) => (
+              <div class="hud-c">
+                <span>{c.label}</span>
+                <b class={c.red ? 'r' : undefined} data-num>
+                  {c.v}
+                  {c.small && <small>{c.small}</small>}
+                </b>
+                <em>{c.em}</em>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <caption>{PB.tableCaption}</caption>
+          <thead>
+            <tr>
+              {shipping.table.columns.map((c, i) => <th class={i >= 2 && i <= 4 ? 'n' : undefined}>{c}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              shipping.table.rows.map((r) => (
+                <tr>
+                  {r.map((cell, i) => <td class={i >= 2 && i <= 4 ? 'n' : undefined}>{cell}</td>)}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="bd-pilot"><b>{PB.shipping.pilotLead}</b>{PB.shipping.pilot}</p>
+    </div>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{pipelineAbout.cta.kicker}</p>
+      <h2 class="h2">{pipelineAbout.cta.h2}</h2>
+      <p class="id" style="margin-top:18px">{pipelineAbout.cta.id}</p>
+      <div class="ctas" style="margin-top:32px">
+        <a class="btn" href={cta.email.href}><span class="mi">{pipelineAbout.cta.email}</span><span class="ar" aria-hidden="true">→</span></a>
+        {[cta.bookACall, cta.linkedin, cta.github, cta.x].map((l) => <a class="tl" href={l.href} {...(isExternal(l.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{l.label}</a>)}
+      </div>
+    </div>
+  </section>
 </Base>
 
 <style>
-  /* Red Pen 5: two open pull requests are a footnote to the builds, not a ledger. One line each. */
-  .upstream {
-    list-style: none;
-    display: grid;
-    gap: var(--s-4);
-  }
-
-  .upstream li {
-    display: grid;
-    gap: var(--s-1);
-    padding-top: var(--s-3);
-    border-top: var(--line-hair);
-  }
-
-  .upstream a {
-    justify-self: start;
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    font-weight: var(--wght-strong);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .up-line {
-    color: var(--color-text-body);
-    max-width: var(--measure);
-  }
-
-  .up-m {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .summary {
-    margin-top: var(--s-5);
-    font-weight: 500;
-    color: var(--color-text);
-  }
-
-  .summary span {
-    display: block;
-    font-weight: 400;
-    font-size: var(--t-label);
-    font-family: var(--font-data);
-    color: var(--color-text-muted);
-  }
-
-  .legend {
-    display: grid;
-    gap: var(--s-1);
-    margin-top: var(--s-6);
-    padding-top: var(--s-3);
-    border-top: var(--line-hair);
-    font-size: var(--t-small);
-    color: var(--color-text-body);
-    max-width: 62ch;
-  }
-
-  .legend div {
-    display: flex;
-    gap: var(--s-2);
-  }
-
-  .legend dt {
-    font-weight: 500;
-    color: var(--color-text);
-  }
-
-  .legend dt::after {
-    content: ':';
-  }
-
-  .jump {
+  .bd-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 var(--s-5);
-    margin-top: var(--s-5);
+    gap: 8px 28px;
+    margin-top: 22px;
   }
 
-  .jump a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .why {
-    font-size: var(--t-small);
-    color: var(--color-text-body);
-    max-width: var(--measure);
-  }
-
-  .legend-line {
-    margin-block: var(--s-3) var(--s-6);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    line-height: var(--lh-snug);
+  .bd-legend div {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font: 400 var(--t-note) / var(--lh-snug) var(--font-data);
     color: var(--color-text-muted);
-    max-width: 80ch;
   }
 
-  .sub-h2 {
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-h2);
-    line-height: var(--lh-heading);
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-    max-width: 22ch;
-  }
-
-  .dek {
-    margin-block: var(--s-4) var(--s-8);
-    line-height: var(--lh-body);
-    color: var(--color-text-body);
-    max-width: var(--measure);
-  }
-
-  .ja {
-    margin-top: var(--s-11);
-    border-top: var(--line-heavy);
-    padding-top: var(--s-3);
-  }
-
-  .ja figcaption {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    margin-bottom: var(--s-5);
-  }
-
-  .ja figcaption b {
+  .bd-legend b {
     font-weight: 500;
-    color: var(--color-accent-text);
-    margin-right: var(--s-2);
-  }
-
-  .ja-rows {
-    list-style: none;
-    display: grid;
-    gap: var(--s-3);
-  }
-
-  .ja-row,
-  .ja-ax {
-    display: grid;
-    grid-template-columns: 11em minmax(0, 1fr) 6em 6.5em;
-    column-gap: var(--s-4);
-    align-items: center;
-    font-family: var(--font-data);
+    color: var(--color-text);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     font-size: var(--t-label);
   }
 
-  .ja-name {
-    color: var(--color-text);
+  .bd-legend b::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: var(--color-accent);
+    margin-right: 8px;
+    vertical-align: 1px;
   }
 
-  .ja-trk {
-    position: relative;
-    height: 12px;
-    border-bottom: var(--line-hair);
-  }
-
-  .ja-bar {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: calc(var(--b) * 100%);
-    background: var(--color-text);
-    transform-origin: left;
-  }
-
-  .ja-none {
+  .bd-note {
+    margin-top: 18px;
+    font: 400 var(--t-note) / var(--lh-base) var(--font-data);
     color: var(--color-text-muted);
-    font-style: italic;
   }
 
-  .ja-v {
+  .bd-sub {
+    margin-top: 14px;
+  }
+
+  /* ---------- method ---------- */
+  .bd-quote {
+    margin-top: 28px;
+    max-width: 30ch;
+    font-size: clamp(24px, 2.4vw, 38px);
+    line-height: var(--lh-heading);
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    font-variation-settings: 'wdth' 90, 'wght' 560;
+    border-left: var(--line-pen);
+    padding-left: 22px;
+  }
+
+  .bd-two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 64px);
+    margin-top: clamp(32px, 5vh, 56px);
+    align-items: start;
+  }
+
+  @media (max-width: 899px) {
+    .bd-two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Fig. 2 reuses the small-figure grammar from the ledger rows. */
+  .bd-fig {
+    border: var(--line-hair);
+    background: var(--color-surface-sunk);
+    padding: 16px 18px 14px;
+  }
+
+  .bd-fcap {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font: 500 var(--t-label) / var(--lh-label) var(--font-data);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding-bottom: 9px;
+    border-bottom: var(--line-hair);
+    margin-bottom: 14px;
+  }
+
+  .bd-fcap b {
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .bd-fr {
+    display: grid;
+    grid-template-columns: minmax(0, 11em) minmax(0, 1fr) minmax(0, 5.6em);
+    gap: 12px;
+    align-items: center;
+    padding: 7px 0;
+  }
+
+  .bd-fl {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font: 400 11.5px / var(--lh-label) var(--font-data);
+    color: var(--color-text-body);
+  }
+
+  .bd-fv {
+    font: 500 12.5px / 1.2 var(--font-data);
     color: var(--color-text);
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
 
-  .ja-tag {
-    color: var(--color-accent-text);
+  .bd-fv.r {
+    color: var(--color-accent);
   }
 
-  .ja-ax {
-    margin-top: var(--s-1);
-    color: var(--color-text-muted);
+  .bd-tr {
+    position: relative;
+    height: 12px;
+    background: linear-gradient(var(--color-line-strong), var(--color-line-strong)) 0 50% / 100% 1px no-repeat;
   }
 
-  .ja-ax span:nth-child(1) {
-    grid-column: 2;
-    justify-self: start;
+  .bd-b {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    height: 8px;
+    width: var(--x);
+    background: var(--color-text-body);
+    transform-origin: left;
+    transform: scaleX(var(--k, 1));
   }
 
-  .ja-ax span:nth-child(2) {
-    grid-column: 2;
-    justify-self: center;
+  .bd-b.r {
+    background: var(--color-accent);
   }
 
-  .ja-ax span:nth-child(3) {
-    grid-column: 2;
-    justify-self: end;
-  }
-
-  .ja-ax span {
-    grid-row: 1;
-  }
-
-  .note {
-    margin-top: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    line-height: var(--lh-snug);
-    color: var(--color-text-muted);
-    max-width: 80ch;
-  }
-
-  .compare {
-    margin-top: var(--s-11);
-  }
-
-  .compare :global(.data-table th),
-  .compare :global(.data-table td) {
-    text-align: left;
-    vertical-align: top;
-  }
-
-  .compare :global(.data-table td) {
-    font-family: var(--font-text);
-    font-size: var(--t-small);
-    line-height: var(--lh-snug);
-    color: var(--color-text-body);
-  }
-
-  .close-line {
-    margin-top: var(--s-8);
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-quote);
-    line-height: var(--lh-heading);
-    color: var(--color-text);
-    max-width: 40ch;
-  }
-
-  .sentences {
+  .bd-ax {
     display: grid;
-    gap: var(--s-3);
-    margin-top: var(--s-9);
-    max-width: var(--measure);
-    line-height: var(--lh-body);
-    color: var(--color-text-body);
+    grid-template-columns: minmax(0, 11em) minmax(0, 1fr) minmax(0, 5.6em);
+    gap: 12px;
+    margin-top: 4px;
   }
 
-  .ctl-note {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
+  .bd-ax span:nth-child(2) {
+    display: flex;
+    justify-content: space-between;
+    font: 400 var(--t-label) / 1 var(--font-data);
     color: var(--color-text-muted);
   }
 
-  .ship-table {
-    margin-top: var(--s-9);
+  .bd-ax i {
+    font-style: normal;
   }
 
-  @media (min-width: 600px) {
-    .compare :global(.data-table) {
-      min-width: 720px;
-    }
+  .bd-fn {
+    margin-top: 10px;
+    font: 400 var(--t-label) / var(--lh-base) var(--font-data);
+    color: var(--color-text-muted);
+  }
+
+  .bd-tag {
+    font: 500 var(--t-label) / 1 var(--font-data);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border: var(--line-object);
+    padding: 3px 6px;
+    white-space: nowrap;
+  }
+
+  .bd-tag.null {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .bd-status {
+    font-size: inherit;
   }
 
   @media (max-width: 599px) {
-    .ja-row,
-    .ja-ax {
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      row-gap: var(--s-1);
+    .bd-fr,
+    .bd-ax {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 4.6em);
     }
 
-    .ja-name {
+    .bd-fr .bd-fl {
       grid-column: 1 / -1;
     }
 
-    .ja-ax span {
-      grid-column: 1 !important;
+    .bd-ax span:first-child {
+      display: none;
     }
   }
+
+  .bd-tbl td {
+    font-size: 14px;
+    line-height: var(--lh-snug);
+  }
+
+  .bd-tbl td:first-child {
+    color: var(--color-text);
+    font-variation-settings: 'wght' 640;
+    white-space: nowrap;
+  }
+
+  .bd-tbl {
+    min-width: 860px;
+  }
+
+  .bd-close {
+    margin-top: 22px;
+    max-width: 62ch;
+    font-size: 17px;
+    line-height: var(--lh-base);
+    color: var(--color-text-body);
+  }
+
+  /* ---------- contributions ---------- */
+  .bd-prs {
+    list-style: none;
+    border-top: var(--line-heavy);
+    margin-top: clamp(28px, 5vh, 48px);
+  }
+
+  .bd-pr {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
+    gap: 12px 40px;
+    padding: 22px 0;
+    border-bottom: var(--line-hair);
+  }
+
+  .bd-pr a.pn {
+    font-size: clamp(22px, 2.2vw, 32px);
+    line-height: var(--lh-tight);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    color: var(--color-text);
+    font-variation-settings: 'wdth' 82, 'wght' 720;
+    transition: font-variation-settings 0.6s var(--ease-out);
+  }
+
+  .bd-pr a.pn:hover,
+  .bd-pr a.pn:focus-visible {
+    font-variation-settings: 'wdth' 100, 'wght' 880;
+  }
+
+  .bd-pr a.pn span {
+    font-family: var(--font-data);
+    font-size: var(--t-data);
+    color: var(--color-accent);
+    margin-left: 6px;
+  }
+
+  .bd-pr p {
+    font-size: var(--t-small);
+    line-height: var(--lh-base);
+    color: var(--color-text-body);
+  }
+
+  .bd-pr .ros {
+    margin-top: 12px;
+  }
+
+  .bd-pr .ros .v {
+    font-size: var(--t-num);
+    color: var(--color-text);
+  }
+
+  @media (max-width: 599px) {
+    .bd-pr {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---------- shipping ---------- */
+  .bd-hud {
+    margin-top: clamp(28px, 5vh, 48px);
+  }
+
+  .bd-hud .hud-c {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .bd-hud .hud-c b {
+    font-size: clamp(26px, 2.6vw, 40px);
+    font-variation-settings: 'wdth' 88, 'wght' 800;
+  }
+
+  .bd-hud .hud-c em {
+    display: block;
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+    color: var(--color-text-muted);
+  }
+
+  .tbl :global(td.n + td:not(.n)),
+  .tbl :global(th.n + th:not(.n)) {
+    padding-left: 28px;
+  }
+
+  .bd-pilot {
+    margin-top: 14px;
+    font: 400 11.5px / var(--lh-base) var(--font-data);
+    color: var(--color-text-muted);
+  }
+
+  .bd-pilot b {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
 </style>
+
+<script>
+  /* Builds: ledger rows expand in place (siblings slide, nothing jumps), the red edge and the
+     guard / measure / ship chain draw on open, Fig. 2 bars grow once in view. Calm easing only.
+     Without motion the toggle is instant. Without script every panel is open. */
+  import { $, $$, motion, revealNumber } from '../scripts/ds';
+  import { gsap, ScrollTrigger } from '../scripts/gsap';
+
+  const M = motion();
+  const lists = $$<HTMLElement>('[data-ledger]');
+  lists.forEach((l) => l.classList.add('bd-js'));
+  let busy = false;
+  let refreshT = 0;
+  const refresh = () => {
+    if (!M) return;
+    clearTimeout(refreshT);
+    refreshT = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+  };
+
+  const following = (item: HTMLElement) => {
+    const out: Element[] = [];
+    let n = item.nextElementSibling;
+    while (n) {
+      out.push(n);
+      n = n.nextElementSibling;
+    }
+    let s = item.parentElement?.nextElementSibling ?? null;
+    while (s) {
+      out.push(s);
+      s = s.nextElementSibling;
+    }
+    return out;
+  };
+  const tops = (els: Element[]) => els.map((e) => e.getBoundingClientRect().top);
+  const slide = (sibs: Element[], b0: number[], b1: number[], dur: number) =>
+    sibs.forEach((s, i) => {
+      const dy = b0[i] - b1[i];
+      if (Math.abs(dy) > 0.5) gsap.fromTo(s, { y: dy }, { y: 0, duration: dur, ease: 'expo.out', clearProps: 'transform' });
+    });
+
+  /* Draw the chain, bars and figure marks of one panel. */
+  const drawDetail = (det: HTMLElement, instant: boolean) => {
+    const chain = $<HTMLElement>('.bd-chain', det);
+    const nodes = $$<HTMLElement>('.bd-node', det);
+    const nums = $$<HTMLElement>('.bd-n', det);
+    const bars = $$<HTMLElement>('.bd-b', det);
+    const dds = $$<HTMLElement>('.bd-dd', det);
+    if (!M || instant) {
+      det.style.setProperty('--sp', '1');
+      chain?.style.setProperty('--k', '1');
+      nodes.forEach((n) => n.style.setProperty('--d', '1'));
+      bars.forEach((b) => b.style.setProperty('--k', '1'));
+      dds.forEach((x) => {
+        x.style.setProperty('--k', '1');
+        x.style.setProperty('--d', '1');
+      });
+      nums.forEach((n) => revealNumber(n, 1));
+      return;
+    }
+    gsap.fromTo(det, { '--sp': 0 }, { '--sp': 1, duration: 0.9, ease: 'expo.out' });
+    if (chain) gsap.fromTo(chain, { '--k': 0 }, { '--k': 1, duration: 1.1, ease: 'expo.inOut', delay: 0.1 });
+    nodes.forEach((n, i) => gsap.fromTo(n, { '--d': 0 }, { '--d': 1, duration: 0.6, ease: 'power2.out', delay: 0.25 + i * 0.22 }));
+    nums.forEach((n, i) => {
+      const o = { t: 0 };
+      revealNumber(n, 0);
+      gsap.to(o, { t: 1, duration: 0.8, ease: 'none', delay: 0.4 + i * 0.2, onUpdate: () => revealNumber(n, o.t) });
+    });
+    bars.forEach((b, i) => gsap.fromTo(b, { '--k': 0 }, { '--k': 1, duration: 1, ease: 'expo.out', delay: 0.35 + i * 0.08 }));
+    dds.forEach((x, i) => {
+      gsap.set(x, { '--d': 0 });
+      gsap.fromTo(x, { '--k': 0 }, { '--k': 1, duration: 1, ease: 'expo.inOut', delay: 0.4 + i * 0.1 });
+      gsap.to(x, { '--d': 1, duration: 0.5, ease: 'power2.out', delay: 1.15 + i * 0.1 });
+    });
+  };
+
+  const setOpen = (item: HTMLElement, open: boolean) => {
+    item.classList.toggle('open', open);
+    $('.bd-row', item)?.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+
+  const toggle = (item: HTMLElement) => {
+    if (busy) return;
+    const det = $<HTMLElement>('.bd-detail', item)!;
+    const open = !item.classList.contains('open');
+    if (!M) {
+      setOpen(item, open);
+      if (open) drawDetail(det, true);
+      return;
+    }
+    busy = true;
+    const sibs = following(item);
+    if (open) {
+      const b0 = tops(sibs);
+      setOpen(item, true);
+      slide(sibs, b0, tops(sibs), 0.8);
+      gsap.fromTo(det, { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.8, ease: 'expo.out', clearProps: 'clipPath', onComplete: () => { busy = false; refresh(); } });
+      drawDetail(det, false);
+    } else {
+      gsap.to(det, {
+        clipPath: 'inset(0% 0% 100% 0%)',
+        duration: 0.24,
+        ease: 'power2.in',
+        onComplete: () => {
+          const b0 = tops(sibs);
+          setOpen(item, false);
+          gsap.set(det, { clearProps: 'clipPath' });
+          slide(sibs, b0, tops(sibs), 0.6);
+          gsap.delayedCall(0.6, () => { busy = false; refresh(); });
+        },
+      });
+    }
+  };
+  $$<HTMLElement>('.bd-item').forEach((item) => $('.bd-row', item)?.addEventListener('click', () => toggle(item)));
+
+  /* The row that starts open draws on first view. */
+  const first = $<HTMLElement>('.bd-item.open .bd-detail');
+  if (first) {
+    if (M) {
+      gsap.set(first, { '--sp': 0 });
+      const c = $<HTMLElement>('.bd-chain', first);
+      if (c) gsap.set(c, { '--k': 0 });
+      $$<HTMLElement>('.bd-node', first).forEach((n) => gsap.set(n, { '--d': 0 }));
+      ScrollTrigger.create({ trigger: first, start: 'top 85%', once: true, onEnter: () => drawDetail(first, false) });
+    } else drawDetail(first, true);
+  }
+
+  /* Fig. 2 bars grow once in view. */
+  const f2 = $<HTMLElement>('[data-bd-fig2]');
+  if (f2 && M) {
+    const bs = $$<HTMLElement>('.bd-b', f2);
+    gsap.set(bs, { '--k': 0 });
+    ScrollTrigger.create({
+      trigger: f2,
+      start: 'top 82%',
+      once: true,
+      onEnter: () => bs.forEach((b, i) => gsap.to(b, { '--k': 1, duration: 1.1, ease: 'expo.out', delay: i * 0.12 })),
+    });
+  }
+</script>

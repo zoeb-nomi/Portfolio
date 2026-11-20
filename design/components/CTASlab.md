@@ -1,31 +1,36 @@
 # CTASlab
 
 ## Purpose
-The closing call to action: an ink-surface slab, edge to edge, with a margin note and one claim-sized sentence.
+The closing call to action at the foot of an essay or note: a kicker, a heading, one red button and text links. The name is kept from the old slab; it is now a plain kit section.
 
 ## Anatomy
-- `.cta-slab.surface-ink.bleed` with a margin-column grid.
-- Margin column: `marginLines`, one `<p>` each.
-- Body column: the body sentence (Archivo, `--t-slab`), a primary `Button`, an optional `inverse` Button, and an optional mono note under them.
+`section.sec.gut[data-cta] > .in`: `p.kick`, `h2.h2`, `.ctas` row (one primary `Button`, an optional link `Button`, then `links`), and an optional mono `.lab` note under the row.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `marginLines` | `string[]` | margin column lines |
-| `body` | `string` | the sentence |
-| `buttonLabel`, `buttonHref` | `string` | primary action |
-| `secondaryLabel`, `secondaryHref` | `string?` | both needed for the second button |
-| `buttonNote` | `string \| null?` | mono line; default is `cta.bookACallNote` when the href is Book a call, else none |
+| `body` | `string` | the heading text |
+| `buttonLabel`, `buttonHref` | `string` | the one red button |
+| `secondaryLabel`, `secondaryHref` | `string?` | a text link after it |
+| `links` | `{label, href}[]` | more text links (LinkedIn, GitHub, X); default none |
+| `kicker` | `string?` | label above the heading; default `pipelineWriting.contact.kick` |
+| `buttonNote` | `string \| null` | mono line under the row; default is "30 min · intro call" when the button is Book a call, else none |
+| `marginLines` | `string[]?` | accepted for old call sites, not drawn |
 
-## Tokens it reads
-- Colour roles: `--color-text`, `--color-text-muted` (resolved on the ink surface).
-- Type and space: `--font-heading`, `--font-data`, `--wght-head`, `--wdth-head`, `--t-slab`, `--t-label`, `--lh-heading`, `--lh-label`, `--track-wide`, `--s-2`, `--s-4`, `--s-6`, `--s-7`.
+## Variants
+None. Red appears once, on the button.
 
-## States and motion
-Static; the buttons carry their own hover. Breakpoints 899 and 599 restack the grid. Reduced motion changes nothing. It is the ink surface by construction.
+## Kit classes
+`.sec`, `.gut`, `.in`, `.kick`, `.h2`, `.ctas`, `.lab`, `.btn`, `.tl` (via `Button`).
+
+## Motion
+None of its own; the `.h2` is a normal heading. No script.
 
 ## Accessibility
-Plain paragraphs and links; the primary Button and the inverse Button are both real anchors with 44px targets.
+Semantic section with an `h2`; all controls are native links through `Button`. External links open in a new tab with `rel`.
+
+## Light and dark
+Roles only; both themes work unchanged.
 
 ## Used on
-Pages: `/about/`, `/builds/`, `/crosssource/`, `/mirror-eval/`, `/screener-eval/`, `/writing/decisions-api-legal-quiz/`, `/writing/eval-harness-at-my-own-reflection/`, `/writing/nobody-reports-the-misses/`, `/writing/the-judge-caught-a-bug/`, `/writing/two-levers-that-did-not-move/`.
+`/writing/`, `/notes/[slug]/`, and the essays `decisions-api-legal-quiz`, `eval-harness-at-my-own-reflection`, `two-levers-that-did-not-move`, `nobody-reports-the-misses`, `the-judge-caught-a-bug`.

@@ -1,170 +1,232 @@
 ---
-// /design/components/ (Red Pen 5): the component library, live. Every specimen renders the real component with
-// the real data of a page that uses it (no sample numbers), and names its spec in design/components/.
-// Copy: copy.ts `designComponents`. Linked from /design/.
+// /design/components/ (The Pipeline): the kit, rendered. Every class from src/styles/ds.css, once,
+// with the class names beside it. The same markup the pages use. Copy: pipelineKit in copy.ts.
 import Base from '../../layouts/Base.astro';
-import Masthead from '../../components/Masthead.astro';
-import Section from '../../components/Section.astro';
-import Button from '../../components/Button.astro';
-import StatTiles from '../../components/StatTiles.astro';
-import Dumbbell from '../../components/Dumbbell.astro';
-import UnitChart from '../../components/UnitChart.astro';
-import DataTable from '../../components/DataTable.astro';
-import RecordList from '../../components/RecordList.astro';
-import PullQuote from '../../components/PullQuote.astro';
-import AuditSheet from '../../components/AuditSheet.astro';
-import HarnessPanel from '../../components/HarnessPanel.astro';
-import { meta, designComponents as D, shipping, home, evalsLedger, work } from '../../data/copy';
-import { waveData, flipData } from '../../lib/figureData';
+import { meta, cta, pipelineKit as K } from '../../data/copy';
+import { arrowHtml } from '../../lib/arrowHtml';
+import { isExternal } from '../../lib/isExternal';
 
-const G = D.groups;
-const waves = waveData();
-const flips = flipData();
-const tableRows = evalsLedger.map((e) => ({
-  label: e.name,
-  cells: [{ text: e.question }, { text: e.table.judge }, { text: e.table.metric }, { text: e.table.sample }, { text: e.table.verdict }],
-}));
+const links = [cta.bookACall, cta.linkedin, cta.github, cta.x];
+const t = K.type;
+const L = K.longform;
 ---
 
-<Base title={meta.designComponents.title} description={meta.designComponents.description} path="/design/components/" ogImage="/og/design-components.png" motion>
-  <Masthead kicker={D.kicker} h1={D.h1} standfirst={D.standfirst}>
-    <p class="back"><a href={D.back.href}>← {D.back.label}</a></p>
-  </Masthead>
+<Base title={meta.designComponents.title} description={meta.designComponents.description} path="/design/components/" ogImage="/og/design-components.png">
+  <section class="page-head gut">
+    <div class="in">
+      <p class="kick">{K.kicker}</p>
+      <h1 class="display split" id="top">{K.h1}</h1>
+      <div class="byline meta">
+        {K.byline.map((b, i) => <span>{i === 0 ? <b>{b}</b> : b}</span>)}
+      </div>
+      <div class="stats">
+        {
+          K.stats.map((s) => (
+            <div class="ro">
+              <p class="v" data-num set:html={arrowHtml(s.v)} />
+              <p class="u">{s.u}</p>
+              <p class="s">{s.s}</p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="kit-cls">{K.classes.pageHead}</p>
+      <p class="kit-back"><a class="tl" href={K.back.href}>{K.back.label} →</a></p>
+    </div>
+  </section>
 
-  <Section mark={G.actions.mark} label={G.actions.label}>
-    <p class="lead">{G.actions.lead}</p>
-    <div class="pair">
-      <div class="spec">
-        <p class="spec-name">{D.onPaper}</p>
-        <div class="row">
-          <Button href="/about/#contact" variant="primary">{D.buttons.primary}</Button>
-          <Button href="/builds/" variant="secondary">{D.buttons.secondary}</Button>
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{t.kicker}</p>
+      <h2 class="h2 split">{t.h2}</h2>
+      <div class="kit-stack">
+        <p class="id">{t.id}</p>
+        <p class="display">{t.displayPre}<span class="mk">{t.displayMark}<span class="ul"></span></span>{t.displayPost}</p>
+        <p class="h3">{t.h3}</p>
+        <p class="h4">{t.h4}</p>
+        <p class="lab">{t.lab}</p>
+        <p class="lab red">{t.labRed}</p>
+        <div class="ctas">
+          <a class="btn" href="#top"><span class="mi">{t.primary}</span><span class="ar" aria-hidden="true">→</span></a>
+          <a class="btn ghost" href="#top">{t.secondary}</a>
+          <a class="tl" href="#top">{t.link}</a>
+        </div>
+        <div class="tags">
+          <span class="tag">{t.tags[0]}</span><span class="tag red">{t.tags[1]}</span><span class="tag solid">{t.tags[2]}</span>
+          <button class="chip" type="button">{t.chip}</button>
+        </div>
+        <p class="kit-cls">{K.classes.type}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{K.cards.kicker}</p>
+      <h2 class="h2 split">{K.cards.h2}</h2>
+      <ol class="cards kit-stack" data-stagger>
+        {
+          K.cards.items.map((c) => (
+            <li class="card">
+              <div class="card-top"><span><span class="no">{c.top[0]}</span> / {c.top[1]}</span><span>{c.top[2]}</span></div>
+              <h3>{c.h3}</h3>
+              <div class:list={['ros', { n2: c.cols === 2 }]}>
+                {c.ros.map((r) => <div class="ro"><p class="v" set:html={arrowHtml(r.v)} /><p class="u">{r.u}</p><p class="s">{r.s}</p></div>)}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="kit-cls">{K.classes.cards}</p>
+    </div>
+  </section>
+
+  <section class="sec spined gut">
+    <div class="spine" aria-hidden="true"></div>
+    <div class="in">
+      <p class="kick">{K.panel.kicker}</p>
+      <h2 class="h2 split">{K.panel.h2}</h2>
+      <article class="panel">
+        <div data-stagger>
+          <p class="ph"><span class="pi">{K.panel.ph[0]}</span><span>{K.panel.ph[1]}</span></p>
+          <h3 class="pt">{K.panel.pt}</h3>
+          <dl class="how">
+            {K.panel.how.map((r) => <div><dt>{r[0]}</dt><dd>{r[1]}</dd></div>)}
+          </dl>
+          <p class="srcl">{K.panel.srcl}</p>
+        </div>
+        <div>
+          <div class="v-vals">
+            <div class="v-val v-before"><span class="v-num">{K.panel.before}<i class="v-strike"></i></span><span class="lab">{K.panel.beforeLabel}</span></div>
+            <span class="v-arrow" aria-hidden="true">→</span>
+            <div class="v-val"><span class="v-num" data-num>{K.panel.after}</span><span class="lab">{K.panel.afterLabel}</span></div>
+          </div>
+          <div class="v-cap" style="margin-top:28px"><span>{K.panel.cap[0]}</span><span>{K.panel.cap[1]}</span></div>
+          <p class="lab">{K.panel.figure}</p>
+        </div>
+      </article>
+      <p class="kit-cls">{K.classes.panel}</p>
+    </div>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{K.verbs.kicker}</p>
+      <h2 class="h2 split">{K.verbs.h2}</h2>
+      <ul class="verb-row">
+        {K.verbs.items.map((v) => <li class="verb"><span class="vn">{v.n}</span><h3>{v.h}</h3><span class="vp"><b set:html={arrowHtml(v.b)} />{v.t}</span></li>)}
+      </ul>
+      <p class="kit-cls">{K.classes.verbs}</p>
+    </div>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{K.builds.kicker}</p>
+      <h2 class="h2 split">{K.builds.h2}</h2>
+      <ol class="blist" data-stagger>
+        {
+          K.builds.rows.map((r) => (
+            <li>
+              <a class="build" href={r.href}>
+                <span class="bn">{r.name}</span><span class="bk2">{r.kind}</span><span class="bv" set:html={arrowHtml(r.value)} /><span class="ba" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="kit-cls">{K.classes.blist}</p>
+    </div>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{K.hud.kicker}</p>
+      <div class="hud" style="margin-top:24px">
+        <div class="hud-in">
+          {
+            K.hud.cells.map((c) => (
+              <div class="hud-c">
+                <span>{c.l}</span>
+                <b class:list={[{ r: c.red, 'kit-swap': c.swap }]}>{c.v}{c.small && <>{' '}<small>{c.small}</small></>}</b>
+              </div>
+            ))
+          }
         </div>
       </div>
-      <div class="spec surface-ink">
-        <p class="spec-name">{D.onInk}</p>
-        <div class="row">
-          <Button href="/about/#contact" variant="primary">{D.buttons.primary}</Button>
-          <Button href="/builds/#method" variant="inverse">{D.buttons.inverse}</Button>
+      <p class="kit-cls">{K.classes.hud}</p>
+    </div>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{L.kicker}</p>
+      <h2 class="h2 split">{L.h2}</h2>
+      <div class="byline" style="margin-top:18px">
+        {L.byline.map((b, i) => <span>{i === 0 ? <b>{b}</b> : b}</span>)}
+      </div>
+      <div class="article" style="margin-top:32px">
+        <div class="prose">
+          <p>{L.p1a}<span class="num">{L.p1num}</span>{L.p1b}<sup><a href="#fn1" id="r1">1</a></sup></p>
+          <h2><span class="sec-no">{L.h2sec[0]}</span>{L.h2sec[1]}</h2>
+          <p>{L.p2a}<strong>{L.p2strong}</strong>{L.p2b}<code>{L.p2code}</code>{L.p2c}</p>
+          <blockquote>{L.quote}</blockquote>
+          <ul>{L.list.map((i) => <li>{i}</li>)}</ul>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <caption>{L.table.caption}</caption>
+              <thead><tr>{L.table.cols.map((c, i) => <th class={i ? 'n' : undefined}>{c}</th>)}</tr></thead>
+              <tbody>
+                {L.table.rows.map((r) => <tr><td>{r[0]}</td><td class="n">{r[1]}</td><td class={r[3] ? 'n win' : 'n'}>{r[2]}</td></tr>)}
+              </tbody>
+            </table>
+          </div>
+          <figure class="fig">
+            <div class="fig-frame"><p class="lab">{L.fig.body}</p></div>
+            <figcaption><span class="fno">{L.fig.no}</span><span>{L.fig.cap}</span><span class="fsrc">{L.fig.src}</span></figcaption>
+          </figure>
+          <pre><code>{L.code}</code></pre>
+          <div class="footnotes"><ol><li id="fn1">{L.footnote} <a href="#r1" aria-label={L.fnLabel}>↩</a></li></ol></div>
         </div>
+        <aside><p class="margin-note">{L.margin}</p></aside>
+      </div>
+      <p class="kit-cls">{K.classes.article}</p>
+    </div>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{K.cta.kicker}</p>
+      <h2 class="h2">{K.cta.h2}</h2>
+      <div class="ctas" style="margin-top:32px">
+        <a class="btn" href={cta.email.href}><span class="mi">{t.primary}</span><span class="ar" aria-hidden="true">→</span></a>
+        {links.map((l) => <a class="tl" href={l.href} {...(isExternal(l.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{l.label}</a>)}
       </div>
     </div>
-    <p class="file">{D.specNote} <code>design/components/Button.md</code></p>
-  </Section>
-
-  <Section mark={G.numbers.mark} label={G.numbers.label}>
-    <p class="lead">{G.numbers.lead}</p>
-    <div class="spec wide"><StatTiles tiles={shipping.tiles} /></div>
-    <p class="file">{D.specNote} <code>design/components/StatTiles.md</code></p>
-  </Section>
-
-  <Section mark={G.figures.mark} label={G.figures.label}>
-    <p class="lead">{G.figures.lead}</p>
-    <div class="spec wide">
-      <Dumbbell rows={waves.rows} max={waves.max} ticks={waves.ticks} fromLabel={waves.fromLabel} toLabel={waves.toLabel} unit={`of ${waves.of}`} />
-    </div>
-    <p class="file">{D.specNote} <code>design/components/Dumbbell.md</code></p>
-    <div class="spec wide">
-      <UnitChart rows={flips.rows} cols={flips.cols} filledMeans="postings where it happened" emptyMeans="postings where it did not" />
-    </div>
-    <p class="file">{D.specNote} <code>design/components/UnitChart.md</code></p>
-  </Section>
-
-  <Section mark={G.record.mark} label={G.record.label}>
-    <p class="lead">{G.record.lead}</p>
-    <div class="spec wide">
-      <RecordList kicker={work.recordKicker} items={work.keka.record.items} note={work.keka.record.note} context={work.keka.company} flush />
-    </div>
-    <p class="file">{D.specNote} <code>design/components/RecordList.md</code></p>
-    <div class="spec wide">
-      <DataTable caption={home.evals.tableCaption} columns={home.evals.tableColumns} rows={tableRows} />
-    </div>
-    <p class="file">{D.specNote} <code>design/components/DataTable.md</code></p>
-  </Section>
-
-  <Section mark={G.voice.mark} label={G.voice.label}>
-    <p class="lead">{G.voice.lead}</p>
-    <div class="spec wide"><PullQuote rule="ink">{home.evals.methodLine}</PullQuote></div>
-    <p class="file">{D.specNote} <code>design/components/PullQuote.md</code></p>
-  </Section>
-
-  <Section mark={G.live.mark} label={G.live.label}>
-    <p class="lead">{G.live.lead}</p>
-    <div class="spec wide surface-ink"><AuditSheet /></div>
-    <p class="file">{D.specNote} <code>design/components/AuditSheet.md</code></p>
-    <div class="spec-bare"><HarnessPanel /></div>
-    <p class="file">{D.specNote} <code>design/components/HarnessPanel.md</code></p>
-  </Section>
+  </section>
 </Base>
 
 <style>
-  .back {
-    margin-top: var(--s-4);
-    font-size: var(--t-small);
-  }
-
-  .back a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    color: var(--color-link);
-  }
-
-  .lead {
-    max-width: var(--measure);
-    font-size: var(--t-lede);
-    line-height: var(--lh-body);
-    color: var(--color-text-body);
-  }
-
-  .pair {
+  .kit-stack {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: var(--s-6);
-    border: var(--line-object);
+    gap: 18px;
+    margin-top: 32px;
   }
 
-  .spec {
-    padding: var(--s-6);
-    background: var(--color-surface);
-  }
-
-  .spec.wide {
-    margin-top: var(--s-6);
-    border: var(--line-hair);
-  }
-
-  .spec-bare {
-    margin-top: var(--s-6);
-  }
-
-  .spec-name {
-    margin-bottom: var(--s-4);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
+  /* The class names beside each piece, in the data voice. */
+  .kit-cls {
+    margin-top: 18px;
+    font: 400 var(--t-label) / var(--lh-base) var(--font-data);
     color: var(--color-text-muted);
+    overflow-wrap: anywhere;
   }
 
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-4);
+  .kit-back {
+    margin-top: 14px;
   }
 
-  .file {
-    margin-top: var(--s-2);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  @media (max-width: 899px) {
-    .pair {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .spec {
-      padding: var(--s-4);
-    }
+  .article .margin-note {
+    margin-top: 0;
   }
 </style>
+

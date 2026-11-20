@@ -114,12 +114,13 @@ const POSITIVES = [
   'github.com/freelawproject/eyecite/issues/361',
   '15,988 citations',
 
-  // v3 revamp (I16 #5, SPEC v3 #10), added 2026-11-12. The thesis strings and
-  // the new IA. "100+" left with CP decision 5 (corpus figure withheld).
+  // v3 revamp (I16 #5, SPEC v3 #10), added 2026-11-12; moved to The Pipeline 2026-11-20. The thesis strings and
+  // the IA. "100+" left with CP decision 5 (corpus figure withheld).
   'Agents, workflows and evals',
   'I ship the workflow and the checks that catch it.',
-  'Shipped, then measured',
-  'What I built, and how I know it works',
+  'Then it ships. Then I count.',
+  'What I built, and how I know.',
+  'My agent harness, counted as it runs.',
   'Builds',
   'TradeFrame',
   'github.com/zoeb-nomi/tradeframe',
@@ -129,18 +130,10 @@ const POSITIVES = [
   'cheap-tier-legal-tax-hr',
   '1,414',
   '10–15 min',
-  'Fig. 0',
   '30 min · intro call',
-  'llms.txt (for AI assistants)',
+  'llms.txt',
   'zoebnomi.com/builds/',
   'Facing a problem that has to be right? Talk to me.',
-
-  // v3.3 (I16 hero), added 2026-11-12: Fig. 0 is the audit sheet. Its counts are read from the case-study
-  // copy at build time (src/data/fig0-cells.ts), so the strip's sentence is checked here as words, not numbers.
-  'The audit sheet',
-  'failed a check.',
-  'caught before anything was published',
-  'grouped by outcome',
 ];
 
 // Instead's production numbers must never be attached to CrossSource. They are
@@ -195,6 +188,10 @@ const NEGATIVE_LITERALS = [
   // v4 (Red Pen, edited; 19 Nov 2026): the page never names its own parts. The v3 story lines are retired.
   'Back to Fig. 0',
   'The one cell I cannot draw yet',
+
+  // The Pipeline (20 Nov 2026): Fig. 0 and the audit sheet are retired; positioning stays subtle (Zoeb, round 1 review).
+  'Fig. 0',
+  'Hiring an AI PM',
 ];
 
 // "Filed" as a standalone product name — must not match the common word

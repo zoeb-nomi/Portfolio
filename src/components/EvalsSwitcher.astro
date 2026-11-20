@@ -1,8 +1,6 @@
 ---
-// Margin-column switcher on /crosssource and /mirror-eval: lets a reader on
-// one case study jump to the other without going back through nav. Three
-// line tiers only: --rule for the divider above it, --red-ink for the
-// current item (no new colors).
+// The case-study switcher: lets a reader on one eval case study jump to the other two without going back through
+// the nav. A row of kit tags; the current one is red and carries aria-current.
 import { evalsSwitcher, evalsSwitcherLabel } from '../data/copy';
 
 interface Props {
@@ -12,69 +10,45 @@ interface Props {
 const { current } = Astro.props;
 ---
 
-<div class="evals-switch">
-  <p class="switch-label">{evalsSwitcherLabel}</p>
-  <ul class="switch-list">
+<nav class="evals-switch" aria-label={evalsSwitcherLabel}>
+  <p class="lab">{evalsSwitcherLabel}</p>
+  <ul class="tags">
     {
       evalsSwitcher.map((s) => (
         <li>
           {s.name === current ? (
-            <span class="current" aria-current="page">
-              <span aria-hidden="true">→</span> {s.name}
-            </span>
+            <span class="tag red" aria-current="page">{s.name}</span>
           ) : (
-            <a href={s.href}>{s.name}</a>
+            <a class="tag" href={s.href}>{s.name}</a>
           )}
         </li>
       ))
     }
   </ul>
-</div>
+</nav>
 
 <style>
   .evals-switch {
-    margin-top: var(--s-6);
-    padding-top: var(--s-5);
-    border-top: var(--line-hair);
-  }
-
-  .switch-label {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    margin-bottom: var(--s-3);
-  }
-
-  .switch-list {
-    list-style: none;
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-  }
-
-  .switch-list li {
-    padding-block: var(--s-1);
-  }
-
-  .switch-list a {
-    /* WCAG 2.5.8: a standalone link needs a 24px hit area. */
-    display: inline-flex;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    min-height: var(--hit-min);
-    color: var(--color-text-body);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+    gap: var(--s-2) var(--s-4);
   }
 
-  .switch-list a:hover {
-    color: var(--color-link);
-    text-decoration-thickness: 2px;
+  .evals-switch ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  /* The current marker carries a view-transition name, so moving between case
-     studies slides it from one item to the next instead of swapping (brief §3). */
-  .switch-list .current {
-    display: inline-block;
-    color: var(--color-accent-text);
-    view-transition-name: evals-switch-current;
+  .evals-switch a.tag {
+    text-decoration: none;
+    transition: border-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+  }
+
+  .evals-switch a.tag:hover,
+  .evals-switch a.tag:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-text);
   }
 </style>

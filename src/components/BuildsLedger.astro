@@ -1,587 +1,515 @@
 ---
-// BuildsLedger (DESIGN v3 D-08, SPEC #17/#20-22): one row per build, booktabs
-// (Heavy above and below, Ink under the head, Hair between rows). Red only on
-// the verdict tag and the links.
-//
-//   variant="full"     /builds/: # · Build · Guarded · Measured · Shipped at
-//                      >=1100px; each row stacks into label/value pairs below.
-//   variant="compact"  home §2: # · Build · Measured, rows with `compact: true`.
-//   variant="feature"  /builds/ §1 first row (TradeFrame): head, the decision
-//                      path figure, then Guarded / Measured / Shipped cells.
-//
-// Rows are native <details>: tap, click or Enter opens the row's panel (its
-// result figure, its guard, its ship date and the case-study action) with no
-// script at all. The motion layer only animates the panel height on
-// click/tap (no hover-open); the content is always in the HTML.
-import { buildsLedger, builds } from '../data/copy';
+// BuildsLedger (The Pipeline): one row per build, each a button that opens its panel in place.
+// A row is `.build` (name, kind, value, a plus that turns to a cross); its panel holds the one-line
+// description, the guard / measure / ship chain, a small figure and the links. Rows come from
+// `buildsLedger`; the headline value and figure are in `pipelineBuilds.rows`. All panels are in the
+// HTML: without script every panel is open and the page is complete. The open / close motion is in
+// the page script (src/pages/builds.astro). The first row can start open.
+import { buildsLedger, builds, pipelineBuilds as PB } from '../data/copy';
 import type { BuildEntry } from '../data/copy';
-import MiniFigure from './MiniFigure.astro';
 import TradeFrameFlow from './TradeFrameFlow.astro';
+import { arrowHtml } from '../lib/arrowHtml';
 import { isExternal } from '../lib/isExternal';
 
 interface Props {
-  variant?: 'full' | 'compact' | 'feature';
   entries?: BuildEntry[];
-  /** Number shown in the # column for the first row. */
-  start?: number;
+  /** Open the first row on load. */
+  openFirst?: boolean;
 }
 
-const { variant = 'full', start = 1 } = Astro.props;
-const entries = Astro.props.entries ?? (variant === 'compact' ? buildsLedger.filter((b) => b.compact) : buildsLedger);
-const pad = (n: number) => String(n).padStart(2, '0');
-const shipped = (b: BuildEntry) => (b.shippedBeforeLedger ? builds.shippedUntracked(b.shippedBeforeLedger) : '');
-const ext = (href: string) => (isExternal(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {});
-const figLabel = (b: BuildEntry) => `${b.name}: ${b.measured.lead ?? ''} ${b.measured.headline}`.trim();
-const C = builds.columns;
+const { entries = buildsLedger, openFirst = false } = Astro.props;
+const lead = (b: BuildEntry) => PB.rows[b.id];
+// "20 Oct 2026, v0.3" -> value "20 Oct 2026", extra "v0.3".
+const ship = (b: BuildEntry) => {
+  const [when, ...rest] = (b.shippedBeforeLedger ?? '').split(', ');
+  return { when, extra: rest.join(', ') };
+};
+const kind = (b: BuildEntry) => (b.tag ? b.tag.replace(/[[\]]/g, '') : '');
+const plain = (label: string) => label.replace(/\s*→$/, '');
+const pc = (n: number) => `${n}%`;
 ---
 
-{
-  variant === 'feature' ? (
-    entries.map((b, i) => (
-      <article class="feat" aria-labelledby={`b-${b.id}`} data-build={b.id}>
-        <div class="feat-head">
-          <span class="idx">{pad(start + i)}</span>
-          <div>
-            <h3 class="feat-name" id={`b-${b.id}`}>{b.name}</h3>
-            {b.tag && <span class="tag">{b.tag}</span>}
-            <p class="one">{b.oneLine}</p>
-          </div>
-        </div>
-        <TradeFrameFlow variant="full" id={`flow-${b.id}`} />
-        <dl class="feat-cells">
-          <div>
-            <dt>{C.guarded}</dt>
-            <dd>{b.guarded}</dd>
-          </div>
-          <div>
-            <dt>{C.measured}</dt>
-            <dd>{b.measured.headline}</dd>
-          </div>
-          <div>
-            <dt>{C.shipped}</dt>
-            <dd>
-              <p class="ship">{shipped(b)}</p>
-              <p class="lnks">
-                {b.links.map((l) => (
-                  <a href={l.href} {...ext(l.href)}>
-                    {l.label}
-                  </a>
-                ))}
-              </p>
-            </dd>
-          </div>
-        </dl>
-      </article>
-    ))
-  ) : (
-    <div class:list={['ledger', `is-${variant}`]} data-ledger>
-      <div class="l-head" aria-hidden="true">
-        <span>{C.n}</span>
-        <span>{C.build}</span>
-        {variant === 'full' && <span>{C.guarded}</span>}
-        <span>{C.measured}</span>
-        {variant === 'full' && <span>{C.shipped}</span>}
-        <span />
-      </div>
-      <ul class="l-rows" role="list">
-        {entries.map((b, i) => (
-          <li class="l-item">
-            <details class="l-row" data-build={b.id}>
-              <summary class="l-sum">
-                <span class="idx">{pad(start + i)}</span>
-                <span class="l-build">
-                  <span class="l-name" id={`b-${variant}-${b.id}`}>{b.name}</span>
-                  {b.tag && <span class="tag">{b.tag}</span>}
-                  <span class="one">{variant === 'compact' ? (b.homeLine ?? b.oneLine) : b.oneLine}</span>
-                </span>
-                {variant === 'full' && (
-                  <span class="l-cell l-guard">
-                    <span class="l-lab">{C.guarded}</span>
-                    {b.guarded}
-                  </span>
-                )}
-                <span class="l-cell l-meas">
-                  <span class="l-lab">{C.measured}</span>
-                  {b.figure?.kind === 'flow' ? (
-                    <span class="l-flowlead">
-                      <TradeFrameFlow variant="strip" id={`strip-${variant}-${b.id}`} replay={false} />
-                    </span>
-                  ) : (
+<ol class="bd-list" data-ledger>
+  {
+    entries.map((b, i) => {
+      const row = lead(b);
+      const open = openFirst && i === 0;
+      const s = ship(b);
+      return (
+        <li class:list={['bd-item', { open }]} id={`b-${b.id}`}>
+          <button class="build bd-row" type="button" aria-expanded={open ? 'true' : 'false'} aria-controls={`d-${b.id}`} id={`r-${b.id}`}>
+            <span class="bn">{b.name}</span>
+            <span class="bk2">
+              {b.kind === 'eval harness' ? (
+                <>
+                  Eval harness · <span class="bd-j">{kind(b)}</span>
+                </>
+              ) : (
+                b.kind
+              )}
+            </span>
+            <span class="bv" set:html={arrowHtml(row.bv)} />
+            <span class="ba" aria-hidden="true" />
+          </button>
+          <div class="bd-detail" id={`d-${b.id}`} role="region" aria-labelledby={`r-${b.id}`}>
+            <p class="bd-what">{b.oneLine}</p>
+            {b.figure?.kind === 'flow' && <TradeFrameFlow />}
+            <div class="bd-grid">
+              <ol class="bd-chain" aria-label={`${builds.expand.guard}, ${builds.columns.measured}, ${builds.expand.shipped}`}>
+                <li class="bd-node">
+                  <span class="lab red">{builds.expand.guard}</span>
+                  <p>{b.guarded}</p>
+                </li>
+                <li class="bd-node">
+                  <span class="lab red">{builds.columns.measured}</span>
+                  {row.big ? (
                     <>
-                      {b.measured.lead && <span class="l-num">{b.measured.lead}</span>}
-                      <span class="l-mtext">{b.measured.lead ? [b.measured.denominator, variant === 'full' ? b.measured.scorerCheck : null].filter(Boolean).join(' · ') || b.measured.headline : b.measured.headline}</span>
+                      <p class="bd-v bd-n" set:html={arrowHtml(row.big)} />
+                      <p class="bd-u">{row.unit}</p>
                     </>
+                  ) : (
+                    <p>{b.measured.headline}</p>
                   )}
-                </span>
-                {variant === 'full' && (
-                  <span class="l-cell l-ship">
-                    <span class="l-lab">{C.shipped}</span>
-                    {shipped(b)}
-                  </span>
+                </li>
+                <li class="bd-node">
+                  <span class="lab red">{builds.expand.shipped}</span>
+                  <p class="bd-v bd-n">{s.when}</p>
+                  <p class="bd-u">{s.extra ? `${s.extra} · ` : ''}{PB.untracked}</p>
+                </li>
+              </ol>
+              <div>
+                {row.fig && (
+                  <figure class="bd-fig">
+                    <figcaption class="bd-fcap">
+                      <span>{row.fig.cap[0]}</span>
+                      <b>{row.fig.cap[1]}</b>
+                    </figcaption>
+                    {row.fig.rows.map((r) => (
+                      <div class="bd-fr">
+                        <span class="bd-fl">{r.label}</span>
+                        <span class="bd-tr">
+                          {r.x !== undefined && <i class:list={['bd-b', { r: r.red }]} style={`--x:${pc(r.x)}`} />}
+                          {r.a !== undefined && (
+                            <span class="bd-dd" style={`--a:${pc(r.a)};--b:${pc(r.b ?? 0)}`}>
+                              <i class="p0" />
+                              <i class="p1" />
+                            </span>
+                          )}
+                        </span>
+                        <span class:list={['bd-fv', { r: r.red }]} set:html={arrowHtml(r.v)} />
+                      </div>
+                    ))}
+                    <div class="bd-ax">
+                      <span />
+                      <span>{row.fig.axis.map((a) => <i>{a}</i>)}</span>
+                      <span />
+                    </div>
+                    {row.fig.note && <p class="bd-fn">{row.fig.note}</p>}
+                  </figure>
                 )}
-                <span class="l-toggle" aria-hidden="true">
-                  <span class="l-plus" />
-                </span>
-              </summary>
-              <div class="l-panel" data-panel>
-                <div class="l-panel-in">
-                  {b.figure && b.figure.kind === 'flow' && (
-                    <button class="flow-replay" type="button" data-replay="flow" aria-controls={`strip-${variant}-${b.id}`} hidden>
-                      {builds.tradeframeFlow.replay} <span aria-hidden="true">↺</span>
-                    </button>
-                  )}
-                  {b.figure && b.figure.kind !== 'flow' && <MiniFigure fig={b.figure} label={figLabel(b)} />}
-                  <dl class="l-facts">
-                    {(b.measured.lead || b.figure?.kind === 'flow') && (
-                      <div>
-                        <dt>{builds.expand.result}</dt>
-                        <dd>{b.measured.headline}</dd>
-                      </div>
-                    )}
-                    {variant === 'compact' && (
-                      <div>
-                        <dt>{builds.expand.guard}</dt>
-                        <dd>{b.guarded}</dd>
-                      </div>
-                    )}
-                    {variant === 'compact' && (
-                      <div>
-                        <dt>{builds.expand.shipped}</dt>
-                        <dd>{shipped(b)}</dd>
-                      </div>
-                    )}
-                  </dl>
-                  <p class="lnks">
-                    <a class="primary" href={b.primary.href} {...ext(b.primary.href)} aria-describedby={`b-${variant}-${b.id}`}>
-                      {b.primary.label}
+                <div class:list={['bd-links', { 'bd-res': !row.fig }]}>
+                  {b.links.map((l) => (
+                    <a class="tl" href={l.href} {...(isExternal(l.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                      {plain(l.label)}
+                      {isExternal(l.href) && <small>↗</small>}
                     </a>
-                    {b.links
-                      .filter((l) => l.href !== b.primary.href)
-                      .map((l) => (
-                        <a href={l.href} {...ext(l.href)} aria-describedby={`b-${variant}-${b.id}`}>
-                          {l.label}
-                        </a>
-                      ))}
-                  </p>
+                  ))}
                 </div>
               </div>
-            </details>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
+            </div>
+          </div>
+        </li>
+      );
+    })
+  }
+</ol>
 
 <style>
-  /* ---------- shared ---------- */
-  .idx {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    padding-top: 6px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .tag {
-    display: inline-block;
-    margin-top: var(--s-1);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-accent-text);
-  }
-
-  .one {
-    display: block;
-    margin-top: var(--s-2);
-    font-size: var(--t-small);
-    line-height: var(--lh-snug);
-    color: var(--color-text-body);
-    max-width: 46ch;
-  }
-
-  .lnks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--s-5);
-  }
-
-  .lnks a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-min);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .lnks a.primary {
-    min-height: var(--hit-touch);
-    font-weight: 500;
-  }
-
-  .lnks a:hover {
-    color: var(--color-link);
-    text-decoration-thickness: 2px;
-  }
-
-  /* ---------- ledger (booktabs) ---------- */
-  .ledger {
+  .bd-list {
+    list-style: none;
     border-top: var(--line-heavy);
-    border-bottom: var(--line-heavy);
+    margin-top: clamp(28px, 5vh, 56px);
   }
 
-  .l-head,
-  .l-sum {
-    display: grid;
-    grid-template-columns: 40px minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, .75fr) 28px;
-    column-gap: var(--s-5);
-    align-items: start;
+  .bd-item {
+    position: relative;
   }
 
-  .is-compact .l-head,
-  .is-compact .l-sum {
-    grid-template-columns: 40px minmax(0, 1.25fr) minmax(0, 1fr) 28px;
-  }
-
-  .l-head {
-    padding-block: var(--s-2);
-    border-bottom: var(--line-ink);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .l-item + .l-item {
-    border-top: var(--line-hair);
-  }
-
-  .l-rows {
-    list-style: none;
-  }
-
-  .l-row {
-    transition: background-color var(--dur-fast) var(--ease-draw);
-  }
-
-  .l-sum {
-    list-style: none;
+  .bd-row {
+    width: 100%;
+    background: none;
+    border: 0;
+    border-bottom: var(--line-hair);
+    font: inherit;
+    text-align: left;
     cursor: pointer;
-    padding-block: var(--s-6);
-  }
-
-  .l-sum::-webkit-details-marker {
-    display: none;
-  }
-
-  .l-sum:focus-visible {
-    outline-offset: -2px;
-  }
-
-  .l-name {
-    display: block;
-    overflow-wrap: anywhere;
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-h3);
-    line-height: var(--lh-heading);
-    letter-spacing: var(--track-tight);
     color: var(--color-text);
   }
 
-  .l-cell {
-    font-size: var(--t-small);
-    line-height: var(--lh-snug);
+  .bd-row .bd-j {
     color: var(--color-text-body);
   }
 
-  .l-lab {
+  .bd-row .ba {
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .bd-row .ba::before {
+    content: '+';
+    font: 400 22px / 1 var(--font-data);
+  }
+
+  .bd-item.open .bd-row .ba {
+    transform: rotate(45deg);
+  }
+
+  .bd-item.open .bd-row::before {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+
+  .bd-item.open .bd-row::after {
+    transform: scaleY(1);
+  }
+
+  .bd-item.open .bd-row .bn {
+    font-variation-settings: 'wdth' 100, 'wght' 880;
+  }
+
+  .bd-row:hover .ba,
+  .bd-row:focus-visible .ba {
+    transform: none;
+  }
+
+  .bd-item.open .bd-row:hover .ba {
+    transform: rotate(45deg);
+  }
+
+  /* With script, a closed row hides its panel; without it every panel stays open. */
+  :global(.bd-js) .bd-item:not(.open) .bd-detail {
     display: none;
   }
 
-  .l-num {
-    display: block;
-    margin-bottom: var(--s-1);
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-num);
-    line-height: var(--lh-tight);
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .l-ship {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  /* The open/close mark: a plus that turns into a minus. */
-  .l-toggle {
+  /* ---------- panel ---------- */
+  .bd-detail {
     position: relative;
-    justify-self: end;
-    width: 28px;
-    height: 28px;
-    margin-top: 2px;
-    border: var(--line-object-muted);
-    transition: border-color var(--dur-fast) var(--ease-draw);
+    padding: 28px 0 40px clamp(22px, 3vw, 44px);
+    border-bottom: var(--line-hair);
   }
 
-  .l-plus::before,
-  .l-plus::after {
+  .bd-detail::before {
     content: '';
     position: absolute;
-    left: 7px;
-    right: 7px;
-    top: 13px;
-    border-top: var(--line-object);
-    transition: transform var(--dur-base) var(--ease-draw);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--color-accent);
+    transform-origin: top;
+    transform: scaleY(var(--sp, 1));
   }
 
-  .l-plus::after {
-    transform: rotate(90deg);
-  }
-
-  .l-row[open] .l-plus::after {
-    transform: rotate(0deg);
-  }
-
-  .l-row:hover .l-toggle,
-  .l-row[open] .l-toggle {
-    border-color: var(--color-accent);
-  }
-
-  .l-row:hover .l-name,
-  .l-row[open] .l-name {
-    color: var(--color-accent-text);
-  }
-
-  /* Hover: the row's rule goes Hair -> Ink (A §f). */
-  .l-item:hover + .l-item,
-  .l-item:has(.l-row[open]) + .l-item {
-    border-top: var(--line-ink);
-  }
-
-  .l-panel-in {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--s-4) var(--s-8);
-    align-items: start;
-    margin-left: calc(40px + var(--s-5));
-    margin-right: calc(28px + var(--s-5));
-    padding: var(--s-4) 0 var(--s-7);
-    border-top: var(--line-hair);
-  }
-
-  .l-panel-in > :global(.mf),
-  .l-panel-in > .flow-replay {
-    grid-column: 1;
-  }
-
-  .flow-replay {
-    justify-self: start;
-    min-height: var(--hit-touch);
-    padding: 0;
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-accent-text);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .flow-replay[hidden] {
-    display: none;
-  }
-
-  .l-flowlead {
-    display: block;
-  }
-
-  .l-facts {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    display: grid;
-    gap: var(--s-3);
-  }
-
-  .l-facts:empty {
-    display: none;
-  }
-
-  .l-facts dt {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .l-facts dd {
-    margin-top: 2px;
-    font-size: var(--t-small);
+  .bd-what {
+    font-size: clamp(18px, 1.5vw, 22px);
     line-height: var(--lh-snug);
-    color: var(--color-text-body);
-  }
-
-  .l-panel-in > .lnks {
-    grid-column: 1;
-  }
-
-  .is-full .l-name {
-    font-size: clamp(22px, 1.9vw, 26px);
-  }
-
-  /* ---------- stacked rows (D-14): below 1100px every row becomes label/value pairs ---------- */
-  @media (max-width: 1099px) {
-    .l-head {
-      display: none;
-    }
-
-    .l-sum,
-    .is-compact .l-sum {
-      grid-template-columns: 32px minmax(0, 1fr) 28px;
-      row-gap: var(--s-3);
-      padding-block: var(--s-5);
-    }
-
-    .l-build {
-      grid-column: 2;
-      grid-row: 1;
-    }
-
-    .l-toggle {
-      grid-column: 3;
-      grid-row: 1;
-    }
-
-    .l-cell {
-      grid-column: 2 / span 2;
-      display: grid;
-      grid-template-columns: 6.5em minmax(0, 1fr);
-      column-gap: var(--s-3);
-      padding-top: var(--s-2);
-      border-top: var(--line-hair);
-    }
-
-    .l-lab {
-      display: block;
-      font-family: var(--font-data);
-      font-size: var(--t-label);
-      color: var(--color-text-muted);
-      padding-top: 3px;
-    }
-
-    .l-cell .l-num,
-    .l-cell .l-mtext,
-    .l-cell .l-flowlead {
-      grid-column: 2;
-    }
-
-    .l-panel-in {
-      grid-template-columns: 1fr;
-      margin-left: calc(32px + var(--s-5));
-      margin-right: 0;
-    }
-
-    .l-facts,
-    .is-full .l-panel-in > .lnks,
-    .l-panel-in > .lnks {
-      grid-column: 1;
-      grid-row: auto;
-    }
-  }
-
-  @media (max-width: 599px) {
-    .l-cell {
-      grid-template-columns: 1fr;
-      row-gap: 2px;
-    }
-
-    .l-cell .l-num,
-    .l-cell .l-mtext,
-    .l-cell .l-flowlead {
-      grid-column: 1;
-    }
-
-    .l-sum,
-    .is-compact .l-sum {
-      column-gap: var(--s-3);
-    }
-
-    .l-panel-in {
-      margin-left: 0;
-    }
-  }
-
-  /* ---------- feature (TradeFrame) ---------- */
-  .feat {
-    border-top: var(--line-heavy);
-    border-bottom: var(--line-heavy);
-    padding-block: var(--s-6) var(--s-7);
-  }
-
-  .feat-head {
-    display: grid;
-    grid-template-columns: 40px minmax(0, 1fr);
-    column-gap: var(--s-5);
-    margin-bottom: var(--s-7);
-  }
-
-  .feat-name {
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-h2);
-    line-height: var(--lh-heading);
-    letter-spacing: var(--track-tight);
     color: var(--color-text);
+    max-width: 52ch;
+    font-variation-settings: 'wdth' 94, 'wght' 520;
   }
 
-  .feat .one {
-    font-size: var(--t-body);
-    max-width: 58ch;
-  }
-
-  .feat-cells {
+  .bd-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--s-6) var(--s-8);
-    margin-top: var(--s-7);
-    padding-top: var(--s-4);
-    border-top: var(--line-ink);
-  }
-
-  .feat-cells dt {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    margin-bottom: var(--s-2);
-  }
-
-  .feat-cells dd {
-    font-size: var(--t-small);
-    line-height: var(--lh-snug);
-    color: var(--color-text-body);
-  }
-
-  .feat .ship {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    margin-bottom: var(--s-2);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 28px clamp(28px, 4vw, 64px);
+    margin-top: 26px;
+    align-items: start;
   }
 
   @media (max-width: 899px) {
-    .feat-head {
-      grid-template-columns: 32px minmax(0, 1fr);
-      column-gap: var(--s-3);
+    .bd-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* guard, measure, ship: one red line through three nodes */
+  .bd-chain {
+    position: relative;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    padding-top: 22px;
+  }
+
+  .bd-chain::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    right: 0;
+    top: 4px;
+    height: 2px;
+    background: var(--color-accent);
+    transform-origin: left;
+    transform: scaleX(var(--k, 1));
+  }
+
+  .bd-node {
+    position: relative;
+    min-width: 0;
+  }
+
+  .bd-node::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -22px;
+    width: 10px;
+    height: 10px;
+    background: var(--color-surface);
+    border: var(--line-pen);
+    opacity: var(--d, 1);
+  }
+
+  .bd-node::after {
+    content: '→';
+    position: absolute;
+    right: -16px;
+    top: -24px;
+    padding: 0 3px;
+    background: var(--color-surface);
+    font: 400 14px / 1 var(--font-data);
+    color: var(--color-accent);
+    opacity: var(--d, 1);
+  }
+
+  .bd-node:last-child::after {
+    content: none;
+  }
+
+  .bd-node .lab {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .bd-node p {
+    font-size: 14.5px;
+    line-height: var(--lh-snug);
+    color: var(--color-text-body);
+  }
+
+  .bd-node .bd-v {
+    font-size: var(--t-num);
+    line-height: var(--lh-tight);
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    font-variation-settings: 'wdth' var(--w-num), 'wght' var(--g-num);
+    font-variant-numeric: tabular-nums;
+    transform-origin: left bottom;
+  }
+
+  .bd-node .bd-u {
+    font: 400 var(--t-label) / var(--lh-snug) var(--font-data);
+    color: var(--color-text-muted);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 599px) {
+    .bd-chain {
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 0;
+      padding-left: 26px;
+      gap: 20px;
     }
 
-    .feat-cells {
-      grid-template-columns: 1fr;
+    .bd-chain::before {
+      left: 4px;
+      right: auto;
+      top: 4px;
+      bottom: 6px;
+      width: 2px;
+      height: auto;
+      transform-origin: top;
+      transform: scaleY(var(--k, 1));
     }
+
+    .bd-node::before {
+      left: -26px;
+      top: 0;
+    }
+
+    .bd-node::after {
+      content: none;
+    }
+  }
+
+  /* ---------- small figure ---------- */
+  .bd-fig {
+    border: var(--line-hair);
+    background: var(--color-surface-sunk);
+    padding: 16px 18px 14px;
+  }
+
+  .bd-fcap {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font: 500 var(--t-label) / var(--lh-label) var(--font-data);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding-bottom: 9px;
+    border-bottom: var(--line-hair);
+    margin-bottom: 14px;
+  }
+
+  .bd-fcap b {
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .bd-fr {
+    display: grid;
+    grid-template-columns: minmax(0, 11em) minmax(0, 1fr) minmax(0, 5.6em);
+    gap: 12px;
+    align-items: center;
+    padding: 7px 0;
+  }
+
+  .bd-fl {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font: 400 11.5px / var(--lh-label) var(--font-data);
+    color: var(--color-text-body);
+  }
+
+  .bd-fv {
+    font: 500 12.5px / 1.2 var(--font-data);
+    color: var(--color-text);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bd-fv.r {
+    color: var(--color-accent);
+  }
+
+  .bd-tr {
+    position: relative;
+    height: 12px;
+    background: linear-gradient(var(--color-line-strong), var(--color-line-strong)) 0 50% / 100% 1px no-repeat;
+  }
+
+  .bd-b {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    height: 8px;
+    width: var(--x);
+    background: var(--color-text-body);
+    transform-origin: left;
+    transform: scaleX(var(--k, 1));
+  }
+
+  .bd-b.r {
+    background: var(--color-accent);
+  }
+
+  .bd-dd {
+    position: absolute;
+    inset: 0;
+  }
+
+  .bd-dd::before {
+    content: '';
+    position: absolute;
+    left: min(var(--a), var(--b));
+    width: max(calc(var(--b) - var(--a)), calc(var(--a) - var(--b)));
+    top: 5px;
+    height: 2px;
+    background: var(--color-accent);
+    transform-origin: left;
+    transform: scaleX(var(--k, 1));
+  }
+
+  .bd-dd i {
+    position: absolute;
+    top: 2px;
+    width: 8px;
+    height: 8px;
+    margin-left: -4px;
+    background: var(--color-text-muted);
+  }
+
+  .bd-dd i.p0 {
+    left: var(--a);
+  }
+
+  .bd-dd i.p1 {
+    left: var(--b);
+    background: var(--color-text);
+    opacity: var(--d, 1);
+  }
+
+  .bd-ax {
+    display: grid;
+    grid-template-columns: minmax(0, 11em) minmax(0, 1fr) minmax(0, 5.6em);
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .bd-ax span:nth-child(2) {
+    display: flex;
+    justify-content: space-between;
+    font: 400 var(--t-label) / 1 var(--font-data);
+    color: var(--color-text-muted);
+  }
+
+  .bd-ax i {
+    font-style: normal;
+  }
+
+  .bd-fn {
+    margin-top: 10px;
+    font: 400 var(--t-label) / var(--lh-base) var(--font-data);
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 599px) {
+    .bd-fr,
+    .bd-ax {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 4.6em);
+    }
+
+    .bd-fr .bd-fl {
+      grid-column: 1 / -1;
+    }
+
+    .bd-ax span:first-child {
+      display: none;
+    }
+  }
+
+  .bd-res {
+    margin-top: 18px;
+  }
+
+  .bd-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin-top: 20px;
+  }
+
+  .bd-links .tl small {
+    font-size: var(--t-label);
+    color: var(--color-text-muted);
+    margin-left: 2px;
   }
 </style>

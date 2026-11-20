@@ -1,40 +1,43 @@
 # Masthead
 
 ## Purpose
-The page masthead for every interior page: a kicker or case-study block in the margin column, an h1 and standfirst in the body column, closed by an Ink rule.
+The page head (kit `.page-head`) for the writing pages: kicker, h1, optional standfirst, a byline, whatever the page puts in the default slot (the AudioPlayer, a finding line), optional readouts, and optional case-study details. An essay or note head also switches on the reading spine and in-place footnotes.
 
 ## Anatomy
-- Margin column: kicker, or breadcrumbs (`crumbs` replace the kicker), `spec` definition list, `EvalsSwitcher`, repo link. It is an `<aside>` only when it carries spec, switcher or repo; a kicker alone is a plain `div`.
-- `photo` mode (`thumbnail` or `portrait`): a `Headshot` in the margin column, no kicker, stacked above the title on phones.
-- `plain` variant: empty margin column, hidden on phones.
-- Body column: `<nav>` breadcrumbs, `<h1>` (steps down when longer than 40 characters), standfirst, byline slot, default slot (for example the AudioPlayer, which finds `.masthead-inner > .margin-col`).
+`section.page-head.gut` > `.mh`: optional `.mh-photo` (a `Headshot`), then `.mh-body` with `p.kick` (or breadcrumb `nav.kick.crumbs`), `h1.display.split`, `p.dek`, `.byline` (the `byline` slot), the default slot, `.stats > .ro` readouts (`.v`, `.u`, `.s`), a `.hud.mh-spec` spec strip, and `.mh-links` (an `EvalsSwitcher` and a repo `.tl` link).
 
 ## Props
 | prop | type | notes |
 |---|---|---|
 | `h1` | `string` | required |
 | `kicker`, `standfirst` | `string?` | |
-| `label` | `string?` | accessible name for the margin aside |
-| `variant` | `'default' \| 'plain'` | |
-| `thumbnail`, `portrait` | `{alt}?` | thumb (120px) or about (200px) headshot |
-| `h1Max`, `standfirstMax` | `string?` | any CSS length |
-| `narr` | `boolean?` | read-along `data-narr` ids on h1, standfirst, spec |
-| `spec` | `{label, value}[]?` | |
-| `switcher` | `'CrossSource' \| 'mirror-eval' \| 'screener-eval'?` | |
-| `repo` | `{href, label}?` | |
-| `crumbs` | `{label, href?}[]?` | last item gets `aria-current="page"` |
+| `variant` | `'default' \| 'plain'` | `plain` drops the kicker |
+| `stats` | `{v, u, s?}[]` | readouts under the head |
+| `spec` | `{label, value}[]` | the HUD strip; `label` names its group for assistive tech (default "Case study details") |
+| `switcher` | case-study name | renders `EvalsSwitcher` |
+| `repo` | `{href, label}` | repo link |
+| `crumbs` | `{label, href?}[]` | breadcrumb; replaces the kicker |
+| `thumbnail`, `portrait` | `{alt}` | headshot beside the title |
+| `h1Max`, `standfirstMax` | CSS length | width caps |
+| `narr` | `boolean` | read-along anchors (`data-narr`) on h1, dek and spec |
+| `article` | `boolean` | force the article marking on or off; default on when there is a byline and no case-study props |
+
 Slots: `byline`, default.
 
-## Tokens it reads
-- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-line`, `--color-link`.
-- Type: `--font-heading`, `--font-text`, `--font-data`, `--wght-head`, `--wdth-head`, `--t-page`, `--t-body`, `--t-data`, `--t-label`, `--t-micro`, `--track-tight`, `--lh-*`.
-- Space and lines: `--s-1` to `--s-11`, `--gutter`, `--hit-min`, `--underline-offset`, `--line-ink` (closing rule), `--line-hair`.
+## Variants
+Default, `plain`, photo (`thumbnail` or `portrait`), article (`data-article`), case-study details (`spec`, `switcher`, `repo`).
 
-## States and motion
-Static: the component draws no pen mark and has no script (page titles get none from here). Breakpoints 899 and 1099 reflow the columns. Reduced motion and ink surface change nothing.
+## Kit classes
+`.page-head`, `.kick`, `.display`, `.split`, `.dek`, `.byline`, `.stats`, `.ro`, `.hud`, `.hud-in`, `.hud-c`, `.tl`, `.lab`.
+
+## Motion
+The h1 fades up once (`.split`); readout numbers appear whole (`data-num`). When the head is an article, `scripts/reading.ts` is imported and draws the red spine and footnote handling for the sections below.
 
 ## Accessibility
-One `<h1>` per page. Breadcrumbs are a labelled `<nav>` with an ordered list. Hover underline on crumbs only; link targets use `--hit-min`.
+One `h1`; the breadcrumb is a labelled `nav` with `aria-current` on the last item; the spec strip is a `role="group"` with a `dl`. Photo alt text is required.
+
+## Light and dark
+Roles only. Both themes work unchanged.
 
 ## Used on
-Pages: `/about/`, `/builds/`, `/crosssource/`, `/design/`, `/design/components/`, `/mirror-eval/`, `/notes/[slug]/`, `/screener-eval/`, `/writing/`, `/writing/decisions-api-legal-quiz/`, `/writing/eval-harness-at-my-own-reflection/`, `/writing/nobody-reports-the-misses/`, `/writing/the-bus-stop-nobody-notices/`, `/writing/the-judge-caught-a-bug/`, `/writing/two-levers-that-did-not-move/`.
+`/notes/[slug]/`, `/writing/`, `/writing/decisions-api-legal-quiz/`. The photo, crumbs, spec, switcher and repo variants are not passed by any page at the time of writing (case studies use `CsHead` and `CaseTabs`).

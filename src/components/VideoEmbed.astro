@@ -1,88 +1,65 @@
 ---
-// Lite-embed facade. Nothing third-party loads until someone asks to watch:
-// the poster is self-hosted, and the YouTube iframe is created on click. This
-// component makes no third-party request on first paint (the page-level analytics
-// scripts in Base.astro are separate).
+// Click-to-play video facade (The Pipeline). Nothing third-party loads until someone asks to
+// watch: the poster is self-hosted and the youtube-nocookie iframe is created on click, in place.
 //
-// Progressive enhancement: the markup ships an <a> to the watch page, so the
-// poster is a working link with JavaScript off. The inline script upgrades that
-// anchor into a real <button> (aria-label "Play: <title>"): reusing the same
-// child nodes, so the poster is never re-requested, and that button swaps in
-// the iframe. Exactly one control exists in either mode.
+// Progressive enhancement: the markup ships an <a> to the watch page, so the poster is a working
+// link with JavaScript off. The inline script upgrades that anchor into a real <button>
+// (aria-label "Play: <title>"), reusing the same child nodes so the poster is never re-requested.
+// Exactly one control exists in either mode.
 interface Props {
   youtubeId: string;
   title: string;
   caption: string;
-  figNo: number;
-  // Extensionless path to the self-hosted poster: <poster>.webp + <poster>.jpg
-  // must both exist under public/. Required, there is no remote fallback.
+  /** Extensionless path to the self-hosted poster: <poster>.webp and <poster>.jpg under public/. */
   poster: string;
-  channel?: string; // small mono plate, e.g. 'KEKA HR · YOUTUBE'
+  /** Text on the red play tab. */
+  play: string;
+  /** Label of the link to the watch page. */
+  open: string;
+  /** Further links shown beside it. */
+  links?: { label: string; href: string }[];
 }
 
-const { youtubeId, title, caption, figNo, poster, channel } = Astro.props;
+const { youtubeId, title, caption, poster, play, open, links = [] } = Astro.props;
 
 const watchHref = `https://www.youtube.com/watch?v=${youtubeId}`;
 const embedSrc = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`;
 const playLabel = `Play: ${title}`;
 ---
 
-<figure
-  class="video-figure"
-  data-video-embed
-  data-embed-src={embedSrc}
-  data-embed-title={title}
-  data-play-label={playLabel}
->
+<figure class="vid" data-video-embed data-embed-src={embedSrc} data-embed-title={title} data-play-label={playLabel}>
   <div class="frame">
-    <a
-      class="facade"
-      href={watchHref}
-      aria-label={playLabel}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <a class="facade" href={watchHref} target="_blank" rel="noopener noreferrer">
       <picture>
         <source type="image/webp" srcset={`${poster}.webp`} />
-        <img
-          class="poster"
-          src={`${poster}.jpg`}
-          width="1280"
-          height="720"
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
+        <img class="poster" src={`${poster}.jpg`} width="1280" height="720" alt="" loading="lazy" decoding="async" />
       </picture>
-      <span class="glyph" aria-hidden="true">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
-          <path d="M8 5v14l11-7z"></path>
-        </svg>
+      <span class="vplay">
+        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9.5-5.5z" fill="currentColor"></path></svg>{play}<span class="sr">: {title}</span>
       </span>
-      {channel && <span class="plate" aria-hidden="true">{channel}</span>}
     </a>
   </div>
-  <figcaption>Fig. {figNo}: {caption}</figcaption>
-  <a class="open-link" href={watchHref} target="_blank" rel="noopener noreferrer">Open on YouTube →</a>
+  <figcaption>
+    <span>{caption}</span>
+    <span class="vlinks">
+      <a href={watchHref} target="_blank" rel="noopener noreferrer">{open}</a>
+      {links.map((l) => <a href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>)}
+    </span>
+  </figcaption>
 </figure>
 
 <style>
-  .video-figure {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--s-3);
-    width: 100%;
-    max-width: 100%;
-    margin-block: var(--s-8);
+  .vid {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: var(--line-hair);
   }
 
   .frame {
     position: relative;
-    width: 100%;
     aspect-ratio: 16 / 9;
-    /* Ink ground: the glyph and plate still read if the poster never arrives. */
-    background: var(--color-text);
+    background: var(--color-surface-sunk);
+    border: var(--line-hair);
     overflow: hidden;
   }
 
@@ -90,19 +67,14 @@ const playLabel = `Play: ${title}`;
     position: absolute;
     inset: 0;
     display: block;
-    text-decoration: none;
-    cursor: pointer;
-    border: 0;
-    padding: 0;
-    background: transparent;
     width: 100%;
     height: 100%;
-  }
-
-  /* Set by the script if the poster ever fails to decode: the ink ground,
-     glyph and plate carry the frame on their own. */
-  .poster[data-failed] {
-    display: none;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
   }
 
   .facade picture {
@@ -112,54 +84,47 @@ const playLabel = `Play: ${title}`;
   }
 
   .poster {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
-    display: block;
+    filter: grayscale(0.35) contrast(1.02);
+    transition: filter 0.4s ease;
   }
 
-  .glyph {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    border-radius: var(--radius);
-    background: var(--color-text);
-    color: var(--color-surface);
-    /* A paper hairline so the disc still reads against a dark frame of the
-       poster, or against the ink ground when the poster does not load. */
-    box-shadow: 0 0 0 1px var(--color-surface);
-    transition: background-color var(--dur-fast) var(--ease-draw);
+  .poster[data-failed] {
+    display: none;
   }
 
-  .facade:hover .glyph,
-  .facade:focus-visible .glyph {
-    background: var(--color-accent-text);
+  .facade:hover .poster,
+  .facade:focus-visible .poster {
+    filter: none;
   }
 
-  /* .frame clips its children, so the global ring (offset +3px) was drawn outside the box
-     and cut off: keyboard focus showed only the glyph changing colour. Draw it inside. */
+  /* .frame clips its children, so draw the focus ring inside. */
   .facade:focus-visible {
-    outline-offset: calc(-1 * var(--s-2));
+    outline-offset: -4px;
   }
 
-  /* The plate sits on whatever the poster happens to show, so it carries its
-     own ink ground rather than trusting the frame behind it. */
-  .plate {
+  .vplay {
     position: absolute;
-    left: var(--s-3);
-    bottom: var(--s-3);
-    padding: var(--s-1) var(--s-2);
-    background: var(--color-text);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-on-accent-muted);
+    left: 16px;
+    bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+    padding: 0 16px 0 12px;
+    background: var(--color-accent-fill);
+    color: var(--color-on-accent);
+    font: 500 var(--t-nav) / 1 var(--font-data);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .vplay svg {
+    width: 14px;
+    height: 14px;
   }
 
   .frame :global(iframe) {
@@ -172,30 +137,36 @@ const playLabel = `Play: ${title}`;
   }
 
   figcaption {
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    line-height: var(--lh-snug);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 20px;
+    margin-top: 10px;
+    font: 400 11.5px / var(--lh-base) var(--font-data);
     color: var(--color-text-muted);
-    max-width: 60ch;
   }
 
-  .open-link {
-    /* WCAG 2.5.8: 24px minimum hit area without moving the layout. */
-    display: inline-block;
-    min-height: var(--hit-min);
-    padding-block: var(--s-1);
-    margin-block: calc(-1 * var(--s-1));
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+  .vlinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+  }
+
+  .vlinks a {
+    color: var(--color-text-body);
+  }
+
+  .vlinks a:hover,
+  .vlinks a:focus-visible {
+    color: var(--color-text);
   }
 
   @media (max-width: 599px) {
-    .glyph {
-      width: 52px;
-      height: 52px;
+    .vplay {
+      left: 10px;
+      bottom: 10px;
+      height: 34px;
+      padding: 0 12px 0 10px;
     }
   }
 </style>
@@ -206,8 +177,7 @@ const playLabel = `Play: ${title}`;
     const frame = fig.querySelector<HTMLElement>('.frame');
     if (!anchor || !frame) continue;
 
-    // The poster is same-origin, so this should never fire, but a missing
-    // file must not leave a broken-image marker on the page.
+    // A missing poster must not leave a broken-image marker on the page.
     const poster = fig.querySelector<HTMLImageElement>('img.poster');
     if (poster) {
       const markFailed = () => poster.setAttribute('data-failed', '');
@@ -215,18 +185,15 @@ const playLabel = `Play: ${title}`;
       if (poster.complete && poster.naturalWidth === 0) markFailed();
     }
 
-    // Upgrade the no-JS link into a real button, reusing its children so the
-    // poster image is not fetched a second time.
+    // Upgrade the no-JS link into a real button, reusing its children so the poster is not fetched twice.
     const button = document.createElement('button');
     button.type = 'button';
-    // Copy every attribute (class AND Astro's data-astro-cid-* scoping attribute),
-    // otherwise the component's .facade styles never reach the button and the
-    // UA button padding (1px 6px) shows the ink .frame as a dark band.
+    // Copy every attribute (class and Astro's data-astro-cid-* scoping attribute) so the .facade styles reach the button.
     for (const { name, value } of Array.from(anchor.attributes)) {
       if (name === 'href' || name === 'target' || name === 'rel') continue;
       button.setAttribute(name, value);
     }
-    button.setAttribute('aria-label', fig.dataset.playLabel ?? 'Play video');
+    // The button's name comes from its visible text plus the visually hidden title it carries over.
     while (anchor.firstChild) button.appendChild(anchor.firstChild);
     anchor.replaceWith(button);
 
@@ -234,9 +201,8 @@ const playLabel = `Play: ${title}`;
       const iframe = document.createElement('iframe');
       iframe.src = fig.dataset.embedSrc ?? '';
       iframe.title = fig.dataset.embedTitle ?? '';
-      iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+      iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
       iframe.setAttribute('allowfullscreen', '');
-      iframe.setAttribute('loading', 'lazy');
       button.remove();
       frame.appendChild(iframe);
       iframe.focus();

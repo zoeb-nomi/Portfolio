@@ -1,15 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Masthead from '../../components/Masthead.astro';
-import Section from '../../components/Section.astro';
+import EssayShell from '../../components/EssayShell.astro';
+import EssayHeading from '../../components/EssayHeading.astro';
 import EssayFigure from '../../components/EssayFigure.astro';
 import Dumbbell from '../../components/Dumbbell.astro';
 import UnitChart from '../../components/UnitChart.astro';
-import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
-import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
-import { formatDate } from '../../lib/formatDate';
 import { isExternal } from '../../lib/isExternal';
 import { meta, cta, home, writingReflection as wr } from '../../data/copy';
 import { jsonLdString } from '../../lib/jsonLdString';
@@ -35,29 +32,28 @@ const articleLd = articleJsonLd({
   path="/writing/eval-harness-at-my-own-reflection/"
   ogImage="/og/eval-harness.png"
   ogType="article"
+  page="writing"
 >
   <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
-  <Masthead
+  <EssayShell
+    slug="eval-harness-at-my-own-reflection"
     kicker={wr.kicker}
-    h1={wr.title}
-    standfirst={wr.dek}
-    h1Max="24ch"
-    narr
+    title={wr.title}
+    dek={wr.dek}
+    date={wr.date}
+    readingTime={wr.readingTime}
+    audio={wr.audio}
+    articleId="eval-harness-reflection"
   >
-    <Fragment slot="byline"><time datetime={wr.date}>{formatDate(wr.date)}</time> · {wr.readingTime} read</Fragment>
-    {wr.audio && <AudioPlayer audio={wr.audio} articleId="eval-harness-reflection" />}
-  </Masthead>
+    <EssayHeading mark={wr.s1.mark} label={wr.s1.label} narrId="s1-cue" />
+    {wr.s1.paras.map((p, i) => <p data-narr={`s1-p${i}`}>{p}</p>)}
 
-  <Section mark={wr.s1.mark} label={wr.s1.label} narrId="s1-cue">
-    {wr.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
-  </Section>
-
-  <Section mark={wr.s2.mark} label={wr.s2.label} narrId="s2-cue">
+    <EssayHeading mark={wr.s2.mark} label={wr.s2.label} narrId="s2-cue" />
     {
       wr.s2.paras.map((p, i) => (
         <>
-          <p class="prose" data-narr={`s2-p${i}`}>{p}</p>
+          <p data-narr={`s2-p${i}`}>{p}</p>
           {i === 0 && (
             <EssayFigure n={1} replay title="Probes citing my site or repo, by engine" source="Source: mirror-eval Table 1, the owned (site or repo) column. 63 search-mode probes per engine." href="/mirror-eval/" hrefLabel="Case study →">
               <Dumbbell rows={waves.rows} max={waves.max} ticks={waves.ticks} fromLabel={waves.fromLabel} toLabel={waves.toLabel} unit={`of ${waves.of}`} />
@@ -73,17 +69,15 @@ const articleLd = articleJsonLd({
         </>
       ))
     }
-  </Section>
 
-  <Section mark={wr.s3.mark} label={wr.s3.label} narrId="s3-cue">
-    {wr.s3.paras.map((p, i) => <p class="prose" data-narr={`s3-p${i}`}>{p}</p>)}
-  </Section>
+    <EssayHeading mark={wr.s3.mark} label={wr.s3.label} narrId="s3-cue" />
+    {wr.s3.paras.map((p, i) => <p data-narr={`s3-p${i}`}>{p}</p>)}
 
-  <Section mark={wr.s4.mark} label={wr.s4.label} narrId="s4-cue">
+    <EssayHeading mark={wr.s4.mark} label={wr.s4.label} narrId="s4-cue" />
     {
       wr.s4.paras.map((p, i) => (
         <>
-          <p class="prose" data-narr={`s4-p${i}`}>{p}</p>
+          <p data-narr={`s4-p${i}`}>{p}</p>
           {i === 1 && (
             <EssayFigure n={3} replay title="The judges against a blind human" source="Source: mirror-eval section 4 and the CrossSource blind check. A filled square is a judge output that agreed with the human label: the exact tag set in mirror-eval, the citation-precision verdict in CrossSource." href="/mirror-eval/" hrefLabel="Case study →">
               <UnitChart rows={judge.rows} cols={judge.cols} filledMeans="matched the human" emptyMeans="did not match" />
@@ -92,14 +86,11 @@ const articleLd = articleJsonLd({
         </>
       ))
     }
-    <div class="lesson" data-narr="s4-quote">
-      <PullQuote rule="red">{wr.s4.lessonQuote}</PullQuote>
-    </div>
-  </Section>
+    <blockquote data-narr="s4-quote">{wr.s4.lessonQuote}</blockquote>
 
-  <Section mark={wr.s5.mark} label={wr.s5.label} narrId="s5-cue">
-    {wr.s5.paras.map((p, i) => <p class="prose" data-narr={`s5-p${i}`}>{p}</p>)}
-    <p class="prose links-line">
+    <EssayHeading mark={wr.s5.mark} label={wr.s5.label} narrId="s5-cue" />
+    {wr.s5.paras.map((p, i) => <p data-narr={`s5-p${i}`}>{p}</p>)}
+    <p class="wr-links">
       {wr.footer.map((link, i) => (
         <>
           {i > 0 && <span class="sep" aria-hidden="true"> · </span>}
@@ -107,7 +98,7 @@ const articleLd = articleJsonLd({
         </>
       ))}
     </p>
-  </Section>
+  </EssayShell>
 
   <CTASlab
     marginLines={[home.eyebrow.toUpperCase()]}
@@ -118,10 +109,3 @@ const articleLd = articleJsonLd({
     secondaryHref={cta.bookACall.href}
   />
 </Base>
-
-<style>
-  .lesson {
-    margin-top: var(--s-8);
-  }
-
-</style>

@@ -1,22 +1,20 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Masthead from '../../components/Masthead.astro';
-import Section from '../../components/Section.astro';
-import DataTable from '../../components/DataTable.astro';
+import EssayShell from '../../components/EssayShell.astro';
+import EssayHeading from '../../components/EssayHeading.astro';
+import TextTable from '../../components/TextTable.astro';
 import EssayFigure from '../../components/EssayFigure.astro';
 import OwnershipGap from '../../components/OwnershipGap.astro';
 import BarList from '../../components/BarList.astro';
 import UnitChart from '../../components/UnitChart.astro';
-import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
-import { formatDate } from '../../lib/formatDate';
-import PullQuote from '../../components/PullQuote.astro';
 import CTASlab from '../../components/CTASlab.astro';
 import { meta, writingMisses as wm, home, cta } from '../../data/copy';
 import { jsonLdString } from '../../lib/jsonLdString';
 
 const f = wm.figures;
-const summaryRows = f.summary.rows.map((r) => ({ label: r.label, cells: r.cells.map((text) => ({ text })) }));
+// Missing authority is the dominant failure: its bar is the one red row.
+const failureRows = f.crosssource.failures.rows.map((r, i) => ({ ...r, tone: i === 0 ? ('red' as const) : ('ink' as const) }));
 
 const articleLd = articleJsonLd({
   slug: 'nobody-reports-the-misses',
@@ -34,83 +32,65 @@ const articleLd = articleJsonLd({
   path="/writing/nobody-reports-the-misses/"
   ogImage="/og/misses.png"
   ogType="article"
+  page="writing"
 >
   <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
-  <Masthead kicker={wm.kicker} h1={wm.title} standfirst={wm.dek} h1Max="24ch" narr>
-    <Fragment slot="byline"><time datetime={wm.date}>{formatDate(wm.date)}</time> · {wm.readingTime} read</Fragment>
-    <AudioPlayer audio={wm.audio} articleId="misses" />
-    <p class="read-along">
+  <EssayShell
+    slug="nobody-reports-the-misses"
+    kicker={wm.kicker}
+    title={wm.title}
+    dek={wm.dek}
+    date={wm.date}
+    readingTime={wm.readingTime}
+    audio={wm.audio}
+    articleId="misses"
+  >
+    <p slot="head" class="wr-sub">
       The text below follows the audio as it plays. <a href={wm.audio.captions} download>Captions (WebVTT)</a>
     </p>
-    <div class="intro">
-      {wm.intro.map((p, i) => <p class="prose" data-narr={`s0-p${i}`}>{p}</p>)}
-    </div>
+
+    {wm.intro.map((p, i) => <p data-narr={`s0-p${i}`}>{p}</p>)}
     <EssayFigure n={f.gap.n} title={f.gap.title} source={f.gap.source}>
       <OwnershipGap nodes={f.gap.nodes} />
     </EssayFigure>
-  </Masthead>
 
-  {
-    wm.sections.map((s, i) => (
-      <Section mark={s.mark} label={s.label} anchorId={s.id} narrId={`s${i + 1}-cue`}>
-        {s.paras.map((p, j) => (
-          <>
-            {p.startsWith('A rule for autonomy.') ? (
-              <div class="autonomy" data-narr={`s${i + 1}-p${j}`}>
-                <PullQuote rule="red">{p}</PullQuote>
-              </div>
-            ) : (
-              <p class="prose" data-narr={`s${i + 1}-p${j}`}>
-                {p}
-              </p>
-            )}
-            {s.after?.[j] === 'crosssource' && (
-              <EssayFigure n={f.crosssource.n} title={f.crosssource.title} source={f.crosssource.source} href={f.crosssource.href} hrefLabel={f.crosssource.hrefLabel}>
-                <BarList heading={f.crosssource.scores.heading} max={f.crosssource.scores.max} rows={f.crosssource.scores.rows} />
-                <BarList heading={f.crosssource.failures.heading} max={f.crosssource.failures.max} rows={f.crosssource.failures.rows} />
-              </EssayFigure>
-            )}
-            {s.after?.[j] === 'judges' && (
-              <EssayFigure n={f.judges.n} title={f.judges.title} source={f.judges.source} href={f.judges.href} hrefLabel={f.judges.hrefLabel}>
-                <UnitChart rows={f.judges.rows} cols={f.judges.cols} filledMeans={f.judges.filledMeans} emptyMeans={f.judges.emptyMeans} />
-              </EssayFigure>
-            )}
-            {s.after?.[j] === 'flips' && (
-              <EssayFigure n={f.flips.n} title={f.flips.title} source={f.flips.source} href={f.flips.href} hrefLabel={f.flips.hrefLabel}>
-                <UnitChart rows={f.flips.rows} cols={f.flips.cols} filledMeans={f.flips.filledMeans} emptyMeans={f.flips.emptyMeans} />
-              </EssayFigure>
-            )}
-            {s.after?.[j] === 'summary' && (
-              <div class="summary">
-                <div class="summary-table">
-                  <DataTable caption={f.summary.caption} columns={f.summary.columns} rows={summaryRows} />
-                </div>
-                <div class="summary-cards">
-                  <p class="summary-cap">{f.summary.caption}</p>
-                  <ul class="summary-list">
-                    {f.summary.rows.map((r) => (
-                      <li class="summary-card">
-                        <p class="summary-kind">{r.label}</p>
-                        <dl class="summary-fields">
-                          {r.cells.map((c, k) => (
-                            <div class="summary-field">
-                              <dt>{f.summary.columns[k + 1]}</dt>
-                              <dd>{c}</dd>
-                            </div>
-                          ))}
-                        </dl>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-          </>
-        ))}
-      </Section>
-    ))
-  }
+    {
+      wm.sections.map((s, i) => (
+        <>
+          <EssayHeading mark={s.mark} label={s.label} anchorId={s.id} narrId={`s${i + 1}-cue`} />
+          {s.paras.map((p, j) => (
+            <>
+              {p.startsWith('A rule for autonomy.') ? (
+                <blockquote data-narr={`s${i + 1}-p${j}`}>{p}</blockquote>
+              ) : (
+                <p data-narr={`s${i + 1}-p${j}`}>{p}</p>
+              )}
+              {s.after?.[j] === 'crosssource' && (
+                <EssayFigure n={f.crosssource.n} title={f.crosssource.title} source={f.crosssource.source} href={f.crosssource.href} hrefLabel={f.crosssource.hrefLabel}>
+                  <BarList heading={f.crosssource.scores.heading} max={f.crosssource.scores.max} rows={f.crosssource.scores.rows} />
+                  <BarList heading={f.crosssource.failures.heading} max={f.crosssource.failures.max} rows={failureRows} />
+                </EssayFigure>
+              )}
+              {s.after?.[j] === 'judges' && (
+                <EssayFigure n={f.judges.n} title={f.judges.title} source={f.judges.source} href={f.judges.href} hrefLabel={f.judges.hrefLabel}>
+                  <UnitChart rows={f.judges.rows} cols={f.judges.cols} filledMeans={f.judges.filledMeans} emptyMeans={f.judges.emptyMeans} />
+                </EssayFigure>
+              )}
+              {s.after?.[j] === 'flips' && (
+                <EssayFigure n={f.flips.n} title={f.flips.title} source={f.flips.source} href={f.flips.href} hrefLabel={f.flips.hrefLabel}>
+                  <UnitChart rows={f.flips.rows} cols={f.flips.cols} filledMeans={f.flips.filledMeans} emptyMeans={f.flips.emptyMeans} emptyTone="red" />
+                </EssayFigure>
+              )}
+              {s.after?.[j] === 'summary' && (
+                <TextTable caption={f.summary.caption} columns={f.summary.columns} rows={f.summary.rows} wide />
+              )}
+            </>
+          ))}
+        </>
+      ))
+    }
+  </EssayShell>
 
   <CTASlab
     marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
@@ -119,112 +99,3 @@ const articleLd = articleJsonLd({
     buttonHref={cta.bookACall.href}
   />
 </Base>
-
-<style>
-  .autonomy {
-    margin-block: var(--s-8);
-  }
-
-  .intro {
-    margin-top: var(--s-8);
-  }
-
-  .read-along {
-    margin-top: var(--s-3);
-    font-family: var(--font-text);
-    font-size: var(--t-note);
-    line-height: var(--lh-snug);
-    color: var(--color-text-muted);
-  }
-
-  .read-along a {
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  /* A figure or table that follows a paragraph needs the same gap a paragraph
-     would get. The figure supplies its own margin; the table wrapper does here. */
-  .summary {
-    margin-top: var(--s-8);
-    max-width: var(--measure);
-  }
-
-  /* Table 1 is text, not numbers: left-align it (DataTable defaults to the
-     right-aligned numeric look). Scoped to this page's wrapper. */
-  .summary :global(.data-table th),
-  .summary :global(.data-table td) {
-    text-align: left;
-  }
-
-  /* Wide screens: the table. Below 900px: one labelled card per row, so no
-     sideways scrolling for prose. */
-  .summary-cards {
-    display: none;
-  }
-
-  @media (max-width: 899px) {
-    .summary-table {
-      display: none;
-    }
-
-    .summary-cards {
-      display: block;
-    }
-  }
-
-  .summary-cap {
-    padding-bottom: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  .summary-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .summary-card {
-    padding-block: var(--s-4);
-    border-bottom: var(--line-hair);
-  }
-
-  .summary-card:first-child {
-    border-top: var(--line-hair);
-  }
-
-  .summary-kind {
-    margin-bottom: var(--s-3);
-    font-family: var(--font-text);
-    font-size: var(--t-small);
-    font-weight: 500;
-    color: var(--color-text);
-  }
-
-  .summary-fields {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-  }
-
-  .summary-field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
-    font-family: var(--font-data);
-  }
-
-  .summary-field dt {
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  .summary-field dd {
-    margin: 0;
-    font-size: var(--t-data);
-    color: var(--color-text);
-  }
-</style>

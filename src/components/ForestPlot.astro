@@ -1,7 +1,7 @@
 ---
 // Forest plot: each lever as a mean marker with its 95% interval on one shared axis, then the screener gap
 // drawn on the same scale. The values are text first; the drawing is aria-hidden. It plays once as it scrolls
-// into view (zero line, the lever intervals, then the screener bar) and has no controls of its own.
+// into view (the lever intervals, then the screener bar, fading in) and has no controls of its own.
 interface Row {
   label: string;
   sub?: string;
@@ -94,6 +94,11 @@ let order = 0;
 </script>
 
 <style>
+  .fp {
+    --fg-lab: 8.5rem;
+    --fg-val: 10.5rem;
+  }
+
   .fp-group + .fp-group {
     margin-top: var(--s-6);
   }
@@ -101,7 +106,9 @@ let order = 0;
   .fp-title {
     margin-bottom: var(--s-3);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
     color: var(--color-text-muted);
   }
 
@@ -112,8 +119,8 @@ let order = 0;
   .fp-verdict {
     margin-top: var(--s-3);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-accent-text);
+    font-size: var(--t-label);
+    color: var(--color-text-muted);
   }
 
   .fp-zero,
@@ -131,13 +138,13 @@ let order = 0;
   .fp-zero {
     position: absolute;
     inset-block: var(--s-1);
-    border-inline-start: var(--line-ink);
+    border-inline-start: var(--line-strong);
   }
 
-  /* Interval and mean: the whisker is drawn out from its centre, the marker pops in after it. */
+  /* Interval and mean: the interval is ink, the mean a solid square. They fade in once, in row order. */
   .fp-wh {
-    transform-origin: center;
-    transition: transform var(--dur-slow) var(--ease-draw);
+    background: var(--color-text-body);
+    transition: opacity var(--dur-slow) var(--ease-out);
     transition-delay: calc(var(--r) * 90ms);
   }
 
@@ -147,27 +154,23 @@ let order = 0;
     transition-delay: calc(var(--r) * 90ms + 300ms);
   }
 
+  /* The screener gap is the finding: the one red bar. */
   .fp-bar {
     position: absolute;
     inset-block-start: 50%;
     block-size: var(--s-3);
     margin-block-start: calc(var(--s-3) / -2);
     background: var(--color-accent);
-    transform-origin: left;
-    transition: transform 900ms var(--ease-draw);
+    transition: opacity var(--dur-slow) var(--ease-out);
     transition-delay: calc(var(--r) * 90ms + 200ms);
   }
 
   .fp-max {
-    border: var(--line-pen);
+    border-color: var(--color-accent);
   }
 
   .fp[data-state='pre'] .fp-wh,
-  .fp[data-state='pre'] .fp-bar {
-    transform: scaleX(0);
-    transition: none;
-  }
-
+  .fp[data-state='pre'] .fp-bar,
   .fp[data-state='pre'] .fp-mean,
   .fp[data-state='pre'] .fp-max {
     opacity: 0;

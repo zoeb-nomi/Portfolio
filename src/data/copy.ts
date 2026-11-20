@@ -40,9 +40,14 @@ export const site = {
 
 // v3 IA (DESIGN v3 §i, I-01): four items at every width. Builds owns the case
 // studies; Writing owns the notes.
-// Footer-only link to the design page (Red Pen 5): not in the header nav.
-export const designLink = { label: 'How this site is built', href: '/design/' };
-export const llmsLink = { label: 'llms.txt (for AI assistants)', href: '/llms.txt' };
+// Footer-only links (The Pipeline): the design page and llms.txt sit in the one-line footer, not the header nav.
+export const designLink = { label: 'Design system', href: '/design/' };
+export const llmsLink = { label: 'llms.txt', href: '/llms.txt' };
+export const writingLink = { label: 'Writing', href: '/writing/' };
+/** Footer identity line (one line, The Pipeline). */
+export const footerId = 'Zoeb Nomi · AI Product Manager · Agents, workflows and evals';
+/** Header action and theme-toggle labels. */
+export const headerUi = { email: 'Email', themeToLight: 'Switch to light mode', themeToDark: 'Switch to dark mode', skip: 'Skip to content' };
 
 export const nav: NavItem[] = [
   { label: 'Home', href: '/' },
@@ -95,6 +100,7 @@ export const cta = {
   email: { label: 'Email', href: 'mailto:zoeb.nomi@gmail.com' } as CtaLink,
   linkedin: { label: 'LinkedIn', href: 'https://www.linkedin.com/in/zoebnomi' } as CtaLink,
   github: { label: 'GitHub', href: 'https://github.com/zoeb-nomi' } as CtaLink,
+  x: { label: 'X', href: 'https://x.com/zoeb_nomi' } as CtaLink,
 };
 
 // ---------------------------------------------------------------------------
@@ -576,6 +582,201 @@ export const home = {
 };
 
 // ---------------------------------------------------------------------------
+// HOME, The Pipeline (20 Nov 2026): the approved prototype's strings. Reused from `home` above where the text is
+// the same (h1, lede, about, verbs, harness labels); everything the scene, the Shipped panels and the harness band
+// add lives here. Placeholders look like {n}. The scene script reads `scene`, `stations`, `audit` as JSON, so
+// nothing visible is typed into a template or a script. Counts per audit group come from src/data/fig0-cells.ts;
+// `totals` is checked against them at build time (src/pages/index.astro).
+// ---------------------------------------------------------------------------
+
+export const pipelineHome = {
+  id: 'AI product manager · Instead · Bengaluru',
+  totals: { n: 167, failed: 86, passed: 81 },
+  // Short names and verdict lines for the six audit groups, in the order of fig0-cells `groups`.
+  audit: [
+    { id: 'cs1', harness: 'CrossSource', short: 'CrossSource v0.1 · judge', label: 'CrossSource v0.1', pass: 'matched blind human', fail: '' },
+    { id: 'cs3', harness: 'CrossSource', short: 'CrossSource v0.3 · rater', label: 'CrossSource v0.3', pass: 'matched adjudicated label', fail: 'label mismatch, settled pre-release' },
+    { id: 'meC', harness: 'mirror-eval', short: 'mirror-eval · Claude judge', label: 'mirror-eval Claude', pass: 'matched blind human', fail: 'missed blind human label' },
+    { id: 'meG', harness: 'mirror-eval', short: 'mirror-eval · Gemini judge', label: 'mirror-eval Gemini', pass: 'matched blind human', fail: 'missed blind human label' },
+    { id: 'seH', harness: 'screener-eval', short: 'screener-eval · haiku-4-5', label: 'screener haiku-4-5', pass: 'same verdict × 5 runs', fail: 'flipped its own verdict' },
+    { id: 'seG', harness: 'screener-eval', short: 'screener-eval · gpt-5-mini', label: 'screener gpt-5-mini', pass: 'same verdict × 5 runs', fail: 'flipped its own verdict' },
+  ],
+  stations: [
+    {
+      key: 'prompt', no: '01', name: 'Prompt', verb: 'Measured', title: 'Ground truth before the first prompt.',
+      readouts: [
+        { v: '25', u: 'golden questions', s: 'CrossSource v0.1' },
+        { v: '2', u: 'configs: baseline, strict', s: 'CrossSource v0.1' },
+      ],
+    },
+    {
+      key: 'retrieve', no: '02', name: 'Retrieve', verb: 'Traced', title: 'Five passages, traced to source.',
+      readouts: [
+        { v: '0.760', u: 'citation recall', s: 'both configs' },
+        { v: '6', u: 'missing-authority fails', s: 'owned by retrieval' },
+        { v: 'k = 5', u: 'BM25 · 22 opinions', s: 'CrossSource v0.1' },
+      ],
+    },
+    {
+      key: 'draft', no: '03', name: 'Draft', verb: 'Traced', title: 'Every claim carries a citation.',
+      readouts: [
+        { v: '0.981 → 0.994', u: 'citation precision', s: 'CrossSource · n = 25' },
+        { v: '3 → 1', u: 'wrong-passage cites', s: 'strict prompting' },
+      ],
+    },
+    {
+      key: 'check', no: '04', name: 'Check', verb: 'Measured', title: 'The check gets checked.',
+      readouts: [
+        { v: '86 / 167', u: 'failed a check', s: 'audit sheet' },
+        { v: '15 / 15', u: 'judge vs blind human', s: 'CrossSource' },
+        { v: '3 · 12', u: 'of 40, judges vs blind human', s: 'mirror-eval' },
+      ],
+      breakdown: true,
+    },
+    {
+      key: 'ship', no: '05', name: 'Ship', verb: 'Guarded', title: 'The model proposes. Rules decide.',
+      readouts: [
+        { v: '81 / 167', u: 'passed, shipped', s: 'audit sheet' },
+        { v: 'rails', u: 'kill switch · dry run', s: 'TradeFrame' },
+        { v: 'bands', u: 'when a judge fails', s: 'mirror-eval' },
+      ],
+    },
+  ],
+  scene: {
+    canvasLabel:
+      'Live pipeline: 167 real outputs from three eval harnesses flow through Prompt, Retrieve, Draft, Check and Ship. At Check, 86 fail and drop into a red tray by harness; 81 pass and stack at Ship.',
+    stationsLabel: 'Stations',
+    railLabel: 'Pipeline stations',
+    hint: 'Click any output to trace it',
+    skip: { label: 'Skip ↓', href: '#shipped' },
+    hud: { run: 'Run', inFlight: 'In flight', checked: 'Checked', passRate: 'Pass rate', rejected: 'Rejected', last: 'Last verdict' },
+    hudChecked: '/ {n}',
+    hudRejected: '/ {n} audit',
+    hudMobile: { checked: '/{n} checked ·', rejected: 'rejected' },
+    na: 'n/a',
+    waiting: 'Waiting for Check',
+    runDone: 'Run {run} complete · {f} of {n} rejected · matches the audit',
+    trayOf: '/ {k} of {n}',
+    sub: { prompt: 'n {n}', retrieve: 'top-5 · n {n}', draft: 'cites · n {n}', check: '✓ {p}  ✕ {r}', ship: 'shipped {n}' },
+    stage: { tray: 'Tray', shipped: 'Shipped', awaiting: '{stage} · awaiting check' },
+    pass: '✓',
+    fail: '✕',
+  },
+  trace: {
+    kicker: 'Trace · one output',
+    close: 'Close trace',
+    keys: '← → to step · Esc to close',
+    meta: 'One of {n} outputs in this group · {f} of {n} failed',
+    steps: { passed: 'passed', caught: '✕ caught', ok: '✓ passed', held: 'held, not shipped', shipped: 'shipped' },
+    card: 'station card · {s}',
+    caught: 'Caught: {x}.',
+    passedLine: 'Passed: {x}.',
+    checkedBy: 'Checked by {short}. {f} of {n} in this group failed.',
+    held: 'Never shipped. Held in the {h} tray with the other rejects.',
+    shipped: 'Shipped. One of {p} of {n} that passed a check.',
+  },
+  shipped: {
+    kick: 'Shipped',
+    h2: 'Then it ships. Then I count.',
+    panels: [
+      {
+        key: 'instead',
+        pi: '01 / 03',
+        src: 'Instead · production',
+        title: 'Same tax workflow, under a minute.',
+        how: [
+          { k: 'Before', v: '10 to 15 min' },
+          { k: 'After', v: 'under 1 min' },
+          { k: 'Where', v: 'multi-step tax workflow' },
+        ],
+        srcl: 'Instead · AI-native tax research',
+      },
+      {
+        key: 'keka',
+        pi: '02 / 03',
+        src: 'Keka · Checkr API',
+        title: 'Background verification, zero to one.',
+        how: [
+          { k: 'Built', v: 'BGV module on Checkr' },
+          { k: 'Clients', v: '28 US enterprise' },
+          { k: 'Revenue', v: '$2.7M MRR' },
+        ],
+        srcl: 'Keka HR · zero to one',
+      },
+      {
+        key: 'crosssource',
+        pi: '03 / 03',
+        src: 'CrossSource v0.1',
+        title: 'Prompting bought precision, not recall.',
+        how: [
+          { k: 'Precision', v: '0.981 → 0.994' },
+          { k: 'Recall', v: '0.760, unchanged' },
+          { k: 'n', v: '25 golden questions' },
+        ],
+        srcl: 'CrossSource · Tables 1 and 2',
+      },
+    ],
+    instead: {
+      before: { v: '10 to 15 min', l: 'before' },
+      after: { v: 'under 1 min', l: 'after' },
+      cap: ['Run time · min', 'production'],
+      band: '10 to 15',
+      one: '1 min',
+      axis: ['0', '5', '10', '15'],
+      dial: '15 MIN DIAL',
+    },
+    keka: {
+      before: { v: '$0', l: 'start' },
+      after: { v: '$2.7M', l: 'MRR' },
+      cap1: ['Integration', 'my build in red'],
+      nodes: ['Keka HR', 'BGV module', 'Checkr API'],
+      mine: 'MY BUILD',
+      cap2: ['US enterprise clients', '28'],
+      tag: 'Keka’s first US-market product',
+    },
+    crosssource: {
+      before: { v: '0.981', l: 'baseline' },
+      after: { v: '0.994', l: 'strict' },
+      cap1: ['Citation precision', 'n = 25'],
+      gauge: { min: '0.970', max: '1.000', base: '0.981', baseL: 'BASELINE', strict: '0.994', strictL: 'STRICT' },
+      fine: 'Recall 0.760 → 0.760',
+      cap2: ['Failures · count', 'baseline → strict'],
+      none: 'none',
+      rows: [
+        { l: 'Right doc, wrong passage', b: 3, s: 1, d: '3 → 1', win: true },
+        { l: 'Missing authority', b: 6, s: 6, d: '6 → 6', win: false },
+        { l: 'Wrong document', b: 0, s: 0, d: '0 → 0', win: false },
+        { l: 'Unsupported claim', b: 0, s: 0, d: '0 → 0', win: false },
+      ],
+    },
+  },
+  harness: {
+    kick: 'Agent harness',
+    flowLabel: 'How a task moves through the harness',
+    steps: [
+      { k: 'Opened', t: 'Acceptance line and a due date', s: 'on every task' },
+      { k: 'Agent runs', s: 'today · {n} subagent runs' },
+      { k: 'Checked', t: 'Acceptance check and secret scan', s: 'before it reaches me' },
+      { k: 'My review', unit: 'min', s: 'median wait, ready to merged' },
+      { k: 'Closed', s: 'since 10 Nov' },
+    ],
+    caught: { label: 'caught before merge', s: 'dropped, or sent back after it was done · since 10 Nov' },
+    onTime: { label: 'On time', sub: 'to 19 Nov' },
+  },
+  builds: {
+    kick: 'Builds',
+    h2: 'Built in the open.',
+    rows: [
+      { id: 'tradeframe', value: 'AI proposes · code decides', href: '/builds/' },
+      { id: 'crosssource', value: '0.981 → 0.994', href: '/crosssource/' },
+      { id: 'screener-eval', value: '885 calls', href: '/screener-eval/' },
+      { id: 'cheap-tier-legal-tax-hr', value: '1,414 items', href: '/builds/' },
+    ],
+  },
+  contactKick: 'Contact',
+};
+
+// ---------------------------------------------------------------------------
 // BUILDS: /builds/ page strings and the typed ledger (SPEC v3 §3a, CP §2).
 // One entry per build; a build's own PR adds its row. The home §2 compact
 // ledger shows the rows with `compact: true`.
@@ -896,6 +1097,194 @@ export const shipping = {
 };
 
 // ---------------------------------------------------------------------------
+// The Pipeline (20 Nov 2026): /builds/ strings. Rows, guards, ship dates and links come from
+// `buildsLedger`; what is added here is the row's headline value and the little figure in its
+// panel. Positions (x, a, b) are percentages of a track, taken from the ledger numbers.
+// A value written "a → b" is drawn with the red arrow between the two halves.
+// ---------------------------------------------------------------------------
+
+export interface PipelineFigRow {
+  label: string;
+  /** Tag next to the label: counted, null. */
+  tag?: 'counted' | 'null';
+  /** A bar from 0 to x percent. */
+  x?: number;
+  /** A before-to-after pair on one track, a and b as percentages. */
+  a?: number;
+  b?: number;
+  v: string;
+  red?: boolean;
+}
+
+export interface PipelineBuildRow {
+  /** Right-hand value on the closed row. */
+  bv: string;
+  /** The big number in the Measured node, and what it counts. */
+  big?: string;
+  unit?: string;
+  fig?: { cap: [string, string]; rows: PipelineFigRow[]; axis: string[]; note?: string };
+}
+
+export const pipelineBuilds = {
+  kicker: 'Builds',
+  h1: 'What I built, and how I know.',
+  legendLabel: 'How to read each row',
+  untracked: 'before ship-date tracking',
+  stats: [
+    { v: '6', u: 'builds', s: '1 system · 5 eval harnesses' },
+    { v: '2', u: 'open pull requests', s: 'TaxCalcBench · eyecite' },
+    { v: '12', u: 'items shipped by my agents', s: 'since 10 Nov 2026' },
+  ],
+  systems: { kicker: '§1 Systems', h2: 'Who decides what runs.', sub: 'Agents, workflows, guarded automation' },
+  harnesses: {
+    kicker: '§2 Eval harnesses',
+    h2: 'How a step earns the right to run.',
+    legend: [
+      { term: 'judged', text: 'LLM judge, checked against people' },
+      { term: 'counted', text: 'counted, no judge' },
+      { term: 'null', text: 'judge failed its check: bands only' },
+    ],
+  },
+  method: { kicker: '§3 Method', h2: 'Three harnesses, one method.' },
+  contributions: { kicker: '§4 Contributions', h2: "Pull requests to other people's tooling." },
+  shipping: {
+    kicker: '§5 Shipping numbers · since 10 Nov 2026',
+    h2: 'What my agents shipped, counted.',
+    sub: 'Every item: an acceptance line and a due date at filing',
+    hud: [
+      { label: 'Shipped', v: '12', em: 'since 10 Nov' },
+      { label: 'On time', v: '90%', em: '9 of 10 with a due date' },
+      { label: 'API spend / item', v: '$0.07', em: 'failures included' },
+      { label: 'Ready → merged', v: '4.2 h', em: 'median, merged by me' },
+      { label: 'Acceptance check', v: '12', small: 'of 12', em: 'plus a secret scan', red: true },
+    ],
+    pilotLead: 'Pilot',
+    pilot:
+      ' · figures from 10 to 11 Nov 2026, two days of data; updates when the tracker runs. No titles or links: the work is private. Slip is days against the due date; negative is early.',
+  },
+  tableCaption: 'Table 2 · six of the 12 items',
+  fig2Caption: 'Fig. 2 · judge verdicts matching a blind human',
+  fig2Unit: '%',
+  fig2Rows: [
+    { label: 'CrossSource judge', tag: 'judged', x: 100, v: '15 of 15' },
+    { label: 'mirror-eval, judge 1', tag: 'null', x: 7.5, v: '3 of 40', red: true },
+    { label: 'mirror-eval, judge 2', tag: 'null', x: 30, v: '12 of 40', red: true },
+    { label: 'screener-eval', tag: 'counted', v: 'no judge' },
+  ] as PipelineFigRow[],
+  fig2Axis: ['0%', '50%', '100%'],
+  methodCards: [
+    { name: 'CrossSource', status: 'Judge passed', title: 'Caught a harness bug.', note: 'Prompting buys precision; retrieval owns recall.' },
+    { name: 'mirror-eval', status: 'Judge failed', title: 'Survived on counts.', note: 'Index access explains the split.', red: true },
+    { name: 'screener-eval', status: 'No judge', title: 'Needed no judge at all.', note: 'Paired deltas, 10,000-resample bootstrap 95% CI.' },
+  ],
+  prs: {
+    'taxcalcbench-pr-157': {
+      desc: "An audit of a public tax-calculation benchmark's 101 test cases against the official instructions. An opt-in scoring flag proposed.",
+      ros: [
+        { v: '2', u: 'answer-key errors' },
+        { v: '5', u: 'input conflicts' },
+        { v: 'Open', u: 'not merged' },
+      ],
+    },
+    'eyecite-pr-360': {
+      desc: 'A fix to legal-citation extraction for "Id." references past explanatory parentheticals.',
+      ros: [
+        { v: '0 · 0', u: 'gains · losses', s: 'extraction benchmark' },
+        { v: '15,988', u: 'citations' },
+        { v: 'Open', u: 'not merged' },
+      ],
+    },
+  } as Record<string, { desc: string; ros: { v: string; u: string; s?: string }[] }>,
+  /** The TradeFrame "who decides" figure (Fig. 1). */
+  flow: {
+    label:
+      'Who decides what runs. The AI judgment layer proposes trades and never executes. The deterministic layer validates against hard rails and breachable bands and decides. The US book needs a person to confirm each order. The India book runs only after dry-run validation. Each book has a kill switch that can stop new risk but never exits or stops. Every decision is recorded in a decision log scored against a do-nothing baseline.',
+    proposes: 'proposes',
+    decides: 'decides',
+    nodes: {
+      ai: ['AI judgment layer', 'proposes · never executes'],
+      det: ['Deterministic layer', 'hard rails · breachable bands'],
+      us: ['US book', 'a person confirms each order'],
+      india: ['India book', 'runs after dry-run validation'],
+      log: ['Decision log', 'vs do-nothing baseline'],
+    },
+    kill: 'kill switch · stops new risk',
+    tickUs: '✓ confirmed',
+    tickIn: '✓ dry run',
+    stop: 'new risk stopped · open positions untouched',
+    stepsLabel: 'Order of a decision',
+    figNo: 'Fig. 1',
+  },
+  rows: {
+    tradeframe: { bv: 'AI proposes · code decides' },
+    'cheap-tier-legal-tax-hr': {
+      bv: '99 of 100',
+      big: '99 of 100',
+      unit: '1,414 expert-labelled items · 5 models',
+      fig: {
+        cap: ['Stated confidence ≥ 0.9', 'of 100 answers'],
+        rows: [
+          { label: 'Haiku sure', x: 28, v: '28' },
+          { label: 'Haiku right, when sure', x: 99, v: '99', red: true },
+          { label: '3 other cheap models sure', x: 93, v: '92 to 93' },
+          { label: '…wrong, when sure', x: 16, v: '15 to 16', red: true },
+        ],
+        axis: ['0', '100'],
+      },
+    },
+    crosssource: {
+      bv: '0.981 → 0.994',
+      big: '0.981 → 0.994',
+      unit: 'n = 25 · 15/15 blind agreement with a person',
+      fig: {
+        cap: ['Citation precision · v0.1', 'axis zoomed'],
+        rows: [{ label: 'baseline → strict', a: 36.67, b: 80, v: '0.994' }],
+        axis: ['0.97', '1.00'],
+        note: 'Recall 0.760, capped by retrieval. v0.3: 150 items over 45 opinions, two blind model raters, kappa 0.98 / 0.84.',
+      },
+    },
+    'screener-eval': {
+      bv: '22 points · 885 calls',
+      big: '22 points',
+      unit: '885 calls · 21 postings · 2 screeners · 5 repeats',
+      fig: {
+        cap: ['Moved the fit score by', 'points'],
+        rows: [
+          { label: 'employer swap', x: 4.56, v: '≤1.14' },
+          { label: 'links deleted', x: 3.6, v: '≤0.90' },
+          { label: 'which screener', x: 89.2, v: '22.3', red: true },
+        ],
+        axis: ['0', '25 points'],
+      },
+    },
+    'mirror-eval': {
+      bv: '13 → 63 of 63',
+      big: '13 → 63',
+      unit: 'of 63 search probes · judges 3/40 and 12/40, so bands only',
+      fig: {
+        cap: ['Search probes citing the canonical site', 'of 63'],
+        rows: [
+          { label: 'Perplexity', a: 20.63, b: 100, v: '13 → 63' },
+          { label: 'Claude', a: 0, b: 0, v: '0 → 0', red: true },
+        ],
+        axis: ['0', '63'],
+        note: '332 probes per wave. LLM judges matched blind human labels on 3/40 and 12/40, so the taxonomy is reported as bands.',
+      },
+    },
+    'decisions-api-legal-quiz': {
+      bv: '88% · n = 544',
+      big: '88%',
+      unit: 'right at 90% stated confidence · n = 544',
+      fig: {
+        cap: ['Said vs right', 'axis zoomed'],
+        rows: [{ label: '90% said → 88% right', a: 50, b: 40, v: '88%', red: true }],
+        axis: ['80%', '100%'],
+      },
+    },
+  } as Record<string, PipelineBuildRow>,
+};
+
+// ---------------------------------------------------------------------------
 // /design/ · how this site is built, and why (Red Pen 5, 19 Nov 2026)
 // ---------------------------------------------------------------------------
 
@@ -991,6 +1380,479 @@ export const designComponents = {
   buttons: { primary: 'Book a call', secondary: 'See the builds', inverse: 'Read the method' },
   onPaper: 'On paper',
   onInk: 'On ink',
+};
+
+// ---------------------------------------------------------------------------
+// The Pipeline (20 Nov 2026): /design/ and /design/components/ strings. The rules are in
+// design/README.md; this is the page that renders them. Values shown on the page are read
+// live from design/tokens.css, not typed here.
+// ---------------------------------------------------------------------------
+
+export const pipelineDesign = {
+  kicker: 'Design system',
+  h1: 'One system, one red line.',
+  byline: ['The Pipeline', '20 Nov 2026', 'Dark and light', 'Replaces Red Pen 5'],
+  stats: [
+    { v: '12', u: 'colour roles shown', s: 'design/tokens.css' },
+    { v: '2', u: 'typefaces', s: 'Archivo · IBM Plex Mono' },
+    { v: '5', u: 'kinds of motion', s: 'nothing else moves' },
+  ],
+  files: {
+    caption: 'Where it lives',
+    cols: ['File', 'Holds'],
+    rows: [
+      ['design/tokens.css', 'Every value: colour primitives and roles, type scale, space, lines, motion. Dark by default; the light theme re-points the primitives.'],
+      ['src/styles/ds.css', 'The kit: every class on this page, global on every route.'],
+      ['src/scripts/ds.ts', 'The runtime: nav, theme toggle, anchors, reveals, spines, verbs, swap(). GSAP and ScrollTrigger from npm.'],
+      ['design/README.md', 'The rules and the history. This page renders them.'],
+    ],
+  },
+  principles: {
+    kicker: '§1 First principles',
+    h2: 'The site performs the checking.',
+    items: [
+      { h: 'The subject is the pipeline, not the pen.', p: 'Output flows Prompt, Retrieve, Draft, Check, Ship; most of it passes, some is caught. The home page shows that flow live.' },
+      { h: 'Numbers are the proof.', p: 'Every claim is a reading with a unit and a source, revealed whole. Labels over sentences.' },
+      { h: 'One red line.', p: 'Red is the reviewer\'s line: the CTA, the rule that opens a block, the arrow from before to after, a failure, the spine. Never body text, never a whole heading.' },
+    ],
+  },
+  colour: {
+    kicker: '§2 Colour',
+    h2: 'Graphite, paper ink, one red.',
+    sub: 'Two themes, one set of tokens. Components read colour roles (--color-*), never the primitives. Values are read live from design/tokens.css for the theme you are in; switch it in the header. Click a swatch to copy its token.',
+    swatches: [
+      { tok: '--color-surface', r: 'page ground' },
+      { tok: '--color-surface-sunk', r: 'figure ground' },
+      { tok: '--color-surface-raised', r: 'hover fill' },
+      { tok: '--color-panel', r: 'cards' },
+      { tok: '--color-line', r: 'rules inside a block' },
+      { tok: '--color-line-strong', r: 'borders, tracks' },
+      { tok: '--color-text-muted', r: 'labels, sources' },
+      { tok: '--color-text-body', r: 'body text' },
+      { tok: '--color-text', r: 'headings, values' },
+      { tok: '--color-accent', r: 'the pen: act and mark' },
+      { tok: '--color-accent-tint', r: 'hover wash' },
+      { tok: '--color-on-accent', r: 'text on red' },
+    ],
+    copied: 'Copied',
+    copyLabel: 'Copy',
+  },
+  type: {
+    kicker: '§3 Type',
+    h2: 'Width and weight carry emphasis.',
+    sub: 'Archivo is one variable file with two axes. Drag the pad, use the sliders, or pick a role.',
+    specTl: 'Archivo · variable',
+    specTr: 'wdth 62 to 125 · wght 100 to 900',
+    specBl: 'font-variation-settings',
+    word: 'Shipped',
+    wordDot: '.',
+    padLabel: 'Width and weight pad. Arrow keys move it.',
+    padNarrow: '← narrow',
+    padWide: 'wide →',
+    padHeavy: 'heavy ↑',
+    width: 'Width',
+    weight: 'Weight',
+    rolesLabel: 'Type roles',
+    presets: [
+      { label: 'Display', w: 88, g: 800 },
+      { label: 'h3', w: 84, g: 760 },
+      { label: 'Verb at rest', w: 100, g: 620 },
+      { label: 'Before reveal', w: 62, g: 200 },
+    ],
+    voices: [
+      { who: 'Me · Archivo', sample: 'Ship the check with the workflow.', note: 'Claims, headings, body. Width and weight carry emphasis; never italic headings.' },
+      { who: 'The check · IBM Plex Mono', sampleA: 'citation_check: ', sampleB: 'no such case', note: 'Verdicts, labels, data and sources. Uppercase only for short labels.' },
+    ],
+    sizeAt: 'px at this width',
+    ladder: [
+      { cls: 'display', text: 'I ship AI workflows', meta: '.display', tok: '--t-display', axes: 'wdth 88 · wght 800' },
+      { cls: 'h2', text: 'Then it ships.', meta: '.h2', tok: '--t-h2', axes: 'wdth 84 · wght 800' },
+      { cls: 'h3', text: 'Prompting bought precision.', meta: '.h3', tok: '--t-h3', axes: 'wdth 84 · wght 760' },
+      { cls: 'h4', text: 'Every claim carries a citation.', meta: '.h4', tok: '--t-h4', axes: 'wdth 90 · wght 700' },
+      { cls: 'ro', text: '0.981 → 0.994', meta: '.ro .v', tok: '--t-num', axes: 'wdth 90 · wght 780' },
+      { cls: 'prose', text: 'Prompting discipline buys precision. It cannot buy recall.', meta: '.prose', tok: '--t-prose', axes: 'line-height 1.62 · 64ch' },
+      { cls: 'lab', text: 'Mono label · source line', meta: '.lab', tok: '--t-label', axes: 'floor · tracking .12em' },
+    ],
+  },
+  components: {
+    kicker: '§4 Components',
+    h2: 'Every component, live.',
+    sub: 'The same markup the pages use, from src/styles/ds.css. Hover, focus, click.',
+    catalogue: { label: 'The full catalogue', href: '/design/components/' },
+    buttons: { label: 'Buttons and links', primary: 'Email me', ghost: 'Secondary', link: 'Text link', cls: '.btn · .btn.ghost · .tl pen-drawn underline' },
+    tags: { label: 'Tags and chips', tags: ['Eval harness', 'Guarded', 'New'], chip: 'Click any output to trace it', cls: '.tag · .tag.red · .tag.solid · .chip[aria-pressed]' },
+    card: {
+      label: 'Readout card',
+      top: ['04', 'Check', 'Measured'],
+      h3: 'The check gets checked.',
+      ros: [
+        { v: '86 / 167', u: 'failed a check', s: 'audit sheet' },
+        { v: '15 / 15', u: 'judge vs blind human', s: 'CrossSource' },
+        { v: '3 · 12 / 40', u: 'judges vs blind human', s: 'mirror-eval' },
+      ],
+      cls: '.card > .card-top + h3 + .ros > .ro (.v .u .s) · title plus readouts, no paragraphs',
+    },
+    hud: {
+      label: 'HUD bar',
+      cells: [
+        { l: 'Postings', v: '21' },
+        { l: 'Screeners', v: '2' },
+        { l: 'Calls', v: '885' },
+        { l: 'Reps', v: '5' },
+        { l: 'Failed', v: '18', small: '/ 42', red: true },
+      ],
+      cls: '.hud > .hud-in > .hud-c · live values change through swap()',
+    },
+    list: {
+      label: 'List rows · builds and writing',
+      rows: [
+        { name: 'CrossSource', kind: 'Eval harness', value: '0.981 → 0.994', href: '/crosssource/' },
+        { name: 'screener-eval', kind: 'Eval harness', value: '885 calls', href: '/screener-eval/' },
+      ],
+      cls: 'ol.blist > li > a.build (.bn .bk2 .bv .ba) · the row fills and gains weight on hover',
+    },
+    verbs: {
+      label: 'Verbs row',
+      items: [
+        { n: '01', h: 'Measured', b: '15/15', t: ' judge vs blind human' },
+        { n: '02', h: 'Traced', b: 'doc ID + sub-type', t: ' on every cite' },
+        { n: '03', h: 'Guarded', b: 'TradeFrame', t: ' · AI proposes, code decides' },
+        { n: '04', h: 'Shipped', b: '10-15 min → under 1', t: '' },
+      ],
+      cls: 'ul.verb-row > li.verb · a weight wave when the row arrives, once. Labels, not links.',
+    },
+    table: {
+      label: 'Table · booktabs',
+      caption: 'Table 1 · baseline vs strict · CrossSource v0.1',
+      cols: ['Dimension', 'Baseline', 'Strict'],
+      rows: [
+        ['Citation precision', '0.981', '0.994', true],
+        ['Citation recall', '0.760', '0.760', false],
+        ['Faithfulness', '1.000', '1.000', false],
+      ] as [string, string, string, boolean][],
+      cls: '.tbl-wrap > table.tbl · td.n numeric · td.win the better value, in red',
+    },
+  },
+  motion: {
+    kicker: '§5 Motion',
+    h2: 'Five kinds. Nothing else moves.',
+    sub: 'Every page is finished in the HTML. Motion starts from it; reduced motion keeps it still. Demos loop only while on screen.',
+    demos: [
+      { kind: 'reveal', t: 'Fade', d: '1100 ms · power2 out', r: 'Headings and blocks fade up 10px as one line. No word pops.' },
+      { kind: 'number', t: 'Number', d: '600 ms', r: 'Revealed whole with a soft fade. Never counted up.' },
+      { kind: 'swap', t: 'Swap', d: '220 ms tick', r: 'A live value changes instantly, with an opacity tick. No empty frames.' },
+      { kind: 'draw', t: 'Draw', d: '800 ms · scrubbed spines', r: 'The red pen draws underlines, rules and the spine.' },
+      { kind: 'hover', t: 'Hover', d: '600 ms · expo out', r: 'Rows fill and take a red edge; the arrow nudges. Buttons stay still.' },
+      { kind: 'curve', t: '--ease-out', d: 'cubic-bezier(.16, 1, .3, 1)', r: 'Expo out for entrances and hovers. Exits use --ease-in and finish first.' },
+    ],
+    reveal: 'Then it ships.',
+    number: '0.994',
+    swapKeys: [['baseline', '0.981'], ['strict', '0.994']],
+    swapLabels: ['Config', 'Precision'],
+    drawWord: 'checks',
+    hoverRow: 'CrossSource',
+    curveLabel: 'Easing curve cubic-bezier(.16,1,.3,1)',
+    hooks: {
+      caption: 'Hooks · src/scripts/ds.ts',
+      cols: ['Hook', 'Motion'],
+      rows: [
+        ['.split · [data-split]', 'The heading fades up 10px, once. No per-word or per-letter motion.'],
+        ['[data-reveal] · [data-stagger]', 'A block, or its children in sequence, fade up 8 to 10px.'],
+        ['[data-num]', 'A number appears whole: opacity and a 6px rise, never a count.'],
+        ['.spine', 'Scales down its section with scroll, latched: it never shrinks.'],
+        ['.verb-row', 'One time-based variable-weight wave when the row arrives, settling at 620.'],
+        ['swap(el, value)', 'A live digit changes instantly with a 220 ms opacity tick.'],
+      ],
+    },
+    durations: {
+      caption: 'Durations · tokens',
+      cols: ['Token', 'Value', 'Use'],
+      rows: [
+        ['--dur-fast', '180 ms', 'colour and border changes'],
+        ['--dur-base', '300 ms', 'hovers, card entrances'],
+        ['--dur-slow', '800 ms', 'draws, weight morphs'],
+      ],
+    },
+  },
+  copy: {
+    kicker: '§6 Copy rules',
+    h2: 'The copy gets checked too.',
+    inputLabel: 'Write a headline',
+    sample: 'Then it ships. Then I count.',
+    rules: [
+      'No em dashes. A colon, comma or full stop.',
+      'Labels over sentences. Hero 12 words, headlines 8.',
+      'Every number carries its unit and source.',
+      'No exclamation marks. No self-grading adjectives.',
+      'TradeFrame is guarded automation, never an agent.',
+    ],
+    checksLabel: 'Checks, live',
+    checks: [
+      { k: 'words', l: 'Headline: 8 words max' },
+      { k: 'dash', l: 'No em dash' },
+      { k: 'bang', l: 'No exclamation mark' },
+      { k: 'grade', l: 'No self-grading adjective' },
+      { k: 'agent', l: 'TradeFrame is not an agent' },
+    ],
+    graded: 'Graded words checked: rigorous, world-class, deep, expert, leading, pioneer.',
+    flagged: 'flagged',
+    ok: 'ok',
+  },
+  versions: {
+    kicker: '§7 Previous versions',
+    h2: 'Five passes, one pen.',
+    sub: 'Each specimen is drawn from that version\'s own palette and faces, not a screenshot. Dates come from the site\'s git history and design/README.md; a version with no archived page shows no link.',
+    now: 'Current',
+    items: [
+      {
+        no: '01',
+        name: 'The Red Pen 1.0',
+        when: '3 Aug 2026',
+        idea: 'Paper, ink and one red pen.',
+        rest: ' A page that reads like a typeset document a reviewer has marked up. Three faces, self-hosted.',
+        src: 'Source: first commit, "The Red Pen v1.0", 3 Aug 2026',
+        links: [{ label: 'See it on the Wayback Machine ↗', href: 'https://web.archive.org/web/20260818040206/https://www.zoebnomi.com/' }],
+        spec: {
+          bg: '#f4f1ea', ink: '#191713', ink2: '#3b362e', red: '#be241f', rule: '#d5cfc2',
+          face: "'Instrument Serif',Georgia,serif", body: "'IBM Plex Sans',sans-serif",
+          head: 'Paper, ink and one ', mark: 'red pen', tail: '.',
+          line: 'Instrument Serif · IBM Plex Sans · IBM Plex Mono',
+          sw: ['#f4f1ea', '#191713', '#3b362e', '#d5cfc2', '#be241f'],
+          keys: ['paper', 'ink', 'body', 'rule', 'red'],
+        },
+      },
+      {
+        no: '02',
+        name: 'The Red Pen, design pass',
+        when: '7 Sep to 8 Oct 2026',
+        idea: 'The system written down.',
+        rest: ' A design pass, then the design system and evals ledger, then DESIGN.md as the one reference: light only, square, three line tiers, red only for annotation.',
+        src: 'Source: commits "v2-design-pass" (7 Sep), "PR2: design system + evals ledger" (29 Sep), DESIGN.md (8 Oct)',
+        links: [{ label: 'See it on the Wayback Machine ↗', href: 'https://web.archive.org/web/20261008180302/https://www.zoebnomi.com/' }],
+        spec: {
+          bg: '#faf8f3', ink: '#191713', ink2: '#6d675e', red: '#a91515', rule: '#b8b1a0',
+          face: "'Instrument Serif',Georgia,serif", body: "'IBM Plex Sans',sans-serif",
+          head: 'Every number is a ', mark: 'reading', tail: '.',
+          line: 'Same faces · weight never above 500 · radius 0',
+          sw: ['#f4f1ea', '#faf8f3', '#191713', '#b8b1a0', '#a91515'],
+          keys: ['paper', 'raised', 'ink', 'rule', 'red ink'],
+        },
+      },
+      {
+        no: '03',
+        name: 'The Red Pen, editorial ledger (v3)',
+        when: '12 Nov 2026',
+        idea: 'A ledger with an editor\'s pen on it.',
+        rest: ' Horizontal rules only, one display moment on the home page, four nav items at every width. v4, on 19 Nov, cut its volume and was rejected: it edited the page but did not evolve the system.',
+        src: 'Source: PR #32 "v3 revamp: Hybrid 1", 12 Nov 2026; design/README.md history',
+        links: [],
+        spec: {
+          bg: '#f4f1ea', ink: '#191713', ink2: '#6d675e', red: '#be241f', rule: '#b8b1a0',
+          face: "'Instrument Serif',Georgia,serif", body: "'IBM Plex Sans',sans-serif",
+          head: 'LLM products fail ', mark: 'quietly.', tail: '',
+          line: 'Instrument Serif display · 12px floor everywhere',
+          sw: ['#f4f1ea', '#191713', '#6d675e', '#b8b1a0', '#be241f'],
+          keys: ['paper', 'ink', 'muted', 'rule', 'red'],
+        },
+      },
+      {
+        no: '04',
+        name: 'Red Pen 5, "Live Ink"',
+        when: '19 Nov 2026 · live until 20 Nov',
+        idea: 'The pen became an actor on paper.',
+        rest: ' The home page opened on a live audit: a model answer and a pen that checks it. Three voices (Archivo, Source Serif 4, IBM Plex Mono), two surfaces (paper and ink), five kinds of motion.',
+        src: 'Source: PR #33 "Red Pen 5 redesign", 19 Nov 2026; PR #34 "Harness panel reads the live agent ledger", 20 Nov 2026',
+        links: [],
+        spec: {
+          bg: '#f4f1ea', ink: '#15130f', ink2: '#37322b', red: '#e0371f', rule: '#c4bdad',
+          face: "'Archivo',sans-serif", body: "'Source Serif 4',Georgia,serif",
+          fvs: "'wdth' 88,'wght' 800",
+          head: 'Checked, and it ', mark: 'holds', tail: '.',
+          line: 'Archivo · Source Serif 4 · IBM Plex Mono',
+          sw: ['#f4f1ea', '#15130f', '#37322b', '#c4bdad', '#e0371f'],
+          keys: ['paper', 'ink', 'body', 'rule', 'red pen'],
+        },
+      },
+      {
+        no: '05',
+        name: 'The Pipeline',
+        when: '20 Nov 2026 · this site',
+        idea: 'One system, one red line.',
+        rest: ' Graphite ground, paper ink, a variable face whose width and weight carry emphasis. Dark by default, light on request.',
+        src: 'Source: design/tokens.css, src/styles/ds.css, src/scripts/ds.ts',
+        links: [{ label: 'The tokens', href: '#colour' }],
+        now: true,
+        spec: {
+          bg: 'var(--color-surface)', ink: 'var(--color-text)', ink2: 'var(--color-text-muted)', red: 'var(--color-accent)', rule: 'var(--color-line-strong)',
+          face: "'Archivo',sans-serif", body: "'IBM Plex Mono',monospace",
+          fvs: "'wdth' 88,'wght' 800",
+          head: 'One system, one ', mark: 'red line', tail: '.',
+          line: 'Archivo variable · IBM Plex Mono',
+          sw: ['var(--color-surface)', 'var(--color-text)', 'var(--color-text-muted)', 'var(--color-line-strong)', 'var(--color-accent)'],
+          keys: ['surface', 'text', 'muted', 'line', 'accent'],
+        },
+      },
+    ],
+  },
+  templates: {
+    kicker: '§8 Page templates',
+    h2: 'One order per page.',
+    cols: ['Page', 'Order'],
+    rows: [
+      { label: 'Home', href: '/', order: 'Hero scene → Shipped before and after → verbs → harness → Builds → About → contact' },
+      { label: 'Builds', href: '/builds/', order: 'Page head with stats → systems → eval harnesses → method → contributions → shipping numbers' },
+      { label: 'Writing', href: '/writing/', order: 'Page head → essays → notes' },
+      { label: 'Essay, note', href: '/writing/decisions-api-legal-quiz/', order: 'Page head with byline → audio → prose and margin → footnotes → related' },
+      { label: 'Case study', href: '/crosssource/', order: 'Page head and spec strip → headline result → prose with tables and figures → method → repo' },
+      { label: 'About', href: '/about/', order: 'Page head with headshot → belief → career track → verbs → builds → contact' },
+    ],
+    cta: { label: 'Open the kit', href: '/design/components/' },
+    about: { label: 'About the author', href: '/about/' },
+  },
+};
+
+/** /design/components/: the kit rendered, class names beside each piece. */
+export const pipelineKit = {
+  kicker: 'Design system',
+  h1: 'Every component, once.',
+  byline: ['Kit', 'The Pipeline', '20 Nov 2026'],
+  back: { label: 'How this site is built', href: '/design/' },
+  stats: [
+    { v: '0.981 → 0.994', u: 'citation precision', s: 'CrossSource · n = 25' },
+    { v: '885', u: 'scored calls', s: 'screener-eval' },
+    { v: '86 / 167', u: 'failed a check', s: 'audit sheet' },
+  ],
+  classes: {
+    pageHead: 'section.page-head > .kick + h1.display + .byline + .stats > .ro',
+    type: '.id · .display · .h3 · .h4 · .lab · .lab.red · .mk > .ul · .btn · .btn.ghost · .tl · .tag · .chip',
+    cards: 'ol.cards > li.card > .card-top (.no) + h3 + .ros[.n2] > .ro > .v + .u + .s',
+    panel: 'section.sec.spined > .spine + article.panel',
+    verbs: 'ul.verb-row > li.verb > .vn + h3 + .vp',
+    blist: 'ol.blist > li > a.build > .bn + .bk2 + .bv + .ba',
+    hud: '.hud > .hud-in > .hud-c > span + b',
+    article: '.article > .prose + aside.margin-note',
+  },
+  type: {
+    kicker: 'Type',
+    h2: 'Headlines fade in as one line.',
+    id: 'AI product manager · Instead · Bengaluru',
+    displayPre: 'I ship AI workflows with the ',
+    displayMark: 'checks',
+    displayPost: ' built in.',
+    h3: 'h3: case section title',
+    h4: 'h4: card or sub-section title',
+    lab: 'Mono label',
+    labRed: 'Red label marks, never speaks',
+    primary: 'Email me',
+    secondary: 'Secondary',
+    link: 'Text link',
+    tags: ['Eval harness', 'Guarded', 'New'],
+    chip: 'Click any output to trace it',
+  },
+  cards: {
+    kicker: 'Readout cards',
+    h2: 'Title plus readouts, nothing else.',
+    items: [
+      {
+        top: ['03', 'Draft', 'Traced'],
+        h3: 'Every claim carries a citation.',
+        cols: 2,
+        ros: [
+          { v: '0.981 → 0.994', u: 'citation precision', s: 'CrossSource · n = 25' },
+          { v: '3 → 1', u: 'wrong-passage cites', s: 'strict prompting' },
+        ],
+      },
+      {
+        top: ['04', 'Check', 'Measured'],
+        h3: 'The check gets checked.',
+        cols: 3,
+        ros: [
+          { v: '86 / 167', u: 'failed a check', s: 'audit sheet' },
+          { v: '15 / 15', u: 'judge vs blind human', s: 'CrossSource' },
+          { v: '3 · 12 / 40', u: 'judges vs blind human', s: 'mirror-eval' },
+        ],
+      },
+    ],
+  },
+  panel: {
+    kicker: 'Shipped',
+    h2: 'Then it ships. Then I count.',
+    ph: ['01 / 03', 'Instead · production'],
+    pt: 'Same tax workflow, under a minute.',
+    how: [
+      ['Before', '10-15 min'],
+      ['After', 'under 1 min'],
+      ['Where', 'multi-step tax workflow'],
+    ],
+    srcl: 'Instead · AI-native tax research',
+    before: '10-15 min',
+    after: 'under 1 min',
+    beforeLabel: 'before',
+    afterLabel: 'after',
+    cap: ['Run time · min', 'production'],
+    figure: 'Page-specific visual goes here (svg or canvas).',
+  },
+  verbs: {
+    kicker: 'How I work',
+    h2: 'Every workflow gets all four.',
+    items: [
+      { n: '01', h: 'Measured', b: '15/15', t: ' judge vs blind human · CrossSource' },
+      { n: '02', h: 'Traced', b: 'doc ID + sub-type', t: ' on every cite · Instead' },
+      { n: '03', h: 'Guarded', b: 'TradeFrame', t: ' · hard rails · kill switch' },
+      { n: '04', h: 'Shipped', b: '10-15 min → under 1', t: ' · Instead' },
+    ],
+  },
+  builds: {
+    kicker: 'Builds',
+    h2: 'Built in the open.',
+    rows: [
+      { name: 'TradeFrame', kind: 'Guarded automation', value: 'AI proposes · code decides', href: '/builds/' },
+      { name: 'CrossSource', kind: 'Eval harness', value: '0.981 → 0.994', href: '/crosssource/' },
+      { name: 'screener-eval', kind: 'Eval harness', value: '885 calls', href: '/screener-eval/' },
+    ],
+  },
+  hud: {
+    kicker: 'HUD bar',
+    cells: [
+      { l: 'Postings', v: '21' },
+      { l: 'Screeners', v: '2' },
+      { l: 'Calls', v: '885', swap: true },
+      { l: 'Reps', v: '5' },
+      { l: 'Failed a check', v: '18', small: '/ 42', red: true },
+    ],
+    swapTo: '886',
+  },
+  longform: {
+    kicker: 'Essay · note · case study',
+    h2: 'Prose holds a 64ch measure.',
+    byline: ['Zoeb Nomi', 'Essay', '8 min'],
+    p1a: 'Prompting discipline buys precision. It cannot buy recall: ',
+    p1num: '0.760',
+    p1b: ' in both configurations, because every missing-authority failure traces to retrieval.',
+    h2sec: ['§3', 'Findings'],
+    p2a: 'Knowing ',
+    p2strong: 'which layer owns the failure',
+    p2b: ' is the point of separating the metrics. Inline ',
+    p2code: 'doc_id:chunk_id',
+    p2c: ' stays mono.',
+    quote: 'An unvalidated eval reports wrong numbers with full confidence.',
+    list: ['Instrument the pipeline', 'Validate the judge externally'],
+    table: {
+      caption: 'Table 1 · baseline vs strict',
+      cols: ['Dimension', 'Baseline', 'Strict'],
+      rows: [
+        ['Citation precision', '0.981', '0.994', true],
+        ['Citation recall', '0.760', '0.760', false],
+        ['Faithfulness', '1.000', '1.000', false],
+      ] as [string, string, string, boolean][],
+    },
+    fig: { body: 'Figure body: svg, canvas or image', no: 'Fig. 1', cap: 'Citation precision by configuration', src: 'CrossSource v0.1, Table 1 · n = 25' },
+    code: 'python run_eval.py --config strict',
+    footnote: 'CrossSource v0.1, Table 2.',
+    fnLabel: 'Back to text',
+    margin: 'Margin note: one fact or link at most.',
+  },
+  cta: { kicker: 'Contact', h2: 'Facing a problem that has to be right? Talk to me.' },
 };
 
 // ---------------------------------------------------------------------------
@@ -1632,6 +2494,365 @@ export const screenerEval = {
   },
 
   ctaSlabBody: 'Read the code, run it on your own résumé',
+};
+
+// ---------------------------------------------------------------------------
+// THE PIPELINE, CASE STUDIES (builder C). Strings the prototype added around the
+// three case-study bodies above: heads, short deks, method strips, figure labels,
+// limits and rules lists, link rows. The long prose (s1 to s8 above) is kept whole
+// and rendered in the prototype's layout; numbers here come from the same tables.
+// `marks` are substrings that the template sets in bold.
+// ---------------------------------------------------------------------------
+
+export const pipelineCaseStudies = {
+  shared: {
+    tabsLabel: 'Eval harnesses',
+    ext: '↗',
+    arrow: '→',
+    related: 'Related',
+    methodDetail: 'Method in full',
+    contactKick: 'Contact',
+    emailMe: 'Email me',
+    fromTo: 'Wave 1 → Wave 2',
+    figNo: 'Fig.',
+    placeholderNote: 'The spans drawn are placeholders, not real answer text.',
+  },
+
+  crosssource: {
+    kick: 'Eval harness · legal RAG',
+    h1: 'Does the cited opinion support the claim?',
+    findMarks: ['0.981 to 0.994', '0.760'],
+    stats: [
+      { v: '0.981 → 0.994', u: 'citation precision', s: 'v0.1 · n = 25' },
+      { v: '0.760', u: 'citation recall, both prompts', s: 'capped by retrieval' },
+      { v: '15 / 15', u: 'judge vs hand-grade', s: 'blind, stratified' },
+    ],
+    hud: [
+      { label: 'Items', v: '150' },
+      { label: 'Opinions', v: '45' },
+      { label: 'Topics', v: '15' },
+      { label: 'Rater kappa', v: '0.98', small: '/ 0.84' },
+      { label: 'Released', v: '20 Oct 2026', small: 'v0.3' },
+    ],
+    why: { kick: '§1 · Why', h2: 'Invented citations get lawyers sanctioned.' },
+    method: {
+      kick: '§2 · Method',
+      h2: 'Five stages, question to verdict.',
+      dek: 'v0.1 pipeline: two configurations, baseline (citation formatting only) and strict (explicit citation-discipline rules).',
+      dekMarks: ['baseline', 'strict'],
+      steps: [
+        { h: 'Golden set', t: '25 human-authored questions · verified ground-truth chunks', m: ['25'] },
+        { h: 'Corpus', t: '22 public-domain US opinions · 16 Supreme Court, 2 federal circuit, 4 state · ~350-word chunks', m: ['22'] },
+        { h: 'Retrieve', t: 'BM25 · top-5', m: ['BM25'] },
+        { h: 'Generate', t: 'Claude · mandatory inline doc_id:chunk_id cites', m: ['doc_id:chunk_id'] },
+        { h: 'Judge', t: 'claim-level precision, recall, faithfulness, relevance · LLM judge, validated by hand', m: ['validated by hand'] },
+      ],
+    },
+    findings: {
+      kick: '§3 · Findings',
+      h2: 'Prompting bought precision, not recall.',
+      dek: 'Flip the prompt. Precision and wrong-passage failures move. Recall and missing authority do not: they belong to retrieval.',
+      dekMarks: ['retrieval'],
+      fig: {
+        title: 'Which layer owns the failure',
+        toggleLabel: 'Prompt configuration',
+        base: 'Baseline',
+        strict: 'Strict',
+        gaugeAria: 'Citation precision gauge, 0.970 to 1.000. Baseline 0.981, strict 0.994.',
+        axisLo: '0.970',
+        axisHi: '1.000',
+        axisNote: 'axis starts at 0.970',
+        gaugeLabel: 'Citation precision',
+        stripLabel: 'Failures · one square each',
+        totals: { base: 'failures · baseline', strict: 'failures · strict' },
+        legend: [
+          { k: 'r', t: 'wrong passage · prompt' },
+          { k: 'f', t: 'missing authority · retrieval' },
+          { k: '', t: 'absent under strict' },
+        ],
+        bars: [{ sub: 'tied to the prompt', red: true }, { sub: 'traces to retrieval' }, {}, {}] as { sub?: string; red?: boolean }[],
+        ro: [
+          { u: 'citation recall', s: 'unchanged · retrieval cap' },
+          { u: 'faithfulness', s: 'both prompts' },
+          { u: 'answer relevance', s: 'baseline' },
+          { u: 'wrong-passage cites', s: 'baseline → strict' },
+        ],
+        foot: ['CrossSource v0.1, Tables 2 and 3 · n = 25', 'Toggle the prompt: only the prompt changes'],
+      },
+    },
+    judge: {
+      kick: '§4 · The judge',
+      h2: 'Checking the judge exposed a bug.',
+      hint: '5 steps · click through',
+      stepsAria: 'Harness steps',
+      calloutLabel: 'The lesson',
+      failure: 'failure',
+      spanWords: { claim: 'claim', cite: '[cite]', punct: '.' },
+    },
+    limits: {
+      kick: '§5 · Limits',
+      h2: 'What the numbers cannot carry.',
+      items: [
+        { b: 'n = 25.', t: 'The v0.1 finding rests on 25 questions over 22 opinions.' },
+        { b: 'Table 1 is a sanity run', t: 'on a 30-item v0.3 sample, not a full run.' },
+        { b: 'No human labelled every item.', t: 'v0.3 items are model-drafted and model-checked.' },
+        { b: 'Adjudication covers 30 items:', t: 'every disagreement plus a 10% audit. 27 of 30 matched.' },
+      ],
+    },
+    rules: { kick: '§6 · For any agent step', h2: 'The same discipline, anywhere.' },
+    code: {
+      kick: '§7 · Code and data',
+      links: [
+        { bn: 'Repository', bk: 'github.com/zoeb-nomi', bv: 'crosssource ↗' },
+        { bn: 'v0.3 release notes', bk: 'Release', bv: '20 Oct 2026 ↗' },
+        { bn: 'DOI, v0.3', bk: 'Zenodo', bv: '10.5281/zenodo.23493797 ↗' },
+        { bn: 'DOI, all versions', bk: 'Zenodo', bv: '10.5281/zenodo.21969577 ↗' },
+      ],
+      related: [
+        { bn: "The judge caught a bug I didn't", bk: 'Essay', bv: 'zoebnomi.com', href: '/writing/the-judge-caught-a-bug/' },
+        { bn: 'mirror-eval', bk: 'Eval harness', bv: 'same method, AI search', href: '/mirror-eval/' },
+        { bn: 'screener-eval', bk: 'Eval harness', bv: 'same counting, no judge', href: '/screener-eval/' },
+      ],
+    },
+  },
+
+  mirrorEval: {
+    kick: 'Eval harness · AI search',
+    h1: 'What four AI engines say about a person.',
+    findMarks: ['13 → 63 of 63', '0 → 0'],
+    stats: [
+      { v: '13 → 63', u: 'Perplexity · of 63 probes', s: 'owned citations' },
+      { v: '0 → 0', u: 'Claude · of 63 probes', s: 'a true null at four weeks' },
+      { v: '3 · 12 / 40', u: 'judges vs blind human', s: 'exact tag set' },
+    ],
+    hud: [
+      { label: 'Engines', v: '4' },
+      { label: 'Probes', v: '332', small: 'per wave' },
+      { label: 'Waves', v: '2', small: '6 Aug · 4 Sep' },
+      { label: 'Judge failed', v: '3/40 · 12/40', red: true },
+      { label: 'Release', v: 'v1.0' },
+    ],
+    why: { kick: '§1 · Why', h2: 'They ask the engine before you.' },
+    method: {
+      kick: '§2 · Method',
+      h2: 'Two waves, one frozen battery.',
+      dek: 'Built to the CrossSource method: explicit ground truth, a failure taxonomy, a judge measured against a human, and limits stated.',
+      dekMarks: [],
+      steps: [
+        { h: 'Canon', t: 'canon.yaml · true claims, stale claims, clean and poisoned sources · the only file with facts', m: ['canon.yaml'] },
+        { h: 'Battery', t: '83 probes per engine per wave · 63 search, 20 knowledge · from facets, repeated', m: ['83'] },
+        { h: 'Engines', t: "ChatGPT, Claude, Perplexity, Gemini · each provider's own API and retrieval", m: ['own API'] },
+        { h: 'Two waves', t: 'Baseline 6 Aug · lift 4 Sep · six fixes landed 7 to 20 Aug as one cluster', m: ['6 Aug', '4 Sep'] },
+        { h: 'Count', t: 'Which surfaces each engine cited · judge-free', m: ['judge-free'] },
+        { h: 'Judge', t: 'Two model families tag a claim-failure taxonomy · checked on 40 blind human labels', m: ['40'] },
+      ],
+    },
+    findings: {
+      kick: '§3 · Findings',
+      h2: 'Same fixes, opposite outcomes.',
+      dek: 'Probes citing my site or repo, of 63 search probes per engine. Switch waves.',
+      dekMarks: ['63'],
+      fig1: {
+        title: 'Every engine, every search probe',
+        toggleLabel: 'Wave',
+        w1: 'Wave 1 · 6 Aug',
+        w2: 'Wave 2 · 4 Sep',
+        legend: [
+          { k: 'f', t: 'cited in Wave 1' },
+          { k: 'r', t: 'new in Wave 2' },
+          { k: '', t: 'no owned citation' },
+        ],
+        foot: ['Table 1, owned (site or repo) column', 'Squares grouped by outcome, not probe id'],
+      },
+      fig2: {
+        title: 'What filled the gap',
+        legend: [
+          { k: '', t: 'Wave 1' },
+          { k: 'f', t: 'Wave 2' },
+        ],
+        scale: 'scale 0 to',
+        foot: ['Table 2 · each group has its own scale', 'Wave 1 → Wave 2'],
+      },
+      calloutLabel: 'The finding that matters',
+    },
+    judge: {
+      kick: '§4 · The judge',
+      h2: 'This judge failed its check.',
+      hint: 'Hover a judge. Filled squares agreed with the blind human label. When the judge fails, the kind of number changes.',
+      fig: {
+        title: 'The judges against a blind human',
+        legend: [
+          { k: 'f', t: 'matched the human' },
+          { k: '', t: 'did not match' },
+        ],
+        rows: [
+          { j: 'claude', name: 'Claude judge', compared: 'exact tag set vs 40 blind human labels', verdict: 'failed the check', bad: true, lad: 'band' },
+          { j: 'gemini', name: 'Gemini judge', compared: 'exact tag set vs 40 blind human labels', verdict: 'failed the check', bad: true, lad: 'band' },
+          { j: 'xs', name: 'CrossSource judge', sub: 'a different test', compared: 'citation-precision verdict vs a blind hand-grade (a different test)', verdict: 'passed: its numbers can be cited', bad: false, lad: 'count' },
+          { j: 'pair', name: 'Judge vs judge', sub: 'Claude and Gemini', compared: 'Claude and Gemini tag sets on the same answers', verdict: 'no basis for a rate', bad: true, lad: 'band' },
+        ],
+        readout: 'Readout',
+        dts: ['Compared', 'Result', 'Verdict'],
+        results: { matched: 'matched', agreed: 'agreed' },
+        ladder: [
+          { k: 'count', b: 'Counted', t: 'which surfaces were cited · judge-free · point counts' },
+          { k: 'band', b: 'Judged', t: 'taxonomy categories · bands only, never rates' },
+          { k: 'canon', b: 'Computed against canon', t: 'poisoned_citation · 27% → 19%' },
+        ],
+        foot: ['Squares grouped by outcome, not label order', 'Ten repeats of one prompt changed the tag set 86% of the time'],
+      },
+      calloutLabel: 'What changed',
+    },
+    predictions: {
+      kick: '§5 · Predictions, scored',
+      h2: 'Eleven calls, committed before Wave 1.',
+      bodyMarks: ['The misses changed the roadmap more than the hits did.'],
+      list: [
+        { k: 'f', n: '4', t: 'hit', small: 'one tied' },
+        { k: 'half', n: '1', t: 'partly held' },
+        { k: 'h', n: '1', t: 'inconclusive' },
+        { k: 'r', n: '3', t: 'missed' },
+        { k: 'dim', n: '2', t: 'could not be tested' },
+      ],
+    },
+    limits: { kick: '§6 · Limits', h2: 'What the numbers cannot carry.', marks: ['Engine versions', 'two weeks of recrawl', 'six interventions', '40 of 227', 'Canon had a coverage gap', 'Verbatim engine answers'] },
+    rules: {
+      kick: '§7 · For any agent step',
+      h2: 'The method survives the judge failing.',
+      items: ['Count what can be counted.', 'Demote what must be interpreted.', 'Separate index-driven effects from model-driven ones.', 'When the judge fails, change the kind of number you publish.'],
+    },
+    code: {
+      kick: '§8 · Code and data',
+      links: [
+        { bn: 'Repository', bk: 'github.com/zoeb-nomi', bv: 'mirror-eval ↗' },
+        { bn: 'Release v1.0', bk: 'Release', bv: 'github ↗' },
+        { bn: 'PREDICTIONS.md', bk: 'Scored', bv: '11 predictions ↗' },
+      ],
+      related: [
+        { bn: 'I pointed an eval harness at my own reflection', bk: 'Essay', bv: 'zoebnomi.com', href: '/writing/eval-harness-at-my-own-reflection/' },
+        { bn: 'screener-eval', bk: 'Eval harness', bv: 'same counting, no judge', href: '/screener-eval/' },
+        { bn: 'CrossSource', bk: 'Eval harness', bv: 'the judge that passed', href: '/crosssource/' },
+      ],
+    },
+  },
+
+  screenerEval: {
+    kick: 'Eval harness · LLM résumé screeners',
+    h1: '885 screenings, one résumé.',
+    findMarks: ['22'],
+    shock: {
+      aria: 'Largest shift from each change, points of 100: employer swap up to 1.14, links deleted up to 0.90, which screener 22.3.',
+      labels: ['employer swap', 'links deleted', 'which screener'],
+      axis: ['0', '25 points of 100'],
+      scaleMax: 25,
+    },
+    hud: [
+      { label: 'Postings', v: '21' },
+      { label: 'Screeners', v: '2' },
+      { label: 'Calls', v: '885' },
+      { label: 'Reps', v: '5' },
+      { label: 'Parse errors', v: '0' },
+      { label: 'API cost', v: 'under $4' },
+    ],
+    why: { kick: '§1 · Why', h2: 'Applications die before a person reads.' },
+    method: {
+      kick: '§2 · Method',
+      h2: 'Paired, so the delta is the unit.',
+      dek: 'For every posting, A and B are scored by the same model in the same run window, order randomised. Nothing is judged by a model.',
+      dekMarks: ['Nothing is judged by a model.'],
+      steps: [
+        { h: 'Résumé A', t: 'Mine, v4.2', m: ['v4.2'] },
+        { h: 'Two variants', t: 'B-institution: every employer fictional · B-links: every URL deleted · scripted from A', m: ['B-institution', 'B-links'] },
+        { h: '21 postings', t: 'US AI PM roles · 12 frontier labs · 9 large tech · retrieved 2026-09-10', m: ['12', '9'] },
+        { h: 'Two screeners', t: 'claude-haiku-4-5 · gpt-5-mini · strict JSON: fit 0 to 100, advance / hold / reject', m: ['claude-haiku-4-5', 'gpt-5-mini'] },
+        { h: 'Paired delta', t: 'B − A per posting · bootstrap 95% CI · two-sided sign test', m: ['B − A'] },
+      ],
+    },
+    findings: {
+      kick: '§3 · Findings',
+      h2: 'Two levers, two nulls.',
+      dek: 'Paired delta in fit score, B − A, 21 postings, 5 reps. Every interval includes zero: no change this design could detect.',
+      dekMarks: ['includes zero'],
+      fig: {
+        title: 'Two levers against one screener',
+        legend: [
+          { k: 'f', t: 'mean delta' },
+          { k: '', t: '95% CI' },
+        ],
+        groups: ['Every employer swapped for a company that does not exist', 'Every link deleted'],
+        axis: ['−4', '−2', '0', '+2', '+4'],
+        foot: ['Table 1 · change in fit score, points on a 0 to 100 scale', '21 postings · 5 reps'],
+      },
+    },
+    variable: {
+      kick: '§4 · The variable',
+      dek: 'Same résumé, same posting, condition A only. Hover a screener: its band, its wobble, how often it flipped its own verdict.',
+      dekMarks: ['flipped its own verdict'],
+      calloutLabel: 'The finding that matters',
+      fig: {
+        title: 'Same résumé, same posting, two screeners',
+        legend: [
+          { k: 'r', t: 'postings where it happened' },
+          { k: '', t: 'where it did not' },
+        ],
+        scaleNote: 'Fit score, 0 to 100 · bar = mean · band = run-to-run SD on identical input',
+        ticks: ['0', '25', '50', '75', '100'],
+        gapLead: 'mean gap',
+        gapLargest: 'largest',
+        gapHigher: 'gpt-5-mini higher on',
+        postings: 'postings',
+        flipSub: 'flipped its own verdict',
+        both: 'The two screeners',
+        bothSub: 'agreed on the majority verdict',
+        readout: 'Readout',
+        between: 'Between the two',
+        labels: ['Mean fit', 'Most common', 'Distinct scores', 'Identical every rep', 'Run-to-run SD'],
+        bothLabels: ['Mean gap', 'Scored higher', 'Agreed on majority', 'Verdict flipped', 'Correlation'],
+        acrossCalls: 'across 233 calls',
+        foot: ['Table 2 and the between-screeners paragraph · 21 postings', 'Squares grouped by outcome, not posting order'],
+      },
+    },
+    nullSec: { kick: '§5 · The null', h2: 'What the null does not say.', marks: ['The employer swap', 'The link deletion'], groups: [[0, 1], [2]], dek: [3, 4] },
+    parser: {
+      kick: '§6 · The parser test',
+      h2: 'Before any model, an extractor.',
+      calloutLabel: 'What v4.1 got wrong',
+      fig: {
+        title: 'Fields each parser read from the résumé',
+        toggleLabel: 'Résumé version',
+        v41: 'Résumé v4.1',
+        v42: 'Résumé v4.2',
+        legend: [
+          { k: 'f', t: 'ok' },
+          { k: '', t: 'missing' },
+          { k: 'r', t: 'wrong' },
+          { k: 'g', t: 'garbled' },
+        ],
+        counts: ['ok', 'missing', 'wrong', 'garbled'],
+        identical: 'identical results',
+        foot: ['Table 3 · field-level extraction, v4.1 → v4.2', 'Squares grouped by outcome, not field order'],
+      },
+    },
+    limits: {
+      kick: '§7 · Limits',
+      h2: 'What the numbers cannot carry.',
+      marks: ["One candidate's résumé.", 'eight employers', 'Five reps', 'published-research proxy', 'stopped after five complete reps', 'Cheap-tier models only', 'gpt-5-mini returned empty content'],
+    },
+    rules: {
+      kick: '§8 · For any agent step',
+      h2: 'Test it before it runs unchecked.',
+      items: ['Paired inputs.', 'Repeated runs.', 'Counted deltas.', 'No judge.'],
+    },
+    code: {
+      kick: '§9 · Code and data',
+      links: [{ bn: 'Repository', bk: 'github.com/zoeb-nomi', bv: 'screener-eval ↗' }],
+      related: [
+        { bn: '885 screenings, one résumé, and the two levers that did not move', bk: 'Essay', bv: 'zoebnomi.com', href: '/writing/two-levers-that-did-not-move/' },
+        { bn: 'CrossSource', bk: 'Eval harness', bv: 'same discipline, legal RAG', href: '/crosssource/' },
+        { bn: 'mirror-eval', bk: 'Eval harness', bv: 'the judge that failed', href: '/mirror-eval/' },
+      ],
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -3027,6 +4248,169 @@ export const about = {
 };
 
 // ---------------------------------------------------------------------------
+// The Pipeline (20 Nov 2026): /about/ strings. Facts are the same as `about` and `work` above;
+// the career track is split into stations so each one reads as a card.
+// A value written "a → b" is drawn with the red arrow between the two halves.
+// ---------------------------------------------------------------------------
+
+export const pipelineAbout = {
+  kicker: 'About',
+  h1: 'Ship the system, then prove it.',
+  id: 'AI product manager · Instead · Bengaluru',
+  stats: [
+    { v: '4', u: 'companies', s: 'since Oct 2021' },
+    { v: '2', u: 'promotions', s: 'Keka HR' },
+    { v: '6', u: 'public builds', s: 'all with code' },
+  ],
+  belief: {
+    kicker: 'What I believe',
+    pre: 'An AI feature is not done until you can say ',
+    strong: 'how often it is wrong.',
+    listLabel: 'Built alongside every feature',
+    list: ['The rules it cannot break', 'A record of what it did', 'A count of its misses'],
+    arcStrong: 'Mechanical engineering → enterprise integrations → AI workflows',
+    arcRest: ' and the checks around them.',
+  },
+  career: {
+    kicker: 'The record',
+    h2: 'Four companies, two promotions.',
+    stations: [
+      {
+        yr: '2019',
+        name: 'MIT Aurangabad',
+        role: 'B.E. Mechanical Engineering',
+        top: ['Training', '2019'],
+        title: 'Trained as a mechanical engineer.',
+        cols: 2,
+        ros: [
+          { v: 'B.E.', u: 'Mechanical Engineering', s: 'MIT Aurangabad' },
+          { v: '2019', u: 'graduated', s: 'India' },
+        ],
+      },
+      {
+        yr: '2021 to 2022',
+        name: 'Hurix Digital',
+        role: 'Business Analyst',
+        top: ['Business Analyst', 'Oct 2021 to Oct 2022'],
+        title: 'LMS delivery, then video learning.',
+        cols: 2,
+        ros: [
+          { v: '43%', u: 'faster LMS delivery', s: 'agile transformation' },
+          { v: '31%', u: 'customer conversion growth', s: 'video-learning rollout' },
+        ],
+      },
+      {
+        yr: '2022',
+        name: 'STOA',
+        role: 'General Management Program',
+        top: ['Program', '2022'],
+        title: 'General management, before product.',
+        cols: 2,
+        ros: [
+          { v: 'GMP', u: 'General Management Program', s: 'STOA' },
+          { v: '2022', u: 'completed', s: 'before Keka HR' },
+        ],
+      },
+      {
+        yr: '2022 to 2025',
+        name: 'Keka HR',
+        role: 'Product Manager · 3 roles',
+        top: ['Product Manager · 3 roles, 2 promotions', 'Dec 2022 to Mar 2025'],
+        title: 'Background Verification, zero to one.',
+        cols: 3,
+        video: true,
+        ros: [
+          { v: '0 → $2.7M', u: 'MRR, first US-market product', s: 'Checkr API · 28 US enterprise clients' },
+          { v: '6', u: 'SSO integrations', s: '27% adoption lift · $121K upsell' },
+          { v: '28%', u: 'less offboarding time', s: 'Exit Module · CSAT up 80%' },
+        ],
+      },
+      {
+        yr: '2025',
+        name: 'Multiplier',
+        role: 'Product Manager',
+        top: ['Product Manager', 'Mar 2025 to Sep 2025'],
+        title: 'Value-Added Services into a revenue line.',
+        cols: 3,
+        ros: [
+          { v: '21 days', u: 'PosterElite partnership, end to end', s: 'not announced publicly' },
+          { v: '$100K', u: 'incremental revenue', s: 'procurement · BGV · ITSM' },
+          { v: '47%', u: 'efficiency gain', s: 'new SOPs' },
+        ],
+      },
+      {
+        yr: '2025 to now',
+        name: 'Instead',
+        role: 'Product Manager · tax workflows',
+        top: ['Product Manager · now', 'Sep 2025 to present'],
+        title: 'Multi-step tax workflows, and their evals.',
+        cols: 3,
+        now: true,
+        ros: [
+          { v: '10-15 → <1 min', u: 'workflow run time, ~90% cut', s: 'production · scoped re-runs' },
+          { v: '~95%', u: 'citation accuracy', s: 'golden eval set' },
+          { v: '27% → 53%', u: 'onboarding retention', s: '30+ clicks → 8' },
+        ],
+      },
+    ],
+  },
+  video: {
+    play: 'Play video',
+    caption: 'Fig. Background Verification in Keka. Product video, Keka HR.',
+    open: 'Open on YouTube ↗',
+    links: [
+      { label: 'Keka × Checkr listing ↗', href: 'https://www.keka.com/marketplace/app/checkr' },
+      { label: "Checkr's integration guide ↗", href: 'https://help.checkr.com/s/article/Keka-Checkr-Integration-User-Guide' },
+    ],
+  },
+  full: { kicker: 'In full', h2: 'What each role covered.', summary: 'Open' },
+  method: {
+    kicker: 'How I work',
+    h2: 'Every workflow gets all four.',
+    verbs: [
+      { n: '01', h: 'Measured', b: '15/15', t: ' judge vs blind human · CrossSource', href: '/crosssource/' },
+      { n: '02', h: 'Traced', b: 'doc ID + sub-type', t: ' on every cited source · Instead', href: '' },
+      { n: '03', h: 'Guarded', b: 'TradeFrame', t: ' · AI proposes, code decides', href: '' },
+      { n: '04', h: 'Shipped', b: '10-15 min → under 1', t: ' · Instead', href: '' },
+    ],
+  },
+  builds: {
+    kicker: 'Public builds',
+    h2: 'One guarded system, five harnesses.',
+    rows: [
+      { name: 'TradeFrame', kind: 'Guarded automation', value: 'AI proposes · code decides', href: '/builds/' },
+      { name: 'CrossSource', kind: 'Eval harness · legal RAG', value: '0.981 → 0.994', href: '/crosssource/' },
+      { name: 'screener-eval', kind: 'Eval harness · résumé screeners', value: '885 calls', href: '/screener-eval/' },
+      { name: 'mirror-eval', kind: 'Eval harness · AI search', value: 'v1.0', href: '/mirror-eval/' },
+      { name: 'cheap-tier-legal-tax-hr', kind: 'Eval harness · 10-cent models', value: '1,414 items', href: '/notes/cheap-tier-workflows/' },
+      { name: 'decisions-api-legal-quiz', kind: 'Eval harness · confidence', value: 'essay', href: '/writing/decisions-api-legal-quiz/' },
+    ],
+    contributions: [
+      { name: 'TaxCalcBench', kind: '101 cases audited', value: 'PR #157 · open', href: 'https://github.com/column-tax/tax-calc-bench/pull/157' },
+      { name: 'eyecite', kind: '0 gains / 0 losses · 15,988 cites', value: 'PR #360 · open', href: 'https://github.com/freelawproject/eyecite/pull/360' },
+    ],
+    record: [
+      { name: 'How the AI cites tax law', kind: 'Instead', value: 'instead.com', href: 'https://instead.com/products/research' },
+      { name: 'Keka × Checkr', kind: 'Keka HR', value: 'keka.com', href: 'https://www.keka.com/marketplace/app/checkr' },
+      { name: 'Checkr integration guide', kind: 'Keka HR', value: 'help.checkr.com', href: 'https://help.checkr.com/s/article/Keka-Checkr-Integration-User-Guide' },
+      { name: 'BGV product video', kind: 'Keka HR', value: 'youtube.com', href: 'https://www.youtube.com/watch?v=rPYfTCj181w' },
+      { name: 'Background screening', kind: 'Multiplier', value: 'usemultiplier.com', href: 'https://usemultiplier.com/marketplace/partner/veremark' },
+      { name: 'Profile, Jan 2025', kind: 'Keka Product blog', value: 'medium.com', href: 'https://medium.com/keka-product/meet-zoeb-nomi-the-rabbit-hole-explorer-and-corehr-maestro-a252fedbe113' },
+    ],
+    contribKicker: 'Contributions',
+    recordKicker: 'Public record',
+    recordNote: 'Most claims link to something you can check. Where one cannot, the page says so.',
+  },
+  cta: {
+    kicker: 'Contact',
+    h2: 'Facing a problem that has to be right? Talk to me.',
+    id: 'Now: PM at Instead · Before: $2.7M MRR from zero at Keka HR',
+    email: 'Email me',
+    site: { label: 'This site', link: 'How it is built →', href: '/design/' },
+  },
+};
+
+// ---------------------------------------------------------------------------
 // 404
 // ---------------------------------------------------------------------------
 
@@ -3100,6 +4484,218 @@ export const writingIndex = {
   } as Record<string, { value: number; display: string; unit: string }>,
 };
 
+// ---------------------------------------------------------------------------
+// WRITING, The Pipeline (20 Nov 2026): the approved prototype's strings for the Writing index, the Decisions API
+// essay and the note template. The essays' and notes' own text stays in writingDecisions / notes.ts; this block holds
+// what the new templates add (headline, stats, filter labels, margin notes, footnotes, the figure's legend).
+// ---------------------------------------------------------------------------
+
+/** One phrase to set as an inline readout (`.rn`) or one footnote marker, inside a section paragraph. */
+export type PipelineMark = { sec: string; para: number; rn?: string[]; fn?: { n: number; after: string }[] };
+
+export const pipelineWriting = {
+  /** Shared by every essay and note head. */
+  byline: { author: 'Zoeb Nomi', essay: 'Essay', note: 'Note', readSuffix: 'read', listen: 'Listen' },
+  /** Replay control on figures that animate (EssayFigure). */
+  replay: 'Replay',
+  /** Contact closer on every Writing page. The heading is `home.ctaSlabBody`. */
+  contact: { kick: 'Contact', email: 'Email me' },
+  /** Number words for headings that count ("Six notes, one finding each."). */
+  numberWords: ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'],
+
+  index: {
+    kicker: 'Writing',
+    h1: 'Essays with their data. Notes with denominators.',
+    byline: { essays: 'essays', notes: 'notes', offTopic: 'off topic', each: 'Each one with its data and code' },
+    /** The three readouts under the head: value comes from writingIndex.numbers. */
+    stats: [
+      { slug: 'decisions-api-legal-quiz', u: 'legal questions, one call each', s: 'Decisions API essay' },
+      { slug: 'two-levers-that-did-not-move', u: 'screenings', s: 'screener-eval essay' },
+      { slug: 'the-judge-caught-a-bug', u: 'blind agreement', s: 'CrossSource essay' },
+    ],
+    filter: { label: 'Filter by shelf', all: 'All', showing: 'Showing', of: 'of' },
+    sub: {
+      essays: 'AI systems that have to be right',
+      notes: 'one counted finding per note',
+      other: 'off the AI topic, written so it can be wrong',
+    },
+    emptyEssays: 'No essay on this shelf yet. The notes below are the short versions.',
+    emptyNotes: 'No note on this shelf.',
+    ledgerHead: { date: 'Date', shelf: 'Shelf', finding: 'Finding', number: 'Number' },
+    listenGlyph: '♪',
+    /** Chip order, left to right. `offtopic` is the Other writing shelf. */
+    shelfOrder: ['decisions-api', 'crosssource', 'screener-eval', 'mirror-eval', 'tradeframe', 'cheap-tier', 'other', 'offtopic'],
+    offTopicLabel: 'Other writing',
+    /** Which shelf each essay sits on. */
+    essayShelf: {
+      'decisions-api-legal-quiz': 'decisions-api',
+      'nobody-reports-the-misses': 'other',
+      'the-judge-caught-a-bug': 'crosssource',
+      'two-levers-that-did-not-move': 'screener-eval',
+      'eval-harness-at-my-own-reflection': 'mirror-eval',
+      'the-bus-stop-nobody-notices': 'offtopic',
+    } as Record<string, string>,
+  },
+
+  /** The counted number on each note's row (Writing index) and in its head. Keyed by slug. */
+  noteNumbers: {
+    'verdict-modes': '136 of 233',
+    'what-changed-aug-to-sep': '13 → 63 of 63',
+    'six-cases': '6 kinds',
+    'zoominfo-0-to-74': '0 → 74',
+    'same-model-generates-and-judges': '15 labels',
+    'five-parsers': '3 fields',
+    'confident-no': '41 of 242',
+    'eleven-predictions': '3 of 11',
+    'two-levers-that-did-not-move': '1.14 vs 22.3',
+    '444-to-239': '444 → 239',
+    'judges-vs-blind-labels': '3 · 12 of 40',
+    'hearsay-refusals': '21 of 94',
+    'six-of-25-never-retrieved': '6 of 25',
+    'cheap-tier-workflows': '10-cent',
+    'two-screeners-22-point-gap': '28 vs 79',
+    'the-0-9-threshold': '47 of 377',
+    'claude-zero-of-63': '0 of 63',
+    'silence-is-information': '59 ms',
+    'exactly-zero-or-one': '18 of 224',
+    'two-cents': '2 cents',
+    'hearsay-prompt': '1/9 → 3/8',
+    'baseline-vs-strict': '2 fewer',
+    'what-five-reps-can-say': '62.0 · 47.2',
+    'taxonomy-miss': '35 vs 60%',
+    'vendor-criteria': '14 · 9 · 7 · 4',
+    'vendor-voice': '3 of 239',
+    'my-own-counter-was-wrong': '34 vs 17',
+    'seventy-four-strings': '74',
+  } as Record<string, string>,
+
+  note: {
+    /** Head readouts for notes that have a prepared set; every other note shows its one number. */
+    stats: {
+      'six-of-25-never-retrieved': [
+        { v: '6 of 25', u: 'never retrieved', s: 'golden questions' },
+        { v: '0.760', u: 'citation recall', s: 'both prompt configurations' },
+        { v: '463', u: 'chunks from 22 opinions', s: 'median 292 words' },
+      ],
+    } as Record<string, { v: string; u: string; s: string }[]>,
+    numberLabel: 'the counted finding',
+    play: 'Play',
+    /** Where each shelf's "view the build" link goes (null: plain text). */
+    groupHref: {
+      tradeframe: '/builds/',
+      'cheap-tier': '/builds/',
+      'decisions-api': '/writing/decisions-api-legal-quiz/',
+      crosssource: '/crosssource/',
+      'screener-eval': '/screener-eval/',
+      'mirror-eval': '/mirror-eval/',
+      other: null,
+    } as Record<string, string | null>,
+    more: { kick: 'More notes', nav: 'Previous and next note', prev: 'Previous note', next: 'Next note', all: 'All {n} notes' },
+  },
+
+  decisions: {
+    finding: {
+      label: 'Finding',
+      text: 'No number above which you can stop checking, in this data. 47 wrong answers sit inside the set the model was 90% sure about.',
+    },
+    stats: [
+      { v: '544', u: 'yes/no legal questions', s: 'six LegalBench tasks' },
+      { v: '83.2%', u: 'accuracy · 523 answered', s: '21 refused' },
+      { v: '47 of 377', u: 'wrong at 0.9 or more sure', s: 'Table 1' },
+    ],
+    /** Inline readouts and footnote markers, by section id and paragraph index. The phrase must appear in the paragraph. */
+    marks: [
+      { sec: 'quiz', para: 0, fn: [{ n: 1, after: 'released under CC BY.' }] },
+      { sec: 'quiz', para: 1, rn: ['544'] },
+      { sec: 'quiz', para: 2, rn: ['192 thousand', 'two cents', 'four minutes'] },
+      { sec: 'quiz', para: 3, fn: [{ n: 2, after: 'inside that share.' }] },
+      { sec: 'results', para: 0, rn: ['523', '21', '83.2%', '0.894', '0.103', '0.140'], fn: [{ n: 3, after: 'Overall accuracy was 83.2%.' }] },
+      { sec: 'results', para: 2, rn: ['83%', '88%', '28%', '90%', '47'] },
+      { sec: 'misses', para: 0, rn: ['242', '17%'] },
+      { sec: 'meanings', para: 0, rn: ['8 of 50', '87 of 100', '98%'] },
+      { sec: 'refusals', para: 0, rn: ['21 of the 94', '22%', '18 of the 21'] },
+      { sec: 'prompt', para: 1, rn: ['74%', '30 points'] },
+      { sec: 'routing', para: 1, rn: ['12%', '72%'] },
+    ] as PipelineMark[],
+    /** The paragraph set as a pull quote (section id, paragraph index). */
+    quote: { sec: 'misses', para: 2 },
+    /** Margin notes, by section id and paragraph index. */
+    margin: [
+      { sec: 'quiz', para: 2, title: 'The run', text: '192 thousand input tokens · two cents · four minutes' },
+      { sec: 'results', para: 0, title: 'Ranking vs calibration', text: 'AUROC 0.894 · ECE 0.103 · Brier 0.140' },
+      { sec: 'misses', para: 0, title: 'Confident no', text: '242 items near zero · 17% marked yes by the lawyers' },
+      { sec: 'meanings', para: 0, title: 'At 0.9', text: 'Personal jurisdiction 8 of 50, all right · consumer contracts 87 of 100, 98% right' },
+      { sec: 'refusals', para: 0, title: 'Refused', text: '21 of 94 hearsay items · 18 of the 21 marked no' },
+      { sec: 'prompt', para: 1, title: 'Pilot, ten items', text: 'one-line rule: one right · four-sentence rule: three right' },
+      { sec: 'routing', para: 1, title: 'Verdict', text: 'ranks a queue: yes · decides alone: not on questions like these' },
+    ] as { sec: string; para: number; title: string; text: string }[],
+    tableCaption: 'Table 1 · Six tasks at a glance',
+    footnotes: {
+      label: 'Footnotes',
+      ref: 'Footnote',
+      back: 'Back to text',
+      items: [
+        { n: 1, parts: [{ t: 'LegalBench is by Guha and others, 2023, released under CC BY 4.0.' }] },
+        {
+          n: 2,
+          parts: [
+            { t: 'Coverage and accuracy at each threshold are in ' },
+            { t: 'results/trust_curve.csv', href: 'https://github.com/zoeb-nomi/decisions-api-legal-quiz/blob/main/results/trust_curve.csv' },
+            { t: '.' },
+          ],
+        },
+        {
+          n: 3,
+          parts: [
+            { t: 'Metrics and raw scores: ' },
+            { t: 'results/metrics.json', href: 'https://github.com/zoeb-nomi/decisions-api-legal-quiz/blob/main/results/metrics.json' },
+            { t: '. OpenAI Decisions API, gpt-6-luna, 2026-10-08.' },
+          ],
+        },
+      ] as { n: number; parts: { t: string; href?: string }[] }[],
+    },
+    sheet: {
+      fig: { n: 1, title: "The model's answer sheet, as counts" },
+      source:
+        'One square per answered item. Wrong count per task = items at or above 0.9 × (1 − accuracy within those), from Table 1; the six add up to the 47 in the text. Positions within a task are illustrative.',
+      legend: { kept: '0.9 or more sure', wrong: '0.9 or more sure, marked wrong', dropped: 'below 0.9, dropped' },
+      kept: 'kept',
+      wrong: 'wrong',
+      readouts: [
+        { v: '377 of 523', u: 'kept at 0.9', red: false },
+        { v: '47', u: 'wrong inside the kept set', red: true },
+        { v: '28%', u: 'of items dropped', red: false },
+      ],
+      replay: 'Mark the sheet again',
+      aria:
+        'One square per answered item, {answered} in all, grouped by task. {kept} items cleared 0.9 confidence; {wrong} of those were marked wrong by the lawyers and are shown in red. The {dropped} items below 0.9 are outlined.',
+    },
+    related: { kick: 'Notes from this run', h2: '{n} notes, one finding each.', all: 'All writing', code: 'Code and data ↗' },
+    repo: 'https://github.com/zoeb-nomi/decisions-api-legal-quiz',
+  },
+
+  /** The audio player's small labels. The file's own label and note come from src/data/audio/*.json. */
+  player: {
+    play: 'Play',
+    pause: 'Pause',
+    seek: 'Seek',
+    speed: 'Playback speed',
+    captions: 'Download captions (.vtt)',
+    readAlong: 'The text below follows the audio as it plays.',
+    follow: 'Follow',
+    toPlayer: 'Player',
+    toPlayerLabel: 'Back to player',
+    hide: 'Hide these controls until I press play again',
+    playFromHere: 'Play from here',
+    loading: 'Loading audio…',
+    failed: 'This audio could not be loaded. Please try again later.',
+    cannotPlay: 'This audio could not be played.',
+    minutes: 'min',
+    resumes: 'resumes at',
+    captionTrack: 'English',
+  },
+};
+
 export const llmsTxt = `# Zoeb Nomi
 
 > Zoeb Nomi is an AI Product Manager at Instead, an AI-native tax research and planning platform and the first new entrant to clear IRS e-filing approval alongside incumbents. He ships multi-step AI workflows with evals, traces and guardrails built in. At Instead he tested whether a multi-step tax workflow stays coherent end to end and cut its run time from 10 to 15 minutes to under a minute. Before that he built Keka's Background Verification module zero to one on the Checkr API: 28 US enterprise clients, $2.7M MRR. Based in Bengaluru, India.
@@ -3140,6 +4736,22 @@ export const llmsTxt = `# Zoeb Nomi
 - How this site is built (the Red Pen design system and why): https://www.zoebnomi.com/design/
 - The components (every Red Pen component, live): https://www.zoebnomi.com/design/components/
 `;
+
+// ---------------------------------------------------------------------------
+// Essay chrome, The Pipeline: the byline and the related rows shared by the essay pages (src/components/EssayShell.astro).
+// ---------------------------------------------------------------------------
+
+export const pipelineEssay = {
+  author: 'Zoeb Nomi',
+  kind: 'Essay',
+  read: 'read',
+  listen: 'Listen',
+  relatedKick: 'Keep reading',
+  relatedTitle: 'More essays, each with its data and code.',
+  allWriting: 'All writing',
+  /** Reading-progress bar on narrow screens. */
+  progressLabel: 'Reading progress',
+};
 
 // ---------------------------------------------------------------------------
 // OG cards (SPEC #8): scripts/generate-og.mjs reads this list, so a card never

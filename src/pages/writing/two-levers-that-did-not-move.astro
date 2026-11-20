@@ -1,22 +1,22 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Masthead from '../../components/Masthead.astro';
-import Section from '../../components/Section.astro';
+import EssayShell from '../../components/EssayShell.astro';
+import EssayHeading from '../../components/EssayHeading.astro';
 import EssayFigure from '../../components/EssayFigure.astro';
 import ForestPlot from '../../components/ForestPlot.astro';
 import UnitChart from '../../components/UnitChart.astro';
 import ParserCompare from '../../components/ParserCompare.astro';
 import CTASlab from '../../components/CTASlab.astro';
-import AudioPlayer from '../../components/AudioPlayer.astro';
 import { articleJsonLd } from '../../lib/articleJsonLd';
-import { formatDate } from '../../lib/formatDate';
 import { isExternal } from '../../lib/isExternal';
 import { meta, cta, home, writingTwoLevers as wt } from '../../data/copy';
 import { jsonLdString } from '../../lib/jsonLdString';
 import { forestData, flipData, parserData } from '../../lib/figureData';
 
 const forest = forestData();
+// The first two rows count a screener flipping its own verdict: that is the failure, so red. The third is agreement.
 const flips = flipData();
+const flipRows = flips.rows.map((r, i) => ({ ...r, tone: i < 2 ? ('red' as const) : ('ink' as const) }));
 const parsers = parserData();
 
 const articleLd = articleJsonLd({
@@ -35,47 +35,43 @@ const articleLd = articleJsonLd({
   path="/writing/two-levers-that-did-not-move/"
   ogImage="/og/two-levers.png"
   ogType="article"
+  page="writing"
 >
   <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
-  <Masthead
+  <EssayShell
+    slug="two-levers-that-did-not-move"
     kicker={wt.kicker}
-    h1={wt.title}
-    standfirst={wt.dek}
-    h1Max="24ch"
-    narr
+    title={wt.title}
+    dek={wt.dek}
+    date={wt.date}
+    readingTime={wt.readingTime}
+    audio={wt.audio}
+    articleId="two-levers"
   >
-    <Fragment slot="byline"><time datetime={wt.date}>{formatDate(wt.date)}</time> · {wt.readingTime} read</Fragment>
-    {wt.audio && <AudioPlayer audio={wt.audio} articleId="two-levers" />}
-  </Masthead>
+    <EssayHeading mark={wt.s1.mark} label={wt.s1.label} narrId="s1-cue" />
+    {wt.s1.paras.map((p, i) => <p data-narr={`s1-p${i}`}>{p}</p>)}
 
-  <Section mark={wt.s1.mark} label={wt.s1.label} narrId="s1-cue">
-    {wt.s1.paras.map((p, i) => <p class="prose" data-narr={`s1-p${i}`}>{p}</p>)}
-  </Section>
-
-  <Section mark={wt.s2.mark} label={wt.s2.label} narrId="s2-cue">
-    {wt.s2.paras.map((p, i) => <p class="prose" data-narr={`s2-p${i}`}>{p}</p>)}
+    <EssayHeading mark={wt.s2.mark} label={wt.s2.label} narrId="s2-cue" />
+    {wt.s2.paras.map((p, i) => <p data-narr={`s2-p${i}`}>{p}</p>)}
     <EssayFigure n={1} replay title="Two levers against one screener" source="Source: screener-eval Table 1 (mean paired change in fit score, with a 95% bootstrap interval) and its between-screeners paragraph. 21 postings, 5 reps." href="/screener-eval/" hrefLabel="Case study →">
       <ForestPlot {...forest} />
     </EssayFigure>
-  </Section>
 
-  <Section mark={wt.s3.mark} label={wt.s3.label} narrId="s3-cue">
-    {wt.s3.paras.map((p, i) => <p class="prose" data-narr={`s3-p${i}`}>{p}</p>)}
+    <EssayHeading mark={wt.s3.mark} label={wt.s3.label} narrId="s3-cue" />
+    {wt.s3.paras.map((p, i) => <p data-narr={`s3-p${i}`}>{p}</p>)}
     <EssayFigure n={2} replay title="Same résumé, same posting, two screeners" source="Source: screener-eval Table 2 and its between-screeners paragraph. 21 postings, 5 reps each." href="/screener-eval/" hrefLabel="Case study →">
-      <UnitChart rows={flips.rows} cols={flips.cols} filledMeans="postings where it happened" emptyMeans="postings where it did not" />
+      <UnitChart rows={flipRows} cols={flips.cols} filledMeans="postings where it happened" emptyMeans="postings where it did not" />
     </EssayFigure>
-  </Section>
 
-  <Section mark={wt.s4.mark} label={wt.s4.label} narrId="s4-cue">
-    {wt.s4.paras.map((p, i) => <p class="prose" data-narr={`s4-p${i}`}>{p}</p>)}
-  </Section>
+    <EssayHeading mark={wt.s4.mark} label={wt.s4.label} narrId="s4-cue" />
+    {wt.s4.paras.map((p, i) => <p data-narr={`s4-p${i}`}>{p}</p>)}
 
-  <Section mark={wt.s5.mark} label={wt.s5.label} narrId="s5-cue">
+    <EssayHeading mark={wt.s5.mark} label={wt.s5.label} narrId="s5-cue" />
     {
       wt.s5.paras.map((p, i) => (
         <>
-          <p class="prose" data-narr={`s5-p${i}`}>{p}</p>
+          <p data-narr={`s5-p${i}`}>{p}</p>
           {i === 0 && (
             <EssayFigure n={3} replay title="Fields each parser read from the résumé" source="Source: screener-eval Table 3. Squares are grouped by outcome, not by field order. The three plain extractors had identical results." href="/screener-eval/" hrefLabel="Case study →">
               <ParserCompare rows={parsers.rows} />
@@ -84,7 +80,7 @@ const articleLd = articleJsonLd({
         </>
       ))
     }
-    <p class="prose links-line">
+    <p class="wr-links">
       {wt.footer.map((link, i) => (
         <>
           {i > 0 && <span class="sep" aria-hidden="true"> · </span>}
@@ -92,7 +88,7 @@ const articleLd = articleJsonLd({
         </>
       ))}
     </p>
-  </Section>
+  </EssayShell>
 
   <CTASlab
     marginLines={[home.eyebrow.toUpperCase()]}
@@ -103,6 +99,3 @@ const articleLd = articleJsonLd({
     secondaryHref={cta.bookACall.href}
   />
 </Base>
-
-<style>
-</style>

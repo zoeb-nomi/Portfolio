@@ -2,12 +2,10 @@
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import '../styles/base.css';
+import '../styles/ds.css';
 import '../styles/layout.css';
 import '../styles/reading.css';
 import '../styles/figures.css';
-import '../styles/motion.css';
-import '../styles/pen.css';
-import Motion from '../components/Motion.astro';
 // theme-color must be a literal in <meta>; read it from the token file so the
 // palette is still declared in one place (design/tokens.css).
 import tokensCss from '../../design/tokens.css?raw';
@@ -17,6 +15,7 @@ import {
   softwareSourceCodeJsonLd,
   googleSiteVerification,
   cloudflareBeaconToken,
+  headerUi,
 } from '../data/copy';
 import { jsonLdString } from '../lib/jsonLdString';
 
@@ -28,8 +27,10 @@ interface Props {
   includeSoftwareSourceCode?: boolean;
   noindex?: boolean;
   ogType?: 'website' | 'article';
-  /** Load the motion layer (anime.js) and arm `.motion` in the head. */
+  /** Kept for old call sites; The Pipeline runtime (src/scripts/ds.ts) runs on every page. */
   motion?: boolean;
+  /** Nav key for the current page: home, builds, writing, about. */
+  page?: string;
 }
 
 const {
@@ -40,10 +41,13 @@ const {
   includeSoftwareSourceCode = false,
   noindex = false,
   ogType = 'website',
-  motion = false,
+  page,
 } = Astro.props;
 
-const themeColor = /--paper:\s*(#[0-9a-fA-F]{6})/.exec(tokensCss)?.[1];
+// Dark first, light second (the light block is the second --bg declaration in tokens.css).
+const bgs = [...tokensCss.matchAll(/--bg:\s*(#[0-9a-fA-F]{6})/g)].map((m) => m[1]);
+const themeColor = bgs[0];
+const themeColorLight = bgs[1];
 
 const canonicalURL = new URL(path, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
@@ -64,13 +68,16 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content={themeColor} />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content={themeColorLight} />
 
-    <!-- `.js` when scripts run. On motion pages, `.motion` too, when
-         IntersectionObserver exists and reduced motion is off; removed again
-         if the motion module has not booted in 4 s, so nothing stays hidden. -->
-    <script is:inline define:vars={{ motion }}>
+    <!-- `.js` when scripts run; the saved theme (dark by default) before first paint. -->
+    <script is:inline>
       (function (d) {
         d.classList.add('js');
+        try {
+          var t = localStorage.getItem('ds-theme');
+          if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
+        } catch (e) {}
         // Hash hop from an old-URL stub (src/components/Moved.astro): keep the
         // fragment the visitor asked for when the new page has that id.
         var fromHash = new URLSearchParams(window.location.search).get('from-hash');
@@ -82,11 +89,6 @@ const ogImageURL = new URL(ogImage, Astro.site);
             if (el) el.scrollIntoView();
           });
         }
-        if (!motion || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        d.classList.add('motion');
-        setTimeout(function () {
-          if (!window.__zmMotion) d.classList.remove('motion');
-        }, 4000);
       })(document.documentElement);
     </script>
 
@@ -137,33 +139,16 @@ const ogImageURL = new URL(ogImage, Astro.site);
     ></script>
     <script defer src="https://cloud.umami.is/script.js" data-website-id="794b2e27-f0e2-4298-9376-b76ff8cb4c1c" is:inline></script> 
   </head>
-  <body>
-    <a class="skip-link" href="#main">Skip to content</a>
-    <div class="red-thread" aria-hidden="true"></div>
-    <div class="shell">
-      <SiteHeader currentPath={path} />
-      <main id="main" tabindex="-1">
-        <slot />
-      </main>
-      <SiteFooter />
-    </div>
-    {motion && <Motion />}
+  <body data-page={page}>
+    <a class="skip" href="#main">{headerUi.skip}</a>
+    <SiteHeader currentPath={path} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
     <script>
-      import '../scripts/pen-scroll';
+      import { init } from '../scripts/ds';
+      init();
     </script>
   </body>
 </html>
-
-<style>
-  .shell {
-    max-width: var(--shell-max);
-    margin-inline: auto;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  main {
-    flex: 1;
-  }
-</style>

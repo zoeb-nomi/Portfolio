@@ -1,148 +1,27 @@
 ---
-// Site footer (DESIGN v3 §e, D-06): display-type name, role line, a links row
-// with 44px targets, then a hair rule and a meta row with the nav and the
-// labelled llms.txt link. No top rule: the CTA slab (or the page's last
-// section rule) closes the page above it.
-import { site, cta, nav, designLink, llmsLink } from '../data/copy';
+// Site footer (The Pipeline, design/README.md §6): one line. Identity on the left; Writing,
+// Design system, Email, LinkedIn, GitHub, X and llms.txt on the right. Styles: ds.css (.foot).
+import { cta, designLink, llmsLink, writingLink, footerId } from '../data/copy';
 import { isExternal } from '../lib/isExternal';
 
-const links = [cta.bookACall, cta.email, cta.linkedin, cta.github];
-const roleLine = site.footerLine.replace(`${site.name} · `, '');
+const links = [writingLink, designLink, cta.email, cta.linkedin, cta.github, cta.x, llmsLink];
 ---
 
-<footer class="site-footer surface-ink bleed">
-  <div class="footer-inner grid-margin">
-    <div class="margin-col" aria-hidden="true"></div>
-    <div class="body-col">
-      <p class="ftr-name">{site.name}</p>
-      <p class="ftr-role">{roleLine}</p>
-      <ul class="ftr-links">
-        {
-          links.map((l) => (
-            <li>
-              <a
-                href={l.href}
-                target={isExternal(l.href) ? '_blank' : undefined}
-                rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}
-              >
-                {l.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-      <div class="ftr-meta">
-        <nav aria-label="Footer">
-          <ul>
-            {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
-          </ul>
-        </nav>
-        <span class="ftr-extra">
-          <a class="llms-link" href={designLink.href}>{designLink.label}</a>
-          <a class="llms-link" href={llmsLink.href}>{llmsLink.label}</a>
-        </span>
-      </div>
-    </div>
+<footer class="foot gut">
+  <div class="in">
+    <span class="foot-id">{footerId}</span>
+    <nav aria-label="Footer">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            target={isExternal(l.href) ? '_blank' : undefined}
+            rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}
+          >
+            {l.label}
+          </a>
+        ))
+      }
+    </nav>
   </div>
 </footer>
-
-<style>
-  .footer-inner {
-    --body-pad-end: var(--s-11);
-  }
-
-  footer.surface-ink {
-    margin-top: 0;
-    padding-block: var(--s-9) var(--s-6);
-  }
-
-  .ftr-name {
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-h3);
-    line-height: var(--lh-heading);
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-  }
-
-  .ftr-role {
-    margin-top: var(--s-2);
-    font-size: var(--t-small);
-    color: var(--color-text-muted);
-  }
-
-  .ftr-links {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: var(--s-6);
-    list-style: none;
-    margin-top: var(--s-4);
-  }
-
-  .ftr-links a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    font-family: var(--font-text);
-    font-weight: 500;
-    font-size: var(--t-small);
-    color: var(--color-text);
-    text-decoration: underline;
-    text-decoration-color: var(--color-link);
-    text-underline-offset: 4px;
-  }
-
-  .ftr-links a:hover,
-  .ftr-meta a:hover {
-    color: var(--color-link);
-    text-decoration-thickness: 2px;
-  }
-
-  .ftr-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s-4);
-    margin-top: var(--s-4);
-    padding-top: var(--s-3);
-    border-top: var(--line-hair);
-  }
-
-  .ftr-meta ul {
-    display: flex;
-    gap: var(--s-6);
-    list-style: none;
-  }
-
-  .ftr-meta a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    text-decoration: none;
-  }
-
-  .ftr-extra {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--s-6);
-  }
-
-  .llms-link {
-    text-decoration: underline !important;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  @media (max-width: 899px) {
-    .footer-inner > .margin-col {
-      display: none;
-    }
-
-    .footer-inner > .body-col {
-      padding-top: var(--s-9);
-    }
-  }
-</style>

@@ -1,27 +1,75 @@
 ---
+// The Decisions API essay (The Pipeline): the shared essay template (Masthead, Section, MarginNote, DataTable, EssayFigure,
+// AudioPlayer, CTASlab) with this essay's answer sheet. The text is writingDecisions in copy.ts; the inline readouts,
+// footnote markers and margin notes are pipelineWriting.decisions, found in the text by phrase. The narration
+// (scripts/audio) is built from the data-narr anchors, so their ids and text must not change.
 import Base from '../../layouts/Base.astro';
 import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import DataTable from '../../components/DataTable.astro';
 import EssayFigure from '../../components/EssayFigure.astro';
+import MarginNote from '../../components/MarginNote.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
-import { articleJsonLd } from '../../lib/articleJsonLd';
-import { formatDate } from '../../lib/formatDate';
 import CTASlab from '../../components/CTASlab.astro';
-import { meta, writingDecisions as wd, home, cta } from '../../data/copy';
+import { articleJsonLd } from '../../lib/articleJsonLd';
+import { formatDate, formatClock } from '../../lib/formatDate';
 import { jsonLdString } from '../../lib/jsonLdString';
+import { meta, writingDecisions as wd, pipelineWriting as P, home, cta } from '../../data/copy';
+import { notes } from '../../data/notes';
 
+const D = P.decisions;
 const f = wd.figures;
 const glance = f.glance;
 const glanceRows = glance.rows.map((r) => ({ label: r.label, cells: r.cells.map((text) => ({ text })) }));
 
-// A bare URL in a paragraph (the repo link in section 9) renders as a link whose text is the URL.
-function withLinks(text: string): { text: string; href?: string }[] {
-  return text
-    .split(/(https?:\/\/\S*[^\s.,;:)])/)
-    .filter(Boolean)
-    .map((part) => (/^https?:\/\//.test(part) ? { text: part, href: part } : { text: part }));
+// ---- Paragraph parts: plain text, inline readouts (.rn) and footnote markers, found by phrase ----
+type Part = { t: string; rn?: boolean; fn?: number };
+function parts(sec: string, para: number, text: string): Part[] {
+  const m = D.marks.filter((x) => x.sec === sec && x.para === para);
+  let out: Part[] = [{ t: text }];
+  const split = (needle: string, mark: (hit: string) => Part[]) => {
+    const i = out.findIndex((p) => !p.rn && p.fn === undefined && p.t.includes(needle));
+    if (i < 0) throw new Error(`pipelineWriting.decisions.marks: "${needle}" is not in ${sec} paragraph ${para}`);
+    const at = out[i].t.indexOf(needle);
+    const pre = out[i].t.slice(0, at);
+    const post = out[i].t.slice(at + needle.length);
+    out.splice(i, 1, ...[{ t: pre }, ...mark(needle), { t: post }].filter((p) => p.t !== '' || p.fn !== undefined));
+  };
+  for (const x of m) {
+    for (const k of x.fn ?? []) split(k.after, (hit) => [{ t: hit }, { t: '', fn: k.n }]);
+    for (const r of x.rn ?? []) split(r, (hit) => [{ t: hit, rn: true }]);
+  }
+  return out;
 }
+// A bare URL in a paragraph (the repo link in section 9) renders as a link whose text is the URL.
+const linkify = (t: string) => t.split(/(https?:\/\/\S*[^\s.,;:)])/).filter(Boolean).map((x) => (/^https?:\/\//.test(x) ? { t: x, href: x } : { t: x }));
+const note = (sec: string, para: number) => D.margin.find((x) => x.sec === sec && x.para === para);
+const isQuote = (sec: string, para: number) => D.quote.sec === sec && D.quote.para === para;
+
+// ---- Fig. 1: one square per answered item, counted from Table 1 ----
+const taskRows = glance.rows.slice(0, -1).map((r) => {
+  const n = Number(r.cells[0]);
+  const kept = Number(r.cells[3].split(' of ')[0]);
+  const within = parseFloat(r.cells[4]);
+  const wrong = Math.round(kept * (1 - within / 100));
+  const hit = new Set(Array.from({ length: wrong }, (_, j) => Math.floor(((j + 0.5) * kept) / wrong)));
+  const cells = [...Array.from({ length: kept }, (_, i) => (hit.has(i) ? 'x' : 'k')), ...Array.from({ length: n - kept }, () => 'd')];
+  return { label: r.label.split(' · ')[0], kept, n, wrong, cells };
+});
+const sum = (k: 'kept' | 'n' | 'wrong') => taskRows.reduce((a, r) => a + r[k], 0);
+const totalRow = glance.rows[glance.rows.length - 1];
+if (sum('kept') !== Number(totalRow.cells[3].split(' of ')[0]) || sum('n') !== Number(totalRow.cells[0]) || sum('wrong') !== Math.round(sum('kept') * (1 - parseFloat(totalRow.cells[4]) / 100))) {
+  throw new Error('decisions-api-legal-quiz: the answer sheet does not add up to Table 1');
+}
+const sheetAria = D.sheet.aria
+  .replace('{answered}', String(sum('n')))
+  .replace('{kept}', String(sum('kept')))
+  .replace('{wrong}', String(sum('wrong')))
+  .replace('{dropped}', String(sum('n') - sum('kept')));
+
+// ---- Related notes: the notes on this build, newest first ----
+const related = notes.filter((n) => n.group === 'decisions-api').sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+const relatedH2 = D.related.h2.replace('{n}', P.numberWords[related.length] ?? String(related.length));
 
 const articleLd = articleJsonLd({
   slug: 'decisions-api-legal-quiz',
@@ -39,287 +87,450 @@ const articleLd = articleJsonLd({
   path="/writing/decisions-api-legal-quiz/"
   ogImage="/og/decisions-api-legal-quiz.png"
   ogType="article"
+  page="writing"
 >
   <script type="application/ld+json" set:html={jsonLdString(articleLd)} is:inline />
 
-  <Masthead kicker={wd.kicker} h1={wd.title} standfirst={wd.dek} h1Max="24ch" narr>
-    <Fragment slot="byline"><time datetime={wd.date}>{formatDate(wd.date)}</time> · {wd.readingTime} read</Fragment>
+  <Masthead kicker={wd.kicker} h1={wd.title} standfirst={wd.dek} narr stats={D.stats}>
+    <Fragment slot="byline">
+      <span><b>{P.byline.author}</b></span>
+      <span>{P.byline.essay}</span>
+      <time datetime={wd.date}>{formatDate(wd.date)}</time>
+      <span>{wd.readingTime} {P.byline.readSuffix}</span>
+      <span><a href="#listen">{P.byline.listen} {formatClock(wd.audio.duration)}</a></span>
+    </Fragment>
     <AudioPlayer audio={wd.audio} articleId="decisions" />
-    <p class="read-along">
-      The text below follows the audio as it plays. <a href={wd.audio.captions} download>Download captions (.vtt)</a>
-    </p>
-    <div class="intro">
-      {wd.intro.map((p, i) => <p class="prose" data-narr={`s0-p${i}`}>{p}</p>)}
+    <p class="src-line read-along">{P.player.readAlong}</p>
+    <div class="finding">
+      <span class="lab red">{D.finding.label}</span>
+      <p>{D.finding.text}</p>
     </div>
   </Masthead>
+
+  <Section mark="" label="">
+    {wd.intro.map((p, i) => <p class="prose" data-narr={`s0-p${i}`}>{p}</p>)}
+  </Section>
 
   {
     wd.sections.map((s, i) => (
       <Section mark={s.mark} label={s.label} anchorId={s.id} narrId={`s${i + 1}-cue`}>
-        {s.paras.map((p, j) => (
-          <>
-            <p class="prose" data-narr={`s${i + 1}-p${j}`}>
-              {withLinks(p).map((part) => (part.href ? <a class="prose-link" href={part.href}>{part.text}</a> : part.text))}
+        {s.paras.map((text, j) => {
+          const narr = `s${i + 1}-p${j}`;
+          const body = parts(s.id, j, text);
+          const para = isQuote(s.id, j) ? (
+            <div class="prose">
+              <blockquote data-narr={narr}>{text}</blockquote>
+            </div>
+          ) : (
+            <p class="prose" data-narr={narr}>
+              {body.map((x) =>
+                x.fn !== undefined ? (
+                  <sup><a href={`#fn${x.fn}`} id={`r${x.fn}`} data-n={x.fn} aria-label={`${D.footnotes.ref} ${x.fn}`}></a></sup>
+                ) : x.rn ? (
+                  <span class="rn">{x.t}</span>
+                ) : (
+                  linkify(x.t).map((y) => (y.href ? <a href={y.href} target="_blank" rel="noopener noreferrer">{y.t}</a> : y.t))
+                ),
+              )}
             </p>
-            {s.after?.[j] === 'glance' && (
-              <div class="summary">
-                <div class="summary-table">
-                  <DataTable caption={glance.caption} columns={glance.columns} rows={glanceRows} nowrap />
-                </div>
-                <div class="summary-cards">
-                  <p class="summary-cap">{glance.caption}</p>
-                  <ul class="summary-list">
-                    {glance.rows.map((r) => (
-                      <li class="summary-card">
-                        <p class="summary-kind">{r.label}</p>
-                        <dl class="summary-fields">
-                          {r.cells.map((c, k) => (
-                            <div class="summary-field">
-                              <dt>{glance.columns[k + 1]}</dt>
-                              <dd>{c}</dd>
-                            </div>
-                          ))}
-                        </dl>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <p class="summary-source">
-                  {glance.source}{' '}
-                  <a href={glance.href}>{glance.hrefLabel}</a>{' '}
-                  <a href={glance.href2}>{glance.hrefLabel2}</a>
-                </p>
-              </div>
-            )}
-            {s.after?.[j] === 'trust' && (
-              <EssayFigure n={f.trust.n} title={f.trust.title} source={f.trust.source} href={f.trust.href} hrefLabel={f.trust.hrefLabel}>
-                <video
-                  muted
-                  loop
-                  playsinline
-                  preload="none"
-                  data-trust-curve
-                  poster={f.trust.video.poster}
-                  width={f.trust.video.width}
-                  height={f.trust.video.height}
-                  aria-label={f.trust.video.label}
-                >
-                  <source src={f.trust.video.src} type="video/mp4" />
-                </video>
-                <div class="fig-controls">
-                  <button type="button" class="fig-toggle" data-trust-toggle hidden>Pause</button>
-                </div>
-                <p class="prose fig-caption" data-narr={`s${i + 1}-fig1`}>{f.trust.caption}</p>
-              </EssayFigure>
-            )}
-          </>
-        ))}
+          );
+          const mn = note(s.id, j);
+          const withNote = mn ? (
+            <div class="article">
+              {para}
+              <aside aria-label={mn.title}>
+                <MarginNote as="div" title={mn.title}>{mn.text}</MarginNote>
+              </aside>
+            </div>
+          ) : (
+            para
+          );
+          return (
+            <>
+              {withNote}
+              {s.after?.[j] === 'glance' && (
+                <>
+                  <DataTable caption={D.tableCaption} columns={glance.columns} rows={glanceRows} totalRow />
+                  <p class="src-line">
+                    {glance.source} <a href={glance.href} target="_blank" rel="noopener noreferrer">{glance.hrefLabel}</a> · <a href={glance.href2} target="_blank" rel="noopener noreferrer">{glance.hrefLabel2}</a>
+                  </p>
+                </>
+              )}
+              {s.after?.[j] === 'trust' && (
+                <>
+                  <p class="prose" data-narr={`s${i + 1}-fig1`}>{f.trust.caption}</p>
+                  <EssayFigure n={D.sheet.fig.n} title={D.sheet.fig.title} source={D.sheet.source}>
+                    <div class="wr-sheet" role="img" aria-label={sheetAria}>
+                      {taskRows.map((r) => (
+                        <div class="sh-row">
+                          <p class="sh-l">
+                            <span>{r.label}</span>
+                            <span class="sh-c">{r.kept} of {r.n} {D.sheet.kept} · <b>{r.wrong}</b> {D.sheet.wrong}</span>
+                          </p>
+                          <div class="sh-g" role="presentation">
+                            {r.cells.map((c) => <i class={c}></i>)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div class="wr-legend">
+                      <span><i class="lk"></i>{D.sheet.legend.kept}</span>
+                      <span><i class="lx"></i>{D.sheet.legend.wrong}</span>
+                      <span><i class="ld"></i>{D.sheet.legend.dropped}</span>
+                    </div>
+                    <div class="wr-figro">
+                      {D.sheet.readouts.map((r) => (
+                        <div>
+                          <p class:list={['v', { r: r.red }]} data-num>{r.v}</p>
+                          <p class="u">{r.u}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <button class="chip wr-replay" type="button" hidden>{D.sheet.replay}</button>
+                  </EssayFigure>
+                  <p class="src-line">{f.trust.source} <a href={f.trust.href} target="_blank" rel="noopener noreferrer">{f.trust.hrefLabel}</a></p>
+                </>
+              )}
+            </>
+          );
+        })}
+        {i === wd.sections.length - 1 && (
+          <div class="footnotes" id="footnotes">
+            <ol>
+              {D.footnotes.items.map((fn) => (
+                <li id={`fn${fn.n}`}>
+                  {fn.parts.map((x) => (x.href ? <a href={x.href} target="_blank" rel="noopener noreferrer">{x.t}</a> : x.t))}{' '}
+                  <a class="back" href={`#r${fn.n}`} aria-label={D.footnotes.back}>↩</a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
       </Section>
     ))
   }
 
+  <section class="sec gut">
+    <div class="in">
+      <p class="kick">{D.related.kick}</p>
+      <h2 class="h2 split">{relatedH2}</h2>
+      <ol class="wr-rel" data-stagger>
+        {
+          related.map((n) => (
+            <li>
+              <a class="wr-rrow" href={`/notes/${n.slug}/`}>
+                <time class="d" datetime={n.date}>{formatDate(n.date)}</time>
+                <span class="t">{n.title}</span>
+                <span class="r">{P.noteNumbers[n.slug]}</span>
+                <span class="ba" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="ctas rel-ctas">
+        <a class="tl" href="/writing/">{D.related.all}</a>
+        <a class="tl" href={D.repo} target="_blank" rel="noopener noreferrer">{D.related.code}</a>
+      </div>
+    </div>
+  </section>
+
   <CTASlab
-    marginLines={[home.ctaSlabMarginNow, home.ctaSlabMarginBefore]}
     body={home.ctaSlabBody}
-    buttonLabel={cta.bookACall.label}
-    buttonHref={cta.bookACall.href}
+    buttonLabel={P.contact.email}
+    buttonHref={cta.email.href}
+    secondaryLabel={cta.bookACall.label}
+    secondaryHref={cta.bookACall.href}
+    links={[cta.linkedin, cta.github, cta.x]}
+    buttonNote={null}
   />
 </Base>
 
-<script is:inline>
-  // Fig. 1 plays muted on a loop while at least 35% of it is on screen. Reduced motion: the poster
-  // only, and nothing downloads. The button holds the video paused until it is pressed again.
-  for (const v of document.querySelectorAll('video[data-trust-curve]')) {
-    const b = v.closest('figure').querySelector('[data-trust-toggle]'); let held = false;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.querySelector('source')?.remove(); v.load(); continue; }
-    new IntersectionObserver(([e]) => { if (e.intersectionRatio >= 0.35 && !held) v.play().catch(() => {}); else v.pause(); }, { threshold: [0, 0.35] }).observe(v.closest('figure'));
-    v.onplay = v.onpause = () => { b.textContent = v.paused ? 'Play' : 'Pause'; };
-    b.hidden = false; b.onclick = () => { held = !v.paused; if (held) v.pause(); else v.play().catch(() => {}); };
+<script>
+  import { $, $$, motion } from '../../scripts/ds';
+  import { gsap, ScrollTrigger } from '../../scripts/gsap';
+
+  // Fig. 1 marks itself once, when it arrives: the rows come in, the dropped squares are outlined, then the red crosses
+  // appear. A calm fade throughout. Under reduced motion the sheet is simply its final state.
+  const sheet = $('.wr-sheet');
+  const replay = $<HTMLButtonElement>('.wr-replay');
+  if (sheet && motion()) {
+    const rows = $$('.sh-row', sheet);
+    let tl: gsap.core.Timeline | undefined;
+    const run = () => {
+      tl?.kill();
+      sheet.classList.add('pre-d', 'pre-x');
+      tl = gsap.timeline();
+      tl.fromTo(rows, { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.8, ease: 'expo.out', stagger: 0.07 })
+        .add(() => sheet.classList.remove('pre-d'), '+=0.15')
+        .add(() => sheet.classList.remove('pre-x'), '+=0.75')
+        .add(() => {
+          if (replay) replay.hidden = false;
+        });
+    };
+    sheet.classList.add('pre-d', 'pre-x');
+    gsap.set(rows, { autoAlpha: 0 });
+    ScrollTrigger.create({ trigger: sheet, start: 'top 78%', once: true, onEnter: run });
+    replay?.addEventListener('click', run);
   }
 </script>
 
 <style>
-  .intro {
-    margin-top: var(--s-8);
-  }
-
-  /* The trust-curve video fills its figure. */
-  video {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .fig-caption {
-    margin-top: var(--s-3);
-  }
-
-  /* Pause / Play for Fig. 1, right-aligned above the caption. Shown by the script only. */
-  .fig-controls {
+  /* The finding line in the head. */
+  .finding {
     display: flex;
-    justify-content: flex-end;
-    margin-top: var(--s-3);
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    align-items: baseline;
+    margin-top: 22px;
+    padding: 12px 0;
+    border-top: var(--line-hair);
+    border-bottom: var(--line-hair);
+    max-width: 640px;
   }
 
-  .fig-toggle {
-    min-block-size: var(--hit-min);
-    padding: var(--s-1) var(--s-3);
-    border: var(--line-object-muted);
-    border-radius: var(--radius);
-    background: none;
-    font-family: var(--font-data);
-    font-size: var(--t-note);
-    line-height: var(--lh-label);
+  .finding p {
+    font-size: 16px;
     color: var(--color-text);
-    cursor: pointer;
-  }
-
-  .fig-toggle[hidden] {
-    display: none;
-  }
-
-  .prose-link {
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-    overflow-wrap: anywhere;
-  }
-
-  /* Standalone links in this page's source lines meet the 24px hit area. */
-  .read-along a,
-  .summary-source a,
-  :global(.ef-source a) {
-    display: inline-block;
-    min-block-size: var(--hit-min);
-    line-height: var(--lh-label);
+    font-variation-settings: 'wdth' 92, 'wght' 600;
   }
 
   .read-along {
-    margin-top: var(--s-3);
-    font-family: var(--font-text);
-    font-size: var(--t-note);
-    line-height: var(--lh-snug);
+    max-width: 640px;
+  }
+
+  /* Fig. 1: the answer sheet. */
+  .wr-sheet {
+    display: grid;
+    gap: 14px;
+  }
+
+  .sh-row {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .sh-l {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font: 500 var(--t-label) / var(--lh-label) var(--font-data);
+    letter-spacing: 0.06em;
+    color: var(--color-text-body);
+  }
+
+  .sh-c {
+    font-weight: 400;
+    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .sh-c b {
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .sh-g {
+    display: grid;
+    grid-template-columns: repeat(50, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .sh-g i {
+    display: block;
+    aspect-ratio: 1;
+    background: var(--color-text-body);
+    transition: background-color 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out), opacity 0.6s var(--ease-out);
+  }
+
+  .sh-g i.x {
+    background: var(--color-accent);
+  }
+
+  .sh-g i.d {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--color-line-strong);
+  }
+
+  .wr-sheet.pre-d .sh-g i.d,
+  .wr-sheet.pre-x .sh-g i.x {
+    background: var(--color-text-muted);
+    box-shadow: none;
+  }
+
+  .wr-sheet.pre-d .sh-g i.d {
+    opacity: 0.85;
+  }
+
+  @media (max-width: 599px) {
+    .sh-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+
+    .sh-l {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+    }
+
+    .sh-g {
+      gap: 1.5px;
+    }
+  }
+
+  .wr-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 12px;
+    font: 400 var(--t-label) / 1.4 var(--font-data);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--color-text-muted);
   }
 
-  .read-along a {
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+  .wr-legend i {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 7px;
+    vertical-align: -1px;
   }
 
-  /* A figure or table that follows a paragraph needs the same gap a paragraph
-     would get. The figure supplies its own margin; the table wrapper does here. */
-  .summary {
-    margin-top: var(--s-8);
-    margin-bottom: var(--s-8);
-    max-width: var(--measure);
+  .wr-legend .lk {
+    background: var(--color-text-body);
   }
 
-  /* The Overall row closes the table: a 1px ink rule above it. Cell borders win over the
-     row borders in the collapsed table, so the rule shows against Hearsay's hairline. */
-  .summary-table :global(.data-table tbody tr:last-child > *) {
-    border-top: var(--line-ink);
+  .wr-legend .lx {
+    background: var(--color-accent);
   }
 
-  /* Wide screens: the table. Below 900px: one labelled card per row, so no
-     sideways scrolling for six numeric columns. */
-  .summary-cards {
+  .wr-legend .ld {
+    box-shadow: inset 0 0 0 1px var(--color-line-strong);
+  }
+
+  .wr-figro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 22px;
+    margin-top: 14px;
+  }
+
+  .wr-figro .v {
+    font-size: var(--t-num);
+    line-height: var(--lh-tight);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wr-figro .u {
+    margin-top: 4px;
+    font: 400 var(--t-label) / var(--lh-label) var(--font-data);
+    color: var(--color-text-muted);
+  }
+
+  .wr-figro .v.r {
+    color: var(--color-accent);
+  }
+
+  .wr-replay {
+    margin-top: 14px;
+  }
+
+  .wr-replay[hidden] {
     display: none;
   }
 
-  @media (max-width: 899px) {
-    .summary-table {
-      display: none;
-    }
-
-    .summary-cards {
-      display: block;
-    }
-  }
-
-  .summary-cap {
-    padding-bottom: var(--s-3);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  .summary-list {
+  /* Related notes. */
+  .wr-rel {
     list-style: none;
-    margin: 0;
-    padding: 0;
+    border-top: var(--line-heavy);
+    margin-top: clamp(24px, 4vh, 40px);
   }
 
-  .summary-card {
-    padding-block: var(--s-4);
-    border-bottom: var(--line-hair);
-  }
-
-  .summary-card:first-child {
-    border-top: var(--line-hair);
-  }
-
-  /* Overall: the same ink rule above it as in the table. */
-  .summary-card:last-child {
-    border-top: var(--line-ink);
-  }
-
-  .summary-card:nth-last-child(2) {
-    border-bottom: 0;
-  }
-
-  .summary-kind {
-    margin-bottom: var(--s-3);
-    font-family: var(--font-text);
-    font-size: var(--t-small);
-    font-weight: 500;
-    color: var(--color-text);
-  }
-
-  .summary-fields {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-  }
-
-  /* One row per field: label left, value right. */
-  .summary-field {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  .wr-rrow {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr) minmax(0, 130px) 22px;
+    gap: 18px;
     align-items: baseline;
-    gap: var(--s-4);
-    font-family: var(--font-data);
-  }
-
-  .summary-field dt {
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-  }
-
-  .summary-field dd {
-    margin: 0;
-    flex: none;
-    text-align: right;
-    white-space: nowrap;
-    font-size: var(--t-data);
+    padding: 13px 0;
+    border-bottom: var(--line-hair);
+    text-decoration: none;
     color: var(--color-text);
   }
 
-  /* Source line under the table, set like EssayFigure's. */
-  .summary-source {
-    margin-top: var(--s-5);
-    font-family: var(--font-text);
-    font-size: var(--t-note);
-    line-height: var(--lh-snug);
-    color: var(--color-text-muted);
+  .wr-rrow::before {
+    content: '';
+    position: absolute;
+    inset: 0 -16px;
+    background: var(--color-surface-raised);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.6s var(--ease-out);
+    z-index: -1;
   }
 
-  .summary-source a {
-    color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+  .wr-rrow:hover::before,
+  .wr-rrow:focus-visible::before {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+
+  .wr-rrow .d {
+    font: 400 var(--t-nav) / var(--lh-label) var(--font-data);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .wr-rrow .t {
+    font-size: 17px;
+    line-height: 1.35;
+    font-variation-settings: 'wdth' 96, 'wght' 520;
+  }
+
+  .wr-rrow .r {
+    font: 500 var(--t-data) / var(--lh-label) var(--font-data);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wr-rrow .ba {
+    text-align: right;
+  }
+
+  .wr-rrow:hover .ba,
+  .wr-rrow:focus-visible .ba {
+    transform: translateX(6px);
+  }
+
+  @media (max-width: 899px) {
+    .wr-rrow {
+      grid-template-columns: minmax(0, 1fr) 22px;
+      gap: 4px 12px;
+    }
+
+    .wr-rrow .t,
+    .wr-rrow .r {
+      grid-column: 1;
+    }
+
+    .wr-rrow .r {
+      text-align: left;
+      color: var(--color-text-body);
+    }
+
+    .wr-rrow .ba {
+      grid-column: 2;
+      grid-row: 1 / 3;
+    }
+  }
+
+  .rel-ctas {
+    margin-top: 28px;
   }
 </style>

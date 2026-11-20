@@ -1,4 +1,4 @@
-// Tokens audit — does the rendered site stay inside The Red Pen's token set?
+// Tokens audit: does the rendered site stay inside The Pipeline's token set?
 // (Pages come from the built sitemap; widths are 1440 / 1024 / 390.)
 // Run against a live site:  npx astro preview --host 127.0.0.1 --port 4321 &  npm run tokens
 // Env: BASE_URL (default http://127.0.0.1:4321). Report: .astro/tokens-report.json
@@ -47,7 +47,7 @@ const sizeOk = (px) =>
   sizeRanges.some(([lo, hi]) => px >= lo - 0.05 && px <= hi + 0.05);
 
 const colourTokens = [
-  ...new Set([...css.matchAll(/(--(?:paper|ink|rule|red|on-red|heat|surface-ink|on-ink|graphite)[\w-]*):/g)].map((m) => m[1])),
+  ...new Set([...css.matchAll(/(--(?:bg|raise|panel|ink|rule|red|on-red|heat|glass|chip-bg|code-bg|color)[\w-]*):/g)].map((m) => m[1])),
 ];
 
 // --- in-page probe ----------------------------------------------------------
@@ -125,7 +125,8 @@ const probe = ({ colourTokens, fixed, ranges, WEIGHT_MAX }) => {
   };
 
   for (const e of document.body.querySelectorAll('*')) {
-    if (e.closest('svg') || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(e.tagName)) continue;
+    // [data-specimen] shows a retired palette on purpose (the Design page's previous versions).
+    if (e.closest('svg, [data-specimen]') || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(e.tagName)) continue;
     if (e.getClientRects().length === 0) continue;
     const cs = getComputedStyle(e);
     if (cs.visibility === 'hidden') continue;

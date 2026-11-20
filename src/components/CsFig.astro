@@ -1,0 +1,22 @@
+---
+// The figure shell the three pages share: a header (title and controls), a body, a two-part foot.
+interface Props {
+  no: string;
+  title: string;
+  foot?: string[];
+  id?: string;
+  /** Extra class on the figure, e.g. a top margin. */
+  gap?: boolean;
+}
+
+const { no, title, foot = [], id, gap = false } = Astro.props;
+---
+
+<figure class:list={['cs-fig', gap && 'gap']} id={id}>
+  <div class="cs-fig-top">
+    <p class="cs-fig-t"><span class="fno">{no}</span>{title}</p>
+    <slot name="top" />
+  </div>
+  <div class="cs-fig-body"><slot /></div>
+  {foot.length > 0 && <figcaption class="cs-fig-foot">{foot.map((f) => <span>{f}</span>)}</figcaption>}
+</figure>

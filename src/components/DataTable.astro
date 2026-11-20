@@ -1,4 +1,9 @@
 ---
+// A data table in the kit's booktabs style (`.tbl`: a 2px ink rule top and bottom, a 1px rule under the head).
+// A column whose every cell reads as a number (23, 0.894, 87 of 100, 83.2%, +0.07) is set as a numeric column:
+// right-aligned, in the mono face. Pass `numeric` to say which data columns are numeric when that guess is wrong.
+// Wide tables scroll sideways inside their own box; pass `stack` to stack the rows into label and value pairs
+// at 599px and below instead.
 interface Cell {
   text: string;
   win?: boolean;
@@ -13,306 +18,127 @@ interface Props {
   caption: string;
   columns: string[]; // first column header is the row-label header
   rows: Row[];
-  // Keep every data cell on one line (numbers, ids, ranges: "claude-haiku-4-5", "-3.05 to +2.76").
-  // Wide tables then scroll sideways instead of breaking a value mid-token. Leave off for prose cells.
+  /** Kept for old call sites: cells never break mid-token in the kit table. */
   nowrap?: boolean;
-  /** D-14: at <=599px the table stacks into label/value rows instead of scrolling. */
+  /** At 599px and below the table stacks into label/value rows instead of scrolling. */
   stack?: boolean;
+  /** Per data column (not counting the label column): true = numeric. Default: guessed from the cells. */
+  numeric?: boolean[];
+  /** Set the last row as a total (heavier text). */
+  totalRow?: boolean;
 }
 
-const { caption, columns, rows, nowrap = false, stack = true } = Astro.props;
+const { caption, columns, rows, stack = false, numeric, totalRow = false } = Astro.props;
 const [labelHeader, ...dataHeaders] = columns;
+
+const NUM = /^[~+\-\u2212\u2013]?[$₹]?\d[\d,]*(?:\.\d+)?\s*(?:%|×|x|ms|s|pp|pts?|points?|cents?|k|M)?(?:\s*(?:of|to|vs|→|·|\/|\u2013|-)\s*[~+\-\u2212\u2013]?[$₹]?\d[\d,]*(?:\.\d+)?\s*(?:%|×|x|ms|s|pp|pts?|points?|cents?|k|M)?)*$/i;
+const isNum = (t: string) => NUM.test(t.trim());
+const numCols = dataHeaders.map((_, i) => numeric?.[i] ?? (rows.length > 0 && rows.every((r) => r.cells[i] && isNum(r.cells[i].text))));
 ---
 
-<div class:list={['data-table-scroll', { 'is-stack': stack }]}>
-{/* The visible caption sits outside the scroller so it is as wide as the visible
-    box (not the whole table) and can leave room for the "scroll" hint beside it.
-    The <caption> inside the table stays, visually hidden, for assistive tech. */}
-<p class="dt-caption" aria-hidden="true">{caption}</p>
-<div class="data-table-wrap" tabindex="0" role="region" aria-label={caption} data-label={caption}>
-<table class:list={['data-table', { 'data-table--nowrap': nowrap }]}>
-  <caption class="visually-hidden">{caption}</caption>
-  <thead>
-    <tr>
-      <th scope="col">{labelHeader}</th>
-      {dataHeaders.map((h) => <th scope="col">{h}</th>)}
-    </tr>
-  </thead>
-  <tbody>
-    {
-      rows.map((row) => (
-        <tr>
-          <th scope="row">{row.label}</th>
-          {row.cells.map((cell, i) => (
-            <td class:list={[{ win: cell.win }]} data-l={dataHeaders[i]}>{cell.text}</td>
-          ))}
-        </tr>
-      ))
-    }
-  </tbody>
-</table>
-</div>
-<span class="scroll-hint" aria-hidden="true">scroll &rarr;</span>
+<div class:list={['tbl-wrap', 'dt', { 'dt--stack': stack }]} tabindex="0" role="region" aria-label={caption}>
+  <table class="tbl">
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{labelHeader}</th>
+        {dataHeaders.map((h, i) => <th scope="col" class:list={[{ n: numCols[i] }]}>{h}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row, r) => (
+          <tr class:list={[{ 'dt-total': totalRow && r === rows.length - 1 }]}>
+            <th scope="row">{row.label}</th>
+            {row.cells.map((cell, i) => (
+              <td class:list={[{ n: numCols[i], win: cell.win }]} data-l={dataHeaders[i]}>{cell.text}</td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
 </div>
 
 <style>
-  /* Wide tables (5-7 columns) scroll sideways inside their own box on narrow
-     screens instead of squeezing headers into each other. */
-  .data-table-scroll {
-    position: relative;
-    /* The wrap's inline padding keeps the focus ring off the first glyphs;
-       the matching negative margin keeps the table aligned to the column. */
-    margin-inline: calc(-1 * var(--s-1));
-    timeline-scope: --dt-x;
+  /* A row label is a header cell for assistive tech and reads like the kit's first column. */
+  .tbl tbody th {
+    padding: 11px 14px 11px 0;
+    border-bottom: var(--line-hair);
+    font-size: var(--t-small);
+    font-weight: normal;
+    text-align: left;
+    color: var(--color-text);
+    vertical-align: baseline;
   }
 
-  .data-table-wrap {
-    overflow-x: auto;
-    max-width: 100%;
-    padding-inline: var(--s-1);
-    scroll-timeline: --dt-x inline;
-  }
-
-  /* Sideways-scroll cue: a paper fade on the right edge + a "scroll ->" note.
-     Both are driven by the wrap's own scroll position, so they exist only while
-     the table overflows and fade out at the far end. Hidden by default, so
-     browsers without scroll-driven animations simply show no cue. */
-  .data-table-scroll::after {
-    content: '';
-    position: absolute;
-    inset-block: 0;
-    inset-inline-end: 0;
-    width: var(--s-8);
-    background: linear-gradient(to left, var(--color-surface), transparent);
-    pointer-events: none;
-    opacity: 0;
-  }
-
-  .scroll-hint {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-end: var(--s-1);
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    line-height: 1;
-    color: var(--color-text-muted);
-    pointer-events: none;
-    opacity: 0;
-    z-index: 1; /* above the edge fade */
-  }
-
-  @supports (animation-timeline: --dt-x) {
-    .data-table-scroll::after,
-    .scroll-hint {
-      animation: dt-cue linear both;
-      animation-timeline: --dt-x;
-      animation-range: calc(100% - var(--s-6)) 100%;
-    }
-  }
-
-  @keyframes dt-cue {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-
-  /* D-02 booktabs: Heavy above and below, Ink under the head, Hair between rows. */
-  .data-table {
-    width: 100%;
-    font-family: var(--font-data);
-    font-size: var(--t-data);
-    border-top: var(--line-heavy);
+  .tbl tbody tr:last-child th {
     border-bottom: var(--line-heavy);
   }
 
-  .data-table tbody tr:last-child {
-    border-bottom: 0;
+  /* A text column that follows a number gets breathing room. */
+  .tbl :global(td.n + td:not(.n)),
+  .tbl :global(th.n + th:not(.n)) {
+    padding-left: 28px;
   }
 
-  /* D-14: on phones a table stacks into label/value rows; nothing scrolls sideways. */
+  .dt-total th,
+  .dt-total td {
+    color: var(--color-text);
+    font-variation-settings: 'wght' 640;
+  }
+
+  .dt-total td.n {
+    font-weight: 500;
+  }
+
+  .tbl td.win {
+    color: var(--color-accent);
+  }
+
   @media (max-width: 599px) {
-    .is-stack .data-table-wrap {
-      overflow: visible;
+    .dt--stack .tbl {
+      min-width: 0;
     }
 
-    .is-stack .data-table thead {
+    .dt--stack .tbl thead {
       position: absolute;
       width: 1px;
       height: 1px;
       overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
+      clip: rect(0, 0, 0, 0);
     }
 
-    .is-stack .data-table,
-    .is-stack .data-table tbody,
-    .is-stack .data-table tr,
-    .is-stack .data-table th[scope='row'],
-    .is-stack .data-table td {
+    .dt--stack .tbl,
+    .dt--stack .tbl tbody,
+    .dt--stack .tbl tr,
+    .dt--stack .tbl tbody th,
+    .dt--stack .tbl td {
       display: block;
-      width: 100%;
     }
 
-    .is-stack .data-table tr {
+    .dt--stack .tbl tr {
       padding-block: var(--s-3);
+      border-bottom: var(--line-hair);
     }
 
-    .is-stack .data-table th[scope='row'] {
-      position: static;
-      padding: 0 0 var(--s-1);
-      color: var(--color-text);
-      font-weight: 500;
-      background: none;
+    .dt--stack .tbl tbody th,
+    .dt--stack .tbl td {
+      padding: var(--s-1) 0;
+      border: 0;
     }
 
-    .is-stack .data-table td {
-      display: grid;
-      grid-template-columns: minmax(7em, 40%) minmax(0, 1fr);
-      column-gap: var(--s-3);
-      padding: 2px 0;
-      text-align: left;
-      white-space: normal;
+    .dt--stack .tbl td {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--s-4);
+      text-align: right;
     }
 
-    .is-stack .data-table td::before {
+    .dt--stack .tbl td::before {
       content: attr(data-l);
-      font-size: var(--t-label);
+      text-align: left;
       color: var(--color-text-muted);
     }
-
-    .is-stack .scroll-hint,
-    .is-stack.data-table-scroll::after {
-      display: none;
-    }
-  }
-
-  .dt-caption {
-    text-align: left;
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
-    padding-bottom: var(--s-3);
-    /* Matches the wrap's inline padding so the caption stays aligned with the table. */
-    padding-inline: var(--s-1);
-    /* Room for the "scroll" hint at the block's top-right (it is absolutely
-       positioned): a long caption wraps before it rather than printing under it. */
-    padding-inline-end: var(--s-12);
-  }
-
-  .data-table th,
-  .data-table td {
-    padding-block: var(--s-3);
-    padding-inline-start: var(--s-4);
-    text-align: right;
-    font-weight: 400;
-    vertical-align: baseline;
-  }
-
-  /* Headers may wrap between words but never mid-word; the inline gap above
-     keeps neighbouring right-aligned headers ("BASELINE" | "STRICT") apart. */
-  .data-table thead th {
-    overflow-wrap: normal;
-    word-break: normal;
-    hyphens: none;
-  }
-
-  .data-table th[scope='col']:first-child,
-  .data-table th[scope='row'] {
-    padding-inline-start: 0;
-  }
-
-  @media (max-width: 599px) {
-    .data-table thead th {
-    }
-  }
-
-  .data-table thead th {
-    border-bottom: var(--line-ink);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .data-table th[scope='col']:first-child,
-  .data-table th[scope='row'] {
-    text-align: left;
-  }
-
-  .data-table th[scope='row'] {
-    color: var(--color-text-body);
-  }
-
-  .data-table tbody tr {
-    border-bottom: var(--line-hair);
-    transition: background-color var(--dur-fast) var(--ease-draw);
-  }
-
-  .data-table tbody tr:hover {
-    background: var(--color-surface-raised);
-  }
-
-  .data-table td {
-    color: var(--color-text-muted);
-  }
-
-  .data-table--nowrap td {
-    white-space: nowrap;
-  }
-
-  /* On narrow screens a scrolling table keeps its row label in view (the first column is a row
-     header, so the reader never loses which row a number belongs to). */
-  @media (max-width: 899px) {
-    .data-table th[scope='row'] {
-      position: sticky;
-      inset-inline-start: 0;
-      z-index: 1;
-      background: var(--color-surface);
-      padding-inline-end: var(--s-3);
-    }
-
-    .data-table tbody tr:hover th[scope='row'] {
-      background: var(--color-surface-raised);
-    }
-  }
-
-  .data-table td.win {
-    color: var(--color-accent-text);
-    font-weight: 500;
-  }
-
-  .data-table td:last-child,
-  .data-table th[scope='col']:last-child {
-    color: var(--color-text);
-  }
-
-  .data-table td.win:last-child {
-    color: var(--color-accent-text);
   }
 </style>
-
-<script>
-  // A scroll region is a tab stop and a landmark only while it actually scrolls. Without
-  // overflow it is just a table: no extra Tab stop, no extra region to announce. (With
-  // JavaScript off the attributes stay, which is the safe default.)
-  const wraps = document.querySelectorAll<HTMLElement>('.data-table-wrap');
-  function sync(w: HTMLElement) {
-    if (w.scrollWidth > w.clientWidth + 1) {
-      w.setAttribute('tabindex', '0');
-      w.setAttribute('role', 'region');
-      w.setAttribute('aria-label', w.dataset.label ?? '');
-    } else {
-      w.removeAttribute('tabindex');
-      w.removeAttribute('role');
-      w.removeAttribute('aria-label');
-    }
-  }
-  const ro = new ResizeObserver((entries) => entries.forEach((e) => sync(e.target as HTMLElement)));
-  wraps.forEach((w) => {
-    sync(w);
-    ro.observe(w);
-    const t = w.querySelector('table');
-    if (t) ro.observe(t);
-  });
-</script>

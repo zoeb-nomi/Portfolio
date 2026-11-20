@@ -1,17 +1,22 @@
 ---
-// The harness panel (Red Pen 5, home): Zoeb's agent harness, counted as it runs, on the ink surface.
-// Two groups kept apart: today (agent and subagent runs) and outcomes (closed and caught in the last 7 days, all-in
-// cost per task with API only, review wait with on-time), then a 14-day unit grid: one square per closed task in
-// the text colour, caught in the pen (annotation only), the last 7 days shaded, days before the ledger starts shown
-// as a short line. One tab stop for the grid; arrow keys move between days and the readout gives that day's counts.
-// Data: the snapshot (src/data/ledger-snapshot.json, refreshed by scripts/fetch-ledger.mjs at build) is the HTML;
-// on load the panel reads the agent ledger's public summary and holds its WebSocket, so numbers move while a
-// visitor watches. Any error leaves what is on screen. Status: "Live, last event <time>" or "Last updated <date>"
-// in graphite. No motion: no count-up (a live number must never be rewound) and no pulse (red is the pen's).
-import { home } from '../data/copy';
+// The agent harness panel (The Pipeline, home band): Zoeb's agent harness, counted as it runs.
+//   A five-step flow (Filed, Agent runs, Checked, My review, Closed) with a dashed "caught before merge" branch
+//   under Checked and My review; four tiles (closed and caught in 7 days, all-in cost per task, on time); and a
+//   14-day grid, one square per closed task, caught ones red, the last 7 days shaded, days before the ledger starts
+//   shown as a short line. "How these count" is a closed disclosure. One tab stop for the grid; arrows, Home and
+//   End move between days and the readout line gives that day's counts.
+//   Data: the snapshot (src/data/ledger-snapshot.json, refreshed by scripts/fetch-ledger.mjs at build) is the HTML.
+//   On load the panel reads the agent ledger's public summary and holds its WebSocket, so numbers move while a
+//   visitor watches (digits change with swap(), never a count-up). Any error leaves what is on screen.
+//   Status: "Live, last event <time>" or "Last updated <date>". The band around it (heading, background) is the
+//   page's; this component is the .hz block.
+// Variants: none. Motion: none of its own; changed digits tick once (ds.ts swap).
+// Copy: home.v5.harness and pipelineHome.harness in src/data/copy.ts. Every number is a snapshot or ledger field.
+import { home, pipelineHome } from '../data/copy';
 import snapshot from '../data/ledger-snapshot.json';
 
 const h = home.v5.harness;
+const hx = pipelineHome.harness;
 const s = snapshot;
 
 const fill = (t: string, v: Record<string, string | number>) => t.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
@@ -21,17 +26,6 @@ const dayLabel = (iso: string) =>
 const o = s.outcomes;
 const ro = o.readout as { on_time?: { x: number; y: number }; median_wait_for_review_min?: { value: number } };
 const start = o.since;
-const outcomeValues = [
-  { v: String(o.shipped_7d), sub: fill(h.since, { n: o.shipped_total }) },
-  { v: String(o.caught_7d), sub: fill(h.since, { n: o.caught_total }) },
-  { v: money(o.cost.all_in_per_shipped_usd), sub: fill(h.apiOnly, { api: money(o.cost.api_per_shipped_usd) }) },
-  {
-    v: String(ro.median_wait_for_review_min?.value ?? 'n/a'),
-    unit: h.waitUnit,
-    sub: fill(h.waitSub, { x: ro.on_time?.x ?? '?', y: ro.on_time?.y ?? '?' }),
-  },
-];
-const liveValues = [s.live.agent_runs_today, s.live.subagent_runs_today];
 const days = s.days.map((d, i) => ({ ...d, before: d.date < start, week: i >= s.days.length - 7 }));
 const detail = (d: (typeof days)[number]) =>
   d.before ? fill(h.beforeDetail, { date: dayLabel(d.date) }) : fill(h.dayDetail, { date: dayLabel(d.date), s: d.shipped, c: d.caught });
@@ -41,96 +35,119 @@ const startIdx = days.findIndex((d) => d.date === start);
 const staleText = `${h.staleLabel} ${dayLabel(s.generated_at.slice(0, 10))}`;
 // Reserve the grid's height from the snapshot's busiest day, so live data rarely moves the page.
 const maxSq = Math.max(1, ...days.map((d) => d.shipped + d.caught));
-const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
+const ROWS_MAX = 28; // a day taller than this is clipped at the top; the readout line still has its exact counts
+const rows = Math.min(ROWS_MAX, Math.ceil(maxSq / 2));
+const capParts = h.gridCaption.split('; ');
+const step = hx.steps;
+const wait = ro.median_wait_for_review_min?.value;
 ---
 
 <div
-  class="hp surface-ink"
+  class="hz"
   data-hp
   data-ledger={h.ledgerUrl}
   data-live-label={h.liveLabel}
   data-stale-label={h.staleLabel}
   data-since={h.since}
   data-api-only={h.apiOnly}
-  data-wait-sub={h.waitSub}
+  data-runs-sub={step[1].s}
   data-readout={h.readout}
   data-day-detail={h.dayDetail}
   data-before-detail={h.beforeDetail}
   data-from-tick={h.fromTick}
   data-today-tick={h.todayTick}
   data-start={start}
+  style={`--rows:${rows}`}
 >
-  <div class="hp-bar">
-    <span class="hp-status" data-hp-status><i class="hp-dot" aria-hidden="true"></i><span data-hp-label>{staleText}</span></span>
+  <div class="hz-bar">
+    <span class="hz-st" data-hp-status><i aria-hidden="true"></i><span data-hp-label>{staleText}</span></span>
   </div>
 
-  <section class="hp-group hp-live" aria-labelledby="hp-g-live">
-    <h3 class="hp-gh" id="hp-g-live">{h.groups.live}</h3>
-    <dl class="hp-tiles">
-      {
-        liveValues.map((v, i) => (
-          <div class="hp-tile">
-            <dt class="hp-l">{h.liveTiles[i]}</dt>
-            <dd class="hp-v hp-v-today" data-hp-live={i}>{v}</dd>
-          </div>
-        ))
-      }
-    </dl>
-  </section>
+  <ol class="hz-flow" aria-label={hx.flowLabel}>
+    <li class="st s1">
+      <span class="hf-k"><i>01</i>{step[0].k}</span><b class="hf-v t">{step[0].t}</b><span class="hf-s">{step[0].s}</span>
+    </li>
+    <li class="st s2">
+      <span class="hf-k"><i>02</i>{step[1].k}</span><b class="hf-v"><span data-hp-live="0">{s.live.agent_runs_today}</span></b>
+      <span class="hf-s" data-hp-runs>{fill(step[1].s, { n: s.live.subagent_runs_today })}</span>
+    </li>
+    <li class="st ck s3">
+      <span class="hf-k"><i>03</i>{step[2].k}</span><b class="hf-v t">{step[2].t}</b><span class="hf-s">{step[2].s}</span>
+    </li>
+    <li class="st ck s4">
+      <span class="hf-k"><i>04</i>{step[3].k}</span><b class="hf-v"><span data-hp-out="wait">{wait ?? 'n/a'}</span><small>{step[3].unit}</small></b>
+      <span class="hf-s">{step[3].s}</span>
+    </li>
+    <li class="st end">
+      <span class="hf-k"><i>05</i>{step[4].k}</span><b class="hf-v"><span data-hp-out="closedTotal">{o.shipped_total}</span></b><span class="hf-s">{step[4].s}</span>
+    </li>
+    <li class="catch">
+      <span class="cb" aria-hidden="true"></span>
+      <p><b data-hp-out="caughtTotal">{o.caught_total}</b>{hx.caught.label}</p>
+      <span class="hf-s">{hx.caught.s}</span>
+    </li>
+  </ol>
 
-  <section class="hp-group" aria-labelledby="hp-g-out">
-    <h3 class="hp-gh" id="hp-g-out">{h.groups.outcomes}</h3>
-    <p class="hp-s hp-means">{h.closedMeans}</p>
-    <dl class="hp-tiles">
-      {
-        outcomeValues.map((t, i) => (
-          <div class="hp-tile">
-            <dt class="hp-l">{h.outcomeTiles[i]}</dt>
-            <dd class="hp-v">
-              <span data-hp-out={i}>{t.v}</span>
-              {t.unit && <span class="hp-u">{t.unit}</span>}
-            </dd>
-            <dd class="hp-s" data-hp-sub={i}>{t.sub}</dd>
-          </div>
-        ))
-      }
-    </dl>
-  </section>
+  <dl class="hz-tiles">
+    <div class="hz-t">
+      <dt>{h.outcomeTiles[0]}</dt>
+      <dd><span data-hp-out="closed7">{o.shipped_7d}</span></dd>
+      <dd class="hs" data-hp-sub="closed7">{fill(h.since, { n: o.shipped_total })}</dd>
+    </div>
+    <div class="hz-t r">
+      <dt>{h.outcomeTiles[1]}</dt>
+      <dd><span data-hp-out="caught7">{o.caught_7d}</span></dd>
+      <dd class="hs" data-hp-sub="caught7">{fill(h.since, { n: o.caught_total })}</dd>
+    </div>
+    <div class="hz-t">
+      <dt>{h.outcomeTiles[2]}</dt>
+      <dd><span data-hp-out="allin">{money(o.cost.all_in_per_shipped_usd)}</span></dd>
+      <dd class="hs" data-hp-sub="allin">{fill(h.apiOnly, { api: money(o.cost.api_per_shipped_usd) })}</dd>
+    </div>
+    <div class="hz-t">
+      <dt>{hx.onTime.label}</dt>
+      <dd><span data-hp-out="onx">{ro.on_time?.x ?? 'n/a'}</span><small>/ <span data-hp-out="ony">{ro.on_time?.y ?? 'n/a'}</span></small></dd>
+      <dd class="hs">{hx.onTime.sub}</dd>
+    </div>
+  </dl>
 
-  <figure class="hp-grid" style={`--rows-d:${rows.d};--rows-m:${rows.m}`}>
-    <figcaption class="hp-cap">{h.gridCaption}</figcaption>
-    <ol class="hp-days" data-hp-days aria-label={h.gridCaption}>
+  <figure class="hz-g">
+    <div class="v-cap"><span>{capParts[0]}</span><span>{capParts[1]}</span></div>
+    <ol class="hz-days" data-hp-days aria-label={h.gridCaption}>
       {
         days.map((d, i) => (
           <li
-            class:list={['hp-day', { 'is-week': d.week, 'is-before': d.before }]}
+            class:list={['hz-day', { wk: d.week, pre: d.before }]}
             tabindex={i === days.length - 1 ? 0 : -1}
             aria-label={detail(d)}
             data-date={d.date}
             data-detail={detail(d)}
           >
-            <span class="hp-stack" aria-hidden="true">
-              {Array.from({ length: d.caught }, () => <i class="hp-sq is-caught" />)}
-              {Array.from({ length: d.shipped }, () => <i class="hp-sq" />)}
+            <span class="hz-stk" aria-hidden="true">
+              {Array.from({ length: d.caught }, () => <i class="c" />)}
+              {Array.from({ length: d.shipped }, () => <i />)}
             </span>
           </li>
         ))
       }
     </ol>
-    <p class="hp-ticks" aria-hidden="true" data-hp-ticks>
+    <p class="hz-ax lab" aria-hidden="true" data-hp-ticks>
+      <span style="grid-column:1">{dayLabel(days[0].date)}</span>
       {startIdx > 0 && <span style={`grid-column:${startIdx + 1}`}>{fill(h.fromTick, { date: dayLabel(start) })}</span>}
-      <span class="hp-tick-end">{h.todayTick}</span>
+      <span class="hz-tick-end">{h.todayTick}</span>
     </p>
-    <p class="hp-readout" aria-live="polite" data-hp-readout data-default={readout}>{readout}</p>
+    <p class="hz-read" aria-live="polite" data-hp-readout data-default={readout}>{readout}</p>
   </figure>
 
-  <details class="hp-how">
+  <details class="hz-how">
     <summary>{h.how.summary}</summary>
     <ul>{h.how.items.map((t) => <li>{t}</li>)}</ul>
   </details>
 </div>
 
 <script>
+  import { swap } from '../scripts/ds';
+
   type Day = { date: string; shipped: number; caught: number };
   type Summary = {
     last_event_at: string | null;
@@ -171,7 +188,7 @@ const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
       readout.textContent = li ? li.dataset.detail ?? '' : readout.dataset.default ?? '';
     };
     // One tab stop for the grid (roving tabindex); arrows, Home and End move between days.
-    const cols = () => [...ol.querySelectorAll<HTMLElement>('.hp-day')];
+    const cols = () => [...ol.querySelectorAll<HTMLElement>('.hz-day')];
     const focusDay = (li: HTMLElement) => {
       cols().forEach((c) => (c.tabIndex = c === li ? 0 : -1));
       li.focus();
@@ -186,11 +203,16 @@ const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
       e.preventDefault();
       focusDay(list[Math.max(0, Math.min(list.length - 1, to))]);
     });
-    ol.addEventListener('focusin', (e) => show((e.target as HTMLElement).closest('.hp-day')));
+    ol.addEventListener('focusin', (e) => show((e.target as HTMLElement).closest('.hz-day')));
     ol.addEventListener('focusout', () => show(null));
-    ol.addEventListener('pointerover', (e) => show((e.target as HTMLElement).closest('.hp-day')));
+    ol.addEventListener('pointerover', (e) => show((e.target as HTMLElement).closest('.hz-day')));
     ol.addEventListener('pointerleave', () => show(ol.contains(document.activeElement) ? (document.activeElement as HTMLElement) : null));
 
+    // Digits change through swap() (an instant change with a short opacity tick, never a count); sentences are set whole.
+    const setNum = (key: string, value: string | number) => {
+      const el = $(`[data-hp-out="${key}"]`);
+      if (el) swap(el, value);
+    };
     const setText = (sel: string, text: string) => {
       const el = $(sel);
       if (el && el.textContent !== text) el.textContent = text;
@@ -200,19 +222,22 @@ const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
       const live = d?.live, o = d?.outcomes;
       if (!live || !o || !Array.isArray(d.days)) return;
       const a = num(live.agent_runs_today), b = num(live.subagent_runs_today);
-      if (a !== null) setText('[data-hp-live="0"]', String(a));
-      if (b !== null) setText('[data-hp-live="1"]', String(b));
+      const runs = $('[data-hp-live="0"]');
+      if (a !== null && runs) swap(runs, a);
+      if (b !== null) setText('[data-hp-runs]', fill(ds.runsSub ?? '', { n: b }));
       const s7 = num(o.shipped_7d), st = num(o.shipped_total), c7 = num(o.caught_7d), ct = num(o.caught_total);
-      if (s7 !== null) setText('[data-hp-out="0"]', String(s7));
-      if (c7 !== null) setText('[data-hp-out="1"]', String(c7));
-      setText('[data-hp-out="2"]', money(num(o.cost?.all_in_per_shipped_usd)));
+      if (s7 !== null) setNum('closed7', s7);
+      if (c7 !== null) setNum('caught7', c7);
+      if (st !== null) { setNum('closedTotal', st); setText('[data-hp-sub="closed7"]', fill(ds.since ?? '', { n: st })); }
+      if (ct !== null) { setNum('caughtTotal', ct); setText('[data-hp-sub="caught7"]', fill(ds.since ?? '', { n: ct })); }
+      setNum('allin', money(num(o.cost?.all_in_per_shipped_usd)));
+      setText('[data-hp-sub="allin"]', fill(ds.apiOnly ?? '', { api: money(num(o.cost?.api_per_shipped_usd)) }));
       const wait = num(o.readout?.median_wait_for_review_min?.value);
-      if (wait !== null) setText('[data-hp-out="3"]', String(wait));
-      if (st !== null) setText('[data-hp-sub="0"]', fill(ds.since ?? '', { n: st }));
-      if (ct !== null) setText('[data-hp-sub="1"]', fill(ds.since ?? '', { n: ct }));
-      setText('[data-hp-sub="2"]', fill(ds.apiOnly ?? '', { api: money(num(o.cost?.api_per_shipped_usd)) }));
+      if (wait !== null) setNum('wait', wait);
       const ot = o.readout?.on_time;
-      setText('[data-hp-sub="3"]', fill(ds.waitSub ?? '', { x: num(ot?.x) ?? '?', y: num(ot?.y) ?? '?' }));
+      const ox = num(ot?.x), oy = num(ot?.y);
+      if (ox !== null) setNum('onx', ox);
+      if (oy !== null) setNum('ony', oy);
 
       // Rebuild the 14 day columns from validated numbers only (createElement, never innerHTML).
       const start = isoDay(o.since) ?? ds.start ?? '';
@@ -220,23 +245,24 @@ const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
         date: isoDay(x?.date), s: Math.min(num(x?.shipped) ?? 0, 99), c: Math.min(num(x?.caught) ?? 0, 99),
       }));
       if (days.length === 14 && days.every((x) => x.date)) {
+        hp.style.setProperty('--rows', String(Math.min(28, Math.ceil(Math.max(1, ...days.map((x) => x.s + x.c)) / 2))));
         const focusedDate = ol.contains(document.activeElement) ? (document.activeElement as HTMLElement).dataset.date : null;
-        const tabDate = ol.querySelector<HTMLElement>('.hp-day[tabindex="0"]')?.dataset.date;
+        const tabDate = ol.querySelector<HTMLElement>('.hz-day[tabindex="0"]')?.dataset.date;
         const items = days.map((x, i) => {
           const before = x.date! < start;
           const text = before
             ? fill(ds.beforeDetail ?? '', { date: dayLabel(x.date!) })
             : fill(ds.dayDetail ?? '', { date: dayLabel(x.date!), s: x.s, c: x.c });
           const li = document.createElement('li');
-          li.className = 'hp-day' + (i >= 7 ? ' is-week' : '') + (before ? ' is-before' : '');
+          li.className = 'hz-day' + (i >= 7 ? ' wk' : '') + (before ? ' pre' : '');
           li.dataset.date = x.date!;
           li.dataset.detail = text;
           li.setAttribute('aria-label', text);
           const stack = document.createElement('span');
-          stack.className = 'hp-stack';
+          stack.className = 'hz-stk';
           stack.setAttribute('aria-hidden', 'true');
-          for (let k = 0; k < x.c; k++) stack.append(Object.assign(document.createElement('i'), { className: 'hp-sq is-caught' }));
-          for (let k = 0; k < x.s; k++) stack.append(Object.assign(document.createElement('i'), { className: 'hp-sq' }));
+          for (let k = 0; k < x.c; k++) stack.append(Object.assign(document.createElement('i'), { className: 'c' }));
+          for (let k = 0; k < x.s; k++) stack.append(document.createElement('i'));
           li.append(stack);
           return li;
         });
@@ -251,14 +277,14 @@ const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
         const ticks = $('[data-hp-ticks]');
         const si = days.findIndex((x) => x.date === start);
         if (ticks) {
-          const parts: HTMLElement[] = [];
+          const parts: HTMLElement[] = [Object.assign(document.createElement('span'), { textContent: dayLabel(days[0].date!), style: 'grid-column:1' })];
           if (si > 0) parts.push(Object.assign(document.createElement('span'), { textContent: fill(ds.fromTick ?? '', { date: dayLabel(start) }), style: `grid-column:${si + 1}` }));
-          parts.push(Object.assign(document.createElement('span'), { className: 'hp-tick-end', textContent: ds.todayTick ?? '' }));
+          parts.push(Object.assign(document.createElement('span'), { className: 'hz-tick-end', textContent: ds.todayTick ?? '' }));
           ticks.replaceChildren(...parts);
         }
       }
 
-      // Status: live while the newest event is recent; otherwise the date, in graphite.
+      // Status: live while the newest event is recent; otherwise the date, muted.
       const last = typeof d.last_event_at === 'string' ? Date.parse(d.last_event_at) : NaN;
       const fresh = Number.isFinite(last) && Date.now() - last < STALE_MS;
       const status = $('[data-hp-status]')!;
@@ -321,270 +347,76 @@ const rows = { d: Math.ceil(maxSq / 3), m: Math.ceil(maxSq / 2) };
   });
 </script>
 
-<style>
-  .hp {
-    padding: var(--s-6);
-    border: var(--line-object);
-    box-shadow: 10px 10px 0 var(--color-pending);
-  }
-
-  .hp-bar {
-    padding-bottom: var(--s-3);
-    border-bottom: var(--line-hair);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-  }
-
-  .hp-status {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--s-2);
-    min-block-size: var(--hit-min);
-    color: var(--color-pending);
-  }
-
-  .hp-dot {
-    inline-size: 8px;
-    block-size: 8px;
-    border-radius: 50%;
-    border: var(--line-object);
-    border-color: currentColor;
-  }
-
-  /* Live: a solid dot in the text colour. Never red (red is the pen) and never pulsing (red is the only thing
-     that moves on its own). */
-  .hp-status[data-live] {
-    color: var(--color-text-muted);
-  }
-
-  .hp-status[data-live] .hp-dot {
-    background: var(--color-text);
-    border-color: var(--color-text);
-  }
-
-  .hp-group {
-    margin-top: var(--s-6);
-  }
-
-  .hp-live {
-    padding-bottom: var(--s-6);
-    border-bottom: var(--line-hair);
-  }
-
-  .hp-gh {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    font-weight: 500;
-    color: var(--color-text-muted);
-  }
-
-  .hp-means {
-    margin-top: var(--s-1);
-  }
-
-  .hp-tiles {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--s-6);
-    margin-top: var(--s-3);
-  }
-
-  .hp-tile {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .hp-v {
-    order: -1;
-    font-family: var(--font-heading);
-    font-size: var(--t-num);
-    font-weight: var(--wght-claim);
-    font-stretch: calc(var(--wdth-tight) * 1%);
-    line-height: 1;
-    letter-spacing: var(--track-display);
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text);
-  }
-
-  /* Today is context; the outcomes carry the meaning, so today's numerals are a step smaller. */
-  .hp-v-today {
-    font-size: var(--t-h3);
-  }
-
-  .hp-u {
-    margin-left: 2px;
-    font-size: 0.5em;
-  }
-
-  .hp-l {
-    margin-top: var(--s-2);
-    font-size: var(--t-small);
-    line-height: var(--lh-snug);
-    color: var(--color-text-body);
-  }
-
-  .hp-s,
-  .hp-cap,
-  .hp-ticks,
-  .hp-readout,
-  .hp-how {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    line-height: var(--lh-snug);
-    color: var(--color-text-muted);
-  }
-
-  .hp-s {
-    margin-top: var(--s-1);
-  }
-
-  .hp-grid {
-    margin-top: var(--s-8);
-    padding-top: var(--s-4);
-    border-top: var(--line-hair);
-  }
-
-  .hp-days {
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(14, minmax(0, 1fr));
-    align-items: end;
-    gap: 2px;
-    margin-top: var(--s-3);
-    min-block-size: max(var(--s-13), calc(var(--rows-d) * 8px + var(--s-2)));
-    border-bottom: var(--line-hair);
-  }
-
-  /* Day columns and squares are rebuilt by the script on every update, so they carry no Astro scope
-     attribute: their rules are global under the scoped .hp-days list. */
-  .hp-days :global(.hp-day) {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    align-self: stretch;
-    min-block-size: var(--s-13);
-    padding-bottom: var(--s-1);
-    cursor: default;
-  }
-
-  .hp-days :global(.hp-day.is-week) {
-    background: var(--color-surface-raised);
-  }
-
-  .hp-days :global(.hp-day:focus-visible) {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
-
-  .hp-days :global(.hp-stack) {
-    display: flex;
-    flex-wrap: wrap-reverse;
-    align-content: flex-start;
-    gap: 2px;
-    inline-size: calc(3 * 6px + 2 * 2px);
-  }
-
-  /* Before the ledger starts: a short line on the baseline, not an empty column. */
-  .hp-days :global(.hp-day.is-before .hp-stack) {
-    block-size: 2px;
-    background: var(--color-pending);
-  }
-
-  .hp-days :global(.hp-sq) {
-    display: inline-block;
-    inline-size: 6px;
-    block-size: 6px;
-    background: var(--color-text-body);
-  }
-
-  .hp-days :global(.hp-sq.is-caught) {
-    background: var(--color-accent);
-  }
-
-  .hp-days :global(.hp-day:hover .hp-sq:not(.is-caught)),
-  .hp-days :global(.hp-day:focus-visible .hp-sq:not(.is-caught)) {
-    background: var(--color-text);
-  }
-
-  .hp-ticks {
-    display: grid;
-    grid-template-columns: repeat(14, minmax(0, 1fr));
-    gap: 2px;
-    margin-top: var(--s-1);
-    white-space: nowrap;
-  }
-
-  .hp-ticks :global(.hp-tick-end) {
-    grid-column: 14;
-    justify-self: end;
-  }
-
-  .hp-readout {
-    margin-top: var(--s-2);
-    min-block-size: calc(2 * var(--lh-snug) * var(--t-label));
-    color: var(--color-text);
-  }
-
-  .hp-how {
-    margin-top: var(--s-4);
-    padding-top: var(--s-3);
-    border-top: var(--line-hair);
-  }
-
-  .hp-how summary {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--hit-touch);
-    cursor: pointer;
-    color: var(--color-accent-text);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-  }
-
-  .hp-how ul {
-    display: grid;
-    gap: var(--s-2);
-    margin-top: var(--s-2);
-    padding-left: var(--s-4);
-    color: var(--color-text-body);
-  }
-
-  @media (min-width: 1100px) {
-    .hp-days {
-      min-block-size: max(var(--s-13), calc(var(--rows-d) * 10px + var(--s-2)));
-    }
-
-    .hp-days :global(.hp-stack) {
-      inline-size: calc(3 * 8px + 2 * 2px);
-    }
-
-    .hp-days :global(.hp-sq) {
-      inline-size: 8px;
-      block-size: 8px;
-    }
-  }
-
-  @media (max-width: 899px) {
-    .hp {
-      padding: var(--s-4);
-      box-shadow: 6px 6px 0 var(--color-pending);
-    }
-
-    .hp-tiles {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hp-days {
-      min-block-size: max(var(--s-13), calc(var(--rows-m) * 7px + var(--s-2)));
-    }
-
-    .hp-days :global(.hp-stack) {
-      inline-size: calc(2 * 5px + 2px);
-    }
-
-    .hp-days :global(.hp-sq) {
-      inline-size: 5px;
-      block-size: 5px;
-    }
-  }
+<style is:global>
+.hz{margin-top:clamp(28px,5vh,52px);border-top:var(--line-heavy);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:0 clamp(28px,4vw,64px)}
+.hz-bar{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0;border-bottom:var(--line-hair)}
+.hz-st{display:inline-flex;align-items:center;gap:8px;min-height:var(--hit-min);font:500 11px/1 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--color-text-muted)}
+.hz-st i{display:block;width:7px;height:7px;background:var(--color-text-muted)}
+.hz-st[data-live]{color:var(--color-text)}
+.hz-st[data-live] i{background:var(--color-accent)}
+.hz-flow{grid-column:1/-1;list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin:0;padding:26px 0 0;border-bottom:var(--line-hair)}
+.hz-flow>li{position:relative;padding:24px 18px 22px 0;min-width:0}
+.hz-flow>li.st::before{content:"";position:absolute;left:0;top:0;width:9px;height:9px;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px var(--color-text-body);background:var(--color-surface-raised)}
+.hz-flow>li.st:not(.end)::after{content:"";position:absolute;left:15px;right:6px;top:4px;height:1.5px;background:var(--color-line-strong)}
+.hz-flow>li.st.end::before{background:var(--color-text);box-shadow:none}
+.hz-flow>li.st.ck::before{box-shadow:inset 0 0 0 1.5px var(--color-accent)}
+.hf-k{display:block;font:500 11px/1.3 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--color-text-muted)}
+.hf-k i{font-style:normal;color:var(--color-accent);margin-right:8px}
+.hf-v{display:block;margin-top:10px;font-size:var(--t-num);line-height:1;letter-spacing:-.02em;font-variation-settings:"wdth" 90,"wght" 760;font-variant-numeric:tabular-nums;color:var(--color-text);white-space:nowrap}
+.hf-v small{font:400 12px var(--font-data);letter-spacing:0;color:var(--color-text-muted);margin-left:4px}
+.hf-v.t{font-size:clamp(17px,1.35vw,20px);line-height:1.15;letter-spacing:-.01em;font-variation-settings:"wdth" 92,"wght" 640;white-space:normal}
+.hz-flow>li.st .hf-v{min-height:46px}
+.hf-s{display:block;margin-top:6px;font:400 11px/1.4 var(--font-data);color:var(--color-text-muted)}
+.hz-flow>li.catch{grid-column:3/5;grid-row:2;padding:0 18px 22px 0;margin-top:-4px}
+.hz-flow>li.catch .cb{display:block;height:12px;border:var(--line-pen-dashed);border-top:0;margin-right:18px}
+.hz-flow>li.catch p{margin-top:10px;font:500 12px/1.4 var(--font-data);color:var(--color-text-body)}
+.hz-flow>li.catch p b{font-family:var(--font-text);font-size:var(--t-num);line-height:1;letter-spacing:-.02em;font-variation-settings:"wdth" 90,"wght" 760;font-weight:760;color:var(--color-accent);margin-right:8px;vertical-align:-2px}
+.hz-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start}
+.hz-t{padding:18px 16px 18px 0;border-bottom:var(--line-hair);min-width:0}
+.hz-t dt{font:500 11px/1.3 var(--font-data);letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-muted)}
+.hz-t dd{margin:8px 0 0;font-size:var(--t-num);line-height:1;letter-spacing:-.02em;font-weight:760;font-variation-settings:"wdth" 90,"wght" 760;font-variant-numeric:tabular-nums;color:var(--color-text)}
+.hz-t dd small{font:400 12px var(--font-data);letter-spacing:0;color:var(--color-text-muted);margin-left:4px}
+.hz-t .hs{margin-top:6px;font:400 11px/1.3 var(--font-data);color:var(--color-text-muted);font-variation-settings:normal;letter-spacing:0}
+.hz-t.r dd{color:var(--color-accent)}
+.hz-t.r dd.hs{color:var(--color-text-muted)}
+.hz-g{padding:18px 0 0;min-width:0}
+.hz-days{list-style:none;display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:6px;align-items:end;height:max(178px,calc(var(--rows,20) * 8px + 12px));border-bottom:var(--line-strong)}
+.hz-day{position:relative;display:flex;justify-content:center;align-items:flex-end;height:100%;overflow:hidden}
+.hz-stk{display:grid;grid-template-columns:repeat(2,6px);gap:2px;align-content:start;transform:scaleY(-1)}
+.hz-stk i{display:block;width:6px;height:6px;background:var(--color-text-body)}
+.hz-stk i.c{background:var(--color-accent)}
+.hz-day:focus-visible{outline-offset:-2px}
+.hz-day.wk::before{content:"";position:absolute;inset:0;background:var(--color-text);opacity:.035;pointer-events:none}
+.hz-day.pre::after{content:"";width:8px;height:1.5px;background:var(--color-line-strong);margin-bottom:6px}
+.hz-day:hover .hz-stk i,.hz-day:focus-visible .hz-stk i{background:var(--color-text)}
+.hz-day:hover .hz-stk i.c,.hz-day:focus-visible .hz-stk i.c{background:var(--color-accent)}
+.hz-ax{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:6px;margin-top:8px;white-space:nowrap}
+.hz-ax .hz-tick-end{grid-column:14;justify-self:end}
+.hz-read{margin-top:10px;font:400 12px/1.4 var(--font-data);color:var(--color-text-body);min-height:17px}
+.hz-how{margin-top:22px;border-top:var(--line-hair);grid-column:1/-1}
+.hz-how summary{cursor:pointer;list-style:none;padding:14px 0;font:500 12px/1 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--color-text-body);display:flex;align-items:center;gap:10px}
+.hz-how summary::-webkit-details-marker{display:none}
+.hz-how summary::before{content:"+";color:var(--color-accent);width:10px}
+.hz-how[open] summary::before{content:"−"}
+.hz-how summary:hover{color:var(--color-text)}
+.hz-how ul{list-style:none;display:grid;gap:8px;max-width:78ch;padding-bottom:8px}
+.hz-how li{font-size:14px;line-height:var(--lh-base);color:var(--color-text-body);padding-left:14px;position:relative}
+.hz-how li::before{content:"";position:absolute;left:0;top:.7em;width:6px;height:1px;background:var(--color-text-muted)}
+@media (max-width:899px){
+  .hz{grid-template-columns:minmax(0,1fr)}
+  .hz-flow{grid-template-columns:minmax(0,1fr);padding-top:18px}
+  .hz-flow>li.st{padding:0 0 18px 26px}
+  .hz-flow>li.st::before{top:4px}
+  .hz-flow>li.st:not(.end)::after{left:4px;right:auto;top:17px;bottom:0;width:1.5px;height:auto}
+  .hz-flow>li.catch{grid-column:auto;grid-row:auto;order:4;padding:0 0 18px 26px;margin-top:0}
+  .hz-flow>li.catch .cb{display:none}
+  .hz-flow>li.catch p{margin-top:0;padding:10px 12px;border:var(--line-pen-dashed)}
+  .hz-flow>li.st.s4{order:5}.hz-flow>li.st.end{order:6}
+  .hz-flow>li.st .hf-v{min-height:0}
+}
+@media (max-width:599px){
+  .hz-days,.hz-ax{gap:3px}
+  .hz-days{height:max(150px,calc(var(--rows,20) * 6px + 12px))}
+  .hz-stk{grid-template-columns:repeat(2,4px)}.hz-stk i{width:4px;height:4px}
+}
 </style>

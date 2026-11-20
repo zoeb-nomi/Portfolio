@@ -1,0 +1,164 @@
+---
+// A table of words, not numbers, in the kit's .tbl grammar. On wide screens it is the table (and may run
+// past the reading column into the margin rail); on phones each row becomes a labelled card, so a prose
+// cell never has to scroll sideways. Cells are plain text; a cell with `win` is the one red cell.
+interface Cell {
+  text: string;
+  win?: boolean;
+}
+
+interface Row {
+  label: string;
+  cells: (string | Cell)[];
+}
+
+interface Props {
+  caption: string;
+  /** The first column header is the row-label header. */
+  columns: string[];
+  rows: Row[];
+  /** Run the table past the reading column into the margin rail (wide tables). */
+  wide?: boolean;
+}
+
+const { caption, columns, rows, wide = false } = Astro.props;
+const [labelHeader, ...dataHeaders] = columns;
+const cell = (c: string | Cell): Cell => (typeof c === 'string' ? { text: c } : c);
+---
+
+<div class:list={['tbl-wrap', 'tt', { 'tt--wide': wide }]}>
+  <table class="tbl tt-table">
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        <th>{labelHeader}</th>
+        {dataHeaders.map((h) => <th>{h}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr>
+            <td class="tt-label">{r.label}</td>
+            {r.cells.map((c) => <td class:list={[{ win: cell(c).win }]}>{cell(c).text}</td>)}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <div class="tt-cards">
+    <p class="tt-cap">{caption}</p>
+    <ul class="tt-list">
+      {
+        rows.map((r) => (
+          <li class="tt-card">
+            <p class="tt-kind">{r.label}</p>
+            <dl class="tt-fields">
+              {r.cells.map((c, i) => (
+                <div class="tt-field">
+                  <dt>{dataHeaders[i]}</dt>
+                  <dd class:list={[{ win: cell(c).win }]}>{cell(c).text}</dd>
+                </div>
+              ))}
+            </dl>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style>
+  .tt-cards {
+    display: none;
+  }
+
+  .tt-label {
+    color: var(--color-text);
+  }
+
+  /* The table is the reading column's width by default; a wide one borrows the margin rail. */
+  @media (min-width: 1100px) {
+    .tt--wide {
+      width: calc(var(--rs-w) + 306px);
+      max-width: none;
+    }
+  }
+
+  /* Phones: one labelled card per row. */
+  @media (max-width: 599px) {
+    .tt {
+      overflow: visible;
+    }
+
+    .tt-table {
+      display: none;
+    }
+
+    .tt-cards {
+      display: block;
+    }
+  }
+
+  .tt-cap {
+    padding-bottom: 10px;
+    font: 500 var(--t-label) / var(--lh-snug) var(--font-data);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .tt-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: var(--line-heavy);
+  }
+
+  .tt-card {
+    padding-block: var(--s-4);
+    border-bottom: var(--line-hair);
+  }
+
+  .tt-card:last-child {
+    border-bottom: var(--line-heavy);
+  }
+
+  .tt-kind {
+    margin-bottom: var(--s-3);
+    font-size: var(--t-small);
+    color: var(--color-text);
+    font-variation-settings: 'wdth' 92, 'wght' 640;
+  }
+
+  .tt-fields {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .tt-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .tt-field dt {
+    font: 500 var(--t-label) / var(--lh-snug) var(--font-data);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .tt-field dd {
+    margin: 0;
+    font-size: var(--t-small);
+    line-height: var(--lh-snug);
+    color: var(--color-text-body);
+  }
+
+  .tt-field dd.win {
+    color: var(--color-accent);
+  }
+</style>

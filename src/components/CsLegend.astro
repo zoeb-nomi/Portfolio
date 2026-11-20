@@ -1,0 +1,14 @@
+---
+// Case-study figure legend (The Pipeline): a row of mono keys, each a small swatch plus its label. The swatch class
+// (`k`) picks the mark from case-study.css (filled, hollow, red). Inline chip in the figure head by default;
+// `below` sets it as a block under the figure. No motion.
+interface Props {
+  items: { k: string; t: string }[];
+  /** Block legend under a figure instead of the header chip. */
+  below?: boolean;
+}
+
+const { items, below = false } = Astro.props;
+---
+
+<p class:list={['cs-legend', below && 'below']}>{items.map((l) => <span><i class={l.k || undefined}></i>{l.t}</span>)}</p>

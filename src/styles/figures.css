@@ -1,7 +1,9 @@
-/* Shared pieces of the animated figures (ForestPlot, Dumbbell, ...).
+/* Shared pieces of the figures (ForestPlot, Dumbbell, ...), The Pipeline grammar.
+   The figure sits on the dark frame the kit gives .fig-frame (--color-surface-sunk). Hairlines are --line-hair,
+   labels are muted mono, ink is the data, and red is only the series under test, a failure or an "after" value.
    The default style IS the final state, so a figure is complete with no script and with reduced motion.
-   figure-motion.ts sets data-state="pre" for the start frame and "run" to release it. Lines are 1px ink or
-   rule, or a 2px block of ink (a background, not a border). Marks are square. */
+   figure-motion.ts sets data-state="pre" for the start frame and "run" to release it (a calm fade or draw, once).
+   Marks are square. */
 
 .fg-row {
   display: grid;
@@ -12,7 +14,7 @@
   font-family: var(--font-data);
   font-size: var(--t-data);
   line-height: var(--lh-snug);
-  color: var(--color-text);
+  color: var(--color-text-body);
 }
 
 .fg-row + .fg-row {
@@ -21,19 +23,20 @@
 
 .fg-lab small {
   display: block;
-  font-size: var(--t-micro);
+  font-size: var(--t-label);
   color: var(--color-text-muted);
 }
 
 .fg-val {
+  color: var(--color-text);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
 .fg-note {
   grid-column: 2 / -1;
-  font-size: var(--t-micro);
-  color: var(--color-accent-text);
+  font-size: var(--t-label);
+  color: var(--color-text-muted);
 }
 
 /* The track: a hairline with an inset, so a mark at 0% or 100% stays inside it. */
@@ -76,33 +79,40 @@
   inset-block-start: 0;
   transform: translateX(-50%);
   font-family: var(--font-data);
-  font-size: var(--t-micro);
+  font-size: var(--t-label);
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .fg-axis-label {
-  grid-column: 2;
+  grid-column: 2 / -1;
   margin-top: var(--s-1);
-  text-align: center;
+  text-align: left;
   font-family: var(--font-data);
-  font-size: var(--t-micro);
+  font-size: var(--t-label);
   color: var(--color-text-muted);
 }
 
-/* Square marks centred on their left offset. */
+/* Square marks centred on their left offset. A hollow mark is outlined on the figure ground. */
 .fg-pt {
   position: absolute;
   inset-block-start: 50%;
   inline-size: var(--s-3);
   block-size: var(--s-3);
   margin: calc(var(--s-3) / -2) 0 0 calc(var(--s-3) / -2);
-  border: var(--line-object);
-  background: var(--color-surface);
+  border: var(--line-strong);
+  background: var(--color-surface-sunk);
 }
 
 .fg-pt.is-fill {
   background: var(--color-text);
+  border-color: var(--color-text);
+}
+
+/* The "after" or tested mark: the one red thing on the row. */
+.fg-pt.is-red {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 /* A horizontal run of ink, 2px tall, positioned by left and width. */
@@ -111,7 +121,11 @@
   inset-block-start: 50%;
   block-size: 2px;
   margin-block-start: -1px;
-  background: var(--color-text);
+  background: var(--color-text-muted);
+}
+
+.fg-line.is-red {
+  background: var(--color-accent);
 }
 
 @media (max-width: 599px) {

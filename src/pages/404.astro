@@ -1,57 +1,47 @@
 ---
+// 404 (The Pipeline): a page-head, the one square of twelve that is missing, and the ways out as kit rows.
 import Base from '../layouts/Base.astro';
 import { notFound } from '../data/copy';
 ---
 
-<Base
-  title="404 · Zoeb Nomi"
-  description="Page not found."
-  path="/404/"
-  ogImage="/og/404.png"
-  noindex
->
-  <section class="not-found">
-    <h1 class="code">{notFound.message}</h1>
-    <div class="miss" aria-hidden="true">
-      {Array.from({ length: 12 }, (_, i) => <span class={`miss-cell${i === 7 ? ' is-missing' : ''}`} />)}
+<Base title="404 · Zoeb Nomi" description="Page not found." path="/404/" ogImage="/og/404.png" noindex>
+  <section class="page-head gut">
+    <div class="in">
+      <p class="kick">404</p>
+      <h1 class="display split">{notFound.message}</h1>
+      <div class="miss" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => <span class:list={['miss-cell', { 'is-missing': i === 7 }]} />)}
+      </div>
+      <p class="id miss-caption">{notFound.caption}</p>
     </div>
-    <p class="miss-caption">{notFound.caption}</p>
-    <ul class="exits">
-      {notFound.links.map((l) => <li><a class="home-link" href={l.href}>{l.label} <span aria-hidden="true">→</span></a></li>)}
-    </ul>
+  </section>
+
+  <section class="sec gut">
+    <div class="in">
+      <ol class="blist" data-stagger>
+        {
+          notFound.links.map((l) => (
+            <li>
+              <a class="build exit" href={l.href}>
+                <span class="bn">{l.label}</span>
+                <span class="ba" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </section>
 </Base>
 
 <style>
-  .not-found {
-    min-height: 50vh;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: var(--s-6);
-    padding: var(--s-13) var(--gutter);
-  }
-
-  /* Same setting as every other page h1 (Masthead .page-h1). */
-  .code {
-    font-family: var(--font-heading);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-weight: var(--wght-head);
-    font-size: var(--t-page);
-    line-height: var(--lh-display);
-    letter-spacing: var(--track-tight);
-    color: var(--color-text);
-    max-width: 20ch;
-    text-wrap: balance;
-  }
-
   .miss {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, var(--s-6)));
     gap: var(--s-1);
     inline-size: 100%;
     max-inline-size: 24rem;
+    margin-top: var(--s-7);
   }
 
   .miss-cell {
@@ -60,39 +50,18 @@ import { notFound } from '../data/copy';
     background: var(--color-text);
   }
 
+  /* The page you asked for: drawn as an outline, because it is not there. */
   .miss-cell.is-missing {
-    border: var(--line-pen-dashed);
+    border: var(--line-propose);
     background: transparent;
   }
 
   .miss-caption {
-    font-family: var(--font-data);
-    font-size: var(--t-micro);
-    color: var(--color-text-muted);
+    margin-top: var(--s-3);
   }
 
-  .exits {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-1) var(--s-6);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .home-link {
-    /* Each way out of a dead end is a full 44px target. */
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--hit-touch);
-    font-family: var(--font-data);
-    font-size: var(--t-label-lg);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-    color: var(--color-text);
-  }
-
-  .home-link:hover {
-    color: var(--color-link);
+  /* One exit per row: the name and the arrow. */
+  .exit {
+    grid-template-columns: minmax(0, 1fr) 30px;
   }
 </style>

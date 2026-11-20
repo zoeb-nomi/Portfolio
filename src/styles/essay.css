@@ -1,0 +1,164 @@
+/* Essay pages, The Pipeline. Ported from the approved essay prototype (essay-decisions-api-legal-quiz).
+   One red reading spine bounded to the article, a reading column with a margin rail for notes, and the
+   small pieces essays share (inline readouts, source lines, figure legends). Loaded by EssayShell.astro. */
+
+/* The article is one .rs section (layout.css); the spine itself is drawn by scripts/reading.ts. */
+.rs-in.prose {
+  max-width: none;
+}
+
+.rs-in > h2.rs-h {
+  margin-top: calc(clamp(26px, 2.4vw, 36px) * 2);
+}
+
+/* Margin notes ride in the right rail beside their paragraph; below 1100px they fold under it. The wrapper is a
+   grid whose second track has no width, so the row is as tall as the taller of paragraph and note and the note
+   never runs into whatever follows (a wide table that borrows the rail, say). */
+.wr-p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0;
+}
+
+.wr-p > p {
+  grid-column: 1;
+}
+
+.wr-mn {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  width: 250px;
+  margin-left: 56px;
+  margin-top: 0.35em;
+  font: 400 var(--t-note) / var(--lh-base) var(--font-data);
+  color: var(--color-text-muted);
+  border-left: var(--line-accent);
+  padding-left: 12px;
+}
+
+.wr-mn b {
+  display: block;
+  font: 500 var(--t-label) / var(--lh-snug) var(--font-data);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-body);
+  margin-bottom: 3px;
+}
+
+@media (max-width: 1099px) {
+  .wr-p {
+    display: block;
+  }
+
+  .wr-mn {
+    width: auto;
+    margin-left: 0;
+    margin-top: 0.9em;
+  }
+}
+
+/* Header pieces. */
+.wr-head .display {
+  max-width: 22ch;
+}
+
+.wr-dek {
+  max-width: 640px;
+  margin-top: 20px;
+  font-size: clamp(17px, 1.3vw, 20px);
+  line-height: var(--lh-base);
+  color: var(--color-text-body);
+}
+
+.byline a {
+  color: var(--color-text-body);
+  text-decoration: none;
+  border-bottom: var(--line-strong);
+}
+
+.byline a:hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+
+.wr-head .ap,
+.wr-head .audio-player {
+  margin-top: clamp(24px, 4vh, 36px);
+}
+
+/* Numbers set as inline readouts. */
+.prose .wr-n {
+  color: var(--color-text);
+  font-variation-settings: 'wdth' 92, 'wght' 640;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: inset 0 -1px 0 var(--color-line-strong);
+}
+
+/* Source line under a figure or table. */
+.wr-src {
+  margin-top: 10px;
+  font: 400 var(--t-label) / 1.6 var(--font-data);
+  color: var(--color-text-muted);
+}
+
+.wr-src a {
+  color: var(--color-text-body);
+}
+
+/* Figure legend. */
+.wr-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 12px;
+  font: 400 var(--t-label) / var(--lh-snug) var(--font-data);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.wr-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  vertical-align: -1px;
+}
+
+.wr-legend .lk {
+  background: var(--color-text-body);
+}
+
+.wr-legend .lx {
+  background: var(--color-accent);
+}
+
+.wr-legend .ld {
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+}
+
+/* Inline lists inside the article (links lines, source rows). */
+.wr-links {
+  font-family: var(--font-data);
+  font-size: var(--t-data);
+}
+
+.wr-links .sep {
+  color: var(--color-text-muted);
+}
+
+.wr-sub {
+  font-family: var(--font-data);
+  font-size: var(--t-data);
+  color: var(--color-text-muted);
+}
+
+/* The closing "more" row: a plain link, for an essay that is off the AI topic. */
+.wr-more {
+  padding-block: clamp(40px, 7vh, 80px);
+}
+
+.wr-all {
+  margin-top: 28px;
+}

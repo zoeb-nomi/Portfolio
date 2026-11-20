@@ -1,6 +1,9 @@
 ---
-// A captioned figure for essays: "Fig. N" proof mark + title above, source line
-// below. The body is a slot, so charts, diagrams and tables share one frame.
+import { pipelineWriting } from '../data/copy';
+// A captioned figure for essays (kit `.fig`): the body sits in `.fig-frame` on the sunk surface, and the caption
+// under it opens with the red "Fig. N", then the title, then the source line. The body is a slot, so charts,
+// diagrams, images and tables share one frame. Figures that animate pass `replay` and show the Replay control
+// (scripts/figure-motion.ts wires it).
 interface Props {
   n: number;
   title: string;
@@ -15,79 +18,43 @@ interface Props {
 const { n, title, source, href, hrefLabel, replay = false } = Astro.props;
 ---
 
-<figure class="ef">
-  <figcaption class="ef-title">
-    <span><span class="ef-n">Fig. {n}</span> {title}</span>
-    {replay && <button type="button" class="ef-replay" hidden>Replay</button>}
+<figure class="fig ef">
+  <div class="fig-frame ef-body">
+    <slot />
+    {replay && <button type="button" class="chip ef-replay" hidden>{pipelineWriting.replay}</button>}
+  </div>
+  <figcaption>
+    <span class="fno">Fig. {n}</span>
+    <span>{title}</span>
+    {
+      (source || href) && (
+        <span class="fsrc">
+          {source}
+          {href && (
+            <>
+              {' '}
+              <a href={href}>{hrefLabel}</a>
+            </>
+          )}
+        </span>
+      )
+    }
   </figcaption>
-  <div class="ef-body"><slot /></div>
-  {
-    (source || href) && (
-      <p class="ef-source">
-        {source}
-        {href && (
-          <>
-            {' '}
-            <a href={href}>{hrefLabel}</a>
-          </>
-        )}
-      </p>
-    )
-  }
 </figure>
 
 <style>
   .ef {
-    margin-block: var(--s-8);
     max-width: var(--measure);
-    padding-block: var(--s-5);
-    border-block: var(--line-hair);
-  }
-
-  .ef-title {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--s-1) var(--s-4);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-    line-height: var(--lh-label);
-    margin-bottom: var(--s-5);
   }
 
   .ef-replay {
-    min-block-size: var(--hit-min);
-    padding: 0;
-    border: 0;
-    background: none;
-    font: inherit;
-    letter-spacing: inherit;
-    text-transform: inherit;
-    color: var(--color-accent-text);
+    margin-top: var(--s-3);
+  }
+
+  .fsrc a {
+    color: var(--color-text-body);
     text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
-    cursor: pointer;
-  }
-
-  /* The figure number is a reviewer's proof mark: annotation, so red. */
-  .ef-n {
-    color: var(--color-accent-text);
-    margin-inline-end: var(--s-2);
-  }
-
-  .ef-source {
-    margin-top: var(--s-5);
-    font-family: var(--font-text);
-    font-size: var(--t-note);
-    line-height: var(--lh-snug);
-    color: var(--color-text-muted);
-  }
-
-  .ef-source a {
-    color: var(--color-link);
-    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
     text-underline-offset: var(--underline-offset);
   }
 </style>

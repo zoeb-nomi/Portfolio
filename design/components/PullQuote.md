@@ -1,28 +1,31 @@
 # PullQuote
 
 ## Purpose
-A single claim set large (Zoeb's voice, Archivo) under a rule. Used for the line a page wants remembered.
+A pull quote: the kit's prose blockquote (red rule, medium weight), set a little larger than the text, with an optional small red mono label above.
 
 ## Anatomy
-A `<blockquote>`: an optional kicker in the margin column (mono, red text) and the quote in the body column. Without a kicker the quote stands alone, capped at 46ch.
+`blockquote.pq`: optional `p.pq-kick.lab.red`, then `p.pq-text` (the slot).
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `kicker` | `string?` | margin-column label; also switches on the margin grid |
-| `rule` | `'ink' \| 'red'` | top rule: Ink tier (default) or the Pen tier |
-Slot: the quote text.
+| `kicker` | `string?` | the mono label above |
+| `rule` | `'ink' \| 'red'` | accepted for old call sites and ignored: the rule is always the red line |
 
-## Tokens it reads
-- Colour roles: `--color-text` (quote), `--color-accent-text` (kicker).
-- Type: `--font-heading`, `--font-data`, `--wght-head`, `--wdth-head`, `--t-quote`, `--t-label`, `--track-tight`, `--lh-label`.
-- Space and lines: `--s-3`, `--s-6`, `--s-7`, `--line-ink`, `--line-pen`.
+## Variants
+None.
 
-## States and motion
-Static: no script, no animation. Reduced motion changes nothing. Ink surface: roles re-point. At 899px and below the margin column stacks above the quote.
+## Kit classes
+`.lab.red` for the kicker; the rule reads `--line-pen` (the red line) and the text `--color-text`, `--t-quote`, a 92 width and 520 weight.
+
+## Motion
+None.
 
 ## Accessibility
-Real `<blockquote>`. The kicker is text, not a heading.
+A real `blockquote`; the kicker is text, not decoration. Text wraps balanced.
+
+## Light and dark
+Roles only; the red rule is the theme's accent.
 
 ## Used on
-Pages: `/builds/`, `/crosssource/`, `/design/components/`, `/mirror-eval/`, `/screener-eval/`, `/writing/eval-harness-at-my-own-reflection/`, `/writing/nobody-reports-the-misses/`, `/writing/the-bus-stop-nobody-notices/`, `/writing/the-judge-caught-a-bug/`.
+Not imported by any page or component at the time of writing (only mentioned by copy and a lint script).

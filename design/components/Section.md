@@ -1,42 +1,40 @@
 # Section
 
 ## Purpose
-A page section: the mark and label in the margin column, the body in the body column, closed by an Ink rule. A short pen-weight tick sits on the top rule at the margin column's x.
+One prose section of a long-form page: a heading carrying the red § mark, then the body. Consecutive Sections read as one article (a note or an essay built on this template); the red reading spine runs down their left edge and ends under the last one.
 
 ## Anatomy
-- `tick` (`aria-hidden`, `data-tick`): the red mark on the top rule.
-- Margin column: `<h2>` with the mark (mono, red text) and the label (Archivo); optional `sub` (a small line); the `margin` slot; optional `MarginNote` from `note`.
-- Body column: optional `refLine` lead-in, the default slot, optional `next` link.
-- `grid`: a faint drafting grid behind the section.
+`section.rs.gut[data-section] > .in > .rs-in`: optionally `.rs-head` (the `h2.rs-h` with `span.sec-no` and `span.label`, a mono `.rs-sub`, and an `aside` rail holding a `MarginNote` and the `margin` slot), then the default slot.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `mark` | `string` | the section mark in the margin |
-| `label` | `string` | heading text; its slug makes the id `sec-<slug>` unless `anchorId` is set |
-| `note` | `string?` | rendered as a `MarginNote` |
-| `sub` | `string?` | small line under the label, no rule |
+| `mark` | `string` | the § mark |
+| `label` | `string` | heading text; empty renders no heading (an unlabelled opening, before section 1) |
+| `note` | `string?` | a margin note beside the heading (rail at 1100px and up, under it below) |
+| `sub` | `string?` | a small mono line under the heading |
 | `as` | `'section' \| 'div'` | default `section` |
-| `narrId` | `string?` | read-along `data-narr` on the heading |
-| `anchorId` | `string?` | overrides the heading id |
-| `refLine` | `{strong, text}?` | bold lead-in paragraph |
-| `next` | `{label, href}?` | link that ends the section, with a down arrow |
-| `grid` | `boolean?` | drafting grid; `/builds/` only |
+| `narrId`, `anchorId` | `string?` | read-along cue and explicit id; the id defaults to `sec-<slug>` |
+| `wide` | `boolean` | children may use the full shell instead of the reading measure |
 | `class` | `string?` | |
-Slots: default, `margin`.
+| `grid` | `boolean` | accepted for old call sites; ignored |
 
-## Tokens it reads
-- Colour roles: `--color-text`, `-text-muted`, `-accent-text` (mark), `--color-link`.
-- Type: `--font-heading`, `--font-data`, `--wght-head`, `--wdth-head`, `--t-h3`, `--t-small`, `--t-label`, `--track-tight`, `--lh-*`.
-- Space and lines: `--s-1` to `--s-11`, `--gutter`, `--header-h`, `--hit-touch`, `--line-ink` (closing rule), `--line-pen` (tick). Grid: `--grid-ink`, `--grid-step`. Motion: `--dur-base`, `--ease-draw`.
+Slots: default and `margin`.
 
-## States and motion
-- The tick grows when the section enters view (`data-tick`, with `animation-timeline: view()` on pages without the motion module, and `motion.ts` on pages with it; `src/styles/motion.css`). Final state is in CSS.
-- Reduced motion: the tick is shown fully drawn. Ink surface: roles re-point.
-- The next-link arrow nudges on hover.
+## Variants
+Labelled, unlabelled, with or without a rail, `wide`.
+
+## Kit classes
+`.rs`, `.rs-h`, `.sec-no`, `.lab`, `.margin-note` (through `MarginNote`), `.gut`, `.in`. Layout in `src/styles/layout.css` and `reading.css`.
+
+## Motion
+None of its own. The spine (`scripts/reading.ts`, switched on by `Masthead` or `EssayShell`) grows with scroll and ticks at each `.rs-h`.
 
 ## Accessibility
-One `<h2>` per section with a stable id; the mark is `aria-hidden`. `MarginNote` sits in a `div` margin column, so its aside is not nested.
+Each section is a landmark-free `section` with an `h2` and a stable id; the mark is `aria-hidden`; the rail is a labelled `aside` ("Notes: <label>") and the nested note is a `div`.
+
+## Light and dark
+Roles only; the mark is `--color-accent`.
 
 ## Used on
-Pages: `/about/`, `/builds/`, `/crosssource/`, `/design/`, `/design/components/`, `/mirror-eval/`, `/notes/[slug]/`, `/screener-eval/`, `/writing/`, `/writing/decisions-api-legal-quiz/`, `/writing/eval-harness-at-my-own-reflection/`, `/writing/nobody-reports-the-misses/`, `/writing/the-bus-stop-nobody-notices/`, `/writing/the-judge-caught-a-bug/`, `/writing/two-levers-that-did-not-move/`.
+`/notes/[slug]/` and `/writing/decisions-api-legal-quiz/`.

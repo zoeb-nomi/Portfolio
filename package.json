@@ -10,6 +10,7 @@
     "dev": "astro dev",
     "prebuild": "node scripts/fetch-contributions.mjs && node scripts/fetch-ledger.mjs",
     "build": "astro build",
+    "postbuild": "node scripts/csp.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "test": "node scripts/test-parse-contributions.mjs",
@@ -28,7 +29,8 @@
     "links": "node scripts/link-check.mjs",
     "lhci": "lhci autorun --config=lighthouserc.json && lhci autorun --config=lighthouserc.mobile.json",
     "og": "node scripts/generate-og.mjs",
-    "budget": "node scripts/copy-budget.mjs"
+    "budget": "node scripts/copy-budget.mjs",
+    "floor": "node scripts/text-floor.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",
@@ -37,6 +39,7 @@
     "@fontsource/instrument-serif": "^5.1.0",
     "animejs": "4.5.0",
     "astro": "^5.2.0",
+    "gsap": "3.12.5",
     "sharp": "^0.34.5"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 ---
-// Dumbbell: one row per item, a hollow marker where it started and a filled marker where it ended, joined by a
-// line. It plays once as it scrolls into view: the filled marker slides from the start to the end. The values
+// Dumbbell: one row per item, a hollow marker where it started and a red marker where it ended, joined by a
+// line. It plays once as it scrolls into view: the filled marker and its line fade in. The values
 // are text first; the drawing is aria-hidden.
 interface Row {
   label: string;
@@ -35,7 +35,7 @@ const pos = (v: number) => (v / max) * 100;
     showKey && (
       <p class="db-key" aria-hidden="true">
         <span><i class="fg-pt" /> {fromLabel}</span>
-        <span><i class="fg-pt is-fill" /> {toLabel}</span>
+        <span><i class="fg-pt is-red" /> {toLabel}</span>
       </p>
     )
   }
@@ -47,10 +47,10 @@ const pos = (v: number) => (v / max) * 100;
           <span class="fg-in">
             <span
               class="fg-line db-link"
-              style={`--l:${n2(pos(Math.min(r.from, r.to)))};--w:${n2(Math.abs(pos(r.to) - pos(r.from)))};transform-origin:${r.to >= r.from ? 'left' : 'right'}`}
+              style={`--l:${n2(pos(Math.min(r.from, r.to)))};--w:${n2(Math.abs(pos(r.to) - pos(r.from)))}`}
             />
             <span class="fg-pt db-from" style={`--x:${n2(pos(r.from))}`} />
-            <span class="fg-pt is-fill db-to" style={`--from:${n2(pos(r.from))};--to:${n2(pos(r.to))}`} />
+            <span class="fg-pt is-red db-to" style={`--from:${n2(pos(r.from))};--to:${n2(pos(r.to))}`} />
           </span>
         </span>
         <span class="fg-val">{r.from} {'→'} {r.to}{unit ? ` ${unit}` : ''}</span>
@@ -82,7 +82,9 @@ const pos = (v: number) => (v / max) * 100;
   .db-heading {
     margin-bottom: var(--s-3);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
+    letter-spacing: var(--track-caps);
+    text-transform: uppercase;
     color: var(--color-text-muted);
   }
 
@@ -92,7 +94,7 @@ const pos = (v: number) => (v / max) * 100;
     gap: var(--s-1) var(--s-5);
     margin-bottom: var(--s-4);
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
@@ -108,10 +110,11 @@ const pos = (v: number) => (v / max) * 100;
     flex: none;
   }
 
-  /* The filled marker starts on top of the hollow one and slides out; the joining line is drawn behind it. */
+  /* The before mark is hollow, the after mark is the red one, a line joins them. The start frame holds the
+     after mark and the line back; they fade in once. */
   .db-to {
     left: calc(var(--to) * 1%);
-    transition: left 900ms var(--ease-draw);
+    transition: opacity var(--dur-slow) var(--ease-out);
     transition-delay: calc(var(--r) * 110ms + 150ms);
   }
 
@@ -122,17 +125,13 @@ const pos = (v: number) => (v / max) * 100;
   .db-link {
     left: calc(var(--l) * 1%);
     width: calc(var(--w) * 1%);
-    transition: transform 900ms var(--ease-draw);
+    transition: opacity var(--dur-slow) var(--ease-out);
     transition-delay: calc(var(--r) * 110ms + 150ms);
   }
 
-  .db[data-state='pre'] .db-to {
-    left: calc(var(--from) * 1%);
-    transition: none;
-  }
-
+  .db[data-state='pre'] .db-to,
   .db[data-state='pre'] .db-link {
-    transform: scaleX(0);
+    opacity: 0;
     transition: none;
   }
 </style>

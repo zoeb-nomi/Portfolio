@@ -35,6 +35,7 @@ jobs:
           npm run qa
           npm run tokens
       - run: npm run a11y
+      - run: npm run floor
       - run: npm run links
       - name: Lighthouse CI (home, builds, case study, writing; desktop and mobile)
         run: npm run lhci

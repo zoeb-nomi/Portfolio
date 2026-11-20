@@ -1,35 +1,36 @@
 # DataTable
 
 ## Purpose
-A booktabs table for numbers and ids: Heavy rule above and below, Ink under the head, Hair between rows. The winning cell is marked in red text.
+A table of numbers in the kit's booktabs grammar (`.tbl`: a heavy rule top and bottom, a hairline under the head). It guesses which columns are numeric and sets them right-aligned in the mono face.
 
 ## Anatomy
-- Visible caption `<p>` (aria-hidden) above a focusable scroll region; the real `<caption>` is visually hidden.
-- `<thead>` with column headers; first header labels the row-label column. Rows start with `<th scope="row">`.
-- A "scroll" hint and a paper edge fade on the right while the table overflows.
+`div.tbl-wrap.dt` (focusable, `role="region"`, labelled by the caption) > `table.tbl`: `caption`, a `thead` with column headers, and a `tbody` whose first cell per row is a `th scope="row"`. Cells carry `data-l` (the column header) for the stacked layout.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `caption` | `string` | also the region's `aria-label` |
-| `columns` | `string[]` | first is the row-label header |
-| `rows` | `Row[]` | `label`, `cells: {text, win?}[]` |
-| `nowrap` | `boolean?` | keep each data cell on one line; wide tables scroll sideways. Default false |
-| `stack` | `boolean?` | at 599px and below, restack into label/value rows instead of scrolling. Default true |
+| `caption` | `string` | required; also the region's accessible name |
+| `columns` | `string[]` | the first entry is the row-label header |
+| `rows` | `Row[]` | `label` and `cells: { text, win? }[]`; `win` makes that cell the one red cell |
+| `numeric` | `boolean[]?` | per data column override; default guessed from the cells (23, 0.894, 87 of 100, 83.2%, +0.07) |
+| `stack` | `boolean` | at 599px and below, stack rows into label and value pairs instead of scrolling; default `false` |
+| `totalRow` | `boolean` | set the last row heavier |
+| `nowrap` | `boolean` | accepted for old call sites; ignored |
 
-## Tokens it reads
-- Colour roles: `--color-text`, `-text-body`, `-text-muted`, `-surface`, `-surface-raised`, `-accent-text` (winning cells).
-- Type and space: `--font-data`, `--t-data`, `--t-label`, `--t-micro`, `--track-wide`, `--s-1` to `--s-12`.
-- Lines: `--line-heavy`, `--line-ink`, `--line-hair`. Motion: `--dur-fast`, `--ease-draw`.
+## Variants
+Default (scrolls sideways inside its box on phones), `stack`, `totalRow`.
 
-## States and motion
-- Scroll cue: edge fade and hint are driven by the wrap's scroll position (`animation-timeline`, only where supported) and fade out at the far end. No motion verb applies; it is a scroll-linked opacity change.
-- A small script makes the region a tab stop only while it actually scrolls.
-- Stacked mode shows each cell's column name via `data-l`.
-- Ink surface: roles re-point, unchanged.
+## Kit classes
+`.tbl-wrap`, `.tbl`, `td.n`, `th.n`, `td.win`. Own `.dt`, `.dt--stack`, `.dt-total`.
+
+## Motion
+None. Rows tint with `--color-surface-raised` on hover (a kit rule). No script.
 
 ## Accessibility
-Real table semantics (`scope`, caption). The region is `role="region"` with a label and `tabindex="0"` while scrollable. The winning cell is marked by colour and weight only, so say it in the caption or copy as well.
+A labelled, focusable scroll region so keyboard users can pan; real `caption`, `th scope` and `td`. In `stack` mode the thead is visually hidden, not removed, and each cell prints its column name from `data-l`.
+
+## Light and dark
+Roles only. Win cells use `--color-accent`; heavy rules use `--line-heavy`. Both themes work unchanged.
 
 ## Used on
-Pages: `/builds/`, `/crosssource/`, `/design/components/`, `/mirror-eval/`, `/screener-eval/`, `/writing/decisions-api-legal-quiz/`, `/writing/nobody-reports-the-misses/`, `/writing/the-bus-stop-nobody-notices/`.
+`/writing/decisions-api-legal-quiz/`. For tables of words use `TextTable`.

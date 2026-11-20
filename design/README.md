@@ -1,272 +1,253 @@
-# zoebnomi.com design system: Red Pen 5, "Live Ink"
+# zoebnomi.com design system: The Pipeline
 
 This is the one place the design system lives. `design/tokens.css` holds every value;
-this page holds the rules; `design/components/` has one page per component;
+`src/styles/ds.css` holds the shared kit (every class a page uses); `src/scripts/ds.ts` is the
+runtime; this page holds the rules; `design/components/` has one page per component;
 `design/mocks/` keeps dated before/after shots. hq and Notion point here and copy nothing.
+The live catalogue is `/design/` (rules and history) and `/design/components/` (the kit, rendered).
 
 **History.** v3 (12 Nov 2026) was the editorial Red Pen: paper, ink, a red pen as a colour.
-v4 (19 Nov 2026) cut its volume and was rejected: it edited the page but did not evolve the
-system. **Red Pen 5** (19 Nov 2026) starts again from first principles. It keeps the seed
-(paper, ink, one red) and changes what the pen *is*: not a colour, an actor.
+v4 (19 Nov 2026) cut its volume and was rejected. Red Pen 5, "Live Ink" (19 Nov 2026), made
+the pen an actor on paper. **The Pipeline** (20 Nov 2026) replaces it: Zoeb picked it from a
+round of live prototypes, then refined it in two review rounds (prototype:
+claude.ai/artifact/4CpATa2PfQCkeoHYjgonQX). It keeps the seed (ink, paper, one red) and
+inverts the ground: black graphite by default, paper as an opt-in light theme.
 
 ## 0. First principles
 
-The site has one job: show, inside ten seconds, that Zoeb catches the failures other people
-ship. Everything below follows from three facts about him.
+The site has one job: show, inside ten seconds, that Zoeb ships LLM workflows with the checks
+that catch quiet failures. Three facts shape it.
 
-1. **His subject is the quiet failure.** LLM output reads fine until something checks it.
-   So the site does not describe checking; it performs it. The home page is a live audit.
-2. **There are always three parties.** Zoeb (who decides), the model (whose output is on
-   trial) and the check (which reads the output). The type system gives each its own voice.
-3. **The pen is the only actor.** An editor's red pen moves only when it catches something.
-   On this site red is the only thing that moves on its own, and it moves only to mark.
+1. **The subject is the pipeline, not the pen.** Output flows Prompt → Retrieve → Draft →
+   Check → Ship; most of it passes, some is caught. The home page shows that flow live.
+2. **Numbers are the proof.** Every claim on the site is a reading with a unit and a source,
+   revealed whole. Labels over sentences.
+3. **One red line.** Red is the reviewer's line: the CTA, the rule that opens a block, the
+   arrow from before to after, a failure, the reading spine. Never body text, never a whole heading.
 
 ## 1. Principles
 
-1. **Three voices, one actor.** Zoeb speaks in Archivo, the model in Source Serif 4, the
-   check in IBM Plex Mono. The pen (red) acts on all three. Never set a voice in another's face.
-2. **The pen marks; it never decorates.** Every red stroke is a proofreader's mark with a
-   meaning: tick (checked, fine), strike + caret (wrong, corrected), circle (wrong,
-   flagged), underline (stress), box (scoped). No red fills behind text, no red headings.
-3. **Show the check, not the claim about it.** Prefer a live artifact (an answer being
-   marked, a sheet of outputs) over a sentence saying what was measured.
-4. **Every number is a reading.** Value, datum, change, n and source.
-5. **Two surfaces.** Paper is where output lives. Ink is where checks run: the proof, the
-   call to action and the footer. The ink surface is a token mode, not a second palette.
-6. **The final state is in the HTML.** Motion starts from it and returns to it; no script,
-   slow script or reduced motion loses nothing.
-7. **Your words stay whole.** Long text is not cut; it moves to the page that holds it
+1. **Calm, then exact.** Motion is a quiet fade; the exactness is in the numbers and the alignment.
+2. **Show the system, not a claim about it.** Prefer a live artifact (the pipeline scene, the harness
+   band, a before → after panel) over a sentence describing it.
+3. **Every number is a reading.** Value, unit, datum, n and source in mono beside it.
+4. **Dark first, light on request.** Both themes are complete; nothing is designed for one only.
+5. **The final state is in the HTML.** No script, slow script or reduced motion loses nothing.
+6. **Your words stay whole.** Long text is not cut; it moves to the page that holds it
    (Builds, About, the case studies). Home carries one claim per screen.
-8. **The page never names its own parts.** No "Fig. 0, step n", no "Next:" lines.
+7. **No scroll-jacking.** Nothing pins the page for more than about two screens, and any pinned
+   sequence has a visible Skip. A click, not vertical scroll, drives an inspector.
 
 ## 2. Colour (meaning, not just value)
 
-| token | means | never |
-|---|---|---|
-| `--paper`, `--paper-raised`, `--paper-sunk` | the page; an object on it (the audit sheet, a card you can press) | a box around text |
-| `--ink`, `--ink-body`, `--ink-muted` | Zoeb's voice: headings, numerals / running text / labels and sources | |
-| `--rule` | hair rules, empty cells | text |
-| `--graphite` | the pencil: what is only proposed or pending (a passed check's leader line, a pending status) | a verdict |
-| `--red` | the pen's stroke: marks, the scroll thread, failed cells | text on paper (3.9:1) |
-| `--red-ink` | red text on paper (AA 4.5:1): verdicts, links, the primary button | headings, body |
-| `--red-glow` | the pen on the ink surface | paper |
-| `--surface-ink` + `--on-ink*` | the ink surface | paper sections |
+Primitives (declared once in `tokens.css`, dark values first, light values under
+`:root[data-theme="light"]`, print uses the light values):
 
-**Two tiers: primitives and roles.** The table above lists the *primitives* (the values).
-Components never read them. Every colour in `src/` reads a *role*, and `npm run check`
-fails on any primitive read (design-check):
-
-| role | paper (default) | ink surface | means |
+| primitive | dark | light | means |
 |---|---|---|---|
-| `--color-surface`, `-surface-raised`, `-surface-sunk` | paper, paper-raised, paper-sunk | surface-ink, surface-ink-raised | the page; an object on it; a well |
-| `--color-text`, `-text-body`, `-text-muted` | ink, ink-body, ink-muted | on-ink, on-ink-body, on-ink-muted | headings and numerals; running text; labels and sources |
-| `--color-line`, `-line-strong` | rule, ink | rule-on-ink, on-ink | hair rules; the rule that opens a block |
-| `--color-accent` | red | red-glow | the pen's stroke |
-| `--color-accent-text` | red-ink | red-glow | red text (links, verdicts, primary button) |
-| `--color-accent-tint`, `-on-accent` | red-tint, on-red | glow at 18%, surface-ink | a red wash; text on a red fill |
-| `--color-pending` | graphite | on-ink-muted | proposed or not yet checked |
-| `--color-state-pass`, `-fail`, `-warn`, `-na` | ink, red, graphite, graphite | on-ink, red-glow, on-ink-muted | a check's verdict |
-| `--color-series-1` to `-6` | red, ink, graphite, then mixes | the same on ink | chart series; red is the series under test |
+| `--bg` | near-black graphite | warm paper | the page |
+| `--bg-2` | a step up | a step down | a figure's ground, a well |
+| `--raise` | two steps up | two steps down | hover fill on rows |
+| `--panel` | graphite at 95% | paper at 96% | cards, the trace inspector |
+| `--ink`, `--ink-2`, `--ink-3` | paper tones | ink tones | headings and values / body / labels and sources |
+| `--rule`, `--rule-2` | | | hair rules / stronger rules and outlines |
+| `--red` | warm red | deeper red (AA on paper) | the one accent |
+| `--glass`, `--glass-2`, `--chip-bg`, `--code-bg` | translucent fills | | header bar, HUD strip, chips, inline code |
 
-**The ink surface is a mode.** `.surface-ink` (declared in `tokens.css`) re-points the
-roles, so any component works on it unchanged. A custom property resolves where it is
-declared, so a mode or theme must override the **roles**. Overriding a primitive inside
-a scope does not reach a role resolved at `:root`. Pair it with `.bleed` to run a section
-edge to edge.
+**Two tiers: primitives and roles.** Components never read a primitive. Every colour in `src/`
+reads a role, and `npm run check` fails on a primitive read (design-check):
 
-**Derived systems** (other projects) are themes over the same roles. Their DTCG sources
-live in `design/tokens/` and their docs live in `design/systems/<name>/`. A theme may add roles,
-but core declares every role name first, so Red Pen components can read it.
+| role | reads | means |
+|---|---|---|
+| `--color-surface`, `-surface-sunk`, `-surface-raised` | bg, bg-2, raise | the page; a figure ground; a hover fill |
+| `--color-panel`, `-glass`, `-glass-strong`, `-chip`, `-code` | panel, glass, glass-2, chip-bg, code-bg | cards and translucent bars |
+| `--color-text`, `-text-body`, `-text-muted` | ink, ink-2, ink-3 | headings and numerals; running text; labels and sources |
+| `--color-line`, `-line-strong` | rule, rule-2 | hair rules; outlines and strong rules |
+| `--color-accent`, `-accent-text`, `-accent-tint`, `-on-accent`, `-accent-hover` | red | the red line; red text; a red wash; text on red; the primary button on hover |
+| `--color-link`, `-pending` | ink, ink-3 | prose links (red underline); not yet checked |
+| `--color-state-pass`, `-fail`, `-warn`, `-na` | ink, red, ink-3, rule-2 | a check's verdict |
+| `--color-series-1` to `-6` | red, ink, ink-3, then mixes | chart series; red is the series under test |
+| `--scene-bg`, `--scene-ink`, `--scene-red` | "r,g,b" triplets | canvas drawing; scripts read them and redraw on `ds:theme` |
+
+**Theming.** The header toggle sets `data-theme` on `<html>`, stores it per viewer
+(`localStorage` key `ds-theme`, read before first paint in `Base.astro`) and fires a `ds:theme`
+event. Overriding primitives on `:root` reaches every role because both resolve on `<html>`.
+A derived theme overrides primitives the same way and never declares a component colour.
 
 ## 3. Lines
 
-Four tiers, horizontals only: Hair (`--line-hair`, rows), Ink (`--line-ink`, block
-boundaries), Heavy (`--line-heavy`, opens and closes a record), Pen (`--line-pen`, a margin
-note or a stamp). Objects use `--line-object`. Every hand-drawn mark comes from `pen.ts`,
-never from a border.
+Every border reads a token (`npm run lint` fails on a raw `1px solid ...`):
+`--line-hair` (rows, rules), `--line-strong` (outlines: cards, chips, the header action),
+`--line-ink` and `--line-heavy` (booktabs: 1px under a table head, 2px top and bottom),
+`--line-pen` and `--line-accent` (the red line: a blockquote, a margin note, a figure's
+open), `--line-object`, `--line-propose` (dashed: proposed, not yet decided).
+Side rules are allowed (cards, the HUD's cells). No rounded corners (`--radius: 0`), no shadows.
 
-**Objects cast a hard shadow.** An object you can act on (the live audit sheet, a button on
-hover) sits on the desk with a hard, unblurred offset shadow in ink. On paper, an ink-surface
-object (the harness panel) casts it in graphite, so the edge stays visible. A shadow is never
-red, because red belongs to the pen. Nothing else has a shadow, and no shadow is ever blurred.
+## 4. Type
 
-## 4. Type: three voices
+Two families, both self-hosted from Fontsource with their OFL licences (`public/fonts/`):
+**Archivo** (variable: width 62 to 125, weight 100 to 900) for headings, numbers and body;
+**IBM Plex Mono** 400/500 for labels, data, sources and the interface. Labels are mono,
+uppercase, tracked `--track-caps`. Each heading role is a size, a width and a weight:
 
-| voice | face | axes | used for |
+| role | size token | wdth / wght | used for |
 |---|---|---|---|
-| Zoeb | Archivo (variable) | weight 100 to 900, width 62 to 125% | claims, headings, body, interface |
-| Model | Source Serif 4 (variable) | weight, optical size | model output on a sheet; case names and quoted record in italic |
-| Check | IBM Plex Mono 400/500 | | verdicts, harness and check names, data, sources |
+| display (h1) | `--t-display` 34 → 70 | 88 / 800 | page titles, the home claim |
+| h2 | `--t-h2` 34 → 76 | 84 / 800 | section heads |
+| h3 | `--t-h3` 24 → 36 | 84 / 760 | card and block heads |
+| h4 | `--t-h4` 19 → 23 | 90 / 700 | small heads |
+| readout | `--t-num` 20 → 27 | 90 / 780 | a value in a card or the HUD |
+| prose | `--t-prose` 17 → 19 | 100 / 420 | essays, notes, case studies |
+| body | `--t-body` 16 | 100 / 420 | interface text |
+| label | `--t-label` 11, `--t-label-lg` 12 | mono | labels, kickers, sources |
 
-Archivo's two axes are part of the voice, set by tokens: claims are wide and heavy
-(`--wdth-claim` 112, `--wght-claim` 820), headings a little wide (`--wdth-head` 106,
-`--wght-head` 720), mega numerals narrow (`--wdth-tight` 88). `--wght-quiet` (250) is the
-one light weight: it sets the word "quietly" in the home claim, which the motion layer
-fades from heavy to quiet.
-
-| role | token | 390 → 1440 |
-|---|---|---|
-| mega numeral (ink surface) | `--t-mega` | 88 → 232 |
-| home claim | `--t-display` | 56 → 140 |
-| page H1 (long titles step down) | `--t-page` | 44 → 92 |
-| H2 | `--t-h2` | 32 → 62 |
-| reading numeral | `--t-stat` | 56 → 96 |
-| row name | `--t-num` | 34 → 48 |
-| H3 / section label | `--t-h3` | 21 → 27 |
-| lede | `--t-lede` | 20 → 26 |
-| model output | `--t-model` | 18 → 21 |
-| body | `--t-body` | 16 → 17.5 |
-| label, mono | `--t-label` | 12 |
-
-**Mono is never uppercase** and never tracked; caps labels are a stock trope (Krebs's slop
-list). No italic in Archivo (none ships); italic means the model or the record, in serif.
-All three families ship unmodified from Fontsource with their OFL licences
-(`public/fonts/OFL-*.txt`).
+Weight carries emphasis; there is no italic display. Numerals are tabular wherever they line up.
 
 ## 5. Space and grid
 
-4px scale `--s-1` to `--s-15` (136 and 184 are new for section rhythm). Shell 1320px;
-`.bleed` sections run to the viewport edge with their content kept on the shell. Margin
-column 240px (200 at ≤1099), gutters 48/28/20. Breakpoints 599 / 899 / 1099 only.
-Asymmetry is the default on home: 4 + 8 columns, never three equal tiles in a row except
-the readings.
+4px scale `--s-1` (4) to `--s-12` (128). Shell `--shell-max` 1360px with safe-area gutters
+(`.gut` reads `--gutter-l/-r`, 16px minimum). Reading measure `--measure` 64ch. Header
+`--header-h` 60px, sticky glass. Breakpoints 599 / 899 / 1099 only. Spined sections
+(`.sec.spined`) indent their content 22 to 48px from the red spine, and every block in a section
+starts on that same left edge.
 
-## 6. Figure grammar
+## 6. Components (the kit, `src/styles/ds.css`)
 
-Unchanged from v3: a figure opens with a Heavy rule and its caption; hollow = before,
-filled = after; dashed node = proposes, solid = decides; HTML and hairlines, SVG only for
-marks.
+| component | markup |
+|---|---|
+| Page shell | `Base.astro`: `.site` header (brand, `.nav > .nl`, `.theme-t`, `.hcta`), `main#main`, one-line `.foot` |
+| Section | `section.sec.gut > .in`; `.spined` + `<div class="spine">` for the red line |
+| Heads | `.kick` (red dash + mono label) · `h1.display` · `h2.h2` · `.h3` · `.h4` · `.id` · `.lab` (`.lab.red`) · `.mk > .ul` red underline |
+| Heading fade | `.split` or `data-split` on a `.display`/`.h2`: the line fades up 10px once |
+| Page head | `section.page-head` · `.byline` · `.stats > .ro` |
+| Buttons | `.btn > .mi + .ar` (still; only the arrow nudges 3px) · `.btn.ghost` · `.tl` text link · `.ctas` row |
+| Readout card | `.card > .card-top (.no) + h3 + .ros[.n2] > .ro > .v + .u + .s` in a `.cards` grid |
+| Before → after | `article.panel`: left `.ph`, `.pt`, `dl.how`, `.srcl`; right `.v-vals > .v-val.v-before (.v-num + .v-strike)`, `.v-arrow`, `.v-val`, `.v-cap` |
+| Verbs row | `ul.verb-row > li.verb > .vn + h3 + .vp`: labels, not links; no hover, no focus stop |
+| List rows | `ol.blist > li > a.build > .bn + .bk2 + .bv + .ba` (Builds, Writing) |
+| HUD strip | `.hud > .hud-in > .hud-c > span + b (.r)`; live values change through `swap()` |
+| Table | `.tbl-wrap > table.tbl` (booktabs) · `td.n` numeric · `td.win` red |
+| Figure | `figure.fig > .fig-frame + figcaption (.fno, text, .fsrc)` |
+| Prose | `.article > .prose + aside (.margin-note)` · `.sec-no` in h2 · `sup a` · `.footnotes` |
+| Tags | `.tags > .tag` (`.red`, `.solid`) · `.chip` (a button) |
+| Audio player | `AudioPlayer.astro`: play/pause, red scrubber (`role=slider`, arrows seek 10s), time, speed 1 / 1.25 / 1.5, captions from the cue file |
 
-## 7. The pen: marks
+Astro components wrap these classes; `design/components/<Name>.md` documents each one.
+**Figure grammar:** a figure sits on `--color-surface-sunk`, opens with its red number
+(`.fno`), uses hairlines and mono labels, and gives red only to the series under test, the
+failure or the after value. Hollow = before, filled = after; dashed = proposes, solid = decides.
 
-`src/scripts/pen.ts` draws every mark. Marks are generated from the target's box with a
-seeded wobble: the same on every load and resize, but no two alike. Each is an SVG path in
-one `svg.pen-layer` over its host, `aria-hidden`.
+## 7. The red line
 
-| mark | proofreading meaning | used for |
-|---|---|---|
-| tick | checked, fine | a claim that passed |
-| strike + caret | delete, insert | a wrong fact and its correction |
-| circle | query: this is wrong | an invented citation; a build name on hover |
-| underline | stress | the claim's key word; a page title; a reading |
-| box | scope | a verb (Trace) |
-| leader | see the margin | from a mark to its verdict |
+Red marks one thing per block: the CTA, the rule that opens a card (`.card::before`), the
+arrow between before and after, a struck before-value (`.v-strike`), a failure square, the
+active nav underline, and the **spine**: a 2px line down a spined section or an essay that
+grows as you read and ends in a small red square at the footnotes. It never runs past the
+content it belongs to.
 
-Any element can ask for a mark without a component: `data-pen="underline"` (drawn when it
-scrolls into view), `data-pen-on="hover"` (drawn on pointer or focus), `data-pen-delay`,
-`data-pen-heavy`, `data-pen-target` (mark a child, host on the parent). `pen-scroll.ts`
-runs on every page from Base.
+## 8. Motion
 
-## 8. Motion: five verbs
+One signature moment per page; everything else is a quiet reveal. `src/scripts/ds.ts`:
 
-Nothing moves unless it is one of these. Durations and curves are tokens.
-
-| verb | what moves | token | where |
-|---|---|---|---|
-| **stream** | the model writes, token by token, with a caret | `--dur-char` | the live audit |
-| **mark** | the pen draws (stroke-dashoffset only; duration scales with length) | `--dur-mark`, `--ease-pen` | every mark |
-| **stamp** | a verdict lands: a small overshoot from 86% | `--dur-stamp`, `--ease-stamp` | margin verdicts, the insert, the tally |
-| **tally** | a count settles from zero to its HTML value | `--dur-tally` | the mega numeral, readings |
-| **reveal** | a block enters, or the audit sheet's scan line sweeps | `--dur-slow`, `--ease-draw` | Fig. 0, ledger rows |
-
-Plus two ambient pieces, both CSS only: the **red thread** (scroll progress down the left
-edge, `animation-timeline: scroll()`) and **go-quiet** (the claim's last word fades from
-`--wght-claim` to `--wght-quiet` once on load).
+| hook | motion |
+|---|---|
+| `.split` / `[data-split]` | the heading fades up 10px, once (no per-word or per-letter motion) |
+| `[data-reveal]`, `[data-stagger]` | a block, or its children in sequence, fade up 8 to 10px |
+| `[data-num]` | a number appears whole: opacity and a 6px rise, never a count |
+| `.spine` | scales down its section with scroll, latched (never shrinks) |
+| `.verb-row` | one time-based variable-weight wave when the row arrives, settling at 620 |
+| `swap(el, v)` | a live digit changes instantly with a 220ms opacity tick |
 
 Rules:
-1. The final state is in the HTML; pre-states live under `.motion` (home) or are drawn by
-   the script itself (marks). Reduced motion: every mark renders final at once, tallies do
-   not run, the thread is hidden.
-2. Only transforms, opacity, clip-path, stroke offsets and font-weight animate. No layout
-   shift (CLS stays under 0.03).
-3. A tally's element always holds the final number; the count-up only rewrites it while it
-   runs.
-4. The live audit replays only when asked ("Run it again").
-
-| element | motion | trigger |
-|---|---|---|
-| Home claim | "quietly" goes quiet, then the pen underlines it | load |
-| Live audit | stream, then per claim: mark, leader, stamp; then the tally stamps | fonts ready |
-| Proof numeral | tally to 86 | in view |
-| Fig. 0 audit sheet | the scan line sweeps (1.6 s), failed squares turn red | 35% in view |
-| Readings (home) | numerals tally | in view |
-| Build rows (home) | the pen circles the name | hover, focus |
-| Home claim | the pen underlines "quietly." (inner page titles carry no mark) | load |
-| Scroll | the red thread grows down the left edge | scroll |
+1. Entrances use `--ease-out` (expo out); exits are short (about 220ms) and finish before the next element enters.
+2. Animate transform, opacity, clip-path or font-variation only. Canvas for more than about 100
+   moving things; pause loops off-screen.
+3. Numbers are revealed whole. Never count up, never show an intermediate value.
+4. No scroll-jacking: a pinned sequence is short and has a visible Skip. Interactive inspection
+   (the trace) is driven by clicks and arrow keys, not by scroll.
+5. Reduced motion: the final composed state, no movement. Without JS every word is visible.
+6. The kit hooks above run on IntersectionObserver and the Web Animations API, so a plain page ships no animation
+   library. Page scripts that need timelines or pinning (the home scene, Shipped, About, Builds, Design) import
+   GSAP 3.12.5 + ScrollTrigger from `src/scripts/gsap.ts` (npm, pinned). No smooth-scroll library.
 
 ## 9. Do and don't
 
 | do | don't |
 |---|---|
-| Let the pen catch something real | Draw a red line for decoration |
-| Give the model's words the serif and the check's words mono | Set a quote, a claim and a verdict in the same face |
-| Put a number next to its datum, n and source | Leave a headline number alone |
-| Use the ink surface for proof and the call to action | Make a whole page dark |
+| Put a number next to its unit and source | Leave a headline number alone |
+| Give red to one thing per block | Set body text or a whole heading in red |
+| Use mono uppercase for labels | Set a label in the display face |
 | Keep Zoeb's long text on its own page | Cut his copy to fit a budget |
 | Write copy in `src/data/copy.ts` | Type a string into an `.astro` file |
 | Use a colon or comma | Use an em dash (the geo-gate fails the build) |
-| Keep red text in `--red-ink` | Set body-size text in `--red` (3.9:1) |
-| Sentence case everywhere | Uppercase mono labels |
+| Check both themes | Ship a figure that only reads on dark |
+| Fade calmly | Pop words in, bounce buttons, count numbers up |
 
 ### 9a. Copy budgets
 
-`npm run budget` counts rendered words in `<main>`. Home is enforced at 450 (the live
-audit's example answer, about 90 words, is an artifact on the page). Every other page is
-report-only: its text is Zoeb's and stays whole.
+`npm run budget` counts rendered words in `<main>`. Home is enforced at 750 (the approved Pipeline home, 740 at port; the stage cards and harness labels are data, not prose). Every other page
+is report-only: its text is Zoeb's and stays whole. Hero 12 words, headlines 8, cards a title
+plus 2 or 3 readouts.
 
 ## 10. Adding a component
 
-1. Check the catalogue first; extend a variant before adding a component for one page.
-2. Write it in `src/components/`, with a header comment saying what it is, its variants and
-   its motion (the component page is generated from that comment and the Props interface).
-3. Values only from `design/tokens.css`; lines only from the four tiers; copy from
-   `copy.ts`. Animated parts: final state in CSS, pre-state under `.motion` in
-   `src/styles/motion.css`, behaviour in `src/scripts/motion.ts`; pen marks via `data-pen` or `src/scripts/pen.ts`.
+1. Check the kit and the catalogue first; extend a class before adding a component for one page.
+2. Write it in `src/components/`, with a header comment saying what it is, its variants and its motion.
+3. Values only from `design/tokens.css`, colours only from roles, lines only from `--line-*`, copy
+   from `copy.ts`. Motion through the `ds.ts` hooks; anything page-specific stays in that page's module script.
 4. Add `design/components/<Name>.md` and a screenshot in `design/mocks/<date>/components/`.
 5. Run `npm run check` (astro check + design-check), `lint`, `gate`, `a11y`, `links`, `lhci`.
 
-## 11. Page patterns (from v2, still current)
+## 11. Page patterns
+
+| page | order |
+|---|---|
+| Home | hero claim and pipeline scene (Skip, trace inspector) → Shipped before → after panels in a spined section → verbs row → harness band (live) → Builds list → About → contact |
+| Builds | `.page-head` with `.stats` → `.blist` of all builds → a panel per featured build → method (`#method`) |
+| Writing | `.page-head` → essays `.blist` → notes `.blist` (`#notes`) |
+| Essay / note | `.page-head` with `.byline` → audio → `.article` (`.prose` + aside) → `.footnotes` → related `.blist` |
+| Case study | `.page-head` + `.hud` spec strip → headline `.panel` → `.prose` sections with `.tbl` and `.fig` → method verbs → repo CTA |
+| About | `.page-head` with headshot → vertical career track → record (`#record`) → video → CTA |
+| Design | these rules rendered, previous versions; `/design/components/` renders the kit |
 
 **Essay** (`src/pages/writing/<slug>.astro`): copy as `writing<Name>` + `meta.writing<Name>`
-in `copy.ts`; Masthead with `narr`, byline, optional AudioPlayer, intro paragraphs
+in `copy.ts`; Masthead with byline, optional AudioPlayer, intro paragraphs
 (`data-narr="s0-pK"`), Sections (`narrId="sN-cue"`), figures after chosen paragraphs, the
-CTA slab (off-topic essays end on "More writing →" instead). Register it in eight places:
-copy, page, the `essays` list and `writingIndex.numbers` in `src/pages/writing/index.astro`
-/ `copy.ts`, `src/pages/llms.txt.ts`, `src/data/lastmod.json`, an `ogCards` entry (then
-`npm run og`), checks, and narration via `scripts/audio/pages.json` if it has audio.
+CTA row. Register it in eight places: copy, page, the `essays` list and
+`writingIndex.numbers` in `copy.ts`, `src/pages/llms.txt.ts`, `src/data/lastmod.json`, an
+`ogCards` entry (then `npm run og`), checks, and narration via `scripts/audio/pages.json` if it
+has audio.
 
 **Note**: an entry in `src/data/notes.ts` with a `group` (tradeframe, cheap-tier,
 decisions-api, crosssource, screener-eval, mirror-eval, other); it appears on
 `/writing/#notes` under its group.
 
-**Build**: a `buildsLedger` row in `copy.ts` (SPEC v3 §3a). `kind: 'agent'` requires
-`guarded`, `measured.scorerCheck`, a repo and a case study. A row with no number says why.
-Rows started after 10 Nov 2026 get planned vs actual from `public/data/velocity-public.json`.
+**Build**: a `buildsLedger` row in `copy.ts`. `kind: 'agent'` requires `guarded`,
+`measured.scorerCheck`, a repo and a case study. A row with no number says why.
 
-**Case study**: Masthead with `crumbs`, `spec`, `switcher`, repo; a result-first standfirst;
-Fig. 1 in the masthead slot before the audio; a row in `buildsLedger` and `evalsLedger`.
+**Case study**: page head with the spec strip, a result-first panel, the audio, sections; a row in `buildsLedger`.
 
 ## 12. Off-site (social images, video, decks)
 
-The same tokens and faces apply off the site; the social kit in the content-engine repo is
-the reference (`kit/social.css`). A 1080px canvas is read at about 360 CSS px, so every
-floor triples (mono 12 → 36, hairline 1 → 3). One finding, one figure, one red group per
-canvas; no logo, URL or handle on the canvas; frame 0 equals the still. `design-lint` in
-that repo enforces it. OG cards (1200×630) are generated by `scripts/generate-og.mjs` from
-`ogCards` in `copy.ts` and colours from `design/tokens.css`.
-
-Off-site and derived systems: `design/systems/README.md`.
+The same roles and faces apply off the site. The social kit in the content-engine repo
+(`kit/social.css`, `kit/tokens.css`) still carries Red Pen and is due to move to The Pipeline;
+until it does, new social canvases follow this page: graphite ground, paper ink, one red group
+per canvas, Archivo and Plex Mono, every floor tripled for a 1080px canvas. OG cards
+(1200×630) are generated by `scripts/generate-og.mjs` from `ogCards` in `copy.ts` and colours
+from `design/tokens.css`.
 
 ## 13. Checks that enforce this
 
 `npm run check` (astro check + `scripts/design-check.mjs`: no palette hex or token
-declaration outside `design/tokens.css`), `npm run lint` (breakpoints, raw values, line
-tiers), `npm run gate` (required and banned strings, em dashes included), `npm run a11y`
-(axe on every route at 390/768/1024/1440, fails on serious or critical), `npm run links`
-(internal links, fragments, redirect targets; `-- --external` for outbound), `npm run lhci`
-(home, /builds/, a case study, /writing/; perf ≥ 90, a11y ≥ 95, SEO ≥ 95, CLS < 0.1, desktop
-and mobile), `npm run qa` and `npm run tokens` (rendered sweeps), `npm run audio:check`,
-`npm run budget` (home copy budget and the slop audit).
+declaration outside `design/tokens.css`, no primitive read in `src/`), `npm run lint`
+(breakpoints, raw colours, raw values that have tokens, borders through `--line-*`),
+`npm run gate` (required and banned strings, em dashes included), `npm run a11y` (axe on every
+route at 390/768/1024/1440, fails on serious or critical), `npm run links` (internal links,
+fragments, redirect targets; `-- --external` for outbound), `npm run lhci` (home, /builds/, a
+case study, /writing/; perf ≥ 90, a11y ≥ 95, SEO ≥ 95, CLS < 0.1, desktop and mobile),
+`npm run floor` (every route at 375px: no visible text under 11px, SVG labels included), `npm run qa` and `npm run tokens`
+(rendered sweeps), `npm run audio:check`, `npm run budget`. The build itself writes the Content-Security-Policy
+(`scripts/csp.mjs`, postbuild: hashes of the inline scripts plus the allowed hosts).
 
 In a cloud container whose Chromium differs from the pinned Playwright, pass
 `CHROME=/opt/pw-browsers/chromium` to a11y, links, og and budget, and for lhci

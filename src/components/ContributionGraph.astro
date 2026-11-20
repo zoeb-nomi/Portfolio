@@ -90,7 +90,7 @@ const snapshotDateStr = fetchedAt
 
 const initialCaptionRest = `${copy.captionSnapshot} ${snapshotDateStr}`;
 // The total sits in its own span, reserved at its final digit count (mono, tabular), so
-// the motion layer can count it up without moving the text after it.
+// the number never shifts the text after it.
 const totalChars = String(totalLastYear).length;
 
 const rangeLabel =
@@ -258,7 +258,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-weekday-label {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     line-height: var(--cg-cell);
     color: var(--color-text-muted);
     white-space: nowrap;
@@ -275,7 +275,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-month-label {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     line-height: 1;
     color: var(--color-text-muted);
     align-self: end;
@@ -313,11 +313,11 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-caption {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 
-  /* Reserved at the final digit count so a count-up never shifts the caption. */
+  /* Reserved at the final digit count so the caption never shifts. */
   .cg-total {
     display: inline-block;
     min-width: calc(var(--chars, 3) * 1ch);
@@ -331,8 +331,8 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
   }
 
   @keyframes cg-pulse {
-    0% { outline: var(--line-pen); outline-offset: 0; }
-    100% { outline: var(--line-pen); outline-color: transparent; outline-offset: 3px; }
+    0% { outline: var(--line-accent); outline-offset: 0; }
+    100% { outline: var(--line-accent); outline-color: transparent; outline-offset: 3px; }
   }
 
   .cg-legend {
@@ -343,7 +343,7 @@ const ariaSummary = `GitHub contribution calendar for zoeb-nomi: ${totalLastYear
 
   .cg-legend-label {
     font-family: var(--font-data);
-    font-size: var(--t-micro);
+    font-size: var(--t-label);
     color: var(--color-text-muted);
   }
 

@@ -1,28 +1,32 @@
 # EvalsSwitcher
 
 ## Purpose
-A margin-column list that lets a reader of one case study jump to the others without going back through the nav.
+A small switcher for the three eval case studies: a row of kit tags, the current one red. It lets a reader jump between CrossSource, mirror-eval and screener-eval. The case-study pages now use `CaseTabs`; this one is reachable only through `Masthead`'s `switcher` prop.
 
 ## Anatomy
-A label (`evalsSwitcherLabel`) and a list built from `evalsSwitcher` in `src/data/copy.ts`. The current study is a non-link marker with an arrow; the others are links.
+`nav.evals-switch` (labelled) with a `.lab` and `ul.tags`: each item is `a.tag`, and the current one is `span.tag.red[aria-current="page"]`.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `current` | `'CrossSource' \| 'mirror-eval' \| 'screener-eval'` | the study being read; matched against each entry's `name` |
+| `current` | `'CrossSource' \| 'mirror-eval' \| 'screener-eval'` | the page being read |
 
-## Tokens it reads
-- Colour roles: `--color-text-muted` (label), `--color-text-body` (links), `--color-link` (link hover state and links), `--color-accent-text` (current marker).
-- Type and space: `--font-data`, `--t-micro`, `--t-label`, `--s-1`, `--s-3`, `--s-5`, `--s-6`, `--underline-offset`, `--hit-min`.
-- Lines: `--line-hair` (divider above).
+Names, links and the nav label come from `evalsSwitcher` and `evalsSwitcherLabel` in `copy.ts`.
 
-## States and motion
-- Hover on a link changes colour only. The current marker has `view-transition-name: evals-switch-current`, so it moves between case-study pages with a view transition.
-- Reduced motion: a `prefers-reduced-motion` block is present. Ink surface: roles re-point.
+## Variants
+None.
+
+## Kit classes
+`.lab`, `.tags`, `.tag`, `.tag.red`.
+
+## Motion
+None. Hover fades the border and text; no script.
 
 ## Accessibility
-The current item carries `aria-current="page"` (the arrow is `aria-hidden`). Links meet the 24px target rule (`--hit-min`).
+A labelled `<nav>`; the current item is not a link and carries `aria-current="page"`.
+
+## Light and dark
+Roles only; the red tag uses `--color-accent` for border and text.
 
 ## Used on
-Also via: `Masthead`.
-Rendered in the Masthead margin when its `switcher` prop is set.
+`Masthead` (when `switcher` is passed). No page passes it at the time of writing.

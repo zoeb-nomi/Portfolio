@@ -1,28 +1,32 @@
 # MarginNote
 
 ## Purpose
-A reviewer's annotation in the margin column. It never carries a fact that exists nowhere else.
+A margin note (kit `.margin-note`): a red hairline, mono text, beside the paragraph it annotates. It never carries a fact that exists nowhere else.
 
 ## Anatomy
-An `<aside>` (default) or `<div>` holding one `<p>` from the slot, with a pen-weight rule on its left edge. Pass `as="div"` when it would nest inside another `<aside>`.
+`<aside class="margin-note" aria-label>` (or a `div` when nested), an optional bold mono title, then the slot. Put it inside the `aside` of an `.article` row: it sits in the rail at 1100px and up and drops under its paragraph below that.
 
 ## Props
 | prop | type | notes |
 |---|---|---|
-| `label` | `string?` | `aria-label` for the aside; default "Reviewer's note". Ignored for `div` |
-| `as` | `'aside' \| 'div'` | default `aside` |
+| `label` | `string` | accessible name of the aside; default "Margin note" |
+| `as` | `'aside' \| 'div'` | default `aside`; use `div` inside another aside (Section's rail) |
+| `title` | `string?` | a short mono heading ("The run") |
 
-## Tokens it reads
-- Colour roles: `--color-accent-text` (note text).
-- Type and space: `--font-data`, `--t-note`, `--lh-body`, `--s-3`, `--s-6`.
-- Lines: `--line-pen` (left rule).
+## Variants
+`as="aside"` and `as="div"`.
 
-## States and motion
-Static. No script, no reduced-motion rule needed. Ink surface: the role re-points to the glow.
+## Kit classes
+`.margin-note`, laid out by `.article` and its `aside` (`ds.css` §12).
+
+## Motion
+None.
 
 ## Accessibility
-As an `<aside>` it is a labelled landmark; avoid nesting landmarks (use `as="div"`).
+As an `aside` it is a landmark with an `aria-label`; nested it is a plain `div` so landmarks do not stack. The kit hides the rail under 1100px, but on reading pages (`src/styles/reading.css`) the note stays and sits under its paragraph, so phones still get it.
+
+## Light and dark
+Roles only: `--line-accent` rule and `--color-text-muted` text. Both themes work.
 
 ## Used on
-Also via: `Section`, `TimelineEntry`.
-Its callers are `Section` (the `note` prop) and `TimelineEntry` (the `note` prop).
+`Section` (its `note` prop and `margin` slot) and `/writing/decisions-api-legal-quiz/`.

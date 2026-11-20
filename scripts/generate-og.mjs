@@ -35,7 +35,7 @@ async function loadCopy() {
 const { ogCards } = await loadCopy();
 const STANDING_LINE = ogCards.standing;
 const pages = ogCards.cards;
-// The token file's first :root block, embedded so the card uses var(--paper) etc.
+// The token file's first :root block (dark, The Pipeline), embedded so the card uses var(--bg) etc.
 const TOKENS_ROOT = /:root\s*\{[\s\S]*?\n\}/.exec(readFileSync(path.join(ROOT, 'design/tokens.css'), 'utf8'))[0];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -78,7 +78,7 @@ function templateHTML({ title, sub, num }) {
   html, body {
     width: 1200px;
     height: 630px;
-    background: var(--paper);
+    background: var(--bg);
     overflow: hidden;
   }
   .frame {
@@ -94,7 +94,7 @@ function templateHTML({ title, sub, num }) {
   .top {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 18px;
-    color: var(--ink-muted);
+    color: var(--ink-3);
   }
   .main {
     display: flex;
@@ -105,8 +105,8 @@ function templateHTML({ title, sub, num }) {
   .text { flex: 1 1 auto; min-width: 0; }
   .title {
     font-family: 'Archivo', Arial, sans-serif;
-    font-weight: 820;
-    font-stretch: 112%;
+    font-weight: 800;
+    font-stretch: 88%;
     font-size: 104px;
     line-height: 0.94;
     letter-spacing: -0.035em;
@@ -118,13 +118,13 @@ function templateHTML({ title, sub, num }) {
     font-size: 30px;
     line-height: 1.32;
     letter-spacing: 0;
-    color: var(--ink-body);
+    color: var(--ink-2);
     margin-top: 22px;
     text-wrap: balance;
   }
   .num {
     flex: 0 0 auto;
-    width: 400px;
+    width: 480px; /* wide enough for "0.981 → 0.994" at a legible size */
     text-align: right;
     border-right: 4px solid var(--red);
     padding-right: 28px;
@@ -136,7 +136,7 @@ function templateHTML({ title, sub, num }) {
     font-size: 190px;
     line-height: 0.9;
     letter-spacing: -0.035em;
-    color: var(--red-ink);
+    color: var(--red);
     white-space: nowrap;
   }
   .arr, .kicker .arr {
@@ -147,7 +147,7 @@ function templateHTML({ title, sub, num }) {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 20px;
     line-height: 1.3;
-    color: var(--ink-muted);
+    color: var(--ink-3);
     margin-top: 16px;
   }
   .bottom {
@@ -166,7 +166,7 @@ function templateHTML({ title, sub, num }) {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 16px;
     letter-spacing: .04em;
-    color: var(--ink-muted);
+    color: var(--ink-3);
   }
 </style>
 </head>
@@ -175,7 +175,7 @@ function templateHTML({ title, sub, num }) {
     <p class="top">§ Zoeb Nomi</p>
     <div class="main">
       <div class="text">
-        <p class="title" id="title">${esc(title)}</p>
+        <p class="title" id="title">${esc(title).replace(/(\S+-\S+)/g, '<span style="white-space:nowrap">$1</span>')}</p>
         <p class="kicker">${withArrows(sub).replace(/\n/g, '<br>')}</p>
       </div>
       ${num ? `<div class="num"><p class="num-value" id="num">${withArrows(num.value)}</p><p class="num-caption">${withArrows(num.caption)}</p></div>` : ''}
@@ -206,7 +206,9 @@ async function fit(tab) {
       let nf = 190;
       const box = n.parentElement;
       const avail = () => box.clientWidth - 28;
-      while (nf > 80 && n.scrollWidth > avail()) {
+      // Measure the glyphs themselves: a block's scrollWidth can miss overflow from negative tracking and the arrow.
+      const textW = () => { const r = document.createRange(); r.selectNodeContents(n); return r.getBoundingClientRect().width; };
+      while (nf > 80 && textW() > avail()) {
         nf -= 4;
         n.style.fontSize = nf + 'px';
       }

@@ -6,9 +6,7 @@
 //   1. a media query or matchMedia() width that is not on the breakpoint grid (599/600, 899/900, 1099/1100)
 //   2. a raw colour literal outside design/tokens.css (print white is the one allowed exception)
 //   3. a raw line-height, underline offset, hit-area height or font-size that has a token
-//   4. (v3 line tiers, DESIGN v3 §b) a border drawn with a raw width/style instead of a
-//      --line-* token, and a vertical (side) rule from the structural tiers (hair, ink,
-//      heavy) outside figure and object components: horizontals only.
+//   4. a border drawn with a raw width/style instead of a --line-* token (The Pipeline, design/README.md §3)
 //
 // Run: npm run lint   (no build needed, no dependencies)
 
@@ -20,8 +18,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'src');
 
 const BREAKPOINTS = new Set([599, 600, 899, 900, 1099, 1100]);
-const LINE_HEIGHT = { '1.62': '--lh-prose', '1.5': '--lh-snug', '1.7': '--lh-label', '1.6': '--lh-body', '1.55': '--lh-base', '1.15': '--lh-heading', '1.02': '--lh-display', '1.1': '--lh-title' };
-const FONT_PX = { '12px': '--t-label / --t-note / --t-micro', '13px': '--t-data', '15px': '--t-small' };
+const LINE_HEIGHT = { '1.62': '--lh-prose', '1.55': '--lh-body', '1.5': '--lh-base', '1.45': '--lh-snug', '1.3': '--lh-label', '1.12': '--lh-heading', '1.1': '--lh-title', '1.05': '--lh-tight', '.96': '--lh-display' };
+const FONT_PX = { '11px': '--t-label / --t-micro', '12px': '--t-label-lg / --t-note / --t-nav', '13px': '--t-data', '15px': '--t-small' };
 // File + literal pairs that are deliberate. Keep this list short and justified.
 const ALLOW = [
   { file: 'src/styles/base.css', match: /#ffffff/i, why: 'print: force a white page' },
@@ -29,7 +27,7 @@ const ALLOW = [
 
 // Figure and object components may draw side lines (chart axes, diagram nodes, the audio
 // player box): DESIGN v3 §b rule 3, boxes only around objects.
-const SIDE_OK = /src\/components\/(ParserCompare|Dumbbell|ForestPlot|UnitChart|BarList|OwnershipGap|FailureOwners|EvidenceStack|CareerTimeline|ContributionGraph|AudioPlayer|PlayerStepper|ReadAlongDemo|Fig0|TradeFrameFlow|VideoEmbed|EssayThumb)\.astro$/;
+const SIDE_OK = /src\/components\/(ParserCompare|Dumbbell|ForestPlot|UnitChart|BarList|OwnershipGap|ContributionGraph|AudioPlayer|PlayerStepper|ReadAlongDemo|Fig0|TradeFrameFlow|VideoEmbed|EssayThumb)\.astro$/;
 
 const walk = (d) => readdirSync(d).flatMap((f) => { const p = path.join(d, f); return statSync(p).isDirectory() ? walk(p) : /\.(astro|css)$/.test(p) ? [p] : []; });
 
@@ -61,7 +59,6 @@ for (const file of walk(SRC)) {
       if (mh) report(file, n, `min-height ${mh[1]}px has a token: var(${mh[1] === '24' ? '--hit-min' : '--hit-touch'})`);
       const bd = line.match(/\bborder(-(?:top|bottom|left|right|block|inline|block-start|block-end|inline-start|inline-end))?\s*:\s*([^;]+);/);
       if (bd && /\d+px\s+(solid|dashed|dotted|double)/.test(bd[2]) && !/transparent/.test(bd[2]) && !(SIDE_OK.test(rel) && /var\(--c\b/.test(bd[2]))) report(file, n, `border "${bd[2].trim()}" uses a raw width/style; use a --line-* token`);
-      if (bd && /^-(left|right|inline|inline-start|inline-end)$/.test(bd[1] ?? '') && /var\(--line-(hair|ink|heavy)\)/.test(bd[2]) && !SIDE_OK.test(rel)) report(file, n, `vertical ${bd[1].slice(1)} rule from a structural tier; v3 rules are horizontal only`);
       const fs = line.match(/font-size:\s*(\d+px)\s*;/);
       if (fs && FONT_PX[fs[1]]) report(file, n, `font-size ${fs[1]} equals a type token: var(${FONT_PX[fs[1]]})`);
     }

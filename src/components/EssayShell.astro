@@ -1,0 +1,105 @@
+---
+// An essay page in The Pipeline: page head (kicker, title, standfirst, byline, audio), the article with its
+// red reading spine (scripts/reading.ts, shared with every essay), and the related rows. The article content is the default slot; the read-along `data-narr`
+// cues stay on the elements the page puts in it.
+//
+//   <EssayShell slug kicker title dek date readingTime audio articleId>
+//     <p slot="head">...</p>        optional: anything under the audio player
+//     <h2>, <p>, <figure>, ...      the article
+//   </EssayShell>
+import AudioPlayer from './AudioPlayer.astro';
+import { formatDate, formatClock } from '../lib/formatDate';
+import { relatedEssays } from '../lib/essayList';
+import { pipelineEssay as E } from '../data/copy';
+import '../styles/essay.css';
+
+interface Audio {
+  src: string;
+  duration: number;
+  label: string;
+  note: string;
+  chapters?: { id: string; title: string; start: number }[];
+  cues?: [string, number, number][];
+  captions?: string;
+}
+
+interface Props {
+  slug: string;
+  kicker: string;
+  title: string;
+  dek: string;
+  date: string;
+  readingTime: string;
+  audio?: Audio;
+  /** Storage key for the player's resume point. */
+  articleId: string;
+  /** The foot of the page: three other essays (default) or just a plain "All writing" link. */
+  related?: 'list' | 'link';
+}
+
+const { slug, kicker, title, dek, date, readingTime, audio, articleId, related = 'list' } = Astro.props;
+const more = related === 'list' ? relatedEssays(slug) : [];
+---
+
+<section class="page-head gut wr-head" data-article>
+  <div class="in">
+    <p class="kick">{kicker}</p>
+    <h1 class="display split" data-narr="s0-title">{title}</h1>
+    <p class="wr-dek" data-narr="s0-dek">{dek}</p>
+    <div class="byline meta">
+      <span><b>{E.author}</b></span>
+      <span>{E.kind}</span>
+      <span><time datetime={date}>{formatDate(date)}</time></span>
+      <span>{readingTime} {E.read}</span>
+      {audio && <span><a href="#listen">{E.listen} {formatClock(audio.duration)}</a></span>}
+    </div>
+    {audio && <AudioPlayer audio={audio} articleId={articleId} />}
+    <slot name="head" />
+  </div>
+</section>
+
+<section class="rs gut">
+  <div class="in">
+    <div class="rs-in prose" id="article">
+      <slot />
+      {
+        Astro.slots.has('footnotes') && (
+          <div class="footnotes" id="footnotes">
+            <slot name="footnotes" />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+{
+  related === 'list' && (
+    <section class="sec gut">
+      <div class="in">
+        <p class="kick">{E.relatedKick}</p>
+        <h2 class="h2 split">{E.relatedTitle}</h2>
+        <ol class="blist" data-stagger>
+          {more.map((x) => (
+            <li>
+              <a class="build" href={x.href}>
+                <span class="bn">{x.title}</span>
+                <span class="bk2">{x.kicker}</span>
+                <span class="bv">{x.num ? `${x.num.display} ${x.num.unit}` : ''}</span>
+                <span class="ba" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <div class="ctas wr-all">
+          <a class="tl" href="/writing/">{E.allWriting}</a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<script>
+  import { reading } from '../scripts/reading';
+  reading();
+</script>

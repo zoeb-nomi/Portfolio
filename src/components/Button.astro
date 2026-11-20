@@ -1,88 +1,26 @@
 ---
+// A button or link in the kit's grammar. `primary` is the red `.btn` (the arrow nudges 3px, nothing else moves),
+// `secondary` the outlined `.btn.ghost`, `link` (and the old `inverse`) the underlined mono `.tl`. A trailing → or ↗
+// in the label is replaced by the button's own arrow. External hrefs open in a new tab.
 import { isExternal } from '../lib/isExternal';
 
 interface Props {
   href: string;
-  variant?: 'primary' | 'secondary' | 'inverse';
+  variant?: 'primary' | 'secondary' | 'inverse' | 'link';
   class?: string;
+  /** Show the arrow on `.btn` buttons. */
+  arrow?: boolean;
 }
 
-const { href, variant = 'secondary', class: className = '' } = Astro.props;
+const { href, variant = 'secondary', class: className = '', arrow = true } = Astro.props;
 const external = isExternal(href);
+const raw = await Astro.slots.render('default');
+const label = raw.replace(/\s*(?:→|↗|&rarr;)\s*$/, '').trim();
+const isLink = variant === 'link' || variant === 'inverse';
+const classes = isLink ? 'tl' : variant === 'primary' ? 'btn' : 'btn ghost';
+const glyph = external ? '↗' : '→';
 ---
 
-<a
-  href={href}
-  class={`rp-button rp-button--${variant} ${className}`}
-  target={external ? '_blank' : undefined}
-  rel={external ? 'noopener noreferrer' : undefined}
->
-  <slot />
+<a href={href} class:list={[classes, className]} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
+  {isLink ? <Fragment set:html={raw} /> : <><span class="mi" set:html={label} />{arrow && <span class="ar" aria-hidden="true">{glyph}</span>}</>}
 </a>
-
-<style>
-  .rp-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--hit-touch);
-    padding: 14px 24px;
-    font-family: var(--font-text);
-    font-weight: var(--wght-strong);
-    font-stretch: calc(var(--wdth-head) * 1%);
-    font-size: 16px;
-    text-decoration: none;
-    border-radius: var(--radius);
-    border: 1px solid transparent;
-    transition: background-color var(--dur-fast) var(--ease-draw), color var(--dur-fast) var(--ease-draw),
-      border-color var(--dur-fast) var(--ease-draw), transform var(--dur-fast) var(--ease-draw),
-      box-shadow var(--dur-fast) var(--ease-draw);
-  }
-
-  /* Red Pen 5: a button is an object on the desk. Hover lifts it off the paper; press sets it down. */
-  .rp-button:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: 3px 3px 0 var(--color-text);
-  }
-
-  .rp-button:active {
-    transform: none;
-    box-shadow: none;
-  }
-
-  .rp-button--primary {
-    background: var(--color-accent-text);
-    color: var(--color-on-accent);
-    border-color: var(--color-accent-text);
-  }
-
-  .rp-button--primary:hover {
-    background: var(--color-accent-text);
-    border-color: var(--color-text);
-  }
-
-  .rp-button--secondary {
-    background: transparent;
-    color: var(--color-text);
-    border-color: var(--color-line-strong);
-  }
-
-  .rp-button--secondary:hover {
-    background: var(--color-text);
-    color: var(--color-surface);
-  }
-
-  .rp-button--inverse {
-    background: var(--color-surface);
-    color: var(--color-accent-text);
-    border-color: var(--color-surface);
-  }
-
-  /* paper -> paper-raised was 1.06:1, i.e. no visible hover on the red slab.
-     Same ink fill as the secondary variant. */
-  .rp-button--inverse:hover {
-    background: var(--color-text);
-    border-color: var(--color-text);
-    color: var(--color-surface);
-  }
-</style>

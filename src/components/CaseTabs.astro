@@ -1,0 +1,23 @@
+---
+// The three-harness switcher at the top of each case study.
+import { evalsSwitcher, pipelineCaseStudies as P } from '../data/copy';
+
+interface Props {
+  current: number;
+  repoHref: string;
+  repoLabel: string;
+}
+
+const { current, repoHref, repoLabel } = Astro.props;
+---
+
+<div class="gut">
+  <div class="in">
+    <nav class="cs-tabs" aria-label={P.shared.tabsLabel}>
+      {evalsSwitcher.map((e, i) => (
+        <a href={e.href} aria-current={i === current ? 'page' : undefined}><i>{String(i + 1).padStart(2, '0')}</i>{e.name}</a>
+      ))}
+      <a class="cs-repo" href={repoHref} target="_blank" rel="noopener noreferrer">{repoLabel} <span aria-hidden="true">{P.shared.ext}</span></a>
+    </nav>
+  </div>
+</div>
