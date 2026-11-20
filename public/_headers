@@ -1,6 +1,8 @@
 # TODO — Content-Security-Policy. When it lands, the video facade on /work/
 # needs: frame-src https://www.youtube-nocookie.com
 # Nothing else, except: posters are self-hosted, but one bus-stop Watch card hotlinks its poster from i.ytimg.com (Zoeb's decision), so a future CSP also needs img-src https://i.ytimg.com.
+# The home harness panel reads the agent ledger, so a future CSP also needs
+# connect-src https://agent-ledger.zoeb-nomi5699.workers.dev wss://agent-ledger.zoeb-nomi5699.workers.dev
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: DENY

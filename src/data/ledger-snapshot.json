@@ -1,0 +1,138 @@
+{
+  "v": 1,
+  "generated_at": "2026-11-20T10:35:50.605Z",
+  "last_event_at": "2026-11-20T10:35:00.000Z",
+  "live": {
+    "day": "2026-11-20",
+    "tz": "Asia/Kolkata",
+    "agent_runs_today": 7,
+    "subagent_runs_today": 2,
+    "sessions_ended_today": 0,
+    "claude_tokens_today": {
+      "main": 0,
+      "subagent": 0
+    },
+    "claude_list_price_usd_today": {
+      "main": 0,
+      "subagent": 0
+    }
+  },
+  "outcomes": {
+    "since": "2026-11-10",
+    "shipped_7d": 74,
+    "shipped_total": 138,
+    "caught_7d": 16,
+    "caught_total": 26,
+    "caught_breakdown": {
+      "dropped": 3,
+      "sent_back": 0,
+      "seeded": 23
+    },
+    "cost": {
+      "api_usd_total": 47.76,
+      "fixed_usd_prorated": 40.37,
+      "all_in_per_shipped_usd": 0.64,
+      "api_per_shipped_usd": 0.35,
+      "generations_without_cost": 0,
+      "claude_list_price_usd": {
+        "main": 0,
+        "subagent": 0,
+        "tokens_main": 0,
+        "tokens_subagent": 0,
+        "note": "Claude Code on the Max plan: list-price equivalent, not money spent"
+      }
+    },
+    "readout": {
+      "on_time": {
+        "x": 97,
+        "y": 106,
+        "status": "measured",
+        "scope": "harness items with a due date, to 2026-11-19"
+      },
+      "median_wait_for_review_min": {
+        "value": 4,
+        "n": 114,
+        "p80": 52,
+        "status": "measured",
+        "scope": "harness, ready to merged, to 2026-11-19"
+      }
+    }
+  },
+  "days": [
+    {
+      "date": "2026-11-07",
+      "shipped": 0,
+      "caught": 0
+    },
+    {
+      "date": "2026-11-08",
+      "shipped": 0,
+      "caught": 0
+    },
+    {
+      "date": "2026-11-09",
+      "shipped": 0,
+      "caught": 0
+    },
+    {
+      "date": "2026-11-10",
+      "shipped": 11,
+      "caught": 1
+    },
+    {
+      "date": "2026-11-11",
+      "shipped": 15,
+      "caught": 3
+    },
+    {
+      "date": "2026-11-12",
+      "shipped": 26,
+      "caught": 5
+    },
+    {
+      "date": "2026-11-13",
+      "shipped": 12,
+      "caught": 1
+    },
+    {
+      "date": "2026-11-14",
+      "shipped": 14,
+      "caught": 2
+    },
+    {
+      "date": "2026-11-15",
+      "shipped": 7,
+      "caught": 0
+    },
+    {
+      "date": "2026-11-16",
+      "shipped": 11,
+      "caught": 0
+    },
+    {
+      "date": "2026-11-17",
+      "shipped": 32,
+      "caught": 8
+    },
+    {
+      "date": "2026-11-18",
+      "shipped": 2,
+      "caught": 0
+    },
+    {
+      "date": "2026-11-19",
+      "shipped": 4,
+      "caught": 3
+    },
+    {
+      "date": "2026-11-20",
+      "shipped": 4,
+      "caught": 3
+    }
+  ],
+  "seed": {
+    "seeded_through": "2026-11-19T20:59:00Z",
+    "version": 2,
+    "refused_version": null
+  }
+}

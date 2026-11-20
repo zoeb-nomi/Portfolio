@@ -1,91 +1,250 @@
 ---
-// The harness panel (Red Pen 5, home): a small dashboard of Zoeb's agent harness, the system he hands work to.
-// Four tiles and a bar per recent item (agent minutes; hover or focus a bar for its kind, slip and model).
-// Data: the committed pilot snapshot (copy.ts `shipping`) renders in the HTML; on load the panel asks the public
-// shipping log (home.v5.harness.liveUrl) for fresher numbers and swaps them in if the file exists and parses.
-// Nothing is hidden while it waits; a failed fetch leaves the snapshot and its label.
-import { home, shipping } from '../data/copy';
+// The harness panel (Red Pen 5, home): Zoeb's agent harness, counted as it runs, on the ink surface.
+// Two groups kept apart: live activity (agent and subagent runs today) and outcomes (tasks closed and caught
+// before merge in the last 7 days, all-in cost per closed task, median wait for review), then a 14-day unit
+// grid: one square per task, closed in the text colour, caught in the pen (annotation only). Select a day for
+// its counts. Data: the committed ledger snapshot (src/data/ledger-snapshot.json) is the HTML; on load the
+// panel reads the agent ledger's public summary and holds its WebSocket, so numbers move while a visitor
+// watches. Any error leaves the snapshot. Status: "Live, last event <time>" or "Last updated <date>" in
+// graphite when the newest event is old. No count-up motion: a live number must never be rewound to the
+// snapshot. Motion: the live dot pulses; a day column marks on hover or focus.
+import { home } from '../data/copy';
+import snapshot from '../data/ledger-snapshot.json';
 
 const h = home.v5.harness;
-const items = shipping.table.rows.map(([week, kind, min, slip, cost, model]) => ({ week, kind, min: Number(min), slip, cost, model }));
-const maxMin = Math.max(...items.map((i) => i.min));
-const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it.min} agent min · slip ${it.slip} d · API ${it.cost} USD · ${it.model}`;
+type Summary = typeof snapshot;
+const s: Summary = snapshot;
+
+const fill = (t: string, v: Record<string, string | number>) => t.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
+const money = (n: number | null | undefined) => (typeof n === 'number' ? `$${n.toFixed(2)}` : 'n/a');
+const dayLabel = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const o = s.outcomes;
+const ro = o.readout as { on_time?: { x: number; y: number }; median_wait_for_review_min?: { value: number } };
+const outcomeValues = [
+  { v: String(o.shipped_7d), sub: fill(h.since, { n: o.shipped_total }) },
+  { v: String(o.caught_7d), sub: fill(h.since, { n: o.caught_total }) },
+  { v: money(o.cost.all_in_per_shipped_usd), sub: '' },
+  { v: String(ro.median_wait_for_review_min?.value ?? 'n/a'), unit: h.waitUnit, sub: '' },
+];
+const liveValues = [s.live.agent_runs_today, s.live.subagent_runs_today];
+const readout = fill(h.readout, { api: money(o.cost.api_per_shipped_usd), x: ro.on_time?.x ?? '?', y: ro.on_time?.y ?? '?' });
+const detail = (d: { date: string; shipped: number; caught: number }) =>
+  fill(h.dayDetail, { date: dayLabel(d.date), s: d.shipped, c: d.caught });
+const staleText = `${h.staleLabel} ${dayLabel(s.generated_at.slice(0, 10))}`;
+const caption = fill(h.gridCaption, { from: dayLabel(s.days[0].date), to: dayLabel(s.days[s.days.length - 1].date) });
 ---
 
-<div class="hp surface-ink" data-hp data-live-url={h.liveUrl} data-live-label={h.liveLabel}>
+<div
+  class="hp surface-ink"
+  data-hp
+  data-ledger={h.ledgerUrl}
+  data-live-label={h.liveLabel}
+  data-stale-label={h.staleLabel}
+  data-since={h.since}
+  data-readout={h.readout}
+  data-day-detail={h.dayDetail}
+  data-caption={h.gridCaption}
+>
   <div class="hp-bar">
-    <span class="hp-status" data-hp-status><i class="hp-dot" aria-hidden="true"></i><span data-hp-label>{h.snapshotLabel}</span></span>
-    <a class="hp-more" href={h.more.href}>{h.more.label} →</a>
+    <span class="hp-status" data-hp-status><i class="hp-dot" aria-hidden="true"></i><span data-hp-label>{staleText}</span></span>
   </div>
 
-  <dl class="hp-tiles">
-    {
-      shipping.tiles.map((t, i) => (
-        <div class="hp-tile">
-          <dt class="hp-v" data-hp-tile={i}>
-            <span data-tally>{t.value}</span>
-            {t.unit && <span class="hp-u">{t.unit}</span>}
-          </dt>
-          <dd class="hp-l" title={t.label}>{h.tileLabels[i] ?? t.label}</dd>
-        </div>
-      ))
-    }
-  </dl>
-
-  <figure class="hp-items">
-    <figcaption class="hp-cap">{h.itemsCaption}</figcaption>
-    <ol class="hp-bars" data-hp-bars>
+  <section class="hp-group hp-live" aria-labelledby="hp-g-live">
+    <h3 class="hp-gh" id="hp-g-live">{h.groups.live}</h3>
+    <dl class="hp-tiles hp-tiles-2">
       {
-        items.map((it) => (
-          <li class="hp-row" tabindex="0" style={`--v:${(it.min / maxMin).toFixed(3)}`} data-detail={detail(it)}>
-            <span class="hp-k">{it.kind}</span>
-            <span class="hp-track">
-              <span class="hp-fill" />
+        liveValues.map((v, i) => (
+          <div class="hp-tile">
+            <dt class="hp-l">{h.liveTiles[i]}</dt>
+            <dd class="hp-v" data-hp-live={i}>{v}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="hp-group" aria-labelledby="hp-g-out">
+    <h3 class="hp-gh" id="hp-g-out">{h.groups.outcomes}</h3>
+    <dl class="hp-tiles">
+      {
+        outcomeValues.map((t, i) => (
+          <div class="hp-tile">
+            <dt class="hp-l">{h.outcomeTiles[i]}</dt>
+            <dd class="hp-v">
+              <span data-hp-out={i}>{t.v}</span>
+              {t.unit && <span class="hp-u">{t.unit}</span>}
+            </dd>
+            {t.sub && <dd class="hp-s" data-hp-sub={i}>{t.sub}</dd>}
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <figure class="hp-grid">
+    <figcaption class="hp-cap" data-hp-cap>{caption}</figcaption>
+    <ol class="hp-days" data-hp-days>
+      {
+        s.days.map((d) => (
+          <li class="hp-day" tabindex="0" aria-label={detail(d)} data-date={d.date} data-detail={detail(d)}>
+            <span class="hp-stack" aria-hidden="true">
+              {Array.from({ length: d.caught }, () => <i class="hp-sq is-caught" />)}
+              {Array.from({ length: d.shipped }, () => <i class="hp-sq" />)}
             </span>
-            <span class="hp-n">{it.min}</span>
           </li>
         ))
       }
     </ol>
-    <p class="hp-readout" aria-live="polite" data-hp-readout>{h.hint}</p>
+    <p class="hp-readout" aria-live="polite" data-hp-readout data-default={readout}>{readout}</p>
   </figure>
+
+  <details class="hp-how">
+    <summary>{h.how.summary}</summary>
+    <ul>{h.how.items.map((t) => <li>{t}</li>)}</ul>
+  </details>
 </div>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-hp]').forEach((hp) => {
-    const readout = hp.querySelector<HTMLElement>('[data-hp-readout]')!;
-    const hint = readout.textContent ?? '';
-    hp.querySelectorAll<HTMLElement>('.hp-row').forEach((row) => {
-      const on = () => (readout.textContent = row.dataset.detail ?? '');
-      const off = () => (readout.textContent = hint);
-      row.addEventListener('pointerenter', on);
-      row.addEventListener('focus', on);
-      row.addEventListener('pointerleave', off);
-      row.addEventListener('blur', off);
-    });
+  type Day = { date: string; shipped: number; caught: number };
+  type Summary = {
+    last_event_at: string | null;
+    live: { agent_runs_today: number; subagent_runs_today: number };
+    outcomes: {
+      shipped_7d: number; shipped_total: number; caught_7d: number; caught_total: number;
+      cost: { all_in_per_shipped_usd: number | null; api_per_shipped_usd: number | null };
+      readout: { on_time?: { x: number; y: number }; median_wait_for_review_min?: { value: number } };
+    };
+    days: Day[];
+  };
+  const STALE_MS = 3 * 3600 * 1000;
+  const POLL_MS = 60 * 1000;
 
-    // Live data: the public shipping log (I17). Expected shape: { updated, tiles: [{ value, unit?, label }] }.
-    const url = hp.dataset.liveUrl;
-    if (!url) return;
-    fetch(url, { cache: 'no-cache' })
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((d: { updated?: string; tiles?: { value: string; unit?: string; label: string }[] }) => {
-        if (!d?.tiles?.length) return;
-        // Third-party file: accept short strings only, so a bad or hostile file cannot flood the layout.
-        const short = (v: unknown, n: number) => (typeof v === 'string' || typeof v === 'number' ? String(v).slice(0, n) : '');
-        d.tiles.slice(0, 4).forEach((t, i) => {
-          const dt = hp.querySelector<HTMLElement>(`[data-hp-tile="${i}"]`);
-          const dd = dt?.nextElementSibling as HTMLElement | null;
-          const value = short(t?.value, 12);
-          const label = short(t?.label, 60);
-          if (!dt || !dd || !value || !label) return;
-          dt.querySelector('[data-tally]')!.textContent = value;
-          dd.textContent = label;
+  // The ledger is a third party to this page: accept only finite non-negative numbers and ISO dates.
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null);
+  const isoDay = (v: unknown) => (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null);
+  const fill = (t: string, v: Record<string, string | number>) => t.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
+  const money = (n: number | null) => (n === null ? 'n/a' : `$${n.toFixed(2)}`);
+  const dayLabel = (iso: string) =>
+    new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const timeIST = (iso: string) =>
+    new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }) + ' IST';
+
+  document.querySelectorAll<HTMLElement>('[data-hp]').forEach((hp) => {
+    const $ = <T extends HTMLElement>(sel: string) => hp.querySelector<T>(sel);
+    const readout = $('[data-hp-readout]')!;
+    const ds = hp.dataset;
+    let active: HTMLElement | null = null;
+
+    const wireDays = () => {
+      hp.querySelectorAll<HTMLElement>('.hp-day').forEach((day) => {
+        const on = () => { active = day; readout.textContent = day.dataset.detail ?? ''; };
+        const off = () => { active = null; readout.textContent = readout.dataset.default ?? ''; };
+        day.addEventListener('pointerenter', on);
+        day.addEventListener('focus', on);
+        day.addEventListener('pointerleave', off);
+        day.addEventListener('blur', off);
+      });
+    };
+    wireDays();
+
+    const setText = (sel: string, text: string) => {
+      const el = $(sel);
+      if (el && el.textContent !== text) el.textContent = text;
+    };
+
+    const render = (d: Summary) => {
+      const live = d?.live, o = d?.outcomes;
+      if (!live || !o || !Array.isArray(d.days)) return;
+      const a = num(live.agent_runs_today), b = num(live.subagent_runs_today);
+      if (a !== null) setText('[data-hp-live="0"]', String(a));
+      if (b !== null) setText('[data-hp-live="1"]', String(b));
+      const s7 = num(o.shipped_7d), st = num(o.shipped_total), c7 = num(o.caught_7d), ct = num(o.caught_total);
+      if (s7 !== null) setText('[data-hp-out="0"]', String(s7));
+      if (c7 !== null) setText('[data-hp-out="1"]', String(c7));
+      setText('[data-hp-out="2"]', money(num(o.cost?.all_in_per_shipped_usd)));
+      const wait = num(o.readout?.median_wait_for_review_min?.value);
+      if (wait !== null) setText('[data-hp-out="3"]', String(wait));
+      if (st !== null) setText('[data-hp-sub="0"]', fill(ds.since ?? '', { n: st }));
+      if (ct !== null) setText('[data-hp-sub="1"]', fill(ds.since ?? '', { n: ct }));
+      const ot = o.readout?.on_time;
+      readout.dataset.default = fill(ds.readout ?? '', {
+        api: money(num(o.cost?.api_per_shipped_usd)), x: num(ot?.x) ?? '?', y: num(ot?.y) ?? '?',
+      });
+      if (!active) readout.textContent = readout.dataset.default;
+
+      // Rebuild the 14 day columns from validated numbers only (createElement, never innerHTML).
+      const days = d.days.slice(-14).map((x) => ({ date: isoDay(x?.date), s: Math.min(num(x?.shipped) ?? 0, 99), c: Math.min(num(x?.caught) ?? 0, 99) }));
+      if (days.length === 14 && days.every((x) => x.date)) {
+        const ol = $('[data-hp-days]')!;
+        const focused = (document.activeElement as HTMLElement | null)?.dataset?.date;
+        const cols = days.map((x) => {
+          const text = fill(ds.dayDetail ?? '', { date: dayLabel(x.date!), s: x.s, c: x.c });
+          const li = document.createElement('li');
+          li.className = 'hp-day';
+          li.tabIndex = 0;
+          li.dataset.date = x.date!;
+          li.dataset.detail = text;
+          li.setAttribute('aria-label', text);
+          const stack = document.createElement('span');
+          stack.className = 'hp-stack';
+          stack.setAttribute('aria-hidden', 'true');
+          for (let i = 0; i < x.c; i++) { const q = document.createElement('i'); q.className = 'hp-sq is-caught'; stack.append(q); }
+          for (let i = 0; i < x.s; i++) { const q = document.createElement('i'); q.className = 'hp-sq'; stack.append(q); }
+          li.append(stack);
+          return li;
         });
-        hp.querySelector('[data-hp-label]')!.textContent = `${hp.dataset.liveLabel} ${short(d.updated, 24)}`.trim();
-        hp.querySelector('[data-hp-status]')!.setAttribute('data-live', '');
-      })
-      .catch(() => {});
+        ol.replaceChildren(...cols);
+        wireDays();
+        if (focused) ol.querySelector<HTMLElement>(`[data-date="${focused}"]`)?.focus();
+        active = null;
+        setText('[data-hp-cap]', fill(ds.caption ?? '', { from: dayLabel(days[0].date!), to: dayLabel(days[13].date!) }));
+      }
+
+      // Status: live while the newest event is recent; otherwise the date, in graphite.
+      const last = typeof d.last_event_at === 'string' ? Date.parse(d.last_event_at) : NaN;
+      const fresh = Number.isFinite(last) && Date.now() - last < STALE_MS;
+      const status = $('[data-hp-status]')!;
+      if (fresh) {
+        setText('[data-hp-label]', `${ds.liveLabel} ${timeIST(d.last_event_at!)}`);
+        status.setAttribute('data-live', '');
+      } else {
+        setText('[data-hp-label]', `${ds.staleLabel} ${dayLabel(new Date(Number.isFinite(last) ? last : Date.now()).toISOString().slice(0, 10))}`);
+        status.removeAttribute('data-live');
+      }
+    };
+
+    const base = ds.ledger;
+    if (!base || !/^https:\/\//.test(base)) return;
+    const pull = () =>
+      fetch(`${base}/v1/summary`, { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then(render)
+        .catch(() => {});
+
+    // Live: one WebSocket (the ledger pushes the summary on connect and on every event). If it cannot open or
+    // drops, poll the summary once a minute while the tab is visible.
+    let timer = 0;
+    const poll = () => {
+      if (timer) return;
+      timer = window.setInterval(() => document.visibilityState === 'visible' && pull(), POLL_MS);
+    };
+    const connect = () => {
+      try {
+        const ws = new WebSocket(base.replace(/^https:/, 'wss:') + '/v1/live');
+        ws.addEventListener('message', (e) => {
+          if (typeof e.data !== 'string' || e.data.length > 20000) return;
+          try { render(JSON.parse(e.data)); } catch { /* ignore a bad frame */ }
+        });
+        ws.addEventListener('close', poll);
+        ws.addEventListener('error', poll);
+      } catch {
+        poll();
+      }
+    };
+    pull().then(connect);
+    // A new IST day while the page stays open: refetch so "today" and the grid roll over.
+    document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && pull());
   });
 </script>
 
@@ -112,7 +271,7 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
     display: inline-flex;
     align-items: center;
     gap: var(--s-2);
-    color: var(--color-text-muted);
+    color: var(--color-pending);
   }
 
   .hp-dot {
@@ -120,6 +279,10 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
     block-size: 8px;
     border-radius: 50%;
     background: var(--color-pending);
+  }
+
+  .hp-status[data-live] {
+    color: var(--color-text-muted);
   }
 
   .hp-status[data-live] .hp-dot {
@@ -133,29 +296,47 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
     }
   }
 
-  .hp-more {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--hit-touch);
-    color: var(--color-accent-text);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+  .hp-group {
+    margin-top: var(--s-6);
+  }
+
+  .hp-live {
+    padding-bottom: var(--s-6);
+    border-bottom: var(--line-hair);
+  }
+
+  .hp-gh {
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    font-weight: 500;
+    color: var(--color-text-muted);
   }
 
   .hp-tiles {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--s-6);
-    margin-top: var(--s-6);
+    margin-top: var(--s-3);
+  }
+
+  .hp-tiles-2 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .hp-tile {
+    display: flex;
+    flex-direction: column;
   }
 
   .hp-v {
+    order: -1;
     font-family: var(--font-heading);
     font-size: var(--t-num);
     font-weight: var(--wght-claim);
     font-stretch: calc(var(--wdth-tight) * 1%);
     line-height: 1;
     letter-spacing: var(--track-display);
+    font-variant-numeric: tabular-nums;
     color: var(--color-text);
   }
 
@@ -171,69 +352,104 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
     color: var(--color-text-body);
   }
 
-  .hp-items {
+  .hp-s,
+  .hp-cap,
+  .hp-readout,
+  .hp-how {
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    line-height: var(--lh-snug);
+    color: var(--color-text-muted);
+  }
+
+  .hp-s {
+    margin-top: var(--s-1);
+  }
+
+  .hp-grid {
     margin-top: var(--s-8);
     padding-top: var(--s-4);
     border-top: var(--line-hair);
   }
 
-  .hp-cap,
-  .hp-readout {
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-muted);
-  }
-
-  .hp-bars {
+  .hp-days {
     list-style: none;
     display: grid;
-    gap: 6px;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    align-items: end;
+    gap: var(--s-1);
     margin-top: var(--s-3);
+    min-block-size: var(--s-13);
+    border-bottom: var(--line-hair);
   }
 
-  .hp-row {
-    display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr) 3rem;
-    align-items: center;
-    gap: var(--s-3);
-    min-block-size: var(--hit-min);
-    font-family: var(--font-data);
-    font-size: var(--t-label);
-    color: var(--color-text-body);
+  /* Day columns and squares are rebuilt by the script on every update, so they carry no Astro scope
+     attribute: their rules are global under the scoped .hp-days list. */
+  .hp-days :global(.hp-day) {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    min-block-size: var(--s-13);
+    padding-bottom: var(--s-1);
   }
 
-  .hp-row:focus-visible {
+  .hp-days :global(.hp-day:focus-visible) {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
-  .hp-track {
-    block-size: 10px;
-    background: var(--color-surface);
+  .hp-days :global(.hp-stack) {
+    display: flex;
+    flex-wrap: wrap-reverse;
+    align-content: flex-start;
+    gap: 2px;
+    inline-size: calc(3 * 6px + 2 * 2px);
   }
 
-  .hp-fill {
-    display: block;
-    block-size: 100%;
-    inline-size: calc(var(--v) * 100%);
-    background: var(--color-text-muted);
-    transition: background-color var(--dur-fast) var(--ease-draw);
+  .hp-days :global(.hp-sq) {
+    display: inline-block;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--color-text-body);
   }
 
-  .hp-row:hover .hp-fill,
-  .hp-row:focus-visible .hp-fill {
+  .hp-days :global(.hp-sq.is-caught) {
     background: var(--color-accent);
   }
 
-  .hp-n {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
+  .hp-days :global(.hp-day:hover .hp-sq:not(.is-caught)),
+  .hp-days :global(.hp-day:focus-visible .hp-sq:not(.is-caught)) {
+    background: var(--color-text);
   }
 
   .hp-readout {
-    margin-top: var(--s-3);
+    margin-top: var(--s-2);
     min-block-size: calc(2 * var(--lh-snug) * var(--t-label));
     color: var(--color-text);
+  }
+
+  .hp-how {
+    margin-top: var(--s-4);
+    padding-top: var(--s-3);
+    border-top: var(--line-hair);
+  }
+
+  .hp-how summary {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--hit-touch);
+    cursor: pointer;
+    color: var(--color-accent-text);
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
+
+  .hp-how ul {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+    padding-left: var(--s-4);
+    color: var(--color-text-body);
   }
 
   @media (max-width: 899px) {
@@ -242,12 +458,19 @@ const detail = (it: (typeof items)[number]) => `${it.week} · ${it.kind} · ${it
       box-shadow: 6px 6px 0 var(--color-pending);
     }
 
-    .hp-tiles {
+    .hp-tiles,
+    .hp-tiles-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .hp-row {
-      grid-template-columns: 6rem minmax(0, 1fr) 2.5rem;
+    .hp-days :global(.hp-stack) {
+      inline-size: calc(2 * 5px + 2px);
+      gap: 2px;
+    }
+
+    .hp-days :global(.hp-sq) {
+      inline-size: 5px;
+      block-size: 5px;
     }
   }
 </style>

@@ -348,18 +348,37 @@ export const home = {
     harness: {
       h2: 'My agent harness, counted as it runs.',
       sub: 'I hand work to agents. Each item gets an acceptance line and a due date, and is checked before I merge it.',
-      // Short tile labels for the home panel; the full definitions stay on /builds/#shipping.
-      tileLabels: ['items shipped since 10 Nov', 'on time', 'API spend per item', 'median, ready to merged'],
-      // Runtime source (I17 tracker, decision D1): the public shipping log, refreshed nightly. Until it exists the
-      // panel shows the pilot snapshot below, labelled as such. Empty = no fetch (a 404 fails CI and logs a console
-      // error for visitors). Set to 'https://cdn.jsdelivr.net/gh/zoeb-nomi/shipping-log@main/shipping.json' once
-      // that repo is public.
-      liveUrl: '',
-      snapshotLabel: 'Pilot data, 10–11 Nov; live feed soon',
-      liveLabel: 'Live, updated',
-      itemsCaption: 'Agent minutes per item',
-      hint: 'Select a bar.',
-      more: { label: 'How this is measured', href: '/builds/#shipping' },
+      // Runtime source: the agent ledger (hq 00_infra/agent-ledger), a Cloudflare Worker that every place an agent
+      // runs pushes a signed event to. The panel renders the committed snapshot (src/data/ledger-snapshot.json),
+      // then reads /v1/summary and holds /v1/live (WebSocket) so numbers move while a visitor watches. Any error
+      // leaves the snapshot. Empty = no fetch.
+      ledgerUrl: 'https://agent-ledger.zoeb-nomi5699.workers.dev',
+      liveLabel: 'Live, last event',
+      staleLabel: 'Last updated',
+      // Home's copy budget gives the panel about 60 visible words (scripts/copy-budget.mjs); the definitions sit in
+      // the closed "how these count" disclosure, which the budget does not count.
+      groups: { live: 'Today', outcomes: 'Outcomes' },
+      liveTiles: ['agent runs', 'subagent runs'],
+      outcomeTiles: ['closed, 7 days', 'caught, 7 days', 'all-in per task', 'review wait'],
+      since: '{n} since 10 Nov',
+      waitUnit: 'min',
+      // The readout line: this text until a day is selected, then that day's counts.
+      readout: 'API only {api}. On time {x} of {y}.',
+      gridCaption: '{from} to {to}: a square per closed task, red if caught',
+      legend: { closed: 'closed', caught: 'caught' },
+      dayDetail: '{date}: {s} closed, {c} caught',
+      how: {
+        summary: 'How these count',
+        items: [
+          'Every place an agent of mine runs sends a signed event the moment the work finishes. Nothing is polled and nothing on this page is typed in by hand.',
+          'Work I do with Claude in the app counts only when its task closes.',
+          'Closed: the task reached Done. For work my agent harness runs, that is when its pull request opens for my review, before I merge it.',
+          'Caught before merge: dropped after work started, or sent back after it was done.',
+          'All-in cost per task: API spend plus my $100 Claude plan and $13.50 server, prorated by day, divided by tasks closed since 10 Nov. API only is the API spend alone.',
+          'Agent and subagent runs: Claude Code turns and the subagents they start, counted today in India time.',
+          'On time and the wait for my review (ready to merged, median) are from the harness records up to 19 Nov; no live source carries them yet.',
+        ],
+      },
     },
     claim2Pre: 'I ship the workflow and ',
     claim2Pen: 'the checks that catch it.',
