@@ -1,5 +1,5 @@
 {
-  "/": "2026-11-12",
+  "/": "2026-11-21",
   "/about/": "2026-11-12",
   "/crosssource/": "2026-10-04",
   "/mirror-eval/": "2026-10-04",
@@ -13,5 +13,6 @@
   "/writing/two-levers-that-did-not-move/": "2026-10-04",
   "/notes/claude-zero-of-63/": "2026-10-11",
   "/notes/cheap-tier-workflows/": "2026-10-16",
-  "/builds/": "2026-11-12"
+  "/builds/": "2026-11-21",
+  "/mcp/": "2026-11-21"
 }
