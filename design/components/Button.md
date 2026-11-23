@@ -29,7 +29,7 @@ Still: nothing lifts or casts a shadow. Hover and focus move only the arrow 3px 
 Native link semantics, so Enter activates it. The button is 48px tall. Focus uses the global 2px accent outline. The arrow is decorative.
 
 ## Light and dark
-Primary is `--color-accent` with `--color-on-accent` text, and hover mixes toward the text role. Both are role-driven, so the light theme's deeper red stays AA on paper.
+Primary fills with `--color-accent-fill` (the red under text, not the line red `--color-accent`) with `--color-on-accent` text, and hover and focus switch the fill to `--color-accent-hover`, a deeper red. Both are role-driven, so the label stays AA in both themes: 4.8:1 at rest and 5.9:1 on hover in dark, 5.2:1 and 6.3:1 in light.
 
 ## Used on
 Through `CTASlab` on every essay and note.

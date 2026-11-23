@@ -75,7 +75,9 @@
   --color-on-accent: var(--on-red);
   --color-on-accent-muted: var(--on-red);
   --color-accent-fill: var(--red-fill);
-  --color-accent-hover: color-mix(in srgb, var(--red-fill) 88%, var(--ink));
+  /* Hover deepens the fill in both themes: the label keeps AA (dark 5.9:1, light 6.3:1).
+     Mixing toward --ink lightened it in dark to 4.1:1. */
+  --color-accent-hover: color-mix(in srgb, var(--red-fill) 88%, black);
   --color-link: var(--ink);
   /* Translucent washes of ink for tracks and bands, and of red for guide lines (figures, the axis pad). */
   --color-wash: color-mix(in srgb, var(--ink) 5%, transparent);
@@ -129,7 +131,7 @@
   --t-h4: clamp(19px, 1.6vw, 23px);         --w-h4: 90;      --g-h4: 700;
   --t-num: clamp(20px, 1.85vw, 27px);       --w-num: 90;     --g-num: 780;
   --t-prose: clamp(17px, 1.15vw, 19px);
-  --t-body: 16px;
+  --t-body: 16px;                                            --g-body: var(--wght-text);
   --t-small: 15px;
   --t-data: 13px;
   --t-nav: 12px;

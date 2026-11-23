@@ -26,7 +26,7 @@ The nav underline draws in on hover and focus (500ms, once). The toggle itself i
 A `header` landmark and a labelled `nav`; the toggle is a real button whose label names the theme it switches to; the `.skip` link in `Base.astro` comes first.
 
 ## Light and dark
-This is the theme switch: dark by default, paper on request. The bar uses `--color-glass` with a blur, so the page reads through it in both.
+This is the theme switch: dark by default, paper on request. The bar uses `--color-glass-strong`, a solid translucent tint with no `backdrop-filter` (design/README.md section 8, rule 8: a sticky bar never re-blurs a moving canvas), so the page shows faintly through it in both.
 
 ## Used on
 Every page, through `src/layouts/Base.astro`.
